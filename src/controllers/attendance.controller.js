@@ -1,152 +1,171 @@
 const prisma = require('../config/prisma');
 
 /**
- * Web Clock Check-In
- * POST /api/attendance/check-in
+ * Biometric Hardware Device Attendance Sync Endpoint
+ * POST /api/attendance/hardware-sync
+ * Security: Validates x-hardware-key header
  */
-const checkIn = async (req, res) => {
+const hardwareSync = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
-    const userId = req.user.userId;
-    const { notes } = req.body;
+    const hardwareKey = req.headers['x-hardware-key'];
+    const expectedKey = process.env.HARDWARE_SECRET_KEY || 'nexahr_biometric_hardware_secret_2026';
 
-    const now = new Date();
-    // Get start of today (YYYY-MM-DD) for DB date index
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (!hardwareKey || hardwareKey !== expectedKey) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized hardware device request. Invalid hardware secret key.',
+      });
+    }
 
-    // Check if already checked in today
-    const existing = await prisma.attendance.findUnique({
-      where: {
-        tenantId_userId_date: {
-          tenantId,
-          userId,
-          date: today,
+    const { employeeCode, timestamp, type } = req.body;
+
+    if (!employeeCode || !timestamp || !type) {
+      return res.status(400).json({
+        success: false,
+        message: 'Required fields missing: employeeCode, timestamp, and type ("IN" | "OUT").',
+      });
+    }
+
+    const eventType = type.toUpperCase().trim();
+    if (!['IN', 'OUT'].includes(eventType)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid event type. Must be "IN" or "OUT".',
+      });
+    }
+
+    const eventTime = new Date(timestamp);
+    if (isNaN(eventTime.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid timestamp format. Must be a valid ISO-8601 string.',
+      });
+    }
+
+    // Find employee by employeeCode
+    const user = await prisma.user.findUnique({
+      where: { employeeCode: employeeCode.trim() },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `Employee with code '${employeeCode}' not found in system.`,
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: `Employee '${user.firstName} ${user.lastName}' is inactive. Attendance rejected.`,
+      });
+    }
+
+    const todayDate = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
+
+    let attendance = null;
+
+    if (eventType === 'IN') {
+      // Determine status (Late if after 9:30 AM)
+      const currentHour = eventTime.getHours();
+      const currentMinute = eventTime.getMinutes();
+      let status = 'PRESENT';
+      if (currentHour > 9 || (currentHour === 9 && currentMinute > 30)) {
+        status = 'LATE';
+      }
+
+      attendance = await prisma.attendance.upsert({
+        where: {
+          userId_date: {
+            userId: user.id,
+            date: todayDate,
+          },
         },
-      },
-    });
-
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message: 'You have already checked in for today.',
-        data: { attendance: existing },
-      });
-    }
-
-    // Determine status (Late if after 9:30 AM)
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    let status = 'PRESENT';
-    if (currentHour > 9 || (currentHour === 9 && currentMinute > 30)) {
-      status = 'LATE';
-    }
-
-    const attendance = await prisma.attendance.create({
-      data: {
-        tenantId,
-        userId,
-        date: today,
-        checkIn: now,
-        status,
-        notes: notes ? notes.trim() : null,
-      },
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: `Check-in successful at ${now.toLocaleTimeString()} (${status}).`,
-      data: { attendance },
-    });
-  } catch (error) {
-    console.error('Error in checkIn:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to record check-in.',
-      error: error.message,
-    });
-  }
-};
-
-/**
- * Web Clock Check-Out
- * POST /api/attendance/check-out
- */
-const checkOut = async (req, res) => {
-  try {
-    const tenantId = req.tenantId;
-    const userId = req.user.userId;
-    const { notes } = req.body;
-
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    const attendance = await prisma.attendance.findUnique({
-      where: {
-        tenantId_userId_date: {
-          tenantId,
-          userId,
-          date: today,
+        update: {
+          checkInTime: eventTime,
+          status,
+          notes: 'Biometric Hardware Sync (Check-In)',
         },
-      },
-    });
-
-    if (!attendance) {
-      return res.status(400).json({
-        success: false,
-        message: 'No check-in record found for today. Please check in first.',
+        create: {
+          userId: user.id,
+          date: todayDate,
+          checkInTime: eventTime,
+          status,
+          notes: 'Biometric Hardware Sync (Check-In)',
+        },
       });
-    }
-
-    if (attendance.checkOut) {
-      return res.status(400).json({
-        success: false,
-        message: 'You have already checked out for today.',
-        data: { attendance },
+    } else if (eventType === 'OUT') {
+      // Find today's attendance
+      const existing = await prisma.attendance.findUnique({
+        where: {
+          userId_date: {
+            userId: user.id,
+            date: todayDate,
+          },
+        },
       });
+
+      if (!existing) {
+        // If check-out received without prior check-in, set checkInTime = checkOutTime
+        attendance = await prisma.attendance.create({
+          data: {
+            userId: user.id,
+            date: todayDate,
+            checkInTime: eventTime,
+            checkOutTime: eventTime,
+            status: 'PRESENT',
+            totalHours: 0,
+            notes: 'Biometric Hardware Sync (Check-Out without prior Check-In)',
+          },
+        });
+      } else {
+        const checkIn = new Date(existing.checkInTime);
+        const diffMs = Math.max(0, eventTime.getTime() - checkIn.getTime());
+        const totalHours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
+
+        attendance = await prisma.attendance.update({
+          where: { id: existing.id },
+          data: {
+            checkOutTime: eventTime,
+            totalHours,
+            notes: `${existing.notes || ''} (Biometric Check-Out)`.trim(),
+          },
+        });
+      }
     }
-
-    // Calculate work hours
-    const diffMs = now.getTime() - new Date(attendance.checkIn).getTime();
-    const hours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
-
-    const updated = await prisma.attendance.update({
-      where: { id: attendance.id },
-      data: {
-        checkOut: now,
-        workHours: hours,
-        notes: notes ? `${attendance.notes || ''} ${notes.trim()}`.trim() : attendance.notes,
-      },
-    });
 
     return res.status(200).json({
       success: true,
-      message: `Check-out successful. Total hours worked: ${hours} hrs.`,
-      data: { attendance: updated },
+      message: `Biometric ${eventType} synced successfully for ${user.firstName} ${user.lastName} (${user.employeeCode}).`,
+      data: {
+        employee: {
+          id: user.id,
+          employeeCode: user.employeeCode,
+          name: `${user.firstName} ${user.lastName}`,
+        },
+        attendance,
+      },
     });
   } catch (error) {
-    console.error('Error in checkOut:', error);
+    console.error('Error in hardwareSync:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to record check-out.',
+      message: 'Failed to process biometric hardware sync.',
       error: error.message,
     });
   }
 };
 
 /**
- * Get My Attendance Logs
+ * Get My Attendance Logs (Employee)
  * GET /api/attendance/my-logs
  */
 const getMyLogs = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const userId = req.user.userId;
     const { startDate, endDate } = req.query;
 
-    const whereClause = {
-      tenantId,
-      userId,
-    };
+    const whereClause = { userId };
 
     if (startDate || endDate) {
       whereClause.date = {};
@@ -179,14 +198,12 @@ const getMyLogs = async (req, res) => {
  */
 const getCompanyAttendance = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const { date, status, departmentId } = req.query;
 
     const targetDate = date ? new Date(date) : new Date();
     const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
 
     const whereClause = {
-      tenantId,
       date: dayStart,
     };
 
@@ -206,6 +223,7 @@ const getCompanyAttendance = async (req, res) => {
         user: {
           select: {
             id: true,
+            employeeCode: true,
             firstName: true,
             lastName: true,
             email: true,
@@ -218,7 +236,7 @@ const getCompanyAttendance = async (req, res) => {
           },
         },
       },
-      orderBy: { checkIn: 'desc' },
+      orderBy: { checkInTime: 'desc' },
     });
 
     return res.status(200).json({
@@ -232,15 +250,14 @@ const getCompanyAttendance = async (req, res) => {
     console.error('Error in getCompanyAttendance:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to fetch company attendance overview.',
+      message: 'Failed to fetch attendance overview.',
       error: error.message,
     });
   }
 };
 
 module.exports = {
-  checkIn,
-  checkOut,
+  hardwareSync,
   getMyLogs,
   getCompanyAttendance,
 };

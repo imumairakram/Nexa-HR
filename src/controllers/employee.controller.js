@@ -1,13 +1,8 @@
 const prisma = require('../config/prisma');
 const { hashPassword } = require('../utils/password');
 
-/**
- * Onboard a New Employee
- * POST /api/employees
- */
 const onboardEmployee = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const {
       email,
       password,
@@ -35,67 +30,25 @@ const onboardEmployee = async (req, res) => {
     const cleanEmail = email.toLowerCase().trim();
     const cleanEmpCode = employeeCode.trim();
 
-    // Check email uniqueness within tenant
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findFirst({
       where: {
-        tenantId_email: {
-          tenantId,
-          email: cleanEmail,
-        },
+        OR: [{ email: cleanEmail }, { employeeCode: cleanEmpCode }],
       },
     });
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: `User with email '${cleanEmail}' already exists in your company.`,
+        message: `User with email '${cleanEmail}' or Employee Code '${cleanEmpCode}' already exists.`,
       });
-    }
-
-    // Check employee code uniqueness within tenant
-    const existingProfile = await prisma.employeeProfile.findUnique({
-      where: {
-        tenantId_employeeCode: {
-          tenantId,
-          employeeCode: cleanEmpCode,
-        },
-      },
-    });
-
-    if (existingProfile) {
-      return res.status(409).json({
-        success: false,
-        message: `Employee Code '${cleanEmpCode}' already exists in your company.`,
-      });
-    }
-
-    // Verify Department if passed
-    if (departmentId) {
-      const dept = await prisma.department.findFirst({
-        where: { id: departmentId, tenantId },
-      });
-      if (!dept) {
-        return res.status(404).json({ success: false, message: 'Invalid department ID.' });
-      }
-    }
-
-    // Verify Designation if passed
-    if (designationId) {
-      const desig = await prisma.designation.findFirst({
-        where: { id: designationId, tenantId },
-      });
-      if (!desig) {
-        return res.status(404).json({ success: false, message: 'Invalid designation ID.' });
-      }
     }
 
     const hashedPassword = await hashPassword(password);
 
-    // Transaction to create User and EmployeeProfile together
     const result = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
-          tenantId,
+          employeeCode: cleanEmpCode,
           email: cleanEmail,
           password: hashedPassword,
           firstName: firstName.trim(),
@@ -109,8 +62,6 @@ const onboardEmployee = async (req, res) => {
       const newProfile = await tx.employeeProfile.create({
         data: {
           userId: newUser.id,
-          tenantId,
-          employeeCode: cleanEmpCode,
           gender: gender || null,
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
           joiningDate: joiningDate ? new Date(joiningDate) : new Date(),
@@ -134,6 +85,7 @@ const onboardEmployee = async (req, res) => {
       data: {
         employee: {
           id: result.user.id,
+          employeeCode: result.user.employeeCode,
           email: result.user.email,
           firstName: result.user.firstName,
           lastName: result.user.lastName,
@@ -152,21 +104,14 @@ const onboardEmployee = async (req, res) => {
   }
 };
 
-/**
- * Get Employees with Filtering & Pagination
- * GET /api/employees
- */
 const getEmployees = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const { departmentId, designationId, search, page = 1, limit = 20 } = req.query;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const take = parseInt(limit);
 
-    const whereClause = {
-      tenantId,
-    };
+    const whereClause = {};
 
     if (departmentId) {
       whereClause.profile = { departmentId };
@@ -182,7 +127,7 @@ const getEmployees = async (req, res) => {
         { firstName: { contains: searchTrim, mode: 'insensitive' } },
         { lastName: { contains: searchTrim, mode: 'insensitive' } },
         { email: { contains: searchTrim, mode: 'insensitive' } },
-        { profile: { employeeCode: { contains: searchTrim, mode: 'insensitive' } } },
+        { employeeCode: { contains: searchTrim, mode: 'insensitive' } },
       ];
     }
 
@@ -194,6 +139,7 @@ const getEmployees = async (req, res) => {
         take,
         select: {
           id: true,
+          employeeCode: true,
           email: true,
           firstName: true,
           lastName: true,
@@ -234,19 +180,15 @@ const getEmployees = async (req, res) => {
   }
 };
 
-/**
- * Get Employee Profile by User ID
- * GET /api/employees/:id
- */
 const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
-    const tenantId = req.tenantId;
 
-    const user = await prisma.user.findFirst({
-      where: { id, tenantId },
+    const user = await prisma.user.findUnique({
+      where: { id },
       select: {
         id: true,
+        employeeCode: true,
         email: true,
         firstName: true,
         lastName: true,
@@ -284,14 +226,9 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
-/**
- * Update Employee Information & Profile
- * PUT /api/employees/:id
- */
 const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    const tenantId = req.tenantId;
     const {
       firstName,
       lastName,
@@ -307,8 +244,8 @@ const updateEmployee = async (req, res) => {
       designationId,
     } = req.body;
 
-    const existingUser = await prisma.user.findFirst({
-      where: { id, tenantId },
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
       include: { profile: true },
     });
 
@@ -319,7 +256,6 @@ const updateEmployee = async (req, res) => {
       });
     }
 
-    // Update User and Profile in transaction
     const updated = await prisma.$transaction(async (tx) => {
       const userUpdates = {};
       if (firstName) userUpdates.firstName = firstName.trim();
@@ -353,8 +289,6 @@ const updateEmployee = async (req, res) => {
         updatedProfile = await tx.employeeProfile.create({
           data: {
             userId: id,
-            tenantId,
-            employeeCode: `EMP-${Date.now().toString().slice(-5)}`,
             ...profileUpdates,
           },
           include: { department: true, designation: true },

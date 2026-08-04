@@ -1,13 +1,8 @@
 const prisma = require('../config/prisma');
 
-/**
- * Create a new Department
- * POST /api/departments
- */
 const createDepartment = async (req, res) => {
   try {
     const { name, code, description } = req.body;
-    const tenantId = req.tenantId;
 
     if (!name || !code) {
       return res.status(400).json({
@@ -18,26 +13,19 @@ const createDepartment = async (req, res) => {
 
     const formattedCode = code.toUpperCase().trim();
 
-    // Check code uniqueness per tenant
     const existing = await prisma.department.findUnique({
-      where: {
-        tenantId_code: {
-          tenantId,
-          code: formattedCode,
-        },
-      },
+      where: { code: formattedCode },
     });
 
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: `Department code '${formattedCode}' already exists in your company.`,
+        message: `Department code '${formattedCode}' already exists.`,
       });
     }
 
     const department = await prisma.department.create({
       data: {
-        tenantId,
         name: name.trim(),
         code: formattedCode,
         description: description ? description.trim() : null,
@@ -59,16 +47,9 @@ const createDepartment = async (req, res) => {
   }
 };
 
-/**
- * Get all Departments for current tenant
- * GET /api/departments
- */
 const getDepartments = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
-
     const departments = await prisma.department.findMany({
-      where: { tenantId },
       include: {
         _count: {
           select: { profiles: true, designations: true },
@@ -91,17 +72,12 @@ const getDepartments = async (req, res) => {
   }
 };
 
-/**
- * Get single Department by ID
- * GET /api/departments/:id
- */
 const getDepartmentById = async (req, res) => {
   try {
     const { id } = req.params;
-    const tenantId = req.tenantId;
 
-    const department = await prisma.department.findFirst({
-      where: { id, tenantId },
+    const department = await prisma.department.findUnique({
+      where: { id },
       include: {
         designations: true,
         profiles: {
@@ -135,20 +111,12 @@ const getDepartmentById = async (req, res) => {
   }
 };
 
-/**
- * Update Department
- * PUT /api/departments/:id
- */
 const updateDepartment = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, code, description } = req.body;
-    const tenantId = req.tenantId;
 
-    const existing = await prisma.department.findFirst({
-      where: { id, tenantId },
-    });
-
+    const existing = await prisma.department.findUnique({ where: { id } });
     if (!existing) {
       return res.status(404).json({
         success: false,
@@ -181,20 +149,13 @@ const updateDepartment = async (req, res) => {
   }
 };
 
-/**
- * Delete Department
- * DELETE /api/departments/:id
- */
 const deleteDepartment = async (req, res) => {
   try {
     const { id } = req.params;
-    const tenantId = req.tenantId;
 
-    const existing = await prisma.department.findFirst({
-      where: { id, tenantId },
-      include: {
-        _count: { select: { profiles: true } },
-      },
+    const existing = await prisma.department.findUnique({
+      where: { id },
+      include: { _count: { select: { profiles: true } } },
     });
 
     if (!existing) {
@@ -207,13 +168,11 @@ const deleteDepartment = async (req, res) => {
     if (existing._count.profiles > 0) {
       return res.status(400).json({
         success: false,
-        message: `Cannot delete department. There are ${existing._count.profiles} employee(s) assigned to it.`,
+        message: `Cannot delete department. ${existing._count.profiles} employee(s) are assigned to it.`,
       });
     }
 
-    await prisma.department.delete({
-      where: { id },
-    });
+    await prisma.department.delete({ where: { id } });
 
     return res.status(200).json({
       success: true,

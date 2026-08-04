@@ -7,10 +7,15 @@ const checkRole = (...allowedRoles) => {
       });
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    // Support legacy role aliases if requested
+    const userRole = req.user.role;
+    const isAllowed = allowedRoles.includes(userRole) || 
+      (allowedRoles.includes('ADMIN') && ['SUPER_ADMIN', 'COMPANY_ADMIN'].includes(userRole));
+
+    if (!isAllowed) {
       return res.status(403).json({
         success: false,
-        message: `Forbidden. Role '${req.user.role}' does not have sufficient permissions to access this resource.`,
+        message: `Forbidden. Role '${userRole}' does not have permission to access this resource.`,
       });
     }
 

@@ -3,114 +3,88 @@ const { hashPassword, comparePassword } = require('../utils/password');
 const { generateToken } = require('../utils/jwt');
 
 /**
- * Register a new Tenant (Company) and its primary Company Admin user
- * POST /api/auth/register-tenant
+ * Register System Administrator
+ * POST /api/auth/register-admin
  */
-const registerTenant = async (req, res) => {
+const registerAdmin = async (req, res) => {
   try {
-    const { companyName, slug, companyEmail, adminEmail, password, firstName, lastName, phone, address } = req.body;
+    const { email, password, firstName, lastName, phone, employeeCode = 'EMP-ADMIN-001' } = req.body;
 
-    // Validation
-    if (!companyName || !slug || !companyEmail || !adminEmail || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields (companyName, slug, companyEmail, adminEmail, password, firstName, lastName).',
+        message: 'Please provide required fields (email, password, firstName, lastName).',
       });
     }
 
-    const formattedSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-');
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanEmpCode = employeeCode.trim();
 
-    // Check if slug or companyEmail already exists
-    const existingTenant = await prisma.tenant.findFirst({
+    const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ slug: formattedSlug }, { companyEmail }],
+        OR: [{ email: cleanEmail }, { employeeCode: cleanEmpCode }],
       },
     });
 
-    if (existingTenant) {
+    if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: 'A company with this domain slug or email already exists.',
+        message: 'A user with this email address or employee code already exists.',
       });
     }
 
-    // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // Execute atomic transaction to create Tenant and Admin User
-    const result = await prisma.$transaction(async (tx) => {
-      const tenant = await tx.tenant.create({
-        data: {
-          name: companyName,
-          slug: formattedSlug,
-          companyEmail,
-          phone,
-          address,
-          status: 'ACTIVE',
-        },
-      });
-
-      const adminUser = await tx.user.create({
-        data: {
-          tenantId: tenant.id,
-          email: adminEmail.toLowerCase().trim(),
-          password: hashedPassword,
-          firstName,
-          lastName,
-          phone,
-          role: 'COMPANY_ADMIN',
-          isActive: true,
-        },
-      });
-
-      return { tenant, adminUser };
+    const user = await prisma.user.create({
+      data: {
+        employeeCode: cleanEmpCode,
+        email: cleanEmail,
+        password: hashedPassword,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone: phone ? phone.trim() : null,
+        role: 'ADMIN',
+        isActive: true,
+      },
     });
 
-    // Generate JWT token
     const token = generateToken({
-      userId: result.adminUser.id,
-      tenantId: result.tenant.id,
-      role: result.adminUser.role,
+      userId: user.id,
+      role: user.role,
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Tenant company and Company Admin registered successfully.',
+      message: 'System Administrator registered successfully.',
       data: {
         token,
-        tenant: {
-          id: result.tenant.id,
-          name: result.tenant.name,
-          slug: result.tenant.slug,
-          companyEmail: result.tenant.companyEmail,
-          status: result.tenant.status,
-        },
         user: {
-          id: result.adminUser.id,
-          email: result.adminUser.email,
-          firstName: result.adminUser.firstName,
-          lastName: result.adminUser.lastName,
-          role: result.adminUser.role,
+          id: user.id,
+          employeeCode: user.employeeCode,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
         },
       },
     });
   } catch (error) {
-    console.error('Error in registerTenant:', error);
+    console.error('Error in registerAdmin:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to register tenant.',
+      message: 'Failed to register administrator.',
       error: error.message,
     });
   }
 };
 
 /**
- * User Login (All roles)
+ * User Login
  * POST /api/auth/login
  */
 const login = async (req, res) => {
   try {
-    const { email, password, slug } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -121,68 +95,25 @@ const login = async (req, res) => {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // Find users by email
-    const users = await prisma.user.findMany({
+    const user = await prisma.user.findUnique({
       where: { email: cleanEmail },
-      include: {
-        tenant: true,
-      },
     });
 
-    if (!users || users.length === 0) {
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials.',
       });
     }
 
-    let targetUser = null;
-
-    if (users.length === 1) {
-      targetUser = users[0];
-    } else if (slug) {
-      targetUser = users.find((u) => u.tenant && u.tenant.slug === slug.toLowerCase().trim());
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: 'Multiple company accounts found for this email. Please specify tenant domain slug.',
-      });
-    }
-
-    if (!targetUser) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials.',
-      });
-    }
-
-    // Verify User Status
-    if (!targetUser.isActive) {
+    if (!user.isActive) {
       return res.status(403).json({
         success: false,
-        message: 'Your user account has been deactivated. Please contact your company HR/Admin.',
+        message: 'Your user account has been deactivated. Please contact your administrator.',
       });
     }
 
-    // Verify Tenant Status for tenant users
-    if (targetUser.role !== 'SUPER_ADMIN') {
-      if (!targetUser.tenant) {
-        return res.status(403).json({
-          success: false,
-          message: 'No active company tenant associated with this user account.',
-        });
-      }
-
-      if (targetUser.tenant.status !== 'ACTIVE') {
-        return res.status(403).json({
-          success: false,
-          message: `Company account is ${targetUser.tenant.status}. Access restricted.`,
-        });
-      }
-    }
-
-    // Verify Password
-    const isPasswordValid = await comparePassword(password, targetUser.password);
+    const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
@@ -190,11 +121,9 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate Token
     const token = generateToken({
-      userId: targetUser.id,
-      tenantId: targetUser.tenantId,
-      role: targetUser.role,
+      userId: user.id,
+      role: user.role,
     });
 
     return res.status(200).json({
@@ -203,20 +132,13 @@ const login = async (req, res) => {
       data: {
         token,
         user: {
-          id: targetUser.id,
-          email: targetUser.email,
-          firstName: targetUser.firstName,
-          lastName: targetUser.lastName,
-          role: targetUser.role,
+          id: user.id,
+          employeeCode: user.employeeCode,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
         },
-        tenant: targetUser.tenant
-          ? {
-              id: targetUser.tenant.id,
-              name: targetUser.tenant.name,
-              slug: targetUser.tenant.slug,
-              status: targetUser.tenant.status,
-            }
-          : null,
       },
     });
   } catch (error) {
@@ -239,6 +161,7 @@ const getMe = async (req, res) => {
       where: { id: req.user.userId },
       select: {
         id: true,
+        employeeCode: true,
         email: true,
         firstName: true,
         lastName: true,
@@ -246,13 +169,10 @@ const getMe = async (req, res) => {
         role: true,
         isActive: true,
         createdAt: true,
-        tenant: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            companyEmail: true,
-            status: true,
+        profile: {
+          include: {
+            department: true,
+            designation: true,
           },
         },
       },
@@ -273,14 +193,14 @@ const getMe = async (req, res) => {
     console.error('Error in getMe:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to fetch user profile.',
+      message: 'Failed to fetch profile.',
       error: error.message,
     });
   }
 };
 
 module.exports = {
-  registerTenant,
+  registerAdmin,
   login,
   getMe,
 };

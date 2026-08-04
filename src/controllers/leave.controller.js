@@ -1,12 +1,7 @@
 const prisma = require('../config/prisma');
 
-/**
- * Create Leave Type (Admin/HR)
- * POST /api/leaves/types
- */
 const createLeaveType = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const { name, code, daysAllowed = 12, isPaid = true } = req.body;
 
     if (!name || !code) {
@@ -19,24 +14,18 @@ const createLeaveType = async (req, res) => {
     const formattedCode = code.toUpperCase().trim();
 
     const existing = await prisma.leaveType.findUnique({
-      where: {
-        tenantId_code: {
-          tenantId,
-          code: formattedCode,
-        },
-      },
+      where: { code: formattedCode },
     });
 
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: `Leave type code '${formattedCode}' already exists in your company.`,
+        message: `Leave type code '${formattedCode}' already exists.`,
       });
     }
 
     const leaveType = await prisma.leaveType.create({
       data: {
-        tenantId,
         name: name.trim(),
         code: formattedCode,
         daysAllowed: parseInt(daysAllowed),
@@ -59,16 +48,9 @@ const createLeaveType = async (req, res) => {
   }
 };
 
-/**
- * Get Leave Types for Tenant
- * GET /api/leaves/types
- */
 const getLeaveTypes = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
-
     const leaveTypes = await prisma.leaveType.findMany({
-      where: { tenantId },
       orderBy: { name: 'asc' },
     });
 
@@ -86,13 +68,8 @@ const getLeaveTypes = async (req, res) => {
   }
 };
 
-/**
- * Apply for Leave (Employee)
- * POST /api/leaves/apply
- */
 const applyLeave = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const userId = req.user.userId;
     const { leaveTypeId, startDate, endDate, reason } = req.body;
 
@@ -120,13 +97,11 @@ const applyLeave = async (req, res) => {
       });
     }
 
-    // Calculate total days inclusive
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-    // Check valid leave type
-    const leaveType = await prisma.leaveType.findFirst({
-      where: { id: leaveTypeId, tenantId },
+    const leaveType = await prisma.leaveType.findUnique({
+      where: { id: leaveTypeId },
     });
 
     if (!leaveType) {
@@ -136,15 +111,11 @@ const applyLeave = async (req, res) => {
       });
     }
 
-    // Check for overlapping pending or approved leave requests
     const overlapping = await prisma.leaveRequest.findFirst({
       where: {
-        tenantId,
         userId,
         status: { in: ['PENDING', 'APPROVED'] },
-        OR: [
-          { startDate: { lte: end }, endDate: { gte: start } },
-        ],
+        OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
       },
     });
 
@@ -157,7 +128,6 @@ const applyLeave = async (req, res) => {
 
     const leaveRequest = await prisma.leaveRequest.create({
       data: {
-        tenantId,
         userId,
         leaveTypeId,
         startDate: start,
@@ -186,17 +156,12 @@ const applyLeave = async (req, res) => {
   }
 };
 
-/**
- * Get My Leave Requests (Employee)
- * GET /api/leaves/my-requests
- */
 const getMyLeaveRequests = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const userId = req.user.userId;
 
     const requests = await prisma.leaveRequest.findMany({
-      where: { tenantId, userId },
+      where: { userId },
       include: {
         leaveType: { select: { name: true, code: true, isPaid: true } },
         approvedBy: { select: { firstName: true, lastName: true } },
@@ -212,22 +177,17 @@ const getMyLeaveRequests = async (req, res) => {
     console.error('Error in getMyLeaveRequests:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to fetch personal leave history.',
+      message: 'Failed to fetch leave history.',
       error: error.message,
     });
   }
 };
 
-/**
- * Get Company Leave Requests (Admin/HR)
- * GET /api/leaves
- */
 const getCompanyLeaveRequests = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const { status } = req.query;
 
-    const whereClause = { tenantId };
+    const whereClause = {};
     if (status) {
       whereClause.status = status;
     }
@@ -269,15 +229,10 @@ const getCompanyLeaveRequests = async (req, res) => {
   }
 };
 
-/**
- * Approve or Reject Leave Request (Admin/HR)
- * PUT /api/leaves/:id/status
- */
 const updateLeaveStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, rejectionReason } = req.body;
-    const tenantId = req.tenantId;
     const approverId = req.user.userId;
 
     if (!['APPROVED', 'REJECTED'].includes(status)) {
@@ -287,15 +242,9 @@ const updateLeaveStatus = async (req, res) => {
       });
     }
 
-    const leaveRequest = await prisma.leaveRequest.findFirst({
-      where: { id, tenantId },
-    });
-
+    const leaveRequest = await prisma.leaveRequest.findUnique({ where: { id } });
     if (!leaveRequest) {
-      return res.status(404).json({
-        success: false,
-        message: 'Leave request not found.',
-      });
+      return res.status(404).json({ success: false, message: 'Leave request not found.' });
     }
 
     if (leaveRequest.status !== 'PENDING') {

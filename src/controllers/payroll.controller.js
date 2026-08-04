@@ -1,13 +1,8 @@
 const prisma = require('../config/prisma');
 const { calculateEmployeePayroll } = require('../services/payroll.service');
 
-/**
- * Define or Update Employee Salary Structure
- * POST /api/payroll/salary-structure
- */
 const setSalaryStructure = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const {
       userId,
       basicSalary,
@@ -25,22 +20,13 @@ const setSalaryStructure = async (req, res) => {
       });
     }
 
-    // Verify user belongs to tenant
-    const user = await prisma.user.findFirst({
-      where: { id: userId, tenantId },
-    });
-
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'Employee not found in your company.',
-      });
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
     }
 
     const structure = await prisma.salaryStructure.upsert({
-      where: {
-        tenantId_userId: { tenantId, userId },
-      },
+      where: { userId },
       update: {
         basicSalary: parseFloat(basicSalary),
         housingAllowance: parseFloat(housingAllowance),
@@ -51,7 +37,6 @@ const setSalaryStructure = async (req, res) => {
         effectiveDate: new Date(),
       },
       create: {
-        tenantId,
         userId,
         basicSalary: parseFloat(basicSalary),
         housingAllowance: parseFloat(housingAllowance),
@@ -77,27 +62,16 @@ const setSalaryStructure = async (req, res) => {
   }
 };
 
-/**
- * Get Employee Salary Structure
- * GET /api/payroll/salary-structure/:userId
- */
 const getSalaryStructure = async (req, res) => {
   try {
     const { userId } = req.params;
-    const tenantId = req.tenantId;
 
-    // Self check or HR check
     if (req.user.role === 'EMPLOYEE' && req.user.userId !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied.',
-      });
+      return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
     const structure = await prisma.salaryStructure.findUnique({
-      where: {
-        tenantId_userId: { tenantId, userId },
-      },
+      where: { userId },
       include: {
         user: { select: { firstName: true, lastName: true, email: true } },
       },
@@ -124,13 +98,8 @@ const getSalaryStructure = async (req, res) => {
   }
 };
 
-/**
- * Bulk Generate Monthly Payslips (Admin/HR)
- * POST /api/payroll/generate-monthly
- */
 const generateMonthlyPayroll = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const { month, year } = req.body;
 
     if (!month || !year) {
@@ -140,10 +109,8 @@ const generateMonthlyPayroll = async (req, res) => {
       });
     }
 
-    // Fetch active employees with configured salary structure
     const employees = await prisma.user.findMany({
       where: {
-        tenantId,
         isActive: true,
         salaryStructure: { isNot: null },
       },
@@ -153,25 +120,23 @@ const generateMonthlyPayroll = async (req, res) => {
     if (employees.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No active employees with configured salary structures found for this tenant.',
+        message: 'No active employees with configured salary structures found.',
       });
     }
 
     const payslipsData = [];
     for (const emp of employees) {
-      const computed = await calculateEmployeePayroll(tenantId, emp.id, month, year);
+      const computed = await calculateEmployeePayroll(emp.id, month, year);
       if (computed) {
         payslipsData.push(computed);
       }
     }
 
-    // Upsert payslips in transaction
     const createdPayslips = await prisma.$transaction(
       payslipsData.map((data) =>
         prisma.payslip.upsert({
           where: {
-            tenantId_userId_month_year: {
-              tenantId: data.tenantId,
+            userId_month_year: {
               userId: data.userId,
               month: data.month,
               year: data.year,
@@ -198,17 +163,12 @@ const generateMonthlyPayroll = async (req, res) => {
   }
 };
 
-/**
- * Get Personal Payslips (Employee)
- * GET /api/payroll/my-payslips
- */
 const getMyPayslips = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const userId = req.user.userId;
 
     const payslips = await prisma.payslip.findMany({
-      where: { tenantId, userId },
+      where: { userId },
       orderBy: [{ year: 'desc' }, { month: 'desc' }],
     });
 
@@ -226,16 +186,11 @@ const getMyPayslips = async (req, res) => {
   }
 };
 
-/**
- * Get Company Payslips (Admin/HR)
- * GET /api/payroll/payslips
- */
 const getCompanyPayslips = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const { month, year, status } = req.query;
 
-    const whereClause = { tenantId };
+    const whereClause = {};
     if (month) whereClause.month = parseInt(month);
     if (year) whereClause.year = parseInt(year);
     if (status) whereClause.status = status;
@@ -269,21 +224,16 @@ const getCompanyPayslips = async (req, res) => {
     console.error('Error in getCompanyPayslips:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to fetch company payslips.',
+      message: 'Failed to fetch payslips.',
       error: error.message,
     });
   }
 };
 
-/**
- * Update Payslip Status (e.g. Mark PAID)
- * PUT /api/payroll/payslips/:id/status
- */
 const updatePayslipStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const tenantId = req.tenantId;
 
     if (!['DRAFT', 'GENERATED', 'PAID'].includes(status)) {
       return res.status(400).json({
@@ -293,7 +243,7 @@ const updatePayslipStatus = async (req, res) => {
     }
 
     const updated = await prisma.payslip.updateMany({
-      where: { id, tenantId },
+      where: { id },
       data: { status },
     });
 

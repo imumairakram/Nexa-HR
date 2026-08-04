@@ -1,17 +1,10 @@
 const prisma = require('../config/prisma');
 
-/**
- * Get Admin Dashboard Overview Metrics
- * GET /api/dashboard/admin
- */
 const getAdminDashboard = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
-
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // Execute queries in parallel using Promise.all
     const [
       activeEmployeesCount,
       departmentsCount,
@@ -19,30 +12,18 @@ const getAdminDashboard = async (req, res) => {
       pendingLeavesCount,
       latestPayrollSummary,
     ] = await Promise.all([
-      // 1. Total Active Employees
       prisma.user.count({
-        where: { tenantId, isActive: true, role: { not: 'SUPER_ADMIN' } },
+        where: { isActive: true },
       }),
-
-      // 2. Total Departments
-      prisma.department.count({
-        where: { tenantId },
-      }),
-
-      // 3. Today's Attendance records
+      prisma.department.count(),
       prisma.attendance.findMany({
-        where: { tenantId, date: today },
+        where: { date: today },
         select: { status: true },
       }),
-
-      // 4. Pending Leave Applications count
       prisma.leaveRequest.count({
-        where: { tenantId, status: 'PENDING' },
+        where: { status: 'PENDING' },
       }),
-
-      // 5. Latest Month Payroll Summary
       prisma.payslip.aggregate({
-        where: { tenantId },
         _sum: {
           grossSalary: true,
           netSalary: true,
@@ -52,7 +33,6 @@ const getAdminDashboard = async (req, res) => {
       }),
     ]);
 
-    // Calculate attendance status breakdown
     const attendanceStats = {
       present: 0,
       late: 0,
@@ -104,13 +84,8 @@ const getAdminDashboard = async (req, res) => {
   }
 };
 
-/**
- * Get Employee Personal Dashboard Portal Metrics
- * GET /api/dashboard/employee
- */
 const getEmployeeDashboard = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
     const userId = req.user.userId;
 
     const now = new Date();
@@ -123,38 +98,29 @@ const getEmployeeDashboard = async (req, res) => {
       leaveRequestsSummary,
       latestPayslip,
     ] = await Promise.all([
-      // 1. Today's attendance status
       prisma.attendance.findUnique({
         where: {
-          tenantId_userId_date: { tenantId, userId, date: today },
+          userId_date: { userId, date: today },
         },
       }),
-
-      // 2. Monthly attendance history
       prisma.attendance.findMany({
         where: {
-          tenantId,
           userId,
           date: { gte: monthStart },
         },
-        select: { status: true, workHours: true },
+        select: { status: true, totalHours: true },
       }),
-
-      // 3. Leave applications breakdown
       prisma.leaveRequest.groupBy({
         by: ['status'],
-        where: { tenantId, userId },
+        where: { userId },
         _count: { id: true },
       }),
-
-      // 4. Most recent payslip
       prisma.payslip.findFirst({
-        where: { tenantId, userId },
+        where: { userId },
         orderBy: [{ year: 'desc' }, { month: 'desc' }],
       }),
     ]);
 
-    // Calculate monthly attendance stats
     let presentDays = 0;
     let lateDays = 0;
     let totalWorkHours = 0;
@@ -162,7 +128,7 @@ const getEmployeeDashboard = async (req, res) => {
     monthlyAttendances.forEach((record) => {
       if (record.status === 'PRESENT') presentDays++;
       else if (record.status === 'LATE') lateDays++;
-      if (record.workHours) totalWorkHours += record.workHours;
+      if (record.totalHours) totalWorkHours += record.totalHours;
     });
 
     const leaveStats = {
@@ -182,18 +148,18 @@ const getEmployeeDashboard = async (req, res) => {
       data: {
         todayClockStatus: todayAttendance
           ? {
-              checkedIn: true,
-              checkInTime: todayAttendance.checkIn,
-              checkOutTime: todayAttendance.checkOut,
+              synced: true,
+              checkInTime: todayAttendance.checkInTime,
+              checkOutTime: todayAttendance.checkOutTime,
               status: todayAttendance.status,
-              workHours: todayAttendance.workHours,
+              totalHours: todayAttendance.totalHours,
             }
           : {
-              checkedIn: false,
+              synced: false,
               checkInTime: null,
               checkOutTime: null,
-              status: 'NOT_CLOCKED_IN',
-              workHours: null,
+              status: 'NOT_RECORDED',
+              totalHours: null,
             },
         monthlyAttendance: {
           month: now.getMonth() + 1,

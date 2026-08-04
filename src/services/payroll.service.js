@@ -3,29 +3,20 @@ const prisma = require('../config/prisma');
 /**
  * Calculate single employee payroll for a given month & year
  */
-const calculateEmployeePayroll = async (tenantId, userId, month, year) => {
-  // Fetch salary structure
+const calculateEmployeePayroll = async (userId, month, year) => {
   const structure = await prisma.salaryStructure.findUnique({
-    where: {
-      tenantId_userId: {
-        tenantId,
-        userId,
-      },
-    },
+    where: { userId },
   });
 
   if (!structure) {
-    return null; // Skip if no salary structure configured
+    return null;
   }
 
-  // Calculate month date range
   const monthStart = new Date(year, month - 1, 1);
   const monthEnd = new Date(year, month, 0);
 
-  // Fetch approved unpaid leaves in this month
   const unpaidLeaves = await prisma.leaveRequest.findMany({
     where: {
-      tenantId,
       userId,
       status: 'APPROVED',
       leaveType: { isPaid: false },
@@ -52,7 +43,6 @@ const calculateEmployeePayroll = async (tenantId, userId, month, year) => {
   const netSalary = parseFloat((grossSalary - totalDeductions).toFixed(2));
 
   return {
-    tenantId,
     userId,
     month: parseInt(month),
     year: parseInt(year),

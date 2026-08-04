@@ -1,4 +1,4 @@
-// Prisma Schema for NexaHR Multi-Tenant SaaS HRM System
+// Prisma Schema for NexaHR Single-Company Internal HRM System
 
 generator client {
   provider = "prisma-client-js"
@@ -14,16 +14,9 @@ datasource db {
 // ====================================================
 
 enum Role {
-  SUPER_ADMIN
-  COMPANY_ADMIN
+  ADMIN
   HR_MANAGER
   EMPLOYEE
-}
-
-enum TenantStatus {
-  ACTIVE
-  SUSPENDED
-  PENDING
 }
 
 enum AttendanceStatus {
@@ -48,47 +41,22 @@ enum PayslipStatus {
 }
 
 // ====================================================
-// PHASE 1: CORE MULTI-TENANCY & AUTH MODELS
+// CORE SINGLE-COMPANY USER & AUTH MODELS
 // ====================================================
 
-model Tenant {
-  id           String       @id @default(uuid())
-  name         String
-  slug         String       @unique
-  companyEmail String       @unique
-  phone        String?
-  address      String?
-  status       TenantStatus @default(ACTIVE)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  users            User[]
-  departments      Department[]
-  designations     Designation[]
-  profiles         EmployeeProfile[]
-  attendances      Attendance[]
-  leaveTypes       LeaveType[]
-  leaveRequests    LeaveRequest[]
-  salaryStructures SalaryStructure[]
-  payslips         Payslip[]
-
-  @@map("tenants")
-}
-
 model User {
-  id        String   @id @default(uuid())
-  tenantId  String?  // Nullable ONLY for SUPER_ADMIN system users
-  email     String
-  password  String
-  firstName String
-  lastName  String
-  phone     String?
-  role      Role     @default(EMPLOYEE)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  employeeCode String   @unique
+  email        String   @unique
+  password     String
+  firstName    String
+  lastName     String
+  phone        String?
+  role         Role     @default(EMPLOYEE)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  tenant          Tenant?          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   profile         EmployeeProfile?
   attendances     Attendance[]
   leaveRequests   LeaveRequest[]   @relation("UserLeaveRequests")
@@ -96,8 +64,6 @@ model User {
   salaryStructure SalaryStructure?
   payslips        Payslip[]
 
-  @@unique([tenantId, email])
-  @@index([tenantId])
   @@map("users")
 }
 
@@ -124,50 +90,40 @@ model RolePermission {
 }
 
 // ====================================================
-// PHASE 2: EMPLOYEE INFORMATION MANAGEMENT (PIM)
+// EMPLOYEE INFORMATION MANAGEMENT (PIM)
 // ====================================================
 
 model Department {
   id          String   @id @default(uuid())
-  tenantId    String
   name        String
-  code        String
+  code        String   @unique
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   designations Designation[]
   profiles     EmployeeProfile[]
 
-  @@unique([tenantId, code])
-  @@index([tenantId])
   @@map("departments")
 }
 
 model Designation {
   id           String   @id @default(uuid())
-  tenantId     String
   departmentId String?
-  title        String
+  title        String   @unique
   description  String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  tenant     Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   department Department?       @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   profiles   EmployeeProfile[]
 
-  @@unique([tenantId, title])
-  @@index([tenantId])
   @@map("designations")
 }
 
 model EmployeeProfile {
   id               String    @id @default(uuid())
   userId           String    @unique
-  tenantId         String
-  employeeCode     String
   gender           String?
   dateOfBirth      DateTime?
   joiningDate      DateTime  @default(now())
@@ -179,61 +135,51 @@ model EmployeeProfile {
   updatedAt        DateTime  @updatedAt
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   department  Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   designation Designation? @relation(fields: [designationId], references: [id], onDelete: SetNull)
 
-  @@unique([tenantId, employeeCode])
-  @@index([tenantId])
   @@map("employee_profiles")
 }
 
 // ====================================================
-// PHASE 3: TIME, ATTENDANCE & LEAVE MANAGEMENT
+// TIME, BIOMETRIC ATTENDANCE & LEAVE MANAGEMENT
 // ====================================================
 
 model Attendance {
-  id        String           @id @default(uuid())
-  tenantId  String
-  userId    String
-  date      DateTime         @db.Date
-  checkIn   DateTime
-  checkOut  DateTime?
-  status    AttendanceStatus @default(PRESENT)
-  workHours Float?
-  notes     String?
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  id           String           @id @default(uuid())
+  userId       String
+  date         DateTime         @db.Date
+  checkInTime  DateTime
+  checkOutTime DateTime?
+  status       AttendanceStatus @default(PRESENT)
+  totalHours   Float?
+  notes        String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tenantId, userId, date])
-  @@index([tenantId, date])
+  @@unique([userId, date])
+  @@index([date])
   @@map("attendances")
 }
 
 model LeaveType {
   id          String   @id @default(uuid())
-  tenantId    String
   name        String
-  code        String
+  code        String   @unique
   daysAllowed Int      @default(12)
   isPaid      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   leaveRequests LeaveRequest[]
 
-  @@unique([tenantId, code])
-  @@index([tenantId])
   @@map("leave_types")
 }
 
 model LeaveRequest {
   id              String      @id @default(uuid())
-  tenantId        String
   userId          String
   leaveTypeId     String
   startDate       DateTime    @db.Date
@@ -246,23 +192,20 @@ model LeaveRequest {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   user       User      @relation("UserLeaveRequests", fields: [userId], references: [id], onDelete: Cascade)
   leaveType  LeaveType @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
   approvedBy User?     @relation("ApprovedLeaves", fields: [approvedById], references: [id], onDelete: SetNull)
 
-  @@index([tenantId])
   @@index([userId])
   @@map("leave_requests")
 }
 
 // ====================================================
-// PHASE 4: PAYROLL PROCESSING
+// PAYROLL PROCESSING
 // ====================================================
 
 model SalaryStructure {
   id                 String   @id @default(uuid())
-  tenantId           String
   userId             String   @unique
   basicSalary        Float
   housingAllowance   Float    @default(0)
@@ -274,17 +217,13 @@ model SalaryStructure {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tenantId, userId])
-  @@index([tenantId])
   @@map("salary_structures")
 }
 
 model Payslip {
   id                   String        @id @default(uuid())
-  tenantId             String
   userId               String
   month                Int
   year                 Int
@@ -301,10 +240,9 @@ model Payslip {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tenantId, userId, month, year])
-  @@index([tenantId, year, month])
+  @@unique([userId, month, year])
+  @@index([year, month])
   @@map("payslips")
 }

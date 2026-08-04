@@ -19,7 +19,6 @@ const verifyToken = async (req, res, next) => {
       where: { id: decoded.userId },
       select: {
         id: true,
-        tenantId: true,
         email: true,
         firstName: true,
         lastName: true,
@@ -37,7 +36,6 @@ const verifyToken = async (req, res, next) => {
 
     req.user = {
       userId: user.id,
-      tenantId: user.tenantId,
       email: user.email,
       role: user.role,
       fullName: `${user.firstName} ${user.lastName}`,
