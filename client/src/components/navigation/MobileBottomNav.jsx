@@ -1,13 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, CalendarDays, MessageSquare, User } from 'lucide-react';
+import { LayoutGrid, Users, Clock, CalendarDays, Settings } from 'lucide-react';
 
 const MobileBottomNav = () => {
   const mobileNavItems = [
-    { label: 'Home', path: '/app/dashboard', icon: Home },
-    { label: 'Calendar', path: '/app/attendance', icon: CalendarDays },
-    { label: 'Messages', path: '/app/messages', icon: MessageSquare },
-    { label: 'Profile', path: '/app/profile', icon: User },
+    { label: 'Dashboard', path: '/app/dashboard', icon: LayoutGrid },
+    { label: 'Employees', path: '/app/employees', icon: Users },
+    { label: 'Attendance', path: '/app/attendance', icon: Clock },
+    { label: 'Leaves', path: '/app/leaves', icon: CalendarDays },
+    { label: 'Settings', path: '/app/settings', icon: Settings },
   ];
 
   return (

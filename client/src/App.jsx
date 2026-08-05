@@ -4,6 +4,12 @@ import Login from './pages/website/Login';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/app/Dashboard';
 import Employees from './pages/app/Employees';
+import Attendance from './pages/app/Attendance';
+import Leaves from './pages/app/Leaves';
+import Payroll from './pages/app/Payroll';
+import Departments from './pages/app/Departments';
+import Settings from './pages/app/Settings';
+import Profile from './pages/app/Profile';
 
 function App() {
   return (
@@ -13,16 +19,17 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Navigate to="/" replace />} />
 
-        {/* Authenticated Internal Application Routes (Web & Mobile Layout) */}
+        {/* Authenticated Internal Application Routes */}
         <Route path="/app" element={<MainLayout />}>
           <Route index element={<Navigate to="/app/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="employees" element={<Employees />} />
-          <Route path="attendance" element={<Dashboard />} />
-          <Route path="leaves" element={<Dashboard />} />
-          <Route path="payroll" element={<Dashboard />} />
-          <Route path="departments" element={<Dashboard />} />
-          <Route path="settings" element={<Dashboard />} />
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="leaves" element={<Leaves />} />
+          <Route path="payroll" element={<Payroll />} />
+          <Route path="departments" element={<Departments />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* Catch-All Route redirects to Root Login */}

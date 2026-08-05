@@ -4,14 +4,8 @@ import { Bell, Search, Cpu } from 'lucide-react';
 const TopHeader = () => {
   return (
     <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-3xl p-4 md:px-6 shadow-soft border border-slate-100">
-      {/* Search Input & Hardware Status */}
+      {/* Search Input */}
       <div className="flex items-center gap-3">
-        {/* Biometric Device Active Indicator */}
-        <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pastelGreen-light text-pastelGreen-dark text-xs font-semibold shadow-sm">
-          <Cpu className="w-4 h-4 stroke-[1.75]" />
-          <span>Biometric Sync Active</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        </div>
 
         {/* Minimalist Search Bar */}
         <div className="relative flex-1 md:w-80">
