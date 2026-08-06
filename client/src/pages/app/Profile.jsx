@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, User, Mail, Phone, MapPin, Shield, Key, CheckCircle, Save, Sparkles, Building, Briefcase, Calendar, Lock } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import { api } from '../../services/api';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
 
@@ -32,18 +33,38 @@ const Profile = () => {
 
   useEffect(() => {
     // Load stored user data & avatar
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const loadProfileData = async () => {
       try {
-        const u = JSON.parse(storedUser);
-        setFormData((prev) => ({
-          ...prev,
-          firstName: u.firstName || prev.firstName,
-          lastName: u.lastName || prev.lastName,
-          email: u.email || prev.email,
-        }));
-      } catch (e) {}
-    }
+        const res = await api.getMe();
+        if (res.success && res.data) {
+          const u = res.data;
+          setFormData((prev) => ({
+            ...prev,
+            firstName: u.firstName || prev.firstName,
+            lastName: u.lastName || prev.lastName,
+            email: u.email || prev.email,
+            phone: u.phone || prev.phone,
+            role: u.role || prev.role,
+            department: u.profile?.department?.name || prev.department,
+          }));
+        }
+      } catch (e) {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const u = JSON.parse(storedUser);
+            setFormData((prev) => ({
+              ...prev,
+              firstName: u.firstName || prev.firstName,
+              lastName: u.lastName || prev.lastName,
+              email: u.email || prev.email,
+            }));
+          } catch (err) {}
+        }
+      }
+    };
+
+    loadProfileData();
 
     const storedAvatar = localStorage.getItem('user_avatar');
     if (storedAvatar) {

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Rocket,
-  Box,
-  Info,
   BarChart2,
   Clock,
   CalendarDays,
   UserX,
-  RefreshCw,
+  Info,
+  Loader2,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -28,8 +26,7 @@ import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { api } from '../../services/api';
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('recent');
-  const [metrics, setMetrics] = useState(null);
+  const [metricsData, setMetricsData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const loadDashboardMetrics = async () => {
@@ -37,7 +34,7 @@ const Dashboard = () => {
     try {
       const res = await api.getDashboard();
       if (res.success && res.data) {
-        setMetrics(res.data);
+        setMetricsData(res.data);
       }
     } catch (err) {
       console.warn('Dashboard fetch offline or using fallback', err);
@@ -50,8 +47,16 @@ const Dashboard = () => {
     loadDashboardMetrics();
   }, []);
 
-  // Weekly Biometric Attendance Trend
-  const lineChartData = [
+  // Extracted Dynamic Values with robust fallbacks
+  const metrics = metricsData?.metrics || {};
+  const totalEmployees = metrics.totalActiveEmployees ?? metricsData?.summary?.totalActiveEmployees ?? 124;
+  const pendingLeaves = metrics.pendingLeaveRequests ?? metricsData?.summary?.pendingLeaveRequests ?? 4;
+  const workforcePresence = metrics.workforcePresence ?? 85;
+  const onTimeArrival = metrics.onTimeArrival ?? 92.5;
+  const absentToday = metrics.absentToday ?? 3;
+
+  // Chart & Table Data Arrays from API
+  const lineChartData = metricsData?.charts?.weeklyTrend || [
     { date: '05 Jun, 2026', attendance: 85, peak: 95 },
     { date: '07 Jun, 2026', attendance: 120, peak: 135 },
     { date: '09 Jun, 2026', attendance: 90, peak: 105 },
@@ -65,8 +70,7 @@ const Dashboard = () => {
     { date: '25 Jun, 2026', attendance: 130, peak: 138 },
   ];
 
-  // Department Attendance Metrics
-  const barChartData = [
+  const barChartData = metricsData?.charts?.departmentAttendance || [
     { name: '05 Jun', onTime: 80, late: -5 },
     { name: '07 Jun', onTime: 12, late: -2 },
     { name: '09 Jun', onTime: 45, late: -12 },
@@ -77,8 +81,7 @@ const Dashboard = () => {
     { name: '19 Jun', onTime: 40, late: -10 },
   ];
 
-  // Department Performance
-  const radarChartData = [
+  const radarChartData = metricsData?.charts?.departmentPerformance || [
     { subject: 'Punctuality', scoreA: 110, scoreB: 85 },
     { subject: 'Attendance%', scoreA: 130, scoreB: 95 },
     { subject: 'Leave Rate', scoreA: 80, scoreB: 120 },
@@ -86,8 +89,7 @@ const Dashboard = () => {
     { subject: 'Compliance', scoreA: 95, scoreB: 115 },
   ];
 
-  // Biometric Logs Table
-  const biometricLogs = [
+  const biometricLogs = metricsData?.recentLogs || [
     { date: '06/07/2026', empCode: 'EMP-101', time: '08:55 AM', status: 'PRESENT' },
     { date: '06/08/2026', empCode: 'EMP-102', time: '09:12 AM', status: 'PRESENT' },
     { date: '06/09/2026', empCode: 'EMP-103', time: '09:45 AM', status: 'LATE' },
@@ -95,12 +97,9 @@ const Dashboard = () => {
     { date: '06/11/2026', empCode: 'EMP-105', time: '10:05 AM', status: 'LATE' },
   ];
 
-  const totalEmployees = metrics?.summary?.totalActiveEmployees || 124;
-  const pendingLeaves = metrics?.summary?.pendingLeaveRequests || 4;
-
   return (
     <div className="relative font-sans text-slate-800 space-y-6">
-      {/* Top Header matching exact reference screenshot */}
+      {/* Top Header */}
       <AppPageHeader
         title="Welcome Back, Admin"
         onRefresh={() => loadDashboardMetrics()}
@@ -114,13 +113,17 @@ const Dashboard = () => {
           {/* Workforce Presence Gauge Widget */}
           <div className="bg-white rounded-3xl p-6 shadow-soft border border-slate-100/80">
             <p className="text-xs font-bold text-slate-400 mb-1">Today's Workforce Presence</p>
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-4">85%</h2>
+            {loading ? (
+              <div className="h-9 w-24 bg-slate-100 animate-pulse rounded-lg mb-4"></div>
+            ) : (
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-4">{workforcePresence}%</h2>
+            )}
 
             <div className="relative pt-2 pb-6">
               <div className="h-3 w-full rounded-full bg-gradient-to-r from-red-500 via-yellow-400 via-emerald-400 to-emerald-500 shadow-inner"></div>
               <div
                 className="absolute top-0.5 -translate-x-1/2 flex flex-col items-center transition-all duration-500"
-                style={{ left: '85%' }}
+                style={{ left: `${Math.min(100, Math.max(0, workforcePresence))}%` }}
               >
                 <div className="w-3.5 h-6 bg-white rounded-full shadow-md border-2 border-emerald-500 ring-2 ring-emerald-500/20"></div>
               </div>
@@ -138,6 +141,7 @@ const Dashboard = () => {
 
           {/* 4 Stat Cards Grid */}
           <div className="grid grid-cols-2 gap-4">
+            {/* Card 1: Total Employees */}
             <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between hover:shadow-soft-hover transition-all">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
@@ -147,10 +151,15 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-400">Total Employees</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">{totalEmployees}</h3>
+                {loading ? (
+                  <div className="h-7 w-16 bg-slate-100 animate-pulse rounded mt-1"></div>
+                ) : (
+                  <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">{totalEmployees}</h3>
+                )}
               </div>
             </div>
 
+            {/* Card 2: On-Time Arrival */}
             <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between hover:shadow-soft-hover transition-all">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
@@ -160,10 +169,15 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-400">On-Time Arrival</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">92.5%</h3>
+                {loading ? (
+                  <div className="h-7 w-16 bg-slate-100 animate-pulse rounded mt-1"></div>
+                ) : (
+                  <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">{onTimeArrival}%</h3>
+                )}
               </div>
             </div>
 
+            {/* Card 3: Pending Leaves */}
             <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between hover:shadow-soft-hover transition-all">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
@@ -173,10 +187,15 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-400">Pending Leaves</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">{pendingLeaves}</h3>
+                {loading ? (
+                  <div className="h-7 w-16 bg-slate-100 animate-pulse rounded mt-1"></div>
+                ) : (
+                  <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">{pendingLeaves}</h3>
+                )}
               </div>
             </div>
 
+            {/* Card 4: Absent Today */}
             <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between hover:shadow-soft-hover transition-all">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
@@ -186,7 +205,11 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-400">Absent Today</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">3</h3>
+                {loading ? (
+                  <div className="h-7 w-16 bg-slate-100 animate-pulse rounded mt-1"></div>
+                ) : (
+                  <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5">{absentToday}</h3>
+                )}
               </div>
             </div>
           </div>
@@ -199,6 +222,7 @@ const Dashboard = () => {
               <h3 className="font-bold text-sm text-slate-800">Weekly Biometric Attendance Trend</h3>
               <Info className="w-3.5 h-3.5 text-slate-300 cursor-pointer hover:text-slate-500" />
             </div>
+            {loading && <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />}
           </div>
 
           <div className="h-64 w-full">
