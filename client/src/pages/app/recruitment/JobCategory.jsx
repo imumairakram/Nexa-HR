@@ -1,98 +1,98 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Layers, Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { Tag, Plus, Search, CheckCircle2, X, Trash2 } from 'lucide-react';
+
+const INITIAL = [
+  { id: 1, name: 'Software Engineering & Cloud', code: 'ENG', count: 8 },
+  { id: 2, name: 'Product Management & UI/UX', code: 'PROD', count: 4 },
+  { id: 3, name: 'People Operations & Talent HR', code: 'HR', count: 2 },
+  { id: 4, name: 'Enterprise Marketing & Growth', code: 'MKT', count: 2 },
+];
 
 const JobCategory = () => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Software Engineering', activeJobs: 6, status: 'Active' },
-    { id: 2, name: 'Product & Design', activeJobs: 3, status: 'Active' },
-    { id: 3, name: 'Human Resources', activeJobs: 2, status: 'Active' },
-    { id: 4, name: 'Finance & Accounting', activeJobs: 1, status: 'Active' },
-    { id: 5, name: 'Sales & Growth', activeJobs: 4, status: 'Active' },
-  ]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [name, setName] = useState('');
+  const [categories, setCategories] = useState(INITIAL);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [newCat, setNewCat] = useState({ name: '', code: '' });
+  const [toastMsg, setToastMsg] = useState('');
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!name) return;
-    setCategories([...categories, { id: Date.now(), name, activeJobs: 0, status: 'Active' }]);
-    setName('');
-    setIsModalOpen(false);
+    if (!newCat.name) return;
+    setCategories([...categories, { id: Date.now(), name: newCat.name, code: newCat.code.toUpperCase() || 'CAT', count: 0 }]);
+    setIsAddOpen(false);
+    setNewCat({ name: '', code: '' });
+    setToastMsg('Category created!');
+    setTimeout(() => setToastMsg(''), 2500);
   };
 
   return (
-    <div className="space-y-6 text-slate-800 dark:text-slate-100">
-      <AppPageHeader title="Job Categories" subtitle="Classify open requisitions by functional job category" />
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 max-w-4xl mx-auto">
+      <AppPageHeader title="Job Categories Master Table" subtitle="Organize job requisitions into functional talent categories." />
 
-      <div className="flex items-center justify-between bg-white dark:bg-[#1E293B] p-4 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800">
-        <div>
-          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Active Categories ({categories.length})</h3>
-          <p className="text-xs text-slate-400">Categories group postings on public job board</p>
+      {toastMsg && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 cursor-pointer transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Category</span>
-        </button>
+      )}
+
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Taxonomy Categories</h3>
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Category</span>
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+              <tr>
+                <th className="py-3.5 px-4">Category Name</th>
+                <th className="py-3.5 px-4">Code</th>
+                <th className="py-3.5 px-4 text-right">Active Jobs</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {categories.map((c) => (
+                <tr key={c.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+                  <td className="py-4 px-4 font-bold text-slate-900 dark:text-white">{c.name}</td>
+                  <td className="py-4 px-4 font-mono text-[10px] text-blue-600 font-bold">{c.code}</td>
+                  <td className="py-4 px-4 text-right font-black text-slate-700 dark:text-slate-300">{c.count} Roles</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((c) => (
-          <div key={c.id} className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-                  {c.status}
-                </span>
-                <h4 className="text-base font-extrabold text-slate-900 dark:text-white mt-1.5">{c.name}</h4>
-              </div>
-              <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
-                <Layers className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>{c.activeJobs} Open Positions</span>
-              <button className="text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">Edit</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl border border-slate-100 dark:border-slate-800">
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Add Job Category</h3>
-            <form onSubmit={handleAdd} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Category Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  placeholder="e.g. Data Science & AI"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700"
-                >
-                  Save Category
-                </button>
+      {isAddOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl max-w-md w-full p-6 space-y-4">
+            <h3 className="text-base font-black text-slate-900 dark:text-white">Add Job Category</h3>
+            <form onSubmit={handleAdd} className="space-y-3 text-xs">
+              <input
+                type="text"
+                required
+                placeholder="Category Name"
+                value={newCat.name}
+                onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
+                className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
+              />
+              <input
+                type="text"
+                placeholder="Code (e.g. ENG)"
+                value={newCat.code}
+                onChange={(e) => setNewCat({ ...newCat, code: e.target.value })}
+                className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
+              />
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold">Save</button>
               </div>
             </form>
           </div>

@@ -1,40 +1,44 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Briefcase, Plus } from 'lucide-react';
+import { Briefcase, Plus, CheckCircle2 } from 'lucide-react';
+
+const INITIAL = [
+  { id: 1, name: 'Full-Time Permanent', code: 'FT', hours: '40 hrs/wk', count: 12 },
+  { id: 2, name: 'Contract / Project-Based', code: 'CON', hours: 'Flexible', count: 2 },
+  { id: 3, name: 'Internship / Co-op', code: 'INT', hours: '20-40 hrs/wk', count: 2 },
+];
 
 const JobType = () => {
-  const [types, setTypes] = useState([
-    { id: 1, name: 'Full-Time Regular', code: 'FT', count: 12 },
-    { id: 2, name: 'Part-Time', code: 'PT', count: 3 },
-    { id: 3, name: 'Remote Contract', code: 'CNT', count: 5 },
-    { id: 4, name: 'Paid Internship', code: 'INT', count: 4 },
-  ]);
+  const [types, setTypes] = useState(INITIAL);
 
   return (
-    <div className="space-y-6 text-slate-800 dark:text-slate-100">
-      <AppPageHeader title="Employment Types" subtitle="Manage work arrangement types (Full-Time, Part-Time, Contract, Remote)" />
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 max-w-4xl mx-auto">
+      <AppPageHeader title="Employment & Contract Types" subtitle="Configure employment arrangements and work commitments." />
 
-      <div className="flex items-center justify-between bg-white dark:bg-[#1E293B] p-4 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800">
-        <div>
-          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Configured Job Types</h3>
-          <p className="text-xs text-slate-400">Used during job posting creation</p>
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
+        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Supported Contract Types</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+              <tr>
+                <th className="py-3.5 px-4">Contract Type</th>
+                <th className="py-3.5 px-4">Code</th>
+                <th className="py-3.5 px-4">Weekly Commitment</th>
+                <th className="py-3.5 px-4 text-right">Active Roles</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {types.map((t) => (
+                <tr key={t.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+                  <td className="py-4 px-4 font-bold text-slate-900 dark:text-white">{t.name}</td>
+                  <td className="py-4 px-4 font-mono text-blue-600 font-bold">{t.code}</td>
+                  <td className="py-4 px-4 text-slate-600 dark:text-slate-300 font-medium">{t.hours}</td>
+                  <td className="py-4 px-4 text-right font-black text-slate-700 dark:text-slate-300">{t.count} Roles</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 cursor-pointer transition-all">
-          <Plus className="w-4 h-4" />
-          <span>Add Job Type</span>
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {types.map((t) => (
-          <div key={t.id} className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-3">
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
-              {t.code}
-            </span>
-            <h4 className="text-base font-extrabold text-slate-900 dark:text-white">{t.name}</h4>
-            <p className="text-xs text-slate-400 font-medium">{t.count} Active Postings</p>
-          </div>
-        ))}
       </div>
     </div>
   );

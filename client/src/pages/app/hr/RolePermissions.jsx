@@ -1,103 +1,149 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { ShieldCheck, Lock, Check, Plus, Edit2, Trash2 } from 'lucide-react';
+import {
+  Shield,
+  Sliders,
+  CheckCircle2,
+  Lock,
+  Users,
+  Save,
+  Check,
+  Plus,
+  Key,
+} from 'lucide-react';
+
+const MODULES = [
+  { id: 'pim', name: 'Personnel & Employees (PIM)', desc: 'Employee dossier, onboarding, and directory' },
+  { id: 'attendance', name: 'Attendance & Biometrics', desc: 'Biometric logs, clock-in overrides, and shifts' },
+  { id: 'leaves', name: 'Leave Management', desc: 'Time-off requests, approvals, and quotas' },
+  { id: 'payroll', name: 'Payroll & Compensation', desc: 'Salary batch calculation, payslips, and tax' },
+  { id: 'recruitment', name: 'Recruitment & ATS', desc: 'Job requisitions, applicant pipelines, and interviews' },
+  { id: 'reports', name: 'Executive Intelligence', desc: 'Audit exports, liability reports, and metrics' },
+  { id: 'settings', name: 'System Administration', desc: 'Global settings, theme, and API security keys' },
+];
 
 const RolePermissions = () => {
-  const [roles, setRoles] = useState([
-    { id: 1, name: 'System Administrator', usersCount: 3, description: 'Full access to system controls, security, and global configuration' },
-    { id: 2, name: 'HR Manager', usersCount: 8, description: 'Manage employee records, payroll, leave requests, and recruitment' },
-    { id: 3, name: 'Department Head', usersCount: 14, description: 'Approve team leaves, view department analytics, manage shifts' },
-    { id: 4, name: 'Staff Employee', usersCount: 142, description: 'View personal dashboard, attendance punch, submit leave requests' },
-  ]);
+  const [selectedRole, setSelectedRole] = useState('HR_MANAGER');
+  const [toastMsg, setToastMsg] = useState('');
 
   const [permissions, setPermissions] = useState({
-    'Employees Management': { ADMIN: true, HR_MANAGER: true, DEPT_HEAD: false, STAFF: false },
-    'Payroll & Payslips': { ADMIN: true, HR_MANAGER: true, DEPT_HEAD: false, STAFF: false },
-    'Attendance Logs': { ADMIN: true, HR_MANAGER: true, DEPT_HEAD: true, STAFF: false },
-    'Approve Leaves': { ADMIN: true, HR_MANAGER: true, DEPT_HEAD: true, STAFF: false },
-    'Recruitment & ATS': { ADMIN: true, HR_MANAGER: true, DEPT_HEAD: false, STAFF: false },
-    'System Settings': { ADMIN: true, HR_MANAGER: false, DEPT_HEAD: false, STAFF: false },
+    HR_MANAGER: {
+      pim: { view: true, create: true, edit: true, delete: false },
+      attendance: { view: true, create: true, edit: true, delete: true },
+      leaves: { view: true, create: true, edit: true, delete: true },
+      payroll: { view: true, create: true, edit: true, delete: false },
+      recruitment: { view: true, create: true, edit: true, delete: true },
+      reports: { view: true, create: false, edit: false, delete: false },
+      settings: { view: false, create: false, edit: false, delete: false },
+    },
   });
 
-  const togglePermission = (module, roleKey) => {
-    setPermissions((prev) => ({
-      ...prev,
-      [module]: {
-        ...prev[module],
-        [roleKey]: !prev[module][roleKey],
+  const togglePerm = (moduleId, action) => {
+    const rolePerms = permissions[selectedRole] || {};
+    const modPerms = rolePerms[moduleId] || { view: false, create: false, edit: false, delete: false };
+
+    setPermissions({
+      ...permissions,
+      [selectedRole]: {
+        ...rolePerms,
+        [moduleId]: {
+          ...modPerms,
+          [action]: !modPerms[action],
+        },
       },
-    }));
+    });
+  };
+
+  const handleSave = () => {
+    setToastMsg(`Permissions updated for role ${selectedRole}!`);
+    setTimeout(() => setToastMsg(''), 3000);
   };
 
   return (
-    <div className="space-y-6 text-slate-800 dark:text-slate-100">
-      <AppPageHeader title="Role & Permissions" subtitle="Manage access control matrix and user privileges" />
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
+      <AppPageHeader
+        title="Role-Based Access Control (RBAC) & Permissions Matrix"
+        subtitle="Configure granular module authorizations, administrative capabilities, and data privacy ACLs."
+      />
 
-      {/* Role Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {roles.map((r) => (
-          <div key={r.id} className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full">
-                  {r.usersCount} Users
-                </span>
-                <ShieldCheck className="w-4 h-4 text-indigo-500" />
-              </div>
-              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">{r.name}</h4>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">{r.description}</p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-slate-400">
-              <span>Configured</span>
-              <button className="text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">Edit Role</button>
-            </div>
-          </div>
-        ))}
+      {toastMsg && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {/* Role Picker Toolbar */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-2">Configuring Role:</span>
+          {['SUPER_ADMIN', 'HR_MANAGER', 'DEPARTMENT_LEAD', 'RECRUITER', 'EMPLOYEE'].map((role) => (
+            <button
+              key={role}
+              onClick={() => setSelectedRole(role)}
+              className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                selectedRole === role
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+              }`}
+            >
+              {role.replace('_', ' ')}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={handleSave}
+          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
+        >
+          <Save className="w-4 h-4" />
+          <span>Save Permissions</span>
+        </button>
       </div>
 
       {/* Permissions Matrix */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Module Access Matrix</h3>
-            <p className="text-xs text-slate-400">Toggle capabilities for each system role</p>
-          </div>
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-2xl text-xs font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 cursor-pointer">
-            <Plus className="w-4 h-4" />
-            <span>Create New Role</span>
-          </button>
-        </div>
-
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-extrabold uppercase text-[10px]">
-                <th className="py-3 px-4">System Module</th>
-                <th className="py-3 px-4 text-center">Admin</th>
-                <th className="py-3 px-4 text-center">HR Manager</th>
-                <th className="py-3 px-4 text-center">Dept Head</th>
-                <th className="py-3 px-4 text-center">Staff</th>
+            <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+              <tr>
+                <th className="py-4 px-6">System Module</th>
+                <th className="py-4 px-4 text-center">View / Read</th>
+                <th className="py-4 px-4 text-center">Create / Add</th>
+                <th className="py-4 px-4 text-center">Edit / Update</th>
+                <th className="py-4 px-6 text-center">Delete / Purge</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-700 dark:text-slate-200">
-              {Object.keys(permissions).map((module) => (
-                <tr key={module} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                  <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">{module}</td>
-                  {['ADMIN', 'HR_MANAGER', 'DEPT_HEAD', 'STAFF'].map((roleKey) => {
-                    const isChecked = permissions[module][roleKey];
-                    return (
-                      <td key={roleKey} className="py-3.5 px-4 text-center">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {MODULES.map((mod) => {
+                const currentPerm = permissions[selectedRole]?.[mod.id] || {
+                  view: selectedRole === 'SUPER_ADMIN',
+                  create: selectedRole === 'SUPER_ADMIN',
+                  edit: selectedRole === 'SUPER_ADMIN',
+                  delete: selectedRole === 'SUPER_ADMIN',
+                };
+
+                return (
+                  <tr key={mod.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="py-4 px-6">
+                      <div className="font-extrabold text-slate-900 dark:text-white">{mod.name}</div>
+                      <div className="text-[11px] text-slate-400">{mod.desc}</div>
+                    </td>
+
+                    {['view', 'create', 'edit', 'delete'].map((action) => (
+                      <td key={action} className="py-4 px-4 text-center">
                         <input
                           type="checkbox"
-                          checked={isChecked}
-                          onChange={() => togglePermission(module, roleKey)}
-                          className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
+                          checked={currentPerm[action] || false}
+                          disabled={selectedRole === 'SUPER_ADMIN'}
+                          onChange={() => togglePerm(mod.id, action)}
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
                         />
                       </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

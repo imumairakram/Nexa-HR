@@ -1,344 +1,375 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Building2,
-  Briefcase,
-  Users,
   Plus,
-  RefreshCw,
+  Users,
+  Search,
+  Filter,
+  DollarSign,
+  Briefcase,
+  MoreVertical,
+  CheckCircle2,
   X,
-  ChevronRight,
-  Shield,
+  Edit2,
+  Trash2,
   Layers,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
-import { api } from '../../services/api';
+
+const INITIAL_DEPARTMENTS = [
+  {
+    id: 1,
+    name: 'Engineering & DevOps',
+    code: 'ENG',
+    lead: 'Alex Mercer',
+    leadAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+    headcount: 64,
+    budget: '$1,850,000',
+    openJobs: 6,
+    description: 'Core software engineering, cloud architecture, security, and hardware biometric systems.',
+  },
+  {
+    id: 2,
+    name: 'Product & Design',
+    code: 'DES',
+    lead: 'Emily Zhang',
+    leadAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=120&q=80',
+    headcount: 28,
+    budget: '$920,000',
+    openJobs: 3,
+    description: 'Product strategy, UX research, enterprise UI design systems, and design tokens.',
+  },
+  {
+    id: 3,
+    name: 'People Operations & HR',
+    code: 'HR',
+    lead: 'Chloe Bennett',
+    leadAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
+    headcount: 14,
+    budget: '$480,000',
+    openJobs: 2,
+    description: 'Talent acquisition, employee welfare, workplace culture, and compliance.',
+  },
+  {
+    id: 4,
+    name: 'Marketing & Growth',
+    code: 'MKT',
+    lead: 'Sarah Jenkins',
+    leadAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
+    headcount: 22,
+    budget: '$750,000',
+    openJobs: 4,
+    description: 'Brand strategy, developer advocacy, content marketing, and customer acquisition.',
+  },
+  {
+    id: 5,
+    name: 'Finance & Global Payroll',
+    code: 'FIN',
+    lead: 'David Miller',
+    leadAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
+    headcount: 12,
+    budget: '$420,000',
+    openJobs: 1,
+    description: 'Corporate accounting, multi-currency payroll disbursements, and tax auditing.',
+  },
+];
 
 const Departments = () => {
-  const [departments, setDepartments] = useState([]);
-  const [designations, setDesignations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState(INITIAL_DEPARTMENTS);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
 
-  // Modals state
-  const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
-  const [isDesigModalOpen, setIsDesigModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [deptForm, setDeptForm] = useState({
+  // Department Form
+  const [form, setForm] = useState({
     name: '',
     code: '',
+    lead: 'Alex Mercer',
+    budget: '$500,000',
     description: '',
   });
 
-  const [desigForm, setDesigForm] = useState({
-    title: '',
-    departmentId: '',
-    description: '',
-  });
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [deptRes, desigRes] = await Promise.all([
-        api.getDepartments(),
-        api.getDesignations(),
-      ]);
-
-      if (deptRes.success && deptRes.data?.departments) {
-        setDepartments(deptRes.data.departments);
-        if (deptRes.data.departments.length > 0 && !desigForm.departmentId) {
-          setDesigForm((p) => ({ ...p, departmentId: deptRes.data.departments[0].id }));
-        }
-      }
-      if (desigRes.success && desigRes.data?.designations) {
-        setDesignations(desigRes.data.designations);
-      }
-    } catch (err) {
-      console.warn('Backend error or loading, using fallback departmental data', err);
-      setDepartments([
-        { id: '1', name: 'Engineering', code: 'ENG', description: 'Software Development & Cloud Infrastructure' },
-        { id: '2', name: 'Human Resources', code: 'HR', description: 'Talent Acquisition & Employee Operations' },
-        { id: '3', name: 'Product & Design', code: 'PRD', description: 'UI/UX Design & Product Management' },
-        { id: '4', name: 'Finance & Accounts', code: 'FIN', description: 'Payroll & Financial Audits' },
-        { id: '5', name: 'Sales & Marketing', code: 'MKT', description: 'Growth & Enterprise Sales' },
-      ]);
-      setDesignations([
-        { id: 'd1', title: 'VP of Software Engineering', departmentId: '1' },
-        { id: 'd2', title: 'Senior Full-Stack Engineer', departmentId: '1' },
-        { id: 'd3', title: 'HR Lead Manager', departmentId: '2' },
-        { id: 'd4', title: 'Lead UI/UX Designer', departmentId: '3' },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const handleDeptSubmit = async (e) => {
+  const handleCreateDept = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await api.createDepartment(deptForm);
-      if (res.success) {
-        setIsDeptModalOpen(false);
-        setDeptForm({ name: '', code: '', description: '' });
-        loadData();
-      }
-    } catch (err) {
-      alert(err.message || 'Failed to create department');
-    } finally {
-      setIsSubmitting(false);
-    }
+    if (!form.name.trim() || !form.code.trim()) return;
+
+    const newDept = {
+      id: Date.now(),
+      name: form.name,
+      code: form.code.toUpperCase(),
+      lead: form.lead,
+      leadAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      headcount: 1,
+      budget: form.budget,
+      openJobs: 0,
+      description: form.description || 'Department business unit.',
+    };
+
+    setDepartments([...departments, newDept]);
+    setIsAddOpen(false);
+    setForm({
+      name: '',
+      code: '',
+      lead: 'Alex Mercer',
+      budget: '$500,000',
+      description: '',
+    });
+    setToastMsg(`Department "${form.name}" created successfully!`);
+    setTimeout(() => setToastMsg(''), 3000);
   };
 
-  const handleDesigSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await api.createDesignation(desigForm);
-      if (res.success) {
-        setIsDesigModalOpen(false);
-        setDesigForm({ title: '', departmentId: departments[0]?.id || '', description: '' });
-        loadData();
-      }
-    } catch (err) {
-      alert(err.message || 'Failed to create designation');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const filteredDepts = departments.filter(
+  const filtered = departments.filter(
     (d) =>
       d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.code.toLowerCase().includes(searchQuery.toLowerCase())
+      d.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.lead.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const stats = {
+    totalDepts: departments.length,
+    totalStaff: departments.reduce((acc, d) => acc + d.headcount, 0),
+    openRequisitions: departments.reduce((acc, d) => acc + d.openJobs, 0),
+    totalBudget: '$4,420,000',
+  };
+
   return (
-    <div className="space-y-6 text-slate-800">
-      {/* Top Header matching exact reference screenshot */}
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Departments & Job Roles"
-        onSearch={(v) => setSearchQuery(v)}
-        onRefresh={() => loadData()}
-        loading={loading}
+        title="Department Management & Org Units"
+        subtitle="Manage organizational structures, departmental leadership, headcount allocations, and annual budgets."
       />
 
-      {/* 4 Summary Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between">
-          <span className="text-[11px] font-bold text-slate-400">Total Departments</span>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-black text-slate-900">{departments.length}</h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">Active</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between">
-          <span className="text-[11px] font-bold text-slate-400">Configured Designations</span>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-black text-purple-600">{designations.length}</h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">Job Titles</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between">
-          <span className="text-[11px] font-bold text-slate-400">Unassigned Staff</span>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-black text-slate-900">0</h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">100% Assigned</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-3xl p-5 shadow-soft border border-slate-100/80 flex flex-col justify-between">
-          <span className="text-[11px] font-bold text-slate-400">Hierarchy Status</span>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-black text-emerald-600">Sync OK</h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">PostgreSQL</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Departments Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredDepts.map((dept) => {
-          const deptDesignations = designations.filter((d) => d.departmentId === dept.id);
-
-          return (
-            <div
-              key={dept.id}
-              className="bg-white rounded-3xl p-6 shadow-soft border border-slate-100/80 flex flex-col justify-between hover:shadow-soft-hover transition-all group"
-            >
-              <div>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white font-black flex items-center justify-center text-sm shadow-sm group-hover:bg-purple-600 transition-colors">
-                    {dept.code}
-                  </div>
-                  <span className="text-[10px] font-extrabold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
-                    {deptDesignations.length} Roles
-                  </span>
-                </div>
-
-                <h3 className="font-bold text-base text-slate-900 mb-1">{dept.name}</h3>
-                <p className="text-xs text-slate-500 mb-4">{dept.description || 'No description provided.'}</p>
-
-                {/* Designations list inside department card */}
-                <div className="space-y-1.5 pt-3 border-t border-slate-100">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Job Designations</span>
-                  {deptDesignations.length === 0 ? (
-                    <span className="text-xs text-slate-400 italic">No designations assigned yet</span>
-                  ) : (
-                    deptDesignations.map((des) => (
-                      <div key={des.id} className="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 p-2 rounded-xl">
-                        <Briefcase className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                        <span className="truncate">{des.title}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 mt-6 flex items-center justify-between">
-                <span className="text-xs font-bold text-purple-600">Active Division</span>
-                <button
-                  onClick={() => {
-                    setDesigForm((p) => ({ ...p, departmentId: dept.id }));
-                    setIsDesigModalOpen(true);
-                  }}
-                  className="text-xs font-bold text-slate-900 hover:text-purple-600 cursor-pointer transition-colors"
-                >
-                  + Add Role
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Create Department Modal */}
-      {isDeptModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-              <h3 className="text-lg font-bold text-slate-900">Create New Department</h3>
-              <button onClick={() => setIsDeptModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleDeptSubmit} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Department Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Artificial Intelligence & R&D"
-                  value={deptForm.name}
-                  onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Department Code *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. AI-RD"
-                  value={deptForm.code}
-                  onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value.toUpperCase() })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium uppercase"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Description</label>
-                <textarea
-                  rows="3"
-                  placeholder="Describe department operations and scope..."
-                  value={deptForm.description}
-                  onChange={(e) => setDeptForm({ ...deptForm, description: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium"
-                ></textarea>
-              </div>
-
-              <div className="pt-3 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsDeptModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-xs font-bold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 bg-slate-900 text-white rounded-full text-xs font-bold cursor-pointer hover:bg-slate-800"
-                >
-                  {isSubmitting ? 'Saving...' : 'Save Department'}
-                </button>
-              </div>
-            </form>
-          </div>
+      {toastMsg && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
         </div>
       )}
 
-      {/* Add Designation Modal */}
-      {isDesigModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-              <h3 className="text-lg font-bold text-slate-900">Add Designation / Job Role</h3>
-              <button onClick={() => setIsDesigModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X className="w-4 h-4" />
+      {/* ========================================================================= */}
+      {/* 1. STATS METRICS */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Units</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.totalDepts} Departments</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <Building2 className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Staff Allocated</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.totalStaff} Members</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <Users className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Open Requisitions</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.openRequisitions} Openings</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <Briefcase className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Total Org Budget</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.totalBudget}</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <DollarSign className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. SEARCH & ADD TOOLBAR */}
+      {/* ========================================================================= */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="relative flex-1 w-full">
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search departments by name, code, or department lead..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          />
+        </div>
+
+        <button
+          onClick={() => setIsAddOpen(true)}
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Create Department</span>
+        </button>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. DEPARTMENT CARDS GRID */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        {filtered.map((d) => (
+          <div
+            key={d.id}
+            className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4 group"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-mono font-bold">
+                  {d.code}
+                </span>
+
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-extrabold text-slate-600 dark:text-slate-300">
+                  {d.headcount} Members
+                </span>
+              </div>
+
+              <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {d.name}
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                {d.description}
+              </p>
+
+              {/* Stats Box */}
+              <div className="grid grid-cols-2 gap-2 mt-4 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 text-xs">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Annual Budget</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{d.budget}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Open Jobs</span>
+                  <span className="font-bold text-emerald-600">{d.openJobs} Active Roles</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer: Lead Avatar */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <img
+                  src={d.leadAvatar}
+                  alt={d.lead}
+                  className="w-7 h-7 rounded-xl object-cover ring-2 ring-slate-100 dark:ring-slate-700"
+                />
+                <div>
+                  <div className="text-[10px] text-slate-400 font-bold leading-none">DIRECTOR / LEAD</div>
+                  <div className="font-bold text-slate-800 dark:text-slate-200 leading-tight">{d.lead}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4. MODAL: CREATE DEPARTMENT */}
+      {/* ========================================================================= */}
+      {isAddOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Create Department Unit</h3>
+              </div>
+              <button
+                onClick={() => setIsAddOpen(false)}
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleDesigSubmit} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Select Department *</label>
-                <select
-                  value={desigForm.departmentId}
-                  onChange={(e) => setDesigForm({ ...desigForm, departmentId: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium"
-                >
-                  {departments.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name} ({d.code})
-                    </option>
-                  ))}
-                </select>
+            <form onSubmit={handleCreateDept} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Department Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Data & Analytics"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Code *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. DTA"
+                    value={form.code}
+                    onChange={(e) => setForm({ ...form, code: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Appointed Lead</label>
+                  <select
+                    value={form.lead}
+                    onChange={(e) => setForm({ ...form, lead: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                  >
+                    <option value="Alex Mercer">Alex Mercer</option>
+                    <option value="Emily Zhang">Emily Zhang</option>
+                    <option value="Chloe Bennett">Chloe Bennett</option>
+                    <option value="David Miller">David Miller</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Budget Allocation</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. $600,000"
+                    value={form.budget}
+                    onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Designation Title *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Principal Cloud Architect"
-                  value={desigForm.title}
-                  onChange={(e) => setDesigForm({ ...desigForm, title: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium"
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Description</label>
+                <textarea
+                  rows={3}
+                  placeholder="Summarize mission and scope..."
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
                 />
               </div>
 
-              <div className="pt-3 flex justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setIsDesigModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-xs font-bold cursor-pointer"
+                  onClick={() => setIsAddOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 bg-slate-900 text-white rounded-full text-xs font-bold cursor-pointer hover:bg-slate-800"
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Designation'}
+                  Create Department
                 </button>
               </div>
             </form>

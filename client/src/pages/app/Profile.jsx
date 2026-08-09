@@ -1,352 +1,315 @@
-import React, { useState, useEffect } from 'react';
-import { Camera, User, Mail, Phone, MapPin, Shield, Key, CheckCircle, Save, Sparkles, Building, Briefcase, Calendar, Lock } from 'lucide-react';
+import React, { useState } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
-import { api } from '../../services/api';
-
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+import {
+  User,
+  Mail,
+  Phone,
+  Shield,
+  Key,
+  Building,
+  Calendar,
+  CheckCircle2,
+  Lock,
+  Save,
+  Camera,
+  MapPin,
+  Clock,
+  ShieldCheck,
+  Laptop,
+} from 'lucide-react';
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState('personal');
-  const [loading, setLoading] = useState(false);
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
+  const [toastMsg, setToastMsg] = useState('');
 
-  // Profile Form State
-  const [formData, setFormData] = useState({
-    firstName: 'System',
-    lastName: 'Administrator',
+  const [profile, setProfile] = useState({
+    firstName: 'Admin',
+    lastName: 'User',
     email: 'admin@company.com',
-    phone: '+1 (555) 234-5678',
-    role: 'System Administrator',
-    department: 'Executive Management',
-    location: 'Silicon Valley, CA',
-    bio: 'Overseeing HR operations, biometric sync pipelines, payroll disbursements, and platform security for NexaHR.',
+    phone: '+1 (555) 019-2831',
+    role: 'SUPER_ADMIN',
+    department: 'People Operations & Executive Leadership',
+    designation: 'Chief Technology Officer & Head of People',
+    location: 'San Francisco HQ (Executive Suite)',
+    employeeCode: 'NEXA-ADM-001',
+    joiningDate: 'Jan 15, 2021',
   });
 
-  const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
-
-  // Password state
-  const [passwords, setPasswords] = useState({
+  const [security, setSecurity] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
+    twoFactor: true,
   });
-
-  useEffect(() => {
-    // Load stored user data & avatar
-    const loadProfileData = async () => {
-      try {
-        const res = await api.getMe();
-        if (res.success && res.data) {
-          const u = res.data;
-          setFormData((prev) => ({
-            ...prev,
-            firstName: u.firstName || prev.firstName,
-            lastName: u.lastName || prev.lastName,
-            email: u.email || prev.email,
-            phone: u.phone || prev.phone,
-            role: u.role || prev.role,
-            department: u.profile?.department?.name || prev.department,
-          }));
-        }
-      } catch (e) {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            const u = JSON.parse(storedUser);
-            setFormData((prev) => ({
-              ...prev,
-              firstName: u.firstName || prev.firstName,
-              lastName: u.lastName || prev.lastName,
-              email: u.email || prev.email,
-            }));
-          } catch (err) {}
-        }
-      }
-    };
-
-    loadProfileData();
-
-    const storedAvatar = localStorage.getItem('user_avatar');
-    if (storedAvatar) {
-      setAvatar(storedAvatar);
-    }
-  }, []);
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Image = reader.result;
-        setAvatar(base64Image);
-        localStorage.setItem('user_avatar', base64Image);
-        window.dispatchEvent(new Event('user_profile_updated'));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSavedSuccess(true);
-      const updatedUser = {
-        ...formData,
-        avatar,
-      };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      localStorage.setItem('user_avatar', avatar);
-      window.dispatchEvent(new Event('user_profile_updated'));
-      setTimeout(() => setSavedSuccess(false), 3000);
-    }, 600);
+    setToastMsg('Profile information updated successfully!');
+    setTimeout(() => setToastMsg(''), 3000);
+  };
+
+  const handleSaveSecurity = (e) => {
+    e.preventDefault();
+    setToastMsg('Security credentials updated successfully!');
+    setTimeout(() => setToastMsg(''), 3000);
   };
 
   return (
-    <div className="space-y-6 text-slate-800 dark:text-slate-100">
-      {/* Top Header */}
-      <AppPageHeader title="My Profile & Settings" subtitle="Manage your personal details, avatar photo & security settings" />
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
+      <AppPageHeader
+        title="Admin Profile & System Access"
+        subtitle="Manage personal administrator details, executive credentials, 2FA authorization, and active sessions."
+      />
 
-      {/* Main Profile Header Banner */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+      {toastMsg && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
-          {/* Avatar Upload Container */}
-          <div className="relative group shrink-0">
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl bg-slate-100 dark:bg-slate-800 relative">
-              <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
-              {/* Camera Hover Overlay */}
-              <label
-                htmlFor="avatar-upload"
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer duration-200"
-              >
-                <Camera className="w-6 h-6 text-white mb-1" />
-                <span className="text-[10px] font-bold">Change Photo</span>
-              </label>
-            </div>
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className="hidden"
-            />
-            {/* Online Indicator Badge */}
-            <span className="w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-[#1E293B] absolute bottom-2 right-2 shadow-sm"></span>
+      {/* ========================================================================= */}
+      {/* 1. HERO PROFILE CARD */}
+      {/* ========================================================================= */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className="relative group">
+          <img
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+            alt="Admin Profile"
+            className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-blue-500/20 shadow-md"
+          />
+          <button className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-blue-600 text-white shadow-md hover:bg-blue-700 cursor-pointer transition-all">
+            <Camera className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="flex-1 text-center md:text-left space-y-2">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+              {profile.firstName} {profile.lastName}
+            </h2>
+            <span className="px-3 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] font-extrabold uppercase">
+              {profile.role}
+            </span>
           </div>
 
-          {/* User Info Overview */}
-          <div className="text-center sm:text-left flex-1 space-y-2">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-                {formData.firstName} {formData.lastName}
-              </h2>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/60 self-center sm:self-auto">
-                {formData.role}
-              </span>
-            </div>
+          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">{profile.designation}</p>
 
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
-              {formData.bio}
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
-              <div className="flex items-center gap-1.5">
-                <Mail className="w-4 h-4 text-slate-400" />
-                <span>{formData.email}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Building className="w-4 h-4 text-slate-400" />
-                <span>{formData.department}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                <span>{formData.location}</span>
-              </div>
-            </div>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400 pt-1 font-medium">
+            <span className="flex items-center gap-1.5">
+              <Building className="w-3.5 h-3.5" />
+              <span>{profile.department}</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{profile.location}</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Member since {profile.joiningDate}</span>
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Settings Tab Navigation Bar */}
-      <div className="bg-white dark:bg-[#1E293B] p-2 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('personal')}
-          className={`px-5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'personal'
-              ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        >
-          <User className="w-4 h-4" />
-          <span>Personal Information</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('security')}
-          className={`px-5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'security'
-              ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
-        >
-          <Shield className="w-4 h-4" />
-          <span>Security & Passwords</span>
-        </button>
+      {/* ========================================================================= */}
+      {/* 2. TABS NAVIGATION */}
+      {/* ========================================================================= */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/60 dark:bg-slate-800/80 rounded-2xl w-fit">
+        {[
+          { id: 'profile', label: 'Personal Information', icon: User },
+          { id: 'security', label: 'Security & Password', icon: ShieldCheck },
+          { id: 'sessions', label: 'Active Sessions', icon: Laptop },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeTab === tab.id
+                  ? 'bg-white dark:bg-[#1E293B] text-blue-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Tab 1: Personal Information Form */}
-      {activeTab === 'personal' && (
-        <form onSubmit={handleSaveProfile} className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Account Information</h3>
-              <p className="text-xs text-slate-400">Update your account profile details and contact information.</p>
-            </div>
-            {savedSuccess && (
-              <div className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold flex items-center gap-2 animate-in fade-in">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>Profile updated successfully!</span>
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">First Name</label>
-              <input
-                type="text"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Last Name</label>
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Email Address</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Phone Number</label>
-              <input
-                type="text"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Designation / Role</label>
-              <input
-                type="text"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Department</label>
-              <input
-                type="text"
-                value={formData.department}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-          </div>
-
+      {/* ========================================================================= */}
+      {/* 3. TAB CONTENT */}
+      {/* ========================================================================= */}
+      {activeTab === 'profile' && (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
           <div>
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Bio / Professional Summary</label>
-            <textarea
-              rows={3}
-              value={formData.bio}
-              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-            />
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">General Information</h3>
+            <p className="text-xs text-slate-400">Update administrative details and executive contact information</p>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <Save className="w-4 h-4 text-emerald-400 dark:text-emerald-600" />
-              <span>{loading ? 'Saving Changes...' : 'Save Profile Changes'}</span>
-            </button>
-          </div>
-        </form>
+          <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">First Name</label>
+                <input
+                  type="text"
+                  value={profile.firstName}
+                  onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Last Name</label>
+                <input
+                  type="text"
+                  value={profile.lastName}
+                  onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Primary Email</label>
+                <input
+                  type="email"
+                  value={profile.email}
+                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Direct Phone</label>
+                <input
+                  type="text"
+                  value={profile.phone}
+                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Designation Title</label>
+                <input
+                  type="text"
+                  value={profile.designation}
+                  onChange={(e) => setProfile({ ...profile, designation: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Office Location</label>
+                <input
+                  type="text"
+                  value={profile.location}
+                  onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-3">
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105"
+              >
+                <Save className="w-4 h-4" />
+                <span>Save Profile Changes</span>
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      {/* Tab 2: Security & Password */}
       {activeTab === 'security' && (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
-          <div className="pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Security & Password</h3>
-            <p className="text-xs text-slate-400">Ensure your administrative account remains protected with a strong password.</p>
+            <p className="text-xs text-slate-400">Manage administrator authentication and two-factor verification</p>
           </div>
 
-          <div className="max-w-md space-y-4">
+          <form onSubmit={handleSaveSecurity} className="space-y-4 text-xs">
             <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Current Password</label>
+              <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Current Password</label>
               <input
                 type="password"
                 placeholder="••••••••••••"
-                value={passwords.currentPassword}
-                onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
+                className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">New Password</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">New Password</label>
+                <input
+                  type="password"
+                  placeholder="Minimum 8 characters"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Confirm New Password</label>
+                <input
+                  type="password"
+                  placeholder="Repeat new password"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+              <div>
+                <div className="font-bold text-slate-900 dark:text-white">Two-Factor Authentication (2FA)</div>
+                <div className="text-slate-400 text-[11px]">Require authenticator app code on each login</div>
+              </div>
               <input
-                type="password"
-                placeholder="••••••••••••"
-                value={passwords.newPassword}
-                onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
+                type="checkbox"
+                checked={security.twoFactor}
+                onChange={(e) => setSecurity({ ...security, twoFactor: e.target.checked })}
+                className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Confirm New Password</label>
-              <input
-                type="password"
-                placeholder="••••••••••••"
-                value={passwords.confirmPassword}
-                onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
+            <div className="flex justify-end pt-3">
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105"
+              >
+                <Save className="w-4 h-4" />
+                <span>Update Credentials</span>
+              </button>
             </div>
+          </form>
+        </div>
+      )}
 
-            <button
-              onClick={() => alert('Password updated successfully!')}
-              className="px-6 py-2.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-md flex items-center gap-2 transition-all cursor-pointer mt-2"
-            >
-              <Lock className="w-4 h-4 text-emerald-400 dark:text-emerald-600" />
-              <span>Update Password</span>
-            </button>
+      {activeTab === 'sessions' && (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Active Authorized Sessions</h3>
+            <p className="text-xs text-slate-400">Devices currently logged into this administrator account</p>
+          </div>
+
+          <div className="space-y-3 text-xs">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
+                  <Laptop className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="font-extrabold text-slate-900 dark:text-white">Current Session (Chrome on Windows 11)</div>
+                  <div className="text-slate-400 font-mono text-[10px]">IP: 192.168.1.104 • San Francisco, CA</div>
+                </div>
+              </div>
+              <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-extrabold text-[10px]">
+                ACTIVE NOW
+              </span>
+            </div>
           </div>
         </div>
       )}

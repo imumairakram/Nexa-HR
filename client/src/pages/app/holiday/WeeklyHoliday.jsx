@@ -1,79 +1,108 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Calendar, Save, CheckCircle2 } from 'lucide-react';
+import {
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Save,
+  Check,
+  Building2,
+  ShieldCheck,
+} from 'lucide-react';
+
+const DAYS = [
+  { id: 'mon', name: 'Monday', isWeekend: false },
+  { id: 'tue', name: 'Tuesday', isWeekend: false },
+  { id: 'wed', name: 'Wednesday', isWeekend: false },
+  { id: 'thu', name: 'Thursday', isWeekend: false },
+  { id: 'fri', name: 'Friday', isWeekend: false },
+  { id: 'sat', name: 'Saturday', isWeekend: true },
+  { id: 'sun', name: 'Sunday', isWeekend: true },
+];
 
 const WeeklyHoliday = () => {
-  const [days, setDays] = useState([
-    { name: 'Monday', isOff: false },
-    { name: 'Tuesday', isOff: false },
-    { name: 'Wednesday', isOff: false },
-    { name: 'Thursday', isOff: false },
-    { name: 'Friday', isOff: false },
-    { name: 'Saturday', isOff: true },
-    { name: 'Sunday', isOff: true },
-  ]);
+  const [schedule, setSchedule] = useState(DAYS);
+  const [toastMsg, setToastMsg] = useState('');
 
-  const [saved, setSaved] = useState(false);
-
-  const toggleDay = (index) => {
-    const updated = [...days];
-    updated[index].isOff = !updated[index].isOff;
-    setDays(updated);
+  const toggleDay = (id) => {
+    setSchedule(
+      schedule.map((d) => (d.id === id ? { ...d, isWeekend: !d.isWeekend } : d))
+    );
   };
 
   const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setToastMsg('Weekly holiday schedule policy updated successfully!');
+    setTimeout(() => setToastMsg(''), 3000);
   };
 
   return (
-    <div className="space-y-6 text-slate-800 dark:text-slate-100">
-      <AppPageHeader title="Weekly Holiday Configuration" subtitle="Set standard weekly off-days for your organization" />
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 max-w-4xl mx-auto">
+      <AppPageHeader
+        title="Weekly Holiday & Rest-Day Shift Policy"
+        subtitle="Establish company standard non-working weekend days and department shift rest schedules."
+      />
 
-      {saved && (
-        <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-emerald-800 dark:text-emerald-300 p-4 rounded-2xl flex items-center gap-2 text-xs font-bold animate-in fade-in duration-200">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          <span>Weekly holiday rules saved successfully!</span>
+      {toastMsg && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6 max-w-2xl">
+      {/* Main Card */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
         <div>
-          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Workweek Schedule</h3>
-          <p className="text-xs text-slate-400">Toggle days that are designated as non-working weekly holidays</p>
+          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+            Standard Company Work-Week Schedule
+          </h3>
+          <p className="text-xs text-slate-400">
+            Select days designated as off-duty weekends (unpaid rest periods for standard office shifts)
+          </p>
         </div>
 
-        <div className="space-y-3">
-          {days.map((d, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3">
+          {schedule.map((day) => (
             <div
-              key={d.name}
-              onClick={() => toggleDay(idx)}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
-                d.isOff
-                  ? 'bg-rose-50/50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40'
-                  : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800'
+              key={day.id}
+              onClick={() => toggleDay(day.id)}
+              className={`p-5 rounded-3xl border text-center transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                day.isWeekend
+                  ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700/60 shadow-xs'
+                  : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Calendar className={`w-4 h-4 ${d.isOff ? 'text-rose-500' : 'text-slate-400'}`} />
-                <span className="text-xs font-extrabold text-slate-900 dark:text-white">{d.name}</span>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">DAY</span>
+                <h4 className="text-sm font-black text-slate-900 dark:text-white mt-1">{day.name}</h4>
               </div>
-              <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                d.isOff ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300'
-              }`}>
-                {d.isOff ? 'OFF DAY' : 'WORKING DAY'}
-              </span>
+
+              <div
+                className={`py-1 px-2 rounded-xl text-[10px] font-extrabold uppercase ${
+                  day.isWeekend
+                    ? 'bg-amber-500 text-white shadow-xs'
+                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                }`}
+              >
+                {day.isWeekend ? '🏖️ WEEKEND' : '💼 WORK DAY'}
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+        <div className="p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 text-xs text-blue-900 dark:text-blue-200 flex items-center gap-3">
+          <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
+          <span>
+            Current policy defines a <strong>5-Day Working Week (40 standard hours)</strong> with Saturday and Sunday designated as mandatory paid rest days.
+          </span>
+        </div>
+
+        <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 cursor-pointer transition-all"
+            className="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105"
           >
             <Save className="w-4 h-4" />
-            <span>Save Workweek Rules</span>
+            <span>Save Shift Schedule</span>
           </button>
         </div>
       </div>
