@@ -2,6 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/website/Login';
 import MainLayout from './layouts/MainLayout';
+import EmployeeLayout from './layouts/EmployeeLayout';
+
+// HR Admin Pages
 import Dashboard from './pages/app/Dashboard';
 import Employees from './pages/app/Employees';
 import Attendance from './pages/app/Attendance';
@@ -49,6 +52,21 @@ import JobBoard from './pages/app/recruitment/JobBoard';
 import JobInterview from './pages/app/recruitment/JobInterview';
 import JobDesk from './pages/app/recruitment/JobDesk';
 
+// Employee Portal Pages
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import EmployeeAttendance from './pages/employee/EmployeeAttendance';
+import EmployeeLeaves from './pages/employee/EmployeeLeaves';
+import EmployeePayslips from './pages/employee/EmployeePayslips';
+import EmployeeProjects from './pages/employee/EmployeeProjects';
+import EmployeeAnnouncements from './pages/employee/EmployeeAnnouncements';
+import EmployeeAwards from './pages/employee/EmployeeAwards';
+import EmployeeHolidays from './pages/employee/EmployeeHolidays';
+import EmployeeDirectory from './pages/employee/EmployeeDirectory';
+import EmployeeHelpdesk from './pages/employee/EmployeeHelpdesk';
+import EmployeeDocuments from './pages/employee/EmployeeDocuments';
+import EmployeeProfile from './pages/employee/EmployeeProfile';
+import EmployeeSettings from './pages/employee/EmployeeSettings';
+
 function App() {
   return (
     <Router>
@@ -57,7 +75,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Navigate to="/" replace />} />
 
-        {/* Authenticated Internal Application Routes */}
+        {/* Authenticated HR Admin Application Routes */}
         <Route path="/app" element={<MainLayout />}>
           <Route index element={<Navigate to="/app/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -112,6 +130,24 @@ function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
 
+        {/* Authenticated Employee Self-Service Portal Routes */}
+        <Route path="/employee" element={<EmployeeLayout />}>
+          <Route index element={<Navigate to="/employee/dashboard" replace />} />
+          <Route path="dashboard" element={<EmployeeDashboard />} />
+          <Route path="attendance" element={<EmployeeAttendance />} />
+          <Route path="leaves" element={<EmployeeLeaves />} />
+          <Route path="payslips" element={<EmployeePayslips />} />
+          <Route path="projects" element={<EmployeeProjects />} />
+          <Route path="announcements" element={<EmployeeAnnouncements />} />
+          <Route path="awards" element={<EmployeeAwards />} />
+          <Route path="holidays" element={<EmployeeHolidays />} />
+          <Route path="directory" element={<EmployeeDirectory />} />
+          <Route path="helpdesk" element={<EmployeeHelpdesk />} />
+          <Route path="documents" element={<EmployeeDocuments />} />
+          <Route path="profile" element={<EmployeeProfile />} />
+          <Route path="settings" element={<EmployeeSettings />} />
+        </Route>
+
         {/* Catch-All Route redirects to Root Login */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -120,4 +156,3 @@ function App() {
 }
 
 export default App;
-

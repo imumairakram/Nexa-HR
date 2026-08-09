@@ -1,0 +1,44 @@
+import React, { useState } from 'react';
+import { Outlet, Navigate } from 'react-router-dom';
+import EmployeeSidebar from '../components/navigation/EmployeeSidebar';
+import EmployeeBottomNav from '../components/navigation/EmployeeBottomNav';
+
+const EmployeeLayout = () => {
+  const token = localStorage.getItem('token');
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('nexahr_employee_sidebar_collapsed') === 'true';
+  });
+
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('nexahr_employee_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
+
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
+
+  return (
+    <div
+      className={`min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex text-slate-800 dark:text-slate-100 antialiased font-sans p-3 md:p-6 transition-all duration-300 ${
+        isCollapsed ? 'lg:pl-[120px]' : 'lg:pl-[296px]'
+      }`}
+    >
+      {/* Fixed Left Sidebar with Collapse/Expand */}
+      <EmployeeSidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
+
+      {/* Main Content Area */}
+      <main className="flex-1 min-w-0 transition-all duration-300 pb-20 lg:pb-6">
+        <Outlet />
+      </main>
+
+      {/* Mobile Navigation */}
+      <EmployeeBottomNav />
+    </div>
+  );
+};
+
+export default EmployeeLayout;
