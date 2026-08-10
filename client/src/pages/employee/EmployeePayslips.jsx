@@ -118,8 +118,8 @@ const EmployeePayslips = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title="My Payslips & Compensation"
-        subtitle="Review your monthly salary disbursements, tax withholding, and printable payslip vouchers."
+        title="My Payslips"
+        subtitle="Salary disbursements, tax records, and payslip vouchers."
       />
 
       {toastMsg && (

@@ -90,8 +90,8 @@ const EmployeeProjects = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title="My Projects & Assigned Tasks"
-        subtitle="Manage sprint deliverables, track logged hours, and update workflow task progress."
+        title="My Projects"
+        subtitle="Sprint deliverables, tasks, and project hours."
       />
 
       {toastMsg && (

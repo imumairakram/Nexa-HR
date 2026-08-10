@@ -114,8 +114,8 @@ const EmployeeLeaves = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title="My Leaves & Time Off"
-        subtitle="Manage personal leave quotas, submit time-off requests, and track approval status."
+        title="My Leaves"
+        subtitle="Leave quotas, time-off requests, and approvals."
       />
 
       {toastMsg && (

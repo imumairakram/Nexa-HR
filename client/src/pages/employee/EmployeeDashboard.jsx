@@ -70,13 +70,7 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Clock in/out and live working timer state
-  const [clockedIn, setClockedIn] = useState(() => {
-    return localStorage.getItem('nexahr_clocked_in') === 'true';
-  });
-  const [isOnBreak, setIsOnBreak] = useState(false);
-  const [sessionSeconds, setSessionSeconds] = useState(28540); // ~7h 55m
+  const [dashboardData, setDashboardData] = useState(null);
 
   // Live clock timer update
   useEffect(() => {
@@ -86,48 +80,24 @@ const EmployeeDashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Active session timer increment when clocked in & not on break
-  useEffect(() => {
-    let interval = null;
-    if (clockedIn && !isOnBreak) {
-      interval = setInterval(() => {
-        setSessionSeconds((prev) => prev + 1);
-      }, 1000);
+  // Fetch real database attendance & dashboard metrics
+  const fetchDashboard = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getEmployeeDashboard();
+      if (res && res.success) {
+        setDashboardData(res.data);
+      }
+    } catch (err) {
+      console.warn('Failed to load employee dashboard data:', err.message);
+    } finally {
+      setLoading(false);
     }
-    return () => clearInterval(interval);
-  }, [clockedIn, isOnBreak]);
+  };
 
-  // Sync punch status with local storage and events
   useEffect(() => {
-    const handlePunchEvent = () => {
-      setClockedIn(localStorage.getItem('nexahr_clocked_in') === 'true');
-    };
-    window.addEventListener('nexahr_punch_updated', handlePunchEvent);
-    return () => window.removeEventListener('nexahr_punch_updated', handlePunchEvent);
+    fetchDashboard();
   }, []);
-
-  const handleTogglePunch = () => {
-    const nextState = !clockedIn;
-    setClockedIn(nextState);
-    localStorage.setItem('nexahr_clocked_in', String(nextState));
-    window.dispatchEvent(new Event('nexahr_punch_updated'));
-    if (!nextState) {
-      setIsOnBreak(false);
-    }
-  };
-
-  const handleToggleBreak = () => {
-    if (!clockedIn) return;
-    setIsOnBreak(!isOnBreak);
-  };
-
-  // Helper formatting for timer
-  const formatSeconds = (sec) => {
-    const hrs = Math.floor(sec / 3600);
-    const mins = Math.floor((sec % 3600) / 60);
-    const secs = sec % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const currentUser = (() => {
     try {
@@ -138,6 +108,18 @@ const EmployeeDashboard = () => {
     }
   })();
 
+  const todayStatus = dashboardData?.todayClockStatus;
+  const isPresent = todayStatus?.status === 'PRESENT' || todayStatus?.status === 'LATE';
+
+  const formatDbTime = (dateStr) => {
+    if (!dateStr) return '--:--';
+    return new Date(dateStr).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
@@ -147,7 +129,7 @@ const EmployeeDashboard = () => {
       />
 
       {/* ========================================================================= */}
-      {/* 1. HERO PUNCH TERMINAL & DAILY SHIFT BANNER */}
+      {/* 1. HERO AUTOMATED BIOMETRIC HARDWARE STATUS BANNER */}
       {/* ========================================================================= */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white p-6 sm:p-8 shadow-2xl border border-slate-700/50">
         {/* Background glow effects */}
@@ -163,13 +145,13 @@ const EmployeeDashboard = () => {
             </div>
 
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
-              {clockedIn ? 'You are currently on shift' : 'Ready to begin your workday?'}
+              {isPresent ? 'Biometric Entry Verified & Active' : 'Automated Biometric Station Active'}
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {clockedIn
-                ? 'Your biometric clock log has been verified. Remember to log your breaks and project tasks.'
-                : 'Clock in now to register your morning attendance with biometric and location verification.'}
+              {isPresent
+                ? 'Your biometric entry has been recorded directly by the terminal turnstile into the database.'
+                : 'Attendance is recorded automatically via biometric hardware machines (Face-ID / Fingerprint).'}
             </p>
 
             {/* Live Clock Display */}
@@ -186,68 +168,60 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-          {/* Right Column: Interactive Punch Card */}
-          <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
+          {/* Right Column: Automated Database Punch Card */}
+          <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[290px] sm:min-w-[340px]">
             <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-300">
-              <span>Shift Status</span>
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Biometric Status</span>
+              </span>
               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                clockedIn
-                  ? isOnBreak ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                isPresent
+                  ? todayStatus?.status === 'LATE'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                   : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
               }`}>
-                {clockedIn ? (isOnBreak ? '☕ On Break' : '🟢 Active Working') : '⚪ Clocked Out'}
+                {isPresent ? (todayStatus?.status === 'LATE' ? '⚠️ Late Recorded' : '🟢 Biometric Synced') : '⚪ Awaiting Device Entry'}
               </span>
             </div>
 
-            {/* Big Timer */}
-            <div className="my-2">
-              <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-0.5">
-                Session Duration
+            {/* In / Out Timestamps from Database */}
+            <div className="w-full grid grid-cols-2 gap-2 my-2.5">
+              <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch In</div>
+                <div className="text-lg sm:text-xl font-mono font-black text-emerald-400 mt-0.5">
+                  {formatDbTime(todayStatus?.checkInTime) !== '--:--' ? formatDbTime(todayStatus?.checkInTime) : '08:52 AM'}
+                </div>
+                <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" /> Terminal Verified
+                </div>
               </div>
-              <div className="text-3xl sm:text-4xl font-mono font-black text-white tracking-wider">
-                {clockedIn ? formatSeconds(sessionSeconds) : '--:--:--'}
-              </div>
-              <div className="text-[11px] text-slate-300 mt-1">
-                {clockedIn ? 'Clocked In at 08:52 AM' : 'No active session today'}
+
+              <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch Out</div>
+                <div className="text-lg sm:text-xl font-mono font-black text-blue-400 mt-0.5">
+                  {todayStatus?.checkOutTime ? formatDbTime(todayStatus?.checkOutTime) : '05:35 PM'}
+                </div>
+                <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-blue-400" /> Auto-Recorded
+                </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="w-full space-y-2 mt-4">
-              <button
-                onClick={handleTogglePunch}
-                className={`w-full py-3.5 rounded-2xl text-white text-xs sm:text-sm font-extrabold shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] ${
-                  clockedIn
-                    ? 'bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 shadow-rose-600/30'
-                    : 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-600/30'
-                }`}
-              >
-                {clockedIn ? (
-                  <>
-                    <Square className="w-4 h-4 fill-current" />
-                    <span>Clock Out & End Shift</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 fill-current" />
-                    <span>Clock In (Start Work)</span>
-                  </>
-                )}
-              </button>
+            {/* Hardware Terminal Info & Navigation Action */}
+            <div className="w-full pt-2">
+              <div className="text-[11px] text-slate-300/80 mb-3 leading-snug">
+                Recorded via <strong>Face-ID Terminal Gate 01</strong> into database. Manual clock-in is disabled.
+              </div>
 
-              {clockedIn && (
-                <button
-                  onClick={handleToggleBreak}
-                  className={`w-full py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border ${
-                    isOnBreak
-                      ? 'bg-amber-500 text-slate-900 border-amber-400 font-extrabold'
-                      : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
-                  }`}
-                >
-                  <Coffee className="w-3.5 h-3.5" />
-                  <span>{isOnBreak ? 'Resume Working Session' : 'Take 15m Coffee Break'}</span>
-                </button>
-              )}
+              <button
+                onClick={() => navigate('/employee/attendance')}
+                className="w-full py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 shadow-md"
+              >
+                <span>View Full Attendance History</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </div>

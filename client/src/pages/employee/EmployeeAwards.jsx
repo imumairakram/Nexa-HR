@@ -89,8 +89,8 @@ const EmployeeAwards = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title="Awards & Peer Recognition Wall"
-        subtitle="Celebrate milestones, explore your personal honors, and send kudos to appreciate colleagues."
+        title="Awards & Kudos"
+        subtitle="Milestones, honors, and peer recognitions."
       />
 
       {toastMsg && (

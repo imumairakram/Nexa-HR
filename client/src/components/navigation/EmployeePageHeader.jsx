@@ -272,19 +272,13 @@ const EmployeePageHeader = ({
       )}
 
       {/* Top Header Row */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Left Side Title & Subtitle */}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
-              {title}
-            </h1>
-            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              <span className={`w-1.5 h-1.5 rounded-full ${clockedIn ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-              {clockedIn ? 'Clocked In' : 'Clocked Out'}
-            </span>
-          </div>
-          <p className="text-xs font-semibold text-slate-400 dark:text-slate-400 mt-0.5 truncate">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            {title}
+          </h1>
+          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
             {displaySubtitle}
           </p>
         </div>
@@ -548,18 +542,7 @@ const EmployeePageHeader = ({
                     <span>Preferences & Security</span>
                   </button>
 
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
-                    <button
-                      onClick={() => {
-                        navigate('/app/dashboard');
-                        setIsProfileOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 cursor-pointer"
-                    >
-                      <ArrowRightLeft className="w-4 h-4" />
-                      <span>Switch to HR Admin</span>
-                    </button>
-
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"

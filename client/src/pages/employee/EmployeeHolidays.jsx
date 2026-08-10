@@ -24,8 +24,8 @@ const EmployeeHolidays = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title="Official Company Holidays & Calendar"
-        subtitle="Yearly public holiday schedule, long weekend planner, and official time-off calendar."
+        title="Company Holidays"
+        subtitle="Public holiday schedule and calendar."
       />
 
       {/* Next Upcoming Holiday Hero Banner */}

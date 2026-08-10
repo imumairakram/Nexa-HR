@@ -134,22 +134,28 @@ export const api = {
     });
   },
 
-  // --- Attendance ---
+  // --- Attendance (Automated Biometric Database System) ---
   getAttendanceLogs: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return await fetchAPI(`/attendance${query ? `?${query}` : ''}`);
   },
 
-  logAttendance: async (logData) => {
-    return await fetchAPI('/attendance/log', {
-      method: 'POST',
-      body: JSON.stringify(logData),
-    });
+  getMyAttendanceLogs: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/attendance/my-logs${query ? `?${query}` : ''}`);
   },
 
-  syncHardware: async () => {
-    return await fetchAPI('/attendance/sync-hardware', {
+  syncBiometricHardware: async (payload) => {
+    return await fetchAPI('/attendance/hardware-sync', {
       method: 'POST',
+      headers: {
+        'x-hardware-key': 'nexahr_biometric_hardware_secret_2026',
+      },
+      body: JSON.stringify({
+        employeeCode: payload.employeeCode,
+        timestamp: payload.timestamp || new Date().toISOString(),
+        type: payload.type || 'IN',
+      }),
     });
   },
 

@@ -34,11 +34,6 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Clock status state (persisted in localStorage for demo)
-  const [clockedIn, setClockedIn] = useState(() => {
-    return localStorage.getItem('nexahr_clocked_in') === 'true';
-  });
-
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const u = localStorage.getItem('user');
@@ -50,27 +45,17 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setClockedIn(localStorage.getItem('nexahr_clocked_in') === 'true');
       try {
         const u = localStorage.getItem('user');
         if (u) setCurrentUser(JSON.parse(u));
       } catch {}
     };
 
-    window.addEventListener('nexahr_punch_updated', handleStorageChange);
     window.addEventListener('storage', handleStorageChange);
     return () => {
-      window.removeEventListener('nexahr_punch_updated', handleStorageChange);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
-
-  const handleTogglePunch = () => {
-    const nextState = !clockedIn;
-    setClockedIn(nextState);
-    localStorage.setItem('nexahr_clocked_in', String(nextState));
-    window.dispatchEvent(new Event('nexahr_punch_updated'));
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -134,41 +119,9 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
           </button>
         </div>
 
-        {/* Live Punch Status Chip (Non-collapsed) */}
-        {!isCollapsed && (
-          <div className="my-2.5 px-2">
-            <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between shadow-xs">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    clockedIn ? 'bg-emerald-500 ring-4 ring-emerald-500/20 animate-pulse' : 'bg-slate-400'
-                  }`}
-                />
-                <div>
-                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200">
-                    {clockedIn ? 'On Shift (Clocked In)' : 'Clocked Out'}
-                  </div>
-                  <div className="text-[9px] text-slate-400 font-medium">Regular 9:00 - 17:30</div>
-                </div>
-              </div>
-
-              <button
-                onClick={handleTogglePunch}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-xl transition-all cursor-pointer ${
-                  clockedIn
-                    ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-xs'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-                }`}
-              >
-                {clockedIn ? 'Clock Out' : 'Clock In'}
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Scrollable Navigation Items */}
         <nav
-          className={`flex-1 overflow-y-auto overflow-x-hidden pt-1 space-y-1 w-full ${
+          className={`flex-1 overflow-y-auto overflow-x-hidden pt-2 space-y-1 w-full ${
             isCollapsed ? 'no-scrollbar px-0' : 'custom-scrollbar pr-1'
           }`}
         >
@@ -209,22 +162,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
         </nav>
       </div>
 
-      {/* Bottom Controls: Switch to Admin (if admin), Theme Toggle, Sign Out */}
+      {/* Bottom Controls: Theme Toggle, Sign Out */}
       <div className="w-full pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1 shrink-0">
-        {/* Switch to HR Admin Portal option */}
-        <button
-          onClick={() => navigate('/app/dashboard')}
-          title="Switch to HR Admin Portal"
-          className={`flex items-center transition-all cursor-pointer ${
-            isCollapsed
-              ? 'w-11 h-11 rounded-2xl justify-center mx-auto text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40'
-              : 'w-full gap-2.5 px-3 py-2 rounded-2xl text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30'
-          }`}
-        >
-          <ArrowRightLeft className="w-4 h-4 stroke-[2] shrink-0" />
-          {!isCollapsed && <span>Switch to HR Admin</span>}
-        </button>
-
         {/* Theme Switcher */}
         <button
           onClick={toggleTheme}
