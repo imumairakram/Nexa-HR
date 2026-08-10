@@ -63,6 +63,7 @@ model User {
   approvedLeaves  LeaveRequest[]   @relation("ApprovedLeaves")
   salaryStructure SalaryStructure?
   payslips        Payslip[]
+  passwordResetOtps PasswordResetOtp[]
 
   @@map("users")
 }
@@ -246,3 +247,27 @@ model Payslip {
   @@index([year, month])
   @@map("payslips")
 }
+
+// ====================================================
+// SECURITY & PASSWORD RECOVERY OTP MODEL
+// ====================================================
+
+model PasswordResetOtp {
+  id        String   @id @default(uuid())
+  userId    String
+  email     String
+  phone     String?
+  otpHash   String
+  channel   String   // "EMAIL" | "WHATSAPP"
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+  @@map("password_reset_otps")
+}
+

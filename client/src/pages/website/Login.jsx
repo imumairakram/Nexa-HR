@@ -21,6 +21,8 @@ import {
 import { api } from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import Logo from '../../components/common/Logo';
+import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal';
+
 
 // Preset credentials for HR Admin and Employee
 export const DEMO_CREDENTIALS = {
@@ -103,6 +105,9 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
+
 
   // Handle Tab Switch (Employee vs HR Admin)
   const handleRoleTabChange = (role) => {
@@ -294,6 +299,13 @@ const Login = () => {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {resetSuccessNotification && (
+                <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold text-center border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>{resetSuccessNotification}</span>
+                </div>
+              )}
+
               {error && (
                 <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold text-center border border-rose-200 dark:border-rose-800/50">
                   {error}
@@ -344,6 +356,32 @@ const Login = () => {
                     ) : (
                       <Eye className="w-4 h-4 stroke-[1.8]" />
                     )}
+                  </button>
+                </div>
+
+                {/* Password Auxiliaries: Remember Me & Forgot Password */}
+                <div className="flex items-center justify-between mt-2 px-1">
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      id="remember-me"
+                      type="checkbox"
+                      defaultChecked
+                      className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                    />
+                    <label htmlFor="remember-me" className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 cursor-pointer select-none">
+                      Remember me
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setError(null);
+                      setResetSuccessNotification(null);
+                      setIsForgotPasswordOpen(true);
+                    }}
+                    className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline cursor-pointer transition-colors"
+                  >
+                    Forgot Password?
                   </button>
                 </div>
               </div>
@@ -630,8 +668,21 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password & Multi-Channel Recovery Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        initialRole={loginRole}
+        initialEmail={formData.email}
+        onSuccess={({ email, newPassword }) => {
+          setFormData({ email, password: newPassword });
+          setResetSuccessNotification('Password reset successfully! You can now sign in with your new password.');
+        }}
+      />
     </div>
   );
 };
 
 export default Login;
+

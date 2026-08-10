@@ -69,6 +69,38 @@ export const api = {
     return await fetchAPI('/auth/me');
   },
 
+  // --- Password Recovery & OTP Security ---
+  checkRecoveryUser: async (email) => {
+    return await fetchAPI('/auth/forgot-password/check', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  initiateForgotPassword: async ({ email, channel = 'EMAIL' }) => {
+    return await fetchAPI('/auth/forgot-password/initiate', {
+      method: 'POST',
+      body: JSON.stringify({ email, channel }),
+    });
+  },
+
+  verifyResetOtp: async ({ email, otp }) => {
+    return await fetchAPI('/auth/forgot-password/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    });
+  },
+
+  resetPasswordWithToken: async ({ newPassword, confirmPassword, token }) => {
+    return await fetchAPI('/auth/forgot-password/reset-password', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ newPassword, confirmPassword }),
+    });
+  },
+
   // --- Dashboard ---
   getDashboard: async () => {
     return await fetchAPI('/dashboard/admin');
