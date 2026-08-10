@@ -14,6 +14,9 @@ import {
   Phone,
   Calendar,
   Lock,
+  Clock,
+  Briefcase,
+  Sparkles,
 } from 'lucide-react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 
@@ -71,7 +74,7 @@ const NewEmployee = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 max-w-4xl mx-auto">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
         title="Employee Onboarding Wizard"
         subtitle="Step-by-step guided workflow to register new team members, configure salary bands, and grant system credentials."
@@ -85,7 +88,52 @@ const NewEmployee = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. PROGRESS STEPPER */}
+      {/* 1. STATS OVERVIEW CARDS */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">New Hires Q3</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">12 Onboarded</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <UserPlus className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Active Pipeline</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">4 In Progress</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <Sparkles className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Avg Setup Time</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">10 Minutes</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <Clock className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Security Auth</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">Auto 2FA</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. PROGRESS STEPPER */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -98,14 +146,14 @@ const NewEmployee = () => {
               <div
                 key={step.id}
                 onClick={() => setCurrentStep(step.id)}
-                className={`flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer ${
+                className={`flex items-center gap-3 p-4 rounded-2xl transition-all cursor-pointer ${
                   isCurrent
-                    ? 'bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800'
+                    ? 'bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 shadow-sm'
                     : 'bg-slate-50 dark:bg-slate-800/40 opacity-70 hover:opacity-100'
                 }`}
               >
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                     isDone
                       ? 'bg-emerald-500 text-white'
                       : isCurrent
@@ -113,7 +161,7 @@ const NewEmployee = () => {
                       : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                   }`}
                 >
-                  {isDone ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                  {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                 </div>
                 <div className="min-w-0">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">STEP 0{step.id}</div>
@@ -126,12 +174,16 @@ const NewEmployee = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. FORM STEP CONTENT */}
+      {/* 3. FORM STEP CONTENT */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
         {currentStep === 1 && (
-          <div className="space-y-4 text-xs animate-in fade-in">
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Personal & Contact Dossier</h3>
+          <div className="space-y-5 text-xs animate-in fade-in">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Personal & Contact Dossier</h3>
+              <p className="text-xs text-slate-400">Enter government-registered legal name and direct communication channels.</p>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">First Name *</label>
@@ -180,12 +232,37 @@ const NewEmployee = () => {
                 />
               </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Date of Birth</label>
+                <input
+                  type="date"
+                  value={form.dob}
+                  onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Residential Address</label>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
           </div>
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-4 text-xs animate-in fade-in">
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Department & Organization Placement</h3>
+          <div className="space-y-5 text-xs animate-in fade-in">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Department & Organization Placement</h3>
+              <p className="text-xs text-slate-400">Assign reporting hierarchy, internal employee code, and designated shift model.</p>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Assigned Department *</label>
@@ -238,8 +315,12 @@ const NewEmployee = () => {
         )}
 
         {currentStep === 3 && (
-          <div className="space-y-4 text-xs animate-in fade-in">
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Compensation & Benefits Structure</h3>
+          <div className="space-y-5 text-xs animate-in fade-in">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Compensation & Benefits Structure</h3>
+              <p className="text-xs text-slate-400">Establish base annual salary, tax withholding bracket, and company health insurance.</p>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Annual Base Salary ($ USD) *</label>
@@ -260,28 +341,51 @@ const NewEmployee = () => {
                 />
               </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Health & Dental Tier</label>
+                <select
+                  value={form.healthInsurance}
+                  onChange={(e) => setForm({ ...form, healthInsurance: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                >
+                  <option value="Comprehensive Tier 1">Comprehensive Tier 1 (100% Covered)</option>
+                  <option value="Standard Tier 2">Standard Tier 2 (80% Covered)</option>
+                  <option value="Executive Premium Tier">Executive Premium Tier</option>
+                </select>
+              </div>
+            </div>
           </div>
         )}
 
         {currentStep === 4 && (
-          <div className="space-y-4 text-xs animate-in fade-in">
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Credentials & System Access Review</h3>
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 space-y-2">
+          <div className="space-y-5 text-xs animate-in fade-in">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Credentials & System Access Review</h3>
+              <p className="text-xs text-slate-400">Review all configured onboarding parameters before committing the record to database.</p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 space-y-3">
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Employee Name:</span>
-                <span className="text-slate-900 dark:text-white">{form.firstName || 'New'} {form.lastName || 'Staff'}</span>
+                <span className="text-slate-900 dark:text-white text-sm">{form.firstName || 'New'} {form.lastName || 'Staff'}</span>
               </div>
               <div className="flex justify-between font-bold">
-                <span className="text-slate-400">Department:</span>
+                <span className="text-slate-400">Assigned Department:</span>
                 <span className="text-blue-600 dark:text-blue-400">{form.department}</span>
               </div>
               <div className="flex justify-between font-bold">
+                <span className="text-slate-400">Designation Role:</span>
+                <span className="text-slate-900 dark:text-white">{form.designation}</span>
+              </div>
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Annual Compensation:</span>
-                <span className="text-emerald-600">${parseFloat(form.baseSalary || 0).toLocaleString()} / yr</span>
+                <span className="text-emerald-600 font-black">${parseFloat(form.baseSalary || 0).toLocaleString()} / yr</span>
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">System Role Authorization:</span>
-                <span className="text-purple-600">{form.systemRole}</span>
+                <span className="text-purple-600 font-extrabold">{form.systemRole}</span>
               </div>
             </div>
           </div>

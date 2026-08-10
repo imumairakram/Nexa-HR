@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Sparkles, Plus, CheckCircle2, X } from 'lucide-react';
+import { Sparkles, Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers } from 'lucide-react';
 
 const INITIAL = [
-  { id: 1, name: 'React.js & TailwindCSS', category: 'Frontend', level: 'Advanced' },
-  { id: 2, name: 'Node.js & PostgreSQL', category: 'Backend', level: 'Expert' },
-  { id: 3, name: 'Docker, Kubernetes & AWS', category: 'DevOps', level: 'Expert' },
-  { id: 4, name: 'Figma & Design Tokens', category: 'UI/UX Design', level: 'Advanced' },
-  { id: 5, name: 'Biometric Face-ID SDKs', category: 'Hardware/IoT', level: 'Specialist' },
+  { id: 1, name: 'React.js, Next.js & TailwindCSS', category: 'Frontend Engineering', level: 'Advanced (L4+)', assessmentsCount: 42 },
+  { id: 2, name: 'Node.js, PostgreSQL & Prisma ORM', category: 'Backend Architecture', level: 'Expert (L5+)', assessmentsCount: 38 },
+  { id: 3, name: 'Docker, Kubernetes & AWS Infrastructure', category: 'Cloud & DevOps', level: 'Expert (L5+)', assessmentsCount: 29 },
+  { id: 4, name: 'Figma Enterprise & Design Tokens', category: 'UI/UX & Product Design', level: 'Advanced (L4+)', assessmentsCount: 24 },
+  { id: 5, name: 'Biometric Face-ID Hardware SDKs & IoT', category: 'Hardware Systems', level: 'Specialist (L5+)', assessmentsCount: 16 },
+  { id: 6, name: 'SOC-2 Compliance & Role ACLs', category: 'Information Security', level: 'Expert (L5+)', assessmentsCount: 19 },
 ];
 
 const JobSkills = () => {
   const [skills, setSkills] = useState(INITIAL);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newSkill, setNewSkill] = useState({ name: '', category: 'Engineering', level: 'Advanced' });
+  const [newSkill, setNewSkill] = useState({ name: '', category: 'Frontend Engineering', level: 'Advanced (L4+)' });
   const [toastMsg, setToastMsg] = useState('');
 
   const handleAdd = (e) => {
     e.preventDefault();
     if (!newSkill.name) return;
-    setSkills([...skills, { id: Date.now(), ...newSkill }]);
+    setSkills([...skills, { id: Date.now(), ...newSkill, assessmentsCount: 0 }]);
     setIsAddOpen(false);
-    setNewSkill({ name: '', category: 'Engineering', level: 'Advanced' });
-    setToastMsg('Technical skill registered!');
+    setNewSkill({ name: '', category: 'Frontend Engineering', level: 'Advanced (L4+)' });
+    setToastMsg('Technical skill tag registered successfully!');
     setTimeout(() => setToastMsg(''), 2500);
   };
 
+  const filtered = skills.filter((s) =>
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 max-w-4xl mx-auto">
-      <AppPageHeader title="Candidate Skills & Competency Matrix" subtitle="Define required competencies and screening skill tags." />
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
+      <AppPageHeader
+        title="Candidate Skills & Competency Matrix Master Table"
+        subtitle="Define required technical proficiencies, engineering competencies, and automated screening skill tags."
+      />
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
@@ -37,15 +47,71 @@ const JobSkills = () => {
         </div>
       )}
 
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Skill Taxonomies</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{skills.length} Tags</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <Sparkles className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Screened Tests</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+              {skills.reduce((acc, s) => acc + s.assessmentsCount, 0)} Completed
+            </div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <Code className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Core Tracks</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">6 Domains</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <Layers className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Proficiency Level</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">L4 to L6</div>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* Toolbar & Table */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Assessed Skills</h3>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search competencies by name or category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            />
+          </div>
+
           <button
             onClick={() => setIsAddOpen(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 cursor-pointer"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Skill</span>
+            <span>Add Skill Competency</span>
           </button>
         </div>
 
@@ -53,16 +119,18 @@ const JobSkills = () => {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th className="py-3.5 px-4">Skill / Competency</th>
-                <th className="py-3.5 px-4">Category</th>
+                <th className="py-3.5 px-4">Skill / Competency Tag</th>
+                <th className="py-3.5 px-4">Category Domain</th>
+                <th className="py-3.5 px-4">Evaluated Candidates</th>
                 <th className="py-3.5 px-4 text-right">Proficiency Tier</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {skills.map((s) => (
+              {filtered.map((s) => (
                 <tr key={s.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                   <td className="py-4 px-4 font-bold text-slate-900 dark:text-white">{s.name}</td>
-                  <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">{s.category}</td>
+                  <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">{s.category}</td>
+                  <td className="py-4 px-4 font-medium text-slate-500">{s.assessmentsCount} Assessments</td>
                   <td className="py-4 px-4 text-right">
                     <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 text-[10px] font-bold">
                       {s.level}
@@ -77,28 +145,50 @@ const JobSkills = () => {
 
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-base font-black text-slate-900 dark:text-white">Add Skill Tag</h3>
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 space-y-4 shadow-2xl border border-slate-100 dark:border-slate-800 animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">Register Competency Tag</h3>
+              <button onClick={() => setIsAddOpen(false)} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <form onSubmit={handleAdd} className="space-y-3 text-xs">
-              <input
-                type="text"
-                required
-                placeholder="Skill (e.g. GraphQL)"
-                value={newSkill.name}
-                onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
-                className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
-              />
-              <input
-                type="text"
-                required
-                placeholder="Category (e.g. Backend)"
-                value={newSkill.category}
-                onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
-                className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
-              />
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800">Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold">Save</button>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Competency Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. GraphQL & Apollo Federation"
+                  value={newSkill.name}
+                  onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
+                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Category *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Backend Architecture"
+                    value={newSkill.category}
+                    onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
+                    className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Proficiency Tier</label>
+                  <input
+                    type="text"
+                    value={newSkill.level}
+                    onChange={(e) => setNewSkill({ ...newSkill, level: e.target.value })}
+                    className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-3">
+                <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 font-bold">Cancel</button>
+                <button type="submit" className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">Save</button>
               </div>
             </form>
           </div>
