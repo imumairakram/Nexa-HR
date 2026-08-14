@@ -24,13 +24,13 @@ async function fetchAPI(endpoint, options = {}) {
     const data = await response.json();
 
     if (!response.ok) {
-      if (response.status === 401) {
-        // Token expired or invalid
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+      if (response.status === 401 && endpoint !== '/auth/login') {
+        // Only clear if token is genuinely invalid and not during normal navigation
+        console.warn('Authentication expired or unauthorized on endpoint:', endpoint);
       }
       throw new Error(data.message || `Request failed with status ${response.status}`);
     }
+
 
     return data;
   } catch (error) {

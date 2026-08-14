@@ -106,7 +106,12 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
           {/* Collapse / Expand Toggle Button */}
           <button
-            onClick={toggleSidebar}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleSidebar();
+            }}
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
             className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0"
           >
@@ -116,6 +121,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
               <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
             )}
           </button>
+
         </div>
 
         {/* Scrollable Navigation Items */}

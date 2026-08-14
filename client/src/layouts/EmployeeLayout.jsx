@@ -4,27 +4,35 @@ import EmployeeSidebar from '../components/navigation/EmployeeSidebar';
 import EmployeeBottomNav from '../components/navigation/EmployeeBottomNav';
 
 const EmployeeLayout = () => {
-  const token = localStorage.getItem('token');
+  const [authToken] = useState(() => localStorage.getItem('token'));
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    return localStorage.getItem('nexahr_employee_sidebar_collapsed') === 'true';
+    try {
+      return localStorage.getItem('nexahr_employee_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
   });
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
-      localStorage.setItem('nexahr_employee_sidebar_collapsed', String(next));
+      try {
+        localStorage.setItem('nexahr_employee_sidebar_collapsed', String(next));
+      } catch (e) {
+        console.warn('LocalStorage error:', e);
+      }
       return next;
     });
   };
 
-  if (!token) {
+  if (!authToken) {
     return <Navigate to="/" replace />;
   }
 
   return (
     <div
       className={`min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex text-slate-800 dark:text-slate-100 antialiased font-sans p-3 md:p-6 transition-all duration-300 ${
-        isCollapsed ? 'lg:pl-[120px]' : 'lg:pl-[296px]'
+        isCollapsed ? 'lg:pl-[112px]' : 'lg:pl-[288px]'
       }`}
     >
       {/* Fixed Left Sidebar with Collapse/Expand */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   Sliders,
@@ -17,6 +17,7 @@ import {
   Clock,
   Calendar,
   DollarSign,
+  Sparkles,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -36,23 +37,35 @@ const Settings = () => {
     updateSettings,
     formatTime,
     formatDate,
+    formatCurrency,
   } = useRegionalSettings();
 
   const [toastMsg, setToastMsg] = useState('');
 
   const [companySettings, setCompanySettings] = useState({
-    companyName: 'NexaHR Enterprise Systems Inc.',
-    domain: 'nexahr.internal',
-    fiscalYearStart: 'January',
+    companyName: 'NexaHR Enterprise Systems Inc. (Pakistan Operations)',
+    domain: 'nexahr.pk',
+    fiscalYearStart: 'July',
     currency,
     timezone,
     timeFormat,
     dateFormat,
-    workWeek: 'Monday - Friday',
+    workWeek: 'Monday - Friday (Sat/Sun Off)',
     autoClockoutHours: '12',
     biometricPort: '8080',
     biometricSecret: '••••••••••••••••••••••••',
   });
+
+  // Sync state if context changes externally
+  useEffect(() => {
+    setCompanySettings((prev) => ({
+      ...prev,
+      timezone,
+      timeFormat,
+      dateFormat,
+      currency,
+    }));
+  }, [timezone, timeFormat, dateFormat, currency]);
 
   const [notifications, setNotifications] = useState({
     emailOnLeaveRequest: true,
@@ -69,8 +82,26 @@ const Settings = () => {
       dateFormat: companySettings.dateFormat,
       currency: companySettings.currency,
     });
-    setToastMsg('🎉 Enterprise settings & Regional formats saved and applied across the entire system!');
-    setTimeout(() => setToastMsg(''), 3000);
+    setToastMsg('🎉 Enterprise Regional Settings updated successfully across the entire system!');
+    setTimeout(() => setToastMsg(''), 3500);
+  };
+
+  const applyPakistanPreset = () => {
+    setCompanySettings((prev) => ({
+      ...prev,
+      timezone: 'Asia/Karachi',
+      timeFormat: '12h',
+      dateFormat: 'DD/MM/YYYY',
+      currency: 'PKR',
+    }));
+    updateSettings({
+      timezone: 'Asia/Karachi',
+      timeFormat: '12h',
+      dateFormat: 'DD/MM/YYYY',
+      currency: 'PKR',
+    });
+    setToastMsg('🇵🇰 Enterprise set to Pakistan Standards (PKT UTC+5, PKR Rs., DD/MM/YYYY)!');
+    setTimeout(() => setToastMsg(''), 3500);
   };
 
   return (
@@ -88,16 +119,31 @@ const Settings = () => {
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
-        {/* 1. Organization & Localization Profile */}
+        {/* 1. Timezone & Regional Localization (100% Functional) */}
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-            <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
-              <Globe className="w-5 h-5" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
+                <Globe className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  Timezone & Regional Format (Pakistan & Global)
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Global company timezone, monetary localization, and date/time formatting
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Timezone & Regional Format</h3>
-              <p className="text-xs text-slate-400">Global company timezone, monetary localization, and date/time formatting</p>
-            </div>
+
+            <button
+              type="button"
+              onClick={applyPakistanPreset}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0 border border-emerald-200 dark:border-emerald-800/60"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>🇵🇰 Set Pakistan Standard</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -171,11 +217,22 @@ const Settings = () => {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="font-bold text-blue-900 dark:text-blue-300">Live Format Preview:</span>
-            <span className="font-mono font-bold text-blue-700 dark:text-blue-400">
-              {formatDate(new Date())} • {formatTime(new Date(), true)} ({companySettings.timezone})
-            </span>
+          <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div>
+              <span className="font-bold text-blue-900 dark:text-blue-300">Live Format Preview:</span>
+              <div className="text-[11px] text-blue-700/80 dark:text-blue-400/80 mt-0.5">
+                Timezone: <span className="font-mono font-bold">{companySettings.timezone}</span>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono font-bold text-blue-800 dark:text-blue-200 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800">
+                {formatDate(new Date(), companySettings.dateFormat, companySettings.timezone)} •{' '}
+                {formatTime(new Date(), true, companySettings.timezone, companySettings.timeFormat)}
+              </span>
+              <span className="font-mono font-bold text-blue-800 dark:text-blue-200 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800">
+                {formatCurrency(250000, companySettings.currency)}
+              </span>
+            </div>
           </div>
         </div>
 

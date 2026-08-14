@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Settings,
   Bell,
@@ -12,6 +12,7 @@ import {
   Clock,
   DollarSign,
   Calendar,
+  Sparkles,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { useTheme } from '../../context/ThemeContext';
@@ -32,6 +33,7 @@ const EmployeeSettings = () => {
     updateSettings,
     formatTime,
     formatDate,
+    formatCurrency,
   } = useRegionalSettings();
 
   const [toastMsg, setToastMsg] = useState('');
@@ -47,6 +49,17 @@ const EmployeeSettings = () => {
     emailReminders: true,
   });
 
+  // Sync state if context changes externally
+  useEffect(() => {
+    setFormState((prev) => ({
+      ...prev,
+      timezone,
+      timeFormat,
+      dateFormat,
+      currency,
+    }));
+  }, [timezone, timeFormat, dateFormat, currency]);
+
   const handleSave = (e) => {
     e.preventDefault();
     updateSettings({
@@ -55,15 +68,34 @@ const EmployeeSettings = () => {
       dateFormat: formState.dateFormat,
       currency: formState.currency,
     });
-    setToastMsg('🎉 Timezone & Regional preferences updated and applied across the portal!');
-    setTimeout(() => setToastMsg(''), 3000);
+    setToastMsg('🇵🇰 Pakistan Timezone & Regional preferences saved and updated across the portal!');
+    setTimeout(() => setToastMsg(''), 3500);
+  };
+
+  // Quick preset button for Pakistan Standards
+  const applyPakistanPreset = () => {
+    setFormState((prev) => ({
+      ...prev,
+      timezone: 'Asia/Karachi',
+      timeFormat: '12h',
+      dateFormat: 'DD/MM/YYYY',
+      currency: 'PKR',
+    }));
+    updateSettings({
+      timezone: 'Asia/Karachi',
+      timeFormat: '12h',
+      dateFormat: 'DD/MM/YYYY',
+      currency: 'PKR',
+    });
+    setToastMsg('🇵🇰 Pakistan Standard defaults applied (PKT UTC+5, PKR Rs., DD/MM/YYYY, 12h)!');
+    setTimeout(() => setToastMsg(''), 3500);
   };
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
         title="Settings & Workspace Preferences"
-        subtitle="Customize your notification channels, color themes, and timezone preferences."
+        subtitle="Customize your regional localization, timezones, notification channels, and color themes."
       />
 
       {toastMsg && (
@@ -78,19 +110,25 @@ const EmployeeSettings = () => {
         {/* 1. TIMEZONE & REGIONAL FORMAT (100% FUNCTIONAL) */}
         {/* ========================================================================= */}
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <Globe className="w-4 h-4 text-blue-500" />
-                <span>Timezone & Regional Format</span>
+                <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Timezone & Regional Format (Pakistan & Global)</span>
               </h3>
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
                 Accurately localize biometric punch clocks, attendance charts, and currency symbols
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold">
-              Live Formatting
-            </span>
+
+            <button
+              type="button"
+              onClick={applyPakistanPreset}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0 border border-emerald-200 dark:border-emerald-800/60"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>🇵🇰 Set Pakistan Standard</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -102,7 +140,7 @@ const EmployeeSettings = () => {
               <select
                 value={formState.timezone}
                 onChange={(e) => setFormState({ ...formState, timezone: e.target.value })}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
               >
                 {TIMEZONE_OPTIONS.map((tz) => (
                   <option key={tz.id} value={tz.id}>
@@ -120,7 +158,7 @@ const EmployeeSettings = () => {
               <select
                 value={formState.timeFormat}
                 onChange={(e) => setFormState({ ...formState, timeFormat: e.target.value })}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
               >
                 <option value="12h">12-Hour Format (e.g. 09:30 AM / 05:35 PM)</option>
                 <option value="24h">24-Hour Format (e.g. 09:30 / 17:35)</option>
@@ -135,7 +173,7 @@ const EmployeeSettings = () => {
               <select
                 value={formState.dateFormat}
                 onChange={(e) => setFormState({ ...formState, dateFormat: e.target.value })}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
               >
                 {DATE_FORMAT_OPTIONS.map((df) => (
                   <option key={df.id} value={df.id}>
@@ -153,7 +191,7 @@ const EmployeeSettings = () => {
               <select
                 value={formState.currency}
                 onChange={(e) => setFormState({ ...formState, currency: e.target.value })}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
               >
                 {CURRENCY_OPTIONS.map((curr) => (
                   <option key={curr.code} value={curr.code}>
@@ -164,12 +202,23 @@ const EmployeeSettings = () => {
             </div>
           </div>
 
-          {/* Live Preview Bar */}
-          <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="font-bold text-blue-900 dark:text-blue-300">Live Format Preview:</span>
-            <span className="font-mono font-bold text-blue-700 dark:text-blue-400">
-              {formatDate(new Date())} • {formatTime(new Date(), true)} ({formState.timezone})
-            </span>
+          {/* Real-time Dynamic Format Preview Bar */}
+          <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div>
+              <span className="font-bold text-emerald-900 dark:text-emerald-300">Live Format Preview:</span>
+              <div className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-0.5">
+                Timezone: <span className="font-mono font-bold">{formState.timezone}</span>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono font-bold text-emerald-800 dark:text-emerald-200 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                {formatDate(new Date(), formState.dateFormat, formState.timezone)} •{' '}
+                {formatTime(new Date(), true, formState.timezone, formState.timeFormat)}
+              </span>
+              <span className="font-mono font-bold text-emerald-800 dark:text-emerald-200 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                {formatCurrency(150000, formState.currency)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -267,7 +316,7 @@ const EmployeeSettings = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+            className="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
           >
             <Save className="w-4 h-4" />
             <span>Save All Preferences</span>
