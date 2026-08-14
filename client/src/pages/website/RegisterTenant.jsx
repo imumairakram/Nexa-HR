@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Building2, Mail, Lock, User, Phone, MapPin, ArrowRight } from 'lucide-react';
+import { Building2, Mail, Lock, User, Phone, MapPin, ArrowRight } from 'lucide-react';
 
 const RegisterTenant = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const RegisterTenant = () => {
       <div className="w-full max-w-xl bg-white rounded-3xl p-8 shadow-soft border border-slate-100">
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-md mb-3">
-            <Sparkles className="w-6 h-6" />
+            <Building2 className="w-6 h-6" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900">Register Company Tenant</h2>
           <p className="text-xs text-slate-500 mt-1">Scaffold your isolated SaaS HRM instance in seconds</p>

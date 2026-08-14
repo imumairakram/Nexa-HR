@@ -139,7 +139,7 @@ const WeeklyHoliday = () => {
                     : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                 }`}
               >
-                {day.isWeekend ? '🏖️ WEEKEND' : '💼 WORK DAY'}
+                {day.isWeekend ? 'Weekend' : 'Work Day'}
               </div>
             </div>
           ))}

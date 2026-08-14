@@ -64,6 +64,7 @@ model User {
   salaryStructure SalaryStructure?
   payslips        Payslip[]
   passwordResetOtps PasswordResetOtp[]
+  notifications   Notification[]
 
   @@map("users")
 }
@@ -269,5 +270,45 @@ model PasswordResetOtp {
   @@index([userId])
   @@index([email])
   @@map("password_reset_otps")
+}
+
+// ====================================================
+// NOTIFICATION & ANNOUNCEMENT MODELS
+// ====================================================
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?
+  title     String
+  message   String
+  type      String   @default("info") // "success" | "warning" | "info" | "error"
+  category  String   @default("GENERAL") // "ANNOUNCEMENT" | "LEAVE" | "PAYROLL" | "ATTENDANCE" | "GENERAL"
+  link      String?  // Navigation path e.g. "/employee/announcements", "/employee/leaves", "/employee/payslips"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  category    String   @default("EVENTS") // EVENTS | BENEFITS | MEETINGS | OPERATIONS | CORPORATE
+  priority    String   @default("HIGH")   // HIGH | MEDIUM | INFO
+  department  String?  @default("Company-Wide (All Offices)")
+  summary     String?
+  content     String
+  author      String   @default("People Operations & HR")
+  pinned      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+  @@map("announcements")
 }
 

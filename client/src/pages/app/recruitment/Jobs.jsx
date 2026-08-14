@@ -189,8 +189,9 @@ const Jobs = () => {
             </div>
 
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-              <span className="font-bold text-blue-600 dark:text-blue-400">
-                👥 {job.applicants} Candidates Applied
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                <Users className="w-3.5 h-3.5" />
+                <span>{job.applicants} Candidates Applied</span>
               </span>
               <span className="text-slate-400">Posted {job.posted}</span>
             </div>

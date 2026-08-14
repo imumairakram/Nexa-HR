@@ -627,7 +627,7 @@ const resetPassword = async (req, res) => {
       },
     });
 
-    console.log(`✅ [PASSWORD RESET SUCCESS] User: ${user.email} (${user.role}) reset their password.`);
+    console.log(`[PASSWORD RESET SUCCESS] User: ${user.email} (${user.role}) reset their password.`);
 
     return res.status(200).json({
       success: true,

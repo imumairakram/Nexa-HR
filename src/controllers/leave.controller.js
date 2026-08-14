@@ -1,4 +1,10 @@
 const prisma = require('../config/prisma');
+const {
+  createInAppNotification,
+  broadcastInAppNotification,
+  sendLeaveStatusEmail,
+  sendLeaveRequestSubmittedEmail,
+} = require('../services/notification.service');
 
 const createLeaveType = async (req, res) => {
   try {
@@ -141,6 +147,45 @@ const applyLeave = async (req, res) => {
       },
     });
 
+    // 1. Notify HR / Admins in-app about new leave request
+    const applicantName = req.user?.fullName || 'Employee';
+    await broadcastInAppNotification({
+      title: `Leave Request: ${applicantName}`,
+      message: `${leaveType.name} application for ${totalDays} day(s) (${startDate} to ${endDate}) submitted for review.`,
+      type: 'warning',
+      category: 'LEAVE',
+      link: '/app/leaves',
+      targetRoles: ['ADMIN', 'HR_MANAGER'],
+    });
+
+    // 2. Notify Employee in-app that application is recorded
+    await createInAppNotification({
+      userId,
+      title: `Leave Application Submitted`,
+      message: `Your ${leaveType.name} request for ${totalDays} day(s) has been submitted for management review.`,
+      type: 'info',
+      category: 'LEAVE',
+      link: '/employee/leaves',
+    });
+
+    // 3. Dispatch Email to HR administrators
+    const hrAdmins = await prisma.user.findMany({
+      where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true },
+      select: { email: true },
+    });
+    const adminEmails = hrAdmins.map((a) => a.email);
+
+    await sendLeaveRequestSubmittedEmail({
+      adminEmails,
+      employeeName: applicantName,
+      employeeCode: req.user?.email,
+      leaveType: leaveType.name,
+      startDate: start,
+      endDate: end,
+      totalDays,
+      reason: reason.trim(),
+    });
+
     return res.status(201).json({
       success: true,
       message: `Leave application submitted for ${totalDays} day(s).`,
@@ -266,6 +311,36 @@ const updateLeaveStatus = async (req, res) => {
         leaveType: { select: { name: true } },
       },
     });
+
+    // 1. Trigger In-App Notification for the employee
+    const isApproved = status === 'APPROVED';
+    const notifTitle = isApproved ? 'Leave Request Approved' : 'Leave Request Declined';
+    const notifMsg = isApproved
+      ? `Your ${updated.leaveType.name} request for ${leaveRequest.totalDays} day(s) has been approved by HR.`
+      : `Your ${updated.leaveType.name} request was rejected.${rejectionReason ? ` Reason: ${rejectionReason.trim()}` : ''}`;
+
+    await createInAppNotification({
+      userId: leaveRequest.userId,
+      title: notifTitle,
+      message: notifMsg,
+      type: isApproved ? 'success' : 'warning',
+      category: 'LEAVE',
+      link: '/employee/leaves',
+    });
+
+    // 2. Dispatch Corporate Email Notification to employee
+    if (updated.user?.email) {
+      await sendLeaveStatusEmail({
+        email: updated.user.email,
+        name: `${updated.user.firstName} ${updated.user.lastName}`,
+        leaveType: updated.leaveType.name,
+        startDate: leaveRequest.startDate,
+        endDate: leaveRequest.endDate,
+        totalDays: leaveRequest.totalDays,
+        status,
+        rejectionReason,
+      });
+    }
 
     return res.status(200).json({
       success: true,

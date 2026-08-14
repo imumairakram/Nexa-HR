@@ -27,7 +27,6 @@ const INITIAL_AWARDS = [
     month: 'July 2026',
     gift: '$1,000 Spot Bonus',
     reason: 'Outstanding leadership and architecting high-throughput Biometric API Gateway under tight timelines.',
-    badgeIcon: '🚀',
     claps: 28,
   },
   {
@@ -39,7 +38,6 @@ const INITIAL_AWARDS = [
     month: 'Q2 2026',
     gift: '$500 Wellness Card',
     reason: 'Pioneered the NexaHR enterprise design token system and delivered 100% positive usability scores.',
-    badgeIcon: '🎨',
     claps: 34,
   },
   {
@@ -51,7 +49,6 @@ const INITIAL_AWARDS = [
     month: 'June 2026',
     gift: 'MacBook Pro M3 Max',
     reason: 'Maintained 100% on-time check-in and 99.99% infrastructure uptime across 6 consecutive months.',
-    badgeIcon: '⚡',
     claps: 41,
   },
   {
@@ -63,7 +60,6 @@ const INITIAL_AWARDS = [
     month: 'May 2026',
     gift: '$750 Travel Stipend',
     reason: 'Voted top onboarding mentor and conducted high-impact engineering culture workshops.',
-    badgeIcon: '❤️',
     claps: 22,
   },
 ];
@@ -97,7 +93,6 @@ const Award = () => {
       month: form.month,
       gift: form.gift,
       reason: form.reason,
-      badgeIcon: '🏆',
       claps: 1,
     };
 
@@ -111,7 +106,7 @@ const Award = () => {
       gift: '$500 Spot Bonus',
       reason: '',
     });
-    setToastMsg(`Award conferred to ${form.recipient}! 🎉`);
+    setToastMsg(`Award conferred to ${form.recipient} successfully.`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 
@@ -275,7 +270,7 @@ const Award = () => {
                 className="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 font-extrabold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105"
               >
                 <ThumbsUp className="w-3.5 h-3.5" />
-                <span>👏 {a.claps} Applauds</span>
+                <span>{a.claps} Applauds</span>
               </button>
             </div>
           </div>

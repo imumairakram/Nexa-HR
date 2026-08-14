@@ -19,36 +19,53 @@ import {
   Building2,
   DollarSign,
   Sliders,
-  Sparkles,
+  LayoutDashboard,
+  Megaphone,
+  Award,
+  Briefcase,
+  Layers,
   ArrowRight
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { api } from '../../services/api';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+
+function formatRelativeTime(dateString) {
+  if (!dateString) return 'Just now';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSec = Math.floor((now - date) / 1000);
+  if (diffInSec < 60) return 'Just now';
+  if (diffInSec < 3600) return `${Math.floor(diffInSec / 60)} mins ago`;
+  if (diffInSec < 86400) return `${Math.floor(diffInSec / 3600)} hours ago`;
+  if (diffInSec < 172800) return 'Yesterday';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 const INITIAL_NOTIFICATIONS = [
   {
     id: 1,
-    title: 'Biometric Auto-Sync',
-    desc: '124 punch logs verified successfully.',
-    time: 'Just now',
+    title: 'Biometric Gateway Active',
+    desc: 'Hardware attendance engine is online and syncing live logs.',
+    time: '5 mins ago',
     type: 'success',
     read: false,
     link: '/app/attendance'
   },
   {
     id: 2,
-    title: 'Pending Leave Request',
-    desc: 'Alex Mercer submitted a 3-day vacation request.',
-    time: '10 mins ago',
+    title: 'Pending Leave Approvals',
+    desc: '3 employees submitted medical and casual time-off applications.',
+    time: '20 mins ago',
     type: 'warning',
     read: false,
     link: '/app/leaves'
   },
   {
     id: 3,
-    title: 'New Team Member',
-    desc: 'Sarah Jenkins joined Marketing department.',
+    title: 'Employee Onboarding',
+    desc: 'New engineering hire Sarah Jenkins completed tax profile.',
     time: '1 hour ago',
     type: 'info',
     read: true,
@@ -57,7 +74,7 @@ const INITIAL_NOTIFICATIONS = [
 ];
 
 const SEARCH_SHORTCUTS = [
-  { label: 'Dashboard', icon: Sparkles, path: '/app/dashboard', category: 'Pages' },
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/app/dashboard', category: 'Pages' },
   { label: 'New Employee Onboarding', icon: User, path: '/app/hr/new-employee', category: 'HR' },
   { label: 'Employees Directory', icon: Users, path: '/app/employees', category: 'HR' },
   { label: 'Role & Permissions', icon: Sliders, path: '/app/hr/roles', category: 'HR' },
@@ -74,13 +91,13 @@ const SEARCH_SHORTCUTS = [
   { label: 'Payroll Management', icon: DollarSign, path: '/app/payroll', category: 'Payroll' },
   { label: 'Accounts & Ledger', icon: DollarSign, path: '/app/accounts', category: 'Finance' },
   { label: 'Exportable Reports', icon: FileText, path: '/app/reports', category: 'Analytics' },
-  { label: 'Announcements', icon: Sparkles, path: '/app/announcement', category: 'Operations' },
-  { label: 'Awards & Recognition', icon: Sparkles, path: '/app/award', category: 'Operations' },
+  { label: 'Announcements', icon: Megaphone, path: '/app/announcement', category: 'Operations' },
+  { label: 'Awards & Recognition', icon: Award, path: '/app/award', category: 'Operations' },
   { label: 'Project Portfolio', icon: Building2, path: '/app/project', category: 'Operations' },
-  { label: 'Recruitment - Job Desk', icon: Sparkles, path: '/app/recruitment/desk', category: 'Recruitment' },
+  { label: 'Recruitment - Job Desk', icon: Briefcase, path: '/app/recruitment/desk', category: 'Recruitment' },
   { label: 'Recruitment - Active Jobs', icon: Users, path: '/app/recruitment/jobs', category: 'Recruitment' },
   { label: 'Recruitment - Applications', icon: FileText, path: '/app/recruitment/applications', category: 'Recruitment' },
-  { label: 'Recruitment - Job Board', icon: Sparkles, path: '/app/recruitment/board', category: 'Recruitment' },
+  { label: 'Recruitment - Job Board', icon: Layers, path: '/app/recruitment/board', category: 'Recruitment' },
   { label: 'My Profile', icon: User, path: '/app/profile', category: 'System' },
   { label: 'System Settings', icon: Sliders, path: '/app/settings', category: 'System' }
 ];
@@ -109,23 +126,32 @@ const AppPageHeader = ({
   const profileRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Load Notifications from localStorage or default
-  const [notifications, setNotifications] = useState(() => {
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchLiveNotifications = async () => {
     try {
-      const saved = localStorage.getItem('nexahr_header_notifications');
-      return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
-    } catch {
-      return INITIAL_NOTIFICATIONS;
+      const res = await api.getNotifications();
+      if (res?.success && res.data?.notifications) {
+        setNotifications(res.data.notifications);
+        setUnreadCount(res.data.unreadCount ?? res.data.notifications.filter((n) => !n.isRead).length);
+      }
+    } catch (e) {
+      // Gracefully maintain current list if token not ready
     }
-  });
+  };
 
   useEffect(() => {
-    try {
-      localStorage.setItem('nexahr_header_notifications', JSON.stringify(notifications));
-    } catch (e) {
-      console.error('Failed to save notifications to localStorage', e);
-    }
-  }, [notifications]);
+    fetchLiveNotifications();
+    const interval = setInterval(fetchLiveNotifications, 15000);
+    window.addEventListener('nexahr_notification_updated', fetchLiveNotifications);
+    window.addEventListener('focus', fetchLiveNotifications);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('nexahr_notification_updated', fetchLiveNotifications);
+      window.removeEventListener('focus', fetchLiveNotifications);
+    };
+  }, []);
 
   const loadUserData = () => {
     const storedUser = localStorage.getItem('user');
@@ -235,30 +261,58 @@ const AppPageHeader = ({
     window.location.href = '/';
   };
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    triggerToast('All notifications marked as read');
+  const markAllAsRead = async () => {
+    try {
+      await api.markAllNotificationsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+      triggerToast('All notifications marked as read');
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const clearAllNotifications = () => {
-    setNotifications([]);
-    triggerToast('Notifications cleared');
+  const clearAllNotifications = async () => {
+    try {
+      await api.clearAllNotifications();
+      setNotifications([]);
+      setUnreadCount(0);
+      triggerToast('Notifications cleared');
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleNotificationClick = (notif) => {
-    setNotifications((prev) => prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n)));
+  const handleNotificationClick = async (notif) => {
+    try {
+      if (!notif.isRead) {
+        await api.markNotificationRead(notif.id);
+        setNotifications((prev) => prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n)));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+        window.dispatchEvent(new Event('nexahr_notification_updated'));
+      }
+    } catch (err) {
+      console.error(err);
+    }
     setIsNotifyOpen(false);
     if (notif.link) {
       navigate(notif.link);
     }
   };
 
-  const dismissNotification = (e, id) => {
+  const dismissNotification = async (e, id) => {
     e.stopPropagation();
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    try {
+      await api.deleteNotification(id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+    } catch (err) {
+      console.error(err);
+    }
   };
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const currentDateStr = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -459,49 +513,55 @@ const AppPageHeader = ({
 
                 <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
                   {notifications.length > 0 ? (
-                    notifications.map((notif) => (
-                      <div
-                        key={notif.id}
-                        onClick={() => handleNotificationClick(notif)}
-                        className={`group relative flex items-start gap-3 text-xs p-2.5 rounded-2xl cursor-pointer transition-all border ${
-                          notif.read
-                            ? 'bg-slate-50/60 dark:bg-slate-800/40 border-transparent opacity-75 hover:opacity-100'
-                            : 'bg-indigo-50/40 dark:bg-indigo-950/30 border-indigo-100/60 dark:border-indigo-900/40'
-                        }`}
-                      >
-                        {notif.type === 'success' && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        )}
-                        {notif.type === 'warning' && (
-                          <Bell className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                        )}
-                        {notif.type === 'info' && (
-                          <Bell className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
-                        )}
+                    notifications.map((notif) => {
+                      const isRead = notif.isRead ?? notif.read ?? false;
+                      const msg = notif.message || notif.desc || '';
+                      const timeDisplay = notif.createdAt ? formatRelativeTime(notif.createdAt) : (notif.time || 'Just now');
 
-                        <div className="flex-1 min-w-0 pr-4">
-                          <div className="flex items-center justify-between gap-1">
-                            <p className="font-bold text-slate-900 dark:text-white leading-tight truncate">
-                              {notif.title}
-                            </p>
-                            {!notif.read && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                            {notif.desc}
-                          </p>
-                          <span className="text-[9px] text-slate-400 mt-1 block">{notif.time}</span>
-                        </div>
-
-                        <button
-                          onClick={(e) => dismissNotification(e, notif.id)}
-                          className="opacity-0 group-hover:opacity-100 absolute top-2 right-2 p-0.5 text-slate-400 hover:text-rose-500 rounded-full transition-opacity cursor-pointer"
+                      return (
+                        <div
+                          key={notif.id}
+                          onClick={() => handleNotificationClick(notif)}
+                          className={`group relative flex items-start gap-3 text-xs p-2.5 rounded-2xl cursor-pointer transition-all border ${
+                            isRead
+                              ? 'bg-slate-50/60 dark:bg-slate-800/40 border-transparent opacity-75 hover:opacity-100'
+                              : 'bg-indigo-50/40 dark:bg-indigo-950/30 border-indigo-100/60 dark:border-indigo-900/40 shadow-xs'
+                          }`}
                         >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))
+                          {notif.type === 'success' && (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                          )}
+                          {notif.type === 'warning' && (
+                            <Bell className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                          )}
+                          {(notif.type === 'info' || !notif.type) && (
+                            <Bell className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
+                          )}
+
+                          <div className="flex-1 min-w-0 pr-4">
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="font-bold text-slate-900 dark:text-white leading-tight truncate">
+                                {notif.title}
+                              </p>
+                              {!isRead && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                              {msg}
+                            </p>
+                            <span className="text-[9px] text-slate-400 mt-1 block">{timeDisplay}</span>
+                          </div>
+
+                          <button
+                            onClick={(e) => dismissNotification(e, notif.id)}
+                            className="opacity-0 group-hover:opacity-100 absolute top-2 right-2 p-0.5 text-slate-400 hover:text-rose-500 rounded-full transition-opacity cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })
                   ) : (
                     <div className="py-8 text-center">
                       <Bell className="w-6 h-6 text-slate-300 dark:text-slate-600 mx-auto mb-2" />

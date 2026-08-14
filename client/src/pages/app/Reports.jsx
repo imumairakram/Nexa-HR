@@ -12,7 +12,6 @@ import {
   Users,
   Briefcase,
   Layers,
-  Sparkles,
   ShieldCheck,
   BarChart2,
 } from 'lucide-react';

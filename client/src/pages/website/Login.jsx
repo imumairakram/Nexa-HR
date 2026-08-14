@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   User,
   Shield,
-  Sparkles,
   CheckCircle2,
 } from 'lucide-react';
 import { api } from '../../services/api';

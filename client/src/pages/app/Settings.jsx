@@ -17,7 +17,6 @@ import {
   Clock,
   Calendar,
   DollarSign,
-  Sparkles,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -82,7 +81,7 @@ const Settings = () => {
       dateFormat: companySettings.dateFormat,
       currency: companySettings.currency,
     });
-    setToastMsg('🎉 Enterprise Regional Settings updated successfully across the entire system!');
+    setToastMsg('Enterprise Regional Settings updated successfully across the entire system.');
     setTimeout(() => setToastMsg(''), 3500);
   };
 
@@ -100,7 +99,7 @@ const Settings = () => {
       dateFormat: 'DD/MM/YYYY',
       currency: 'PKR',
     });
-    setToastMsg('🇵🇰 Enterprise set to Pakistan Standards (PKT UTC+5, PKR Rs., DD/MM/YYYY)!');
+    setToastMsg('Enterprise set to Pakistan Standards (PKT UTC+5, PKR Rs., DD/MM/YYYY).');
     setTimeout(() => setToastMsg(''), 3500);
   };
 
@@ -141,8 +140,8 @@ const Settings = () => {
               onClick={applyPakistanPreset}
               className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0 border border-emerald-200 dark:border-emerald-800/60"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>🇵🇰 Set Pakistan Standard</span>
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Set Pakistan Standard</span>
             </button>
           </div>
 

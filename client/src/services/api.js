@@ -227,4 +227,60 @@ export const api = {
       body: JSON.stringify(desigData),
     });
   },
+
+  // --- Notifications ---
+  getNotifications: async () => {
+    return await fetchAPI('/notifications');
+  },
+
+  markNotificationRead: async (id) => {
+    return await fetchAPI(`/notifications/${id}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  markAllNotificationsRead: async () => {
+    return await fetchAPI('/notifications/read-all', {
+      method: 'PATCH',
+    });
+  },
+
+  deleteNotification: async (id) => {
+    return await fetchAPI(`/notifications/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  clearAllNotifications: async () => {
+    return await fetchAPI('/notifications', {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Announcements ---
+  getAnnouncements: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/announcements${query ? `?${query}` : ''}`);
+  },
+
+  createAnnouncement: async (announcementData) => {
+    return await fetchAPI('/announcements', {
+      method: 'POST',
+      body: JSON.stringify(announcementData),
+    });
+  },
+
+  updateAnnouncement: async (id, data) => {
+    return await fetchAPI(`/announcements/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteAnnouncement: async (id) => {
+    return await fetchAPI(`/announcements/${id}`, {
+      method: 'DELETE',
+    });
+  },
 };
+

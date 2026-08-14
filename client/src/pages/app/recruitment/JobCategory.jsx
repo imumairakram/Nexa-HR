@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Tag, Plus, Search, CheckCircle2, X, Trash2, Layers, Briefcase, Building, Sparkles } from 'lucide-react';
+import { Tag, Plus, Search, CheckCircle2, X, Trash2, Layers, Briefcase, Building } from 'lucide-react';
 
 const INITIAL = [
   { id: 1, name: 'Software Engineering & Cloud Architecture', code: 'ENG', count: 8, lead: 'Alex Mercer', status: 'ACTIVE' },
@@ -86,7 +86,7 @@ const JobCategory = () => {
             <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">All Active</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+            <CheckCircle2 className="w-5 h-5" />
           </div>
         </div>
       </div>

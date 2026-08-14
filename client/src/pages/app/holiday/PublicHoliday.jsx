@@ -178,7 +178,7 @@ const PublicHoliday = () => {
                       <span>{h.name}</span>
                       {h.isLongWeekend && (
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                          🌴 Long Weekend
+                          Long Weekend
                         </span>
                       )}
                     </div>

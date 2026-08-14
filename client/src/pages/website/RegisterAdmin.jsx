@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Mail, Lock, User, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
 
 const RegisterAdmin = () => {
   const navigate = useNavigate();

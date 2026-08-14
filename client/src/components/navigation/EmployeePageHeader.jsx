@@ -19,7 +19,7 @@ import {
   Megaphone,
   Award,
   Calendar,
-  Sparkles,
+  LayoutDashboard,
   ArrowRight,
   Shield,
   Zap,
@@ -29,11 +29,24 @@ import {
   ArrowRightLeft,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { api } from '../../services/api';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
 
+function formatRelativeTime(dateString) {
+  if (!dateString) return 'Just now';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSec = Math.floor((now - date) / 1000);
+  if (diffInSec < 60) return 'Just now';
+  if (diffInSec < 3600) return `${Math.floor(diffInSec / 60)} mins ago`;
+  if (diffInSec < 86400) return `${Math.floor(diffInSec / 3600)} hours ago`;
+  if (diffInSec < 172800) return 'Yesterday';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 const EMPLOYEE_SEARCH_SHORTCUTS = [
-  { label: 'Employee Dashboard', icon: Sparkles, path: '/employee/dashboard', category: 'Overview' },
+  { label: 'Employee Dashboard', icon: LayoutDashboard, path: '/employee/dashboard', category: 'Overview' },
   { label: 'Clock In / Clock Out & Attendance', icon: Clock, path: '/employee/attendance', category: 'Attendance' },
   { label: 'Apply For Leave', icon: CalendarDays, path: '/employee/leaves', category: 'Leaves' },
   { label: 'My Leave Balances & History', icon: CalendarDays, path: '/employee/leaves', category: 'Leaves' },
@@ -104,21 +117,32 @@ const EmployeePageHeader = ({
   const profileRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Load Notifications
-  const [notifications, setNotifications] = useState(() => {
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchLiveNotifications = async () => {
     try {
-      const saved = localStorage.getItem('nexahr_employee_notifications');
-      return saved ? JSON.parse(saved) : INITIAL_EMPLOYEE_NOTIFICATIONS;
-    } catch {
-      return INITIAL_EMPLOYEE_NOTIFICATIONS;
+      const res = await api.getNotifications();
+      if (res?.success && res.data?.notifications) {
+        setNotifications(res.data.notifications);
+        setUnreadCount(res.data.unreadCount ?? res.data.notifications.filter((n) => !n.isRead).length);
+      }
+    } catch (e) {
+      // Gracefully maintain current list if token not ready
     }
-  });
+  };
 
   useEffect(() => {
-    try {
-      localStorage.setItem('nexahr_employee_notifications', JSON.stringify(notifications));
-    } catch (e) {}
-  }, [notifications]);
+    fetchLiveNotifications();
+    const interval = setInterval(fetchLiveNotifications, 15000);
+    window.addEventListener('nexahr_notification_updated', fetchLiveNotifications);
+    window.addEventListener('focus', fetchLiveNotifications);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('nexahr_notification_updated', fetchLiveNotifications);
+      window.removeEventListener('focus', fetchLiveNotifications);
+    };
+  }, []);
 
   const loadUserData = () => {
     const storedUser = localStorage.getItem('user');
@@ -219,23 +243,56 @@ const EmployeePageHeader = ({
     window.location.href = '/';
   };
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    triggerToast('All notifications marked as read');
+  const markAllAsRead = async () => {
+    try {
+      await api.markAllNotificationsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+      triggerToast('All notifications marked as read');
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const clearAllNotifications = () => {
-    setNotifications([]);
-    triggerToast('Notifications cleared');
+  const clearAllNotifications = async () => {
+    try {
+      await api.clearAllNotifications();
+      setNotifications([]);
+      setUnreadCount(0);
+      triggerToast('Notifications cleared');
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleNotificationClick = (notif) => {
-    setNotifications((prev) => prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n)));
+  const handleNotificationClick = async (notif) => {
+    try {
+      if (!notif.isRead) {
+        await api.markNotificationRead(notif.id);
+        setNotifications((prev) => prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n)));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+        window.dispatchEvent(new Event('nexahr_notification_updated'));
+      }
+    } catch (err) {
+      console.error(err);
+    }
     setIsNotifyOpen(false);
     if (notif.link) navigate(notif.link);
   };
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const dismissNotification = async (e, id) => {
+    e.stopPropagation();
+    try {
+      await api.deleteNotification(id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const currentDateStr = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -435,26 +492,39 @@ const EmployeePageHeader = ({
 
                 <div className="max-h-72 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                   {notifications.length > 0 ? (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => handleNotificationClick(n)}
-                        className={`p-2.5 rounded-2xl transition-all cursor-pointer border ${
-                          !n.read
-                            ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200/50 dark:border-emerald-800/40'
-                            : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 hover:bg-slate-100/80 dark:hover:bg-slate-800'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-1.5">
-                            {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
-                            <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200">{n.title}</h5>
+                    notifications.map((n) => {
+                      const isRead = n.isRead ?? n.read ?? false;
+                      const msg = n.message || n.desc || '';
+                      const timeDisplay = n.createdAt ? formatRelativeTime(n.createdAt) : (n.time || 'Just now');
+
+                      return (
+                        <div
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={`group relative p-2.5 rounded-2xl transition-all cursor-pointer border ${
+                            !isRead
+                              ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200/50 dark:border-emerald-800/40 shadow-xs'
+                              : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 hover:bg-slate-100/80 dark:hover:bg-slate-800 opacity-80 hover:opacity-100'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2 pr-4">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              {!isRead && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                              <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{n.title}</h5>
+                            </div>
+                            <span className="text-[10px] text-slate-400 shrink-0">{timeDisplay}</span>
                           </div>
-                          <span className="text-[10px] text-slate-400 shrink-0">{n.time}</span>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">{msg}</p>
+
+                          <button
+                            onClick={(e) => dismissNotification(e, n.id)}
+                            className="opacity-0 group-hover:opacity-100 absolute top-2 right-2 p-0.5 text-slate-400 hover:text-rose-500 rounded-full transition-opacity cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
                         </div>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">{n.desc}</p>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="py-8 text-center text-xs text-slate-400">
                       You're all caught up! No notifications.

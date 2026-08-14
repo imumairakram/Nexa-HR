@@ -13,6 +13,8 @@ const attendanceRoutes = require('./routes/attendance.routes');
 const leaveRoutes = require('./routes/leave.routes');
 const payrollRoutes = require('./routes/payroll.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const notificationRoutes = require('./routes/notification.routes');
+const announcementRoutes = require('./routes/announcement.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -68,6 +70,8 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 // 404 Route Handler
 app.use((req, res) => {
@@ -89,7 +93,7 @@ app.use((err, req, res, next) => {
 // Start Server
 const server = app.listen(PORT, () => {
   console.log(`====================================================`);
-  console.log(`🚀 NexaHR Backend running on http://localhost:${PORT}`);
+  console.log(`NexaHR Backend running on http://localhost:${PORT}`);
   console.log(`====================================================`);
 });
 

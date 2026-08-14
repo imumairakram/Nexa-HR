@@ -1,5 +1,9 @@
 const prisma = require('../config/prisma');
 const { calculateEmployeePayroll } = require('../services/payroll.service');
+const {
+  createInAppNotification,
+  sendPayslipEmail,
+} = require('../services/notification.service');
 
 const setSalaryStructure = async (req, res) => {
   try {
@@ -147,6 +151,45 @@ const generateMonthlyPayroll = async (req, res) => {
         })
       )
     );
+
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const monthLabel = monthNames[month - 1] || `Month ${month}`;
+
+    // Notify each employee in-app and via email
+    for (const slip of createdPayslips) {
+      const user = await prisma.user.findUnique({
+        where: { id: slip.userId },
+        select: { firstName: true, lastName: true, email: true },
+      });
+
+      if (user) {
+        // 1. In-App Notification
+        await createInAppNotification({
+          userId: slip.userId,
+          title: `${monthLabel} ${year} Payslip Ready`,
+          message: `Your monthly salary slip ($${Number(slip.netSalary).toLocaleString()}) is ready for download.`,
+          type: 'success',
+          category: 'PAYROLL',
+          link: '/employee/payslips',
+        });
+
+        // 2. Corporate Email Dispatch
+        if (user.email) {
+          await sendPayslipEmail({
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            month: monthLabel,
+            year,
+            grossSalary: slip.grossSalary,
+            deductions: (slip.taxDeductions || 0) + (slip.unpaidLeaveDeduction || 0) + (slip.otherDeductions || 0),
+            netSalary: slip.netSalary,
+          });
+        }
+      }
+    }
 
     return res.status(201).json({
       success: true,

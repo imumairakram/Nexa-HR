@@ -1,30 +1,52 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Sparkles, Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers } from 'lucide-react';
+import { Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers } from 'lucide-react';
 
-const INITIAL = [
-  { id: 1, name: 'React.js, Next.js & TailwindCSS', category: 'Frontend Engineering', level: 'Advanced (L4+)', assessmentsCount: 42 },
-  { id: 2, name: 'Node.js, PostgreSQL & Prisma ORM', category: 'Backend Architecture', level: 'Expert (L5+)', assessmentsCount: 38 },
-  { id: 3, name: 'Docker, Kubernetes & AWS Infrastructure', category: 'Cloud & DevOps', level: 'Expert (L5+)', assessmentsCount: 29 },
-  { id: 4, name: 'Figma Enterprise & Design Tokens', category: 'UI/UX & Product Design', level: 'Advanced (L4+)', assessmentsCount: 24 },
-  { id: 5, name: 'Biometric Face-ID Hardware SDKs & IoT', category: 'Hardware Systems', level: 'Specialist (L5+)', assessmentsCount: 16 },
-  { id: 6, name: 'SOC-2 Compliance & Role ACLs', category: 'Information Security', level: 'Expert (L5+)', assessmentsCount: 19 },
+const INITIAL_SKILLS = [
+  { id: 1, name: 'React.js & TypeScript', category: 'Frontend', assessmentsCount: 42, proficiency: 'Advanced', weight: 'Mandatory' },
+  { id: 2, name: 'Node.js & Microservices', category: 'Backend', assessmentsCount: 38, proficiency: 'Advanced', weight: 'Mandatory' },
+  { id: 3, name: 'PostgreSQL & Prisma ORM', category: 'Databases', assessmentsCount: 29, proficiency: 'Intermediate', weight: 'Preferred' },
+  { id: 4, name: 'Kubernetes & CI/CD Pipelines', category: 'DevOps', assessmentsCount: 19, proficiency: 'Expert', weight: 'Mandatory' },
+  { id: 5, name: 'Figma Token Systems', category: 'Design', assessmentsCount: 31, proficiency: 'Advanced', weight: 'Preferred' },
+  { id: 6, name: 'Biometric API Protocols', category: 'IoT & Hardware', assessmentsCount: 14, proficiency: 'Intermediate', weight: 'Mandatory' },
 ];
 
 const JobSkills = () => {
-  const [skills, setSkills] = useState(INITIAL);
+  const [skills, setSkills] = useState(INITIAL_SKILLS);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newSkill, setNewSkill] = useState({ name: '', category: 'Frontend Engineering', level: 'Advanced (L4+)' });
   const [toastMsg, setToastMsg] = useState('');
+
+  const [form, setForm] = useState({
+    name: '',
+    category: 'Engineering',
+    proficiency: 'Advanced',
+    weight: 'Mandatory',
+  });
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!newSkill.name) return;
-    setSkills([...skills, { id: Date.now(), ...newSkill, assessmentsCount: 0 }]);
+    if (!form.name.trim()) return;
+
+    const newSkill = {
+      id: Date.now(),
+      name: form.name.trim(),
+      category: form.category,
+      assessmentsCount: 0,
+      proficiency: form.proficiency,
+      weight: form.weight,
+    };
+
+    setSkills([newSkill, ...skills]);
     setIsAddOpen(false);
-    setNewSkill({ name: '', category: 'Frontend Engineering', level: 'Advanced (L4+)' });
-    setToastMsg('Technical skill tag registered successfully!');
+    setForm({ name: '', category: 'Engineering', proficiency: 'Advanced', weight: 'Mandatory' });
+    setToastMsg(`Skill "${newSkill.name}" added to candidate evaluation matrix.`);
+    setTimeout(() => setToastMsg(''), 2500);
+  };
+
+  const handleDelete = (id) => {
+    setSkills(skills.filter((s) => s.id !== id));
+    setToastMsg('Skill removed.');
     setTimeout(() => setToastMsg(''), 2500);
   };
 
@@ -34,10 +56,10 @@ const JobSkills = () => {
   );
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Candidate Skills & Competency Matrix Master Table"
-        subtitle="Define required technical proficiencies, engineering competencies, and automated screening skill tags."
+        title="Candidate Skill Taxonomy & Assessments"
+        subtitle="Manage required technical competencies, automated grading rubrics, and talent stack tags."
       />
 
       {toastMsg && (
@@ -55,7 +77,7 @@ const JobSkills = () => {
             <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{skills.length} Tags</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+            <Layers className="w-5 h-5" />
           </div>
         </div>
 

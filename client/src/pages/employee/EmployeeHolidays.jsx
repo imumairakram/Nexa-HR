@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import {
   Calendar,
-  Sparkles,
   Clock,
   Sun,
   Compass,
   ArrowRight,
   CheckCircle2,
   MapPin,
-  Flag,
   Moon,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
@@ -46,7 +44,7 @@ const EmployeeHolidays = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title="Official Pakistan Public Holidays"
+        title="Official Public Holidays"
         subtitle="Government gazetted public holiday calendar and official non-working observance days."
       />
 
@@ -55,11 +53,10 @@ const EmployeeHolidays = () => {
         <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center sm:text-left">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-extrabold">
-              <Sparkles className="w-3.5 h-3.5" />
               <span>Gazetted National Public Holiday • Pakistan</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black">
-              🇵🇰 Pakistan Independence Day • Aug 14, 2026
+              Pakistan Independence Day • Aug 14, 2026
             </h2>
             <p className="text-xs sm:text-sm text-emerald-100 max-w-2xl leading-relaxed">
               79th Youm-e-Azadi. Official paid public holiday across all Pakistan offices (Karachi, Lahore, Islamabad) with 3-Day Long Weekend (Friday – Sunday).
@@ -79,18 +76,17 @@ const EmployeeHolidays = () => {
       <div className="flex flex-wrap items-center gap-2">
         {[
           { id: 'ALL', label: 'All Gazetted Holidays' },
-          { id: 'NATIONAL', label: '🇵🇰 National & Memorial' },
-          { id: 'RELIGIOUS', label: '🌙 Islamic & Religious' },
-          { id: 'LONG_WEEKEND', label: '🌴 Long Weekends' },
+          { id: 'NATIONAL', label: 'National & Memorial' },
+          { id: 'RELIGIOUS', label: 'Islamic & Religious' },
+          { id: 'LONG_WEEKEND', label: 'Long Weekends' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setFilter(tab.id)}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-              filter === tab.id
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                : 'bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50'
-            }`}
+            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${filter === tab.id
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+              : 'bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50'
+              }`}
           >
             {tab.label}
           </button>
@@ -102,7 +98,7 @@ const EmployeeHolidays = () => {
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-              Pakistan Gazetted Holidays Schedule (2026 – 2027)
+              Holidays Schedule (2026 – 2027)
             </h3>
             <p className="text-xs text-slate-400 font-medium">
               Ministry of Interior gazette notification compliant corporate calendar
@@ -128,16 +124,15 @@ const EmployeeHolidays = () => {
               {filteredHolidays.map((h) => (
                 <tr
                   key={h.id}
-                  className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${
-                    h.active ? 'bg-emerald-50/40 dark:bg-emerald-950/20 font-bold' : ''
-                  }`}
+                  className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${h.active ? 'bg-emerald-50/40 dark:bg-emerald-950/20 font-bold' : ''
+                    }`}
                 >
                   <td className="py-3.5 px-5 font-bold text-slate-900 dark:text-white">
                     <div className="flex items-center gap-2">
                       <span>{h.name}</span>
                       {h.longWeekend && (
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                          🌴 Long Weekend
+                          Long Weekend
                         </span>
                       )}
                     </div>
@@ -148,22 +143,20 @@ const EmployeeHolidays = () => {
                   <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">{h.day}</td>
                   <td className="py-3.5 px-4">
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                        h.type.includes('National')
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                      }`}
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${h.type.includes('National')
+                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                        : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                        }`}
                     >
                       {h.type}
                     </span>
                   </td>
                   <td className="py-3.5 px-5 text-right">
                     <span
-                      className={`font-mono font-bold ${
-                        h.active
-                          ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1 rounded-full text-[11px]'
-                          : 'text-slate-500 dark:text-slate-400'
-                      }`}
+                      className={`font-mono font-bold ${h.active
+                        ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1 rounded-full text-[11px]'
+                        : 'text-slate-500 dark:text-slate-400'
+                        }`}
                     >
                       {h.countdown}
                     </span>

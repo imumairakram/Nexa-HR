@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  Sparkles,
   Users,
   Briefcase,
   Layers,
@@ -98,7 +97,7 @@ const EmployeeDashboard = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title={`Welcome, ${currentUser?.firstName || 'Staff Member'}! 👋`}
+        title={`Welcome, ${currentUser?.firstName || 'Staff Member'}`}
         subtitle="Here is your personal attendance, schedule, and self-service pulse for today."
         onRefresh={fetchDashboard}
         loading={loading}
@@ -144,10 +143,7 @@ const EmployeeDashboard = () => {
           {/* Right Column: Automated Database Punch Card */}
           <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[290px] sm:min-w-[340px]">
             <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-300">
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Biometric Status</span>
-              </span>
+              <span>Biometric Status</span>
               <span
                 className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
                   isPresent
@@ -157,7 +153,7 @@ const EmployeeDashboard = () => {
                     : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
                 }`}
               >
-                {isPresent ? (todayStatus?.status === 'LATE' ? '⚠️ Late Recorded' : '🟢 Biometric Synced') : '⚪ Awaiting Device Entry'}
+                {isPresent ? (todayStatus?.status === 'LATE' ? 'Late Recorded' : 'Biometric Synced') : 'Awaiting Device Entry'}
               </span>
             </div>
 

@@ -99,7 +99,7 @@ const EmployeeLeaves = () => {
         dayType: 'FULL',
         reason: '',
       });
-      showToast('🎉 Time-off application submitted for management review!');
+      showToast('Time-off application submitted for management review successfully.');
     } catch (err) {
       console.error('Apply leave error:', err);
       showToast(err.message || 'Failed to submit leave request');

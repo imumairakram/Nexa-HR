@@ -183,10 +183,10 @@ const Employees = () => {
       if (res.data?.employee) {
         const createdEmp = res.data.employee;
         setEmployees((prev) => [createdEmp, ...prev]);
-        showToast(`🎉 ${createdEmp.firstName} ${createdEmp.lastName} onboarded successfully!`);
+        showToast(`${createdEmp.firstName} ${createdEmp.lastName} onboarded successfully.`);
       } else {
         await fetchEmployeesData();
-        showToast(`🎉 ${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully!`);
+        showToast(`${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully.`);
       }
 
       setIsOnboardOpen(false);
@@ -317,7 +317,7 @@ const Employees = () => {
       }
 
       setIsEditOpen(false);
-      showToast(`✨ Profile for ${updatedEmp.firstName} ${updatedEmp.lastName} updated successfully!`);
+      showToast(`Profile for ${updatedEmp.firstName} ${updatedEmp.lastName} updated successfully.`);
     } catch (err) {
       console.error('Update employee error:', err);
       // Update locally

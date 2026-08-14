@@ -12,7 +12,7 @@ import {
   Clock,
   DollarSign,
   Calendar,
-  Sparkles,
+  Sliders,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { useTheme } from '../../context/ThemeContext';
@@ -68,7 +68,7 @@ const EmployeeSettings = () => {
       dateFormat: formState.dateFormat,
       currency: formState.currency,
     });
-    setToastMsg('🇵🇰 Pakistan Timezone & Regional preferences saved and updated across the portal!');
+    setToastMsg('Pakistan Timezone & Regional preferences saved and updated across the portal!');
     setTimeout(() => setToastMsg(''), 3500);
   };
 
@@ -87,7 +87,7 @@ const EmployeeSettings = () => {
       dateFormat: 'DD/MM/YYYY',
       currency: 'PKR',
     });
-    setToastMsg('🇵🇰 Pakistan Standard defaults applied (PKT UTC+5, PKR Rs., DD/MM/YYYY, 12h)!');
+    setToastMsg('Pakistan Standard defaults applied (PKT UTC+5, PKR Rs., DD/MM/YYYY, 12h)!');
     setTimeout(() => setToastMsg(''), 3500);
   };
 
@@ -126,8 +126,8 @@ const EmployeeSettings = () => {
               onClick={applyPakistanPreset}
               className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0 border border-emerald-200 dark:border-emerald-800/60"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>🇵🇰 Set Pakistan Standard</span>
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Set Pakistan Standard</span>
             </button>
           </div>
 

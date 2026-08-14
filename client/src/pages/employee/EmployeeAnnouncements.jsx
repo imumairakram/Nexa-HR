@@ -14,41 +14,44 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 
+import { useTheme } from '../../context/ThemeContext';
+import { api } from '../../services/api';
+
 const EmployeeAnnouncements = () => {
   const [filter, setFilter] = useState('ALL');
-  const [announcements, setAnnouncements] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_company_announcements');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Sync live announcements when HR updates or posts
-  const loadAnnouncements = () => {
+  // Sync live announcements from backend
+  const loadAnnouncements = async () => {
+    setLoading(true);
     try {
-      const saved = localStorage.getItem('nexahr_company_announcements');
-      setAnnouncements(saved ? JSON.parse(saved) : []);
-    } catch {
-      setAnnouncements([]);
+      const res = await api.getAnnouncements();
+      if (res?.success && res.data?.announcements) {
+        setAnnouncements(res.data.announcements);
+      }
+    } catch (err) {
+      console.error('Failed to load employee announcements:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     loadAnnouncements();
-    window.addEventListener('storage', loadAnnouncements);
-    return () => window.removeEventListener('storage', loadAnnouncements);
+    window.addEventListener('nexahr_notification_updated', loadAnnouncements);
+    return () => window.removeEventListener('nexahr_notification_updated', loadAnnouncements);
   }, []);
 
-  const togglePin = (id) => {
-    const updated = announcements.map((a) => (a.id === id ? { ...a, pinned: !a.pinned } : a));
-    setAnnouncements(updated);
+  const togglePin = async (id, currentPinned) => {
     try {
-      localStorage.setItem('nexahr_company_announcements', JSON.stringify(updated));
+      await api.updateAnnouncement(id, { pinned: !currentPinned });
+      setAnnouncements((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, pinned: !currentPinned } : a))
+      );
     } catch (e) {
-      console.warn('LocalStorage error:', e);
+      console.warn('Error toggling pin:', e);
     }
   };
 
@@ -79,7 +82,7 @@ const EmployeeAnnouncements = () => {
                   : 'bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50'
               }`}
             >
-              {cat === 'ALL' ? 'All Notices' : cat === 'PINNED' ? '⭐ Pinned' : cat}
+              {cat === 'ALL' ? 'All Notices' : cat === 'PINNED' ? 'Pinned' : cat}
             </button>
           ))}
         </div>
@@ -139,7 +142,7 @@ const EmployeeAnnouncements = () => {
                 </div>
 
                 <button
-                  onClick={() => togglePin(item.id)}
+                  onClick={() => togglePin(item.id, item.pinned)}
                   className={`p-2.5 rounded-2xl border transition-all cursor-pointer shrink-0 ${
                     item.pinned
                       ? 'border-amber-300 bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:border-amber-800'

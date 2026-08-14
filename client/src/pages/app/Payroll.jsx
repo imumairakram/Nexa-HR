@@ -99,7 +99,7 @@ const Payroll = () => {
       await api.generatePayroll({ month: runMonth, year: runYear });
       await fetchPayroll();
       setIsRunModalOpen(false);
-      showToast(`🎉 ${MONTH_NAMES[runMonth - 1]} ${runYear} Payroll Batch generated and recorded successfully!`);
+      showToast(`${MONTH_NAMES[runMonth - 1]} ${runYear} Payroll Batch generated and recorded successfully.`);
     } catch (err) {
       console.error('Failed to generate payroll:', err);
       showToast(err.message || 'Failed to generate payroll batch.');

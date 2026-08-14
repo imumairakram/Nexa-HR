@@ -18,19 +18,16 @@ import {
   Building,
   Bell,
   Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
+import { api } from '../../services/api';
 
 const Announcement = () => {
   const { formatDate } = useRegionalSettings();
-  const [announcements, setAnnouncements] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_company_announcements');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,67 +46,94 @@ const Announcement = () => {
     pinned: false,
   });
 
-  const saveAnnouncements = (updated) => {
-    setAnnouncements(updated);
+  const loadAnnouncements = async () => {
+    setLoading(true);
     try {
-      localStorage.setItem('nexahr_company_announcements', JSON.stringify(updated));
-      window.dispatchEvent(new Event('storage'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
+      const res = await api.getAnnouncements();
+      if (res?.success && res.data?.announcements) {
+        setAnnouncements(res.data.announcements);
+      }
+    } catch (err) {
+      console.error('Failed to load announcements:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePostSubmit = (e) => {
+  useEffect(() => {
+    loadAnnouncements();
+  }, []);
+
+  const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.content.trim()) return;
 
-    const newNotice = {
-      id: `ANN-${Date.now()}`,
-      title: form.title.trim(),
-      category: form.category,
-      priority: form.priority,
-      author: 'People Operations & HR',
-      authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-      date: formatDate(new Date()),
-      department: form.department,
-      summary: form.summary.trim() || form.content.slice(0, 120) + '...',
-      content: form.content.trim(),
-      pinned: form.pinned,
-      views: 1,
-    };
+    setSubmitting(true);
+    try {
+      const res = await api.createAnnouncement({
+        title: form.title.trim(),
+        category: form.category,
+        priority: form.priority,
+        department: form.department,
+        summary: form.summary.trim() || form.content.slice(0, 140) + '...',
+        content: form.content.trim(),
+        pinned: form.pinned,
+      });
 
-    const updated = [newNotice, ...announcements];
-    saveAnnouncements(updated);
-    setIsPostModalOpen(false);
-    setForm({
-      title: '',
-      category: 'EVENTS',
-      priority: 'HIGH',
-      department: 'Company-Wide (All Offices)',
-      summary: '',
-      content: '',
-      pinned: false,
-    });
-    setToastMsg(`Announcement published and broadcast to employee portal! 🎉`);
-    setTimeout(() => setToastMsg(''), 3000);
+      await loadAnnouncements();
+      setIsPostModalOpen(false);
+      setForm({
+        title: '',
+        category: 'EVENTS',
+        priority: 'HIGH',
+        department: 'Company-Wide (All Offices)',
+        summary: '',
+        content: '',
+        pinned: false,
+      });
+
+      // Notify notification header to refresh immediately
+      window.dispatchEvent(new Event('nexahr_notification_updated'));
+
+      setToastMsg('Announcement published! Notifications and emails broadcasted to all employees.');
+      setTimeout(() => setToastMsg(''), 4000);
+    } catch (err) {
+      console.error('Error posting announcement:', err);
+      setToastMsg(err.message || 'Failed to post announcement.');
+      setTimeout(() => setToastMsg(''), 3000);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const togglePin = (id) => {
-    const updated = announcements.map((a) => (a.id === id ? { ...a, pinned: !a.pinned } : a));
-    saveAnnouncements(updated);
+  const togglePin = async (id, currentPinned) => {
+    try {
+      await api.updateAnnouncement(id, { pinned: !currentPinned });
+      setAnnouncements((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, pinned: !currentPinned } : a))
+      );
+      setToastMsg(!currentPinned ? 'Announcement pinned to top.' : 'Announcement unpinned.');
+      setTimeout(() => setToastMsg(''), 2000);
+    } catch (err) {
+      console.error('Error toggling pin:', err);
+    }
   };
 
-  const handleDelete = (id) => {
-    const updated = announcements.filter((a) => a.id !== id);
-    saveAnnouncements(updated);
-    setToastMsg('Announcement removed.');
-    setTimeout(() => setToastMsg(''), 2500);
+  const handleDelete = async (id) => {
+    try {
+      await api.deleteAnnouncement(id);
+      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+      setToastMsg('Announcement removed.');
+      setTimeout(() => setToastMsg(''), 2500);
+    } catch (err) {
+      console.error('Error deleting announcement:', err);
+    }
   };
 
   const filtered = announcements.filter((a) => {
     const matchesSearch =
       a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.summary || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (a.department || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat =
       categoryFilter === 'ALL' ||
@@ -206,7 +230,7 @@ const Announcement = () => {
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
-                {cat === 'ALL' ? 'All' : cat === 'PINNED' ? '⭐ Pinned' : cat}
+                {cat === 'ALL' ? 'All' : cat === 'PINNED' ? 'Pinned' : cat}
               </button>
             ))}
           </div>
@@ -276,7 +300,7 @@ const Announcement = () => {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => togglePin(item.id)}
+                    onClick={() => togglePin(item.id, item.pinned)}
                     className={`p-2 rounded-xl border transition-all cursor-pointer ${
                       item.pinned
                         ? 'border-amber-300 bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:border-amber-800'

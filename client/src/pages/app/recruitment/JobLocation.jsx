@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { MapPin, Plus, CheckCircle2, X, Search, Building2, Globe, Sparkles } from 'lucide-react';
+import { MapPin, Plus, CheckCircle2, X, Search, Building2, Globe } from 'lucide-react';
 
 const INITIAL = [
   { id: 1, name: 'San Francisco Global Headquarters (Floor 4-5)', city: 'San Francisco, CA', country: 'United States', timezone: 'PST (UTC-8)', count: 8, status: 'PRIMARY_HQ' },
@@ -86,7 +86,7 @@ const JobLocation = () => {
             <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">PST to EST</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+            <Globe className="w-5 h-5" />
           </div>
         </div>
       </div>

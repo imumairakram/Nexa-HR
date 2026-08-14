@@ -3,19 +3,19 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const RegionalSettingsContext = createContext();
 
 export const TIMEZONE_OPTIONS = [
-  { id: 'Asia/Karachi', label: '🇵🇰 Pakistan Standard Time (PKT - UTC+5 / Islamabad, Karachi)' },
-  { id: 'Asia/Dubai', label: '🇦🇪 Gulf Standard Time (GST - UTC+4 / Dubai, Abu Dhabi)' },
-  { id: 'Asia/Riyadh', label: '🇸🇦 Arabian Standard Time (AST - UTC+3 / Riyadh, Makkah)' },
-  { id: 'Europe/London', label: '🇬🇧 London, UK - GMT / BST (UTC+0 / +1)' },
-  { id: 'America/New_York', label: '🇺🇸 Eastern Time (US & Canada) - EST (UTC-5)' },
-  { id: 'America/Chicago', label: '🇺🇸 Central Time (US & Canada) - CST (UTC-6)' },
-  { id: 'America/Los_Angeles', label: '🇺🇸 Pacific Time (US & Canada) - PST (UTC-8)' },
-  { id: 'Europe/Paris', label: '🇪🇺 Paris, Berlin, Rome - CET (UTC+1)' },
-  { id: 'Asia/Singapore', label: '🇸🇬 Singapore, Kuala Lumpur - SGT (UTC+8)' },
-  { id: 'Asia/Kolkata', label: '🇮🇳 New Delhi, Mumbai - IST (UTC+5:30)' },
-  { id: 'Asia/Tokyo', label: '🇯🇵 Tokyo, Seoul - JST (UTC+9)' },
-  { id: 'Australia/Sydney', label: '🇦🇺 Sydney, Melbourne - AEST (UTC+10)' },
-  { id: 'UTC', label: '🌐 Universal Coordinated Time - UTC (UTC+0)' },
+  { id: 'Asia/Karachi', label: 'Pakistan Standard Time (PKT - UTC+5 / Islamabad, Karachi)' },
+  { id: 'Asia/Dubai', label: 'Gulf Standard Time (GST - UTC+4 / Dubai, Abu Dhabi)' },
+  { id: 'Asia/Riyadh', label: 'Arabian Standard Time (AST - UTC+3 / Riyadh, Makkah)' },
+  { id: 'Europe/London', label: 'London, UK - GMT / BST (UTC+0 / +1)' },
+  { id: 'America/New_York', label: 'Eastern Time (US & Canada) - EST (UTC-5)' },
+  { id: 'America/Chicago', label: 'Central Time (US & Canada) - CST (UTC-6)' },
+  { id: 'America/Los_Angeles', label: 'Pacific Time (US & Canada) - PST (UTC-8)' },
+  { id: 'Europe/Paris', label: 'Paris, Berlin, Rome - CET (UTC+1)' },
+  { id: 'Asia/Singapore', label: 'Singapore, Kuala Lumpur - SGT (UTC+8)' },
+  { id: 'Asia/Kolkata', label: 'New Delhi, Mumbai - IST (UTC+5:30)' },
+  { id: 'Asia/Tokyo', label: 'Tokyo, Seoul - JST (UTC+9)' },
+  { id: 'Australia/Sydney', label: 'Sydney, Melbourne - AEST (UTC+10)' },
+  { id: 'UTC', label: 'Universal Coordinated Time - UTC (UTC+0)' },
 ];
 
 export const CURRENCY_OPTIONS = [
