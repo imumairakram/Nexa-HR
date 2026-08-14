@@ -57,9 +57,7 @@ import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import EmployeeAttendance from './pages/employee/EmployeeAttendance';
 import EmployeeLeaves from './pages/employee/EmployeeLeaves';
 import EmployeePayslips from './pages/employee/EmployeePayslips';
-import EmployeeProjects from './pages/employee/EmployeeProjects';
 import EmployeeAnnouncements from './pages/employee/EmployeeAnnouncements';
-import EmployeeAwards from './pages/employee/EmployeeAwards';
 import EmployeeHolidays from './pages/employee/EmployeeHolidays';
 import EmployeeDirectory from './pages/employee/EmployeeDirectory';
 import EmployeeHelpdesk from './pages/employee/EmployeeHelpdesk';
@@ -137,9 +135,7 @@ function App() {
           <Route path="attendance" element={<EmployeeAttendance />} />
           <Route path="leaves" element={<EmployeeLeaves />} />
           <Route path="payslips" element={<EmployeePayslips />} />
-          <Route path="projects" element={<EmployeeProjects />} />
           <Route path="announcements" element={<EmployeeAnnouncements />} />
-          <Route path="awards" element={<EmployeeAwards />} />
           <Route path="holidays" element={<EmployeeHolidays />} />
           <Route path="directory" element={<EmployeeDirectory />} />
           <Route path="helpdesk" element={<EmployeeHelpdesk />} />
@@ -147,6 +143,7 @@ function App() {
           <Route path="profile" element={<EmployeeProfile />} />
           <Route path="settings" element={<EmployeeSettings />} />
         </Route>
+
 
         {/* Catch-All Route redirects to Root Login */}
         <Route path="*" element={<Navigate to="/" replace />} />

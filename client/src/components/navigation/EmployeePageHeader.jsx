@@ -39,16 +39,15 @@ const EMPLOYEE_SEARCH_SHORTCUTS = [
   { label: 'My Leave Balances & History', icon: CalendarDays, path: '/employee/leaves', category: 'Leaves' },
   { label: 'View Latest Payslip', icon: CreditCard, path: '/employee/payslips', category: 'Compensation' },
   { label: 'Salary History & Tax Breakdown', icon: CreditCard, path: '/employee/payslips', category: 'Compensation' },
-  { label: 'My Assigned Projects & Tasks', icon: FolderKanban, path: '/employee/projects', category: 'Projects' },
   { label: 'Company Team Directory & Roster', icon: Users, path: '/employee/directory', category: 'Company' },
   { label: 'Company Announcements & Notices', icon: Megaphone, path: '/employee/announcements', category: 'Notices' },
-  { label: 'Awards & Peer Kudos Wall', icon: Award, path: '/employee/awards', category: 'Recognition' },
   { label: 'Upcoming Public Holidays', icon: Calendar, path: '/employee/holidays', category: 'Calendar' },
   { label: 'Helpdesk & Support Requests', icon: LifeBuoy, path: '/employee/helpdesk', category: 'Support' },
   { label: 'Documents & Company Policies', icon: BookOpen, path: '/employee/documents', category: 'Documents' },
   { label: 'My Profile & Account Details', icon: User, path: '/employee/profile', category: 'Account' },
   { label: 'Settings & Workspace Preferences', icon: Settings, path: '/employee/settings', category: 'Account' },
 ];
+
 
 const INITIAL_EMPLOYEE_NOTIFICATIONS = [
   {

@@ -189,6 +189,10 @@ export const api = {
     return await fetchAPI(`/payroll/payslips${query ? `?${query}` : ''}`);
   },
 
+  getMyPayslips: async () => {
+    return await fetchAPI('/payroll/my-payslips');
+  },
+
   getPayslipById: async (id) => {
     return await fetchAPI(`/payroll/payslips/${id}`);
   },
@@ -199,6 +203,7 @@ export const api = {
       body: JSON.stringify(payrollData),
     });
   },
+
 
   // --- Departments & Designations ---
   getDepartments: async () => {

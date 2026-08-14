@@ -4,66 +4,23 @@ import {
   Clock,
   CalendarDays,
   CreditCard,
-  FolderKanban,
   CheckCircle2,
   AlertCircle,
-  Play,
-  Square,
-  Coffee,
   ArrowRight,
-  TrendingUp,
-  Award,
-  Megaphone,
-  UserCheck,
-  Calendar,
   Sparkles,
-  ChevronRight,
   Users,
   Briefcase,
   Layers,
+  Fingerprint,
 } from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { api } from '../../services/api';
 
-const WEEKLY_HOURS_DATA = [
-  { day: 'Mon', hours: 8.5, target: 8.0 },
-  { day: 'Tue', hours: 8.2, target: 8.0 },
-  { day: 'Wed', hours: 9.0, target: 8.0 },
-  { day: 'Thu', hours: 8.4, target: 8.0 },
-  { day: 'Fri', hours: 7.8, target: 8.0 },
-];
-
-const LEAVE_QUOTA_DATA = [
-  { name: 'Annual Leave', available: 10, total: 14, color: '#10B981' },
-  { name: 'Casual Leave', available: 4, total: 6, color: '#3B82F6' },
-  { name: 'Sick Leave', available: 5, total: 8, color: '#F59E0B' },
-];
-
-const TEAM_MEMBERS_TODAY = [
-  { name: 'Alex Mercer (You)', role: 'Senior Engineer', status: 'PRESENT', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' },
-  { name: 'David Miller', role: 'Full-Stack Dev', status: 'PRESENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80' },
-  { name: 'Sarah Jenkins', role: 'UI/UX Designer', status: 'REMOTE', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80' },
-  { name: 'Marcus Vance', role: 'DevOps Lead', status: 'PRESENT', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80' },
-  { name: 'Emily Zhang', role: 'Product Manager', status: 'ON_LEAVE', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80' },
-];
-
-const MY_TASKS_SUMMARY = [
-  { id: 1, title: 'Implement Biometric Webhook Event Handlers', project: 'Biometric API Gateway', priority: 'HIGH', status: 'IN_PROGRESS', due: 'Today' },
-  { id: 2, title: 'Refactor Employee Self-Service Mobile Layout', project: 'NexaHR Mobile App V2', priority: 'MEDIUM', status: 'TO_DO', due: 'Tomorrow' },
-  { id: 3, title: 'Update Tax Deduction Calculation Rules for FY26', project: 'Payroll Auto-Tax Engine', priority: 'LOW', status: 'COMPLETED', due: 'Completed' },
+const DEFAULT_AVATARS = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
 ];
 
 const EmployeeDashboard = () => {
@@ -71,6 +28,8 @@ const EmployeeDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dashboardData, setDashboardData] = useState(null);
+  const [colleagues, setColleagues] = useState([]);
+  const [leaveTypes, setLeaveTypes] = useState([]);
 
   // Live clock timer update
   useEffect(() => {
@@ -84,9 +43,20 @@ const EmployeeDashboard = () => {
   const fetchDashboard = async () => {
     setLoading(true);
     try {
-      const res = await api.getEmployeeDashboard();
-      if (res && res.success) {
-        setDashboardData(res.data);
+      const [dashRes, empRes, leaveRes] = await Promise.allSettled([
+        api.getEmployeeDashboard(),
+        api.getEmployees(),
+        api.getLeaveTypes(),
+      ]);
+
+      if (dashRes.status === 'fulfilled' && dashRes.value?.data) {
+        setDashboardData(dashRes.value.data);
+      }
+      if (empRes.status === 'fulfilled' && empRes.value?.data?.employees) {
+        setColleagues(empRes.value.data.employees.slice(0, 5));
+      }
+      if (leaveRes.status === 'fulfilled' && leaveRes.value?.data?.leaveTypes) {
+        setLeaveTypes(leaveRes.value.data.leaveTypes);
       }
     } catch (err) {
       console.warn('Failed to load employee dashboard data:', err.message);
@@ -100,11 +70,12 @@ const EmployeeDashboard = () => {
   }, []);
 
   const currentUser = (() => {
+    if (dashboardData?.user) return dashboardData.user;
     try {
       const u = localStorage.getItem('user');
-      return u ? JSON.parse(u) : { firstName: 'Alex', lastName: 'Mercer' };
+      return u ? JSON.parse(u) : { firstName: 'Employee', lastName: 'User' };
     } catch {
-      return { firstName: 'Alex', lastName: 'Mercer' };
+      return { firstName: 'Employee', lastName: 'User' };
     }
   })();
 
@@ -120,19 +91,21 @@ const EmployeeDashboard = () => {
     });
   };
 
+  const monthlyAttendance = dashboardData?.monthlyAttendance || { presentDays: 0, lateDays: 0, totalWorkHours: 0 };
+  const leavesSummary = dashboardData?.leavesSummary || { pending: 0, approved: 0, rejected: 0 };
+  const latestPayslip = dashboardData?.latestPayslip || null;
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title={`Hello, ${currentUser?.firstName || 'Alex'}! 👋`}
+        title={`Welcome, ${currentUser?.firstName || 'Staff Member'}! 👋`}
         subtitle="Here is your personal attendance, schedule, and self-service pulse for today."
+        onRefresh={fetchDashboard}
         loading={loading}
       />
 
-      {/* ========================================================================= */}
-      {/* 1. HERO AUTOMATED BIOMETRIC HARDWARE STATUS BANNER */}
-      {/* ========================================================================= */}
+      {/* HERO BIOMETRIC HARDWARE STATUS BANNER */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white p-6 sm:p-8 shadow-2xl border border-slate-700/50">
-        {/* Background glow effects */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -150,7 +123,7 @@ const EmployeeDashboard = () => {
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               {isPresent
-                ? 'Your biometric entry has been recorded directly by the terminal turnstile into the database.'
+                ? 'Your biometric entry has been recorded directly into the PostgreSQL database.'
                 : 'Attendance is recorded automatically via biometric hardware machines (Face-ID / Fingerprint).'}
             </p>
 
@@ -175,13 +148,15 @@ const EmployeeDashboard = () => {
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Biometric Status</span>
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                isPresent
-                  ? todayStatus?.status === 'LATE'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                  : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
-              }`}>
+              <span
+                className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  isPresent
+                    ? todayStatus?.status === 'LATE'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
+                }`}
+              >
                 {isPresent ? (todayStatus?.status === 'LATE' ? '⚠️ Late Recorded' : '🟢 Biometric Synced') : '⚪ Awaiting Device Entry'}
               </span>
             </div>
@@ -191,30 +166,28 @@ const EmployeeDashboard = () => {
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch In</div>
                 <div className="text-lg sm:text-xl font-mono font-black text-emerald-400 mt-0.5">
-                  {formatDbTime(todayStatus?.checkInTime) !== '--:--' ? formatDbTime(todayStatus?.checkInTime) : '08:52 AM'}
+                  {formatDbTime(todayStatus?.checkInTime)}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" /> Terminal Verified
+                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                  {todayStatus?.checkInTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
 
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch Out</div>
                 <div className="text-lg sm:text-xl font-mono font-black text-blue-400 mt-0.5">
-                  {todayStatus?.checkOutTime ? formatDbTime(todayStatus?.checkOutTime) : '05:35 PM'}
+                  {formatDbTime(todayStatus?.checkOutTime)}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-blue-400" /> Auto-Recorded
+                  <CheckCircle2 className="w-2.5 h-2.5 text-blue-400" />
+                  {todayStatus?.checkOutTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
             </div>
 
-            {/* Hardware Terminal Info & Navigation Action */}
+            {/* Hardware Terminal Navigation Action */}
             <div className="w-full pt-2">
-              <div className="text-[11px] text-slate-300/80 mb-3 leading-snug">
-                Recorded via <strong>Face-ID Terminal Gate 01</strong> into database. Manual clock-in is disabled.
-              </div>
-
               <button
                 onClick={() => navigate('/employee/attendance')}
                 className="w-full py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 shadow-md"
@@ -227,53 +200,43 @@ const EmployeeDashboard = () => {
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 2. TOP METRICS CARDS */}
-      {/* ========================================================================= */}
+      {/* TOP METRICS CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Attendance Rate */}
+        {/* Card 1: Days Present */}
         <div
           onClick={() => navigate('/employee/attendance')}
           className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Attendance Rate</span>
+            <span className="text-xs font-bold text-slate-400">Present This Month</span>
             <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">96.2%</span>
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">21/22 Days</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white">{monthlyAttendance.presentDays} Days</span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-            <div className="bg-emerald-500 h-full rounded-full" style={{ width: '96.2%' }}></div>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">1 Late arrival, 0 Absences</p>
+          <p className="text-[11px] text-slate-400 mt-2 font-medium">{monthlyAttendance.lateDays} Late check-ins</p>
         </div>
 
-        {/* Card 2: Leave Quota */}
+        {/* Card 2: Leave Summary */}
         <div
           onClick={() => navigate('/employee/leaves')}
           className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Available Leaves</span>
+            <span className="text-xs font-bold text-slate-400">Approved Leaves</span>
             <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
               <CalendarDays className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">19 Days</span>
-            <span className="text-xs font-bold text-slate-400">/ 28 Total</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white">{leavesSummary.approved} Approved</span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-            <div className="bg-blue-500 h-full rounded-full" style={{ width: '68%' }}></div>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">10 Annual, 4 Casual, 5 Sick</p>
+          <p className="text-[11px] text-slate-400 mt-2 font-medium">{leavesSummary.pending} Pending review</p>
         </div>
 
-        {/* Card 3: Logged Hours */}
+        {/* Card 3: Total Work Hours */}
         <div
           onClick={() => navigate('/employee/attendance')}
           className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
@@ -285,250 +248,76 @@ const EmployeeDashboard = () => {
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">168.5 h</span>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">+4.2h OT</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white">{monthlyAttendance.totalWorkHours} h</span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-            <div className="bg-indigo-500 h-full rounded-full" style={{ width: '88%' }}></div>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">Avg. 8.4 hours / working day</p>
+          <p className="text-[11px] text-slate-400 mt-2 font-medium">Computed from live timestamps</p>
         </div>
 
-        {/* Card 4: Next Payday */}
+        {/* Card 4: Latest Payslip */}
         <div
           onClick={() => navigate('/employee/payslips')}
           className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Next Payday</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="text-xs font-bold text-slate-400">Latest Net Salary</span>
+            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">Aug 31</span>
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">In 22 Days</span>
+            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              {latestPayslip ? `$${latestPayslip.netSalary.toLocaleString()}` : '$0.00'}
+            </span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-            <div className="bg-amber-500 h-full rounded-full" style={{ width: '35%' }}></div>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">Last net payout: $5,450.00</p>
+          <p className="text-[11px] text-slate-400 mt-2 font-medium">
+            {latestPayslip ? `Paid for Month ${latestPayslip.month}/${latestPayslip.year}` : 'Awaiting first pay run'}
+          </p>
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 3. CHARTS & TEAM SCHEDULE ROW */}
-      {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left 7 Cols: Weekly Working Hours Chart */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Weekly Working Hours
-              </h3>
-              <p className="text-xs text-slate-400 font-medium">
-                Actual hours logged vs 8.0h expected standard
-              </p>
-            </div>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
-              Total 41.9 hrs (On Track)
-            </span>
+      {/* TEAM COLLEAGUES PREVIEW */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-black text-sm text-slate-900 dark:text-white">Team Directory Quick Access</h3>
+            <p className="text-xs text-slate-400">Your active colleagues across departments</p>
           </div>
+          <button
+            onClick={() => navigate('/employee/directory')}
+            className="text-xs font-bold text-blue-600 hover:underline cursor-pointer"
+          >
+            View Full Directory →
+          </button>
+        </div>
 
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={WEEKLY_HOURS_DATA} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                <XAxis dataKey="day" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[0, 10]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0F172A',
-                    borderRadius: '16px',
-                    color: '#fff',
-                    border: 'none',
-                    fontSize: '12px',
-                  }}
+        {colleagues.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {colleagues.map((member, idx) => (
+              <div
+                key={member.id || idx}
+                className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/40 flex items-center gap-3"
+              >
+                <img
+                  src={DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length]}
+                  alt={member.firstName}
+                  className="w-10 h-10 rounded-xl object-cover"
                 />
-                <Bar dataKey="hours" name="Logged Hours" fill="#10B981" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Right 5 Cols: Leave Quota Breakdown */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Leave Balances
-              </h3>
-              <p className="text-xs text-slate-400 font-medium">
-                Annual allocated quota distribution
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/employee/leaves')}
-              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <span>Apply</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          <div className="space-y-3.5 my-3">
-            {LEAVE_QUOTA_DATA.map((item, idx) => (
-              <div key={idx} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-                  <span className="text-slate-800 dark:text-slate-200">{item.name}</span>
-                  <span className="text-slate-500 dark:text-slate-400">
-                    <strong className="text-slate-900 dark:text-white">{item.available}</strong> / {item.total} Days
-                  </span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${(item.available / item.total) * 100}%`,
-                      backgroundColor: item.color,
-                    }}
-                  />
+                <div className="overflow-hidden">
+                  <div className="font-extrabold text-xs text-slate-900 dark:text-white truncate">
+                    {member.firstName} {member.lastName}
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate">
+                    {member.profile?.designation?.title || member.role}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
-            <button
-              onClick={() => navigate('/employee/leaves')}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-md transition-all cursor-pointer"
-            >
-              Request Time Off
-            </button>
+        ) : (
+          <div className="text-center py-6 text-slate-400 text-xs">
+            No colleagues registered yet. Newly onboarded employees will appear here dynamically.
           </div>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 4. TASKS, TEAM PRESENCE & ANNOUNCEMENTS */}
-      {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left 7 Cols: My Active Tasks */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                My Assigned Tasks
-              </h3>
-              <p className="text-xs text-slate-400 font-medium">
-                Sprint tasks requiring your input
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/employee/projects')}
-              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <span>View All</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {MY_TASKS_SUMMARY.map((task) => (
-              <div
-                key={task.id}
-                className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 transition-all flex items-center justify-between gap-3"
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <div
-                    className={`mt-0.5 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ${
-                      task.status === 'COMPLETED'
-                        ? 'bg-emerald-500 border-emerald-500 text-white'
-                        : 'border-slate-300 dark:border-slate-600'
-                    }`}
-                  >
-                    {task.status === 'COMPLETED' && <CheckCircle2 className="w-3 h-3" />}
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                      {task.title}
-                    </h4>
-                    <p className="text-[11px] text-slate-400 font-medium truncate">
-                      {task.project}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <span
-                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                      task.priority === 'HIGH'
-                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                        : task.priority === 'MEDIUM'
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                    }`}
-                  >
-                    {task.priority}
-                  </span>
-                  <span className="text-[11px] text-slate-400 font-semibold">{task.due}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right 5 Cols: Today's Team Presence */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Team Presence Today
-              </h3>
-              <p className="text-xs text-slate-400 font-medium">
-                Engineering & DevOps Department
-              </p>
-            </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              5 Members
-            </span>
-          </div>
-
-          <div className="space-y-2.5">
-            {TEAM_MEMBERS_TODAY.map((member, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800"
-                  />
-                  <div>
-                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                      {member.name}
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-medium">{member.role}</div>
-                  </div>
-                </div>
-
-                <span
-                  className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full ${
-                    member.status === 'PRESENT'
-                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400'
-                      : member.status === 'REMOTE'
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400'
-                      : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'
-                  }`}
-                >
-                  {member.status === 'PRESENT' ? 'On-Site' : member.status === 'REMOTE' ? 'Remote' : 'On Leave'}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

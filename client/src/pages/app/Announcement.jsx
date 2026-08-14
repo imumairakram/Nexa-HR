@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   Megaphone,
@@ -19,68 +19,19 @@ import {
   Bell,
   Sparkles,
 } from 'lucide-react';
-
-const INITIAL_ANNOUNCEMENTS = [
-  {
-    id: 1,
-    title: 'Annual Company Retreat 2026 Announcement & RSVP',
-    category: 'EVENTS',
-    priority: 'HIGH',
-    author: 'People Operations & HR',
-    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-    date: 'Aug 05, 2026',
-    department: 'Company-Wide (All Offices)',
-    summary: 'We are thrilled to announce our upcoming annual team retreat in Lake Tahoe from Sept 15-18! Flights, hotel accommodations, and activities are fully sponsored.',
-    content: 'We are thrilled to announce our upcoming annual team retreat in Lake Tahoe from Sept 15-18! Flights, hotel accommodations, and outdoor excursions are fully sponsored by NexaHR. Please fill out your dietary preferences and room allocation preferences in the portal before Aug 25.',
-    pinned: true,
-    views: 142,
-  },
-  {
-    id: 2,
-    title: 'Updated Comprehensive Health Insurance Benefits Plan',
-    category: 'BENEFITS',
-    priority: 'MEDIUM',
-    author: 'Global Benefits Committee',
-    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-    date: 'Aug 02, 2026',
-    department: 'All Full-Time Staff',
-    summary: 'Open enrollment for FY2027 health, dental, and vision insurance begins next week. Enhanced mental wellness coverage and gym stipend now included.',
-    content: 'Open enrollment for FY2027 health, dental, and vision insurance begins next week. Enhanced mental wellness counseling ($1,200 annual credit) and fitness gym stipend ($60/mo) are now included in every tier.',
-    pinned: false,
-    views: 98,
-  },
-  {
-    id: 3,
-    title: 'Q3 Town Hall & Executive Roadmap All-Hands',
-    category: 'MEETINGS',
-    priority: 'INFO',
-    author: 'Executive Leadership Team',
-    authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    date: 'Jul 28, 2026',
-    department: 'All Departments',
-    summary: 'Join CEO and Leadership for the quarterly company-wide town hall this Friday at 3:00 PM EST. Submit your anonymous Q&A questions beforehand.',
-    content: 'Join CEO and Leadership for the quarterly company-wide town hall this Friday at 3:00 PM EST. We will review Q2 growth metrics, upcoming enterprise AI rollouts, and answer team questions live.',
-    pinned: false,
-    views: 210,
-  },
-  {
-    id: 4,
-    title: 'Office Infrastructure Biometric Gateway Upgrade',
-    category: 'OPERATIONS',
-    priority: 'HIGH',
-    author: 'IT & Security Operations',
-    authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    date: 'Jul 20, 2026',
-    department: 'San Francisco & NY Hubs',
-    summary: 'Hardware biometrics firmware is being updated this Saturday between 12:00 AM - 04:00 AM EST. Web check-in available during maintenance.',
-    content: 'Hardware biometrics firmware is being updated this Saturday between 12:00 AM - 04:00 AM EST. Physical turnstiles will remain unlocked with badge backup. Normal operations resume Sunday.',
-    pinned: false,
-    views: 85,
-  },
-];
+import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const Announcement = () => {
-  const [announcements, setAnnouncements] = useState(INITIAL_ANNOUNCEMENTS);
+  const { formatDate } = useRegionalSettings();
+  const [announcements, setAnnouncements] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_company_announcements');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -90,56 +41,67 @@ const Announcement = () => {
   // Post form state
   const [form, setForm] = useState({
     title: '',
-    category: 'CORPORATE',
-    priority: 'MEDIUM',
-    department: 'All Departments',
+    category: 'EVENTS',
+    priority: 'HIGH',
+    department: 'Company-Wide (All Offices)',
     summary: '',
     content: '',
     pinned: false,
   });
+
+  const saveAnnouncements = (updated) => {
+    setAnnouncements(updated);
+    try {
+      localStorage.setItem('nexahr_company_announcements', JSON.stringify(updated));
+      window.dispatchEvent(new Event('storage'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+  };
 
   const handlePostSubmit = (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.content.trim()) return;
 
     const newNotice = {
-      id: Date.now(),
-      title: form.title,
+      id: `ANN-${Date.now()}`,
+      title: form.title.trim(),
       category: form.category,
       priority: form.priority,
-      author: 'HR Administrator (You)',
-      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+      author: 'People Operations & HR',
+      authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
+      date: formatDate(new Date()),
       department: form.department,
-      summary: form.summary || form.content.slice(0, 120) + '...',
-      content: form.content,
+      summary: form.summary.trim() || form.content.slice(0, 120) + '...',
+      content: form.content.trim(),
       pinned: form.pinned,
       views: 1,
     };
 
-    setAnnouncements([newNotice, ...announcements]);
+    const updated = [newNotice, ...announcements];
+    saveAnnouncements(updated);
     setIsPostModalOpen(false);
     setForm({
       title: '',
-      category: 'CORPORATE',
-      priority: 'MEDIUM',
-      department: 'All Departments',
+      category: 'EVENTS',
+      priority: 'HIGH',
+      department: 'Company-Wide (All Offices)',
       summary: '',
       content: '',
       pinned: false,
     });
-    setToastMsg(`Announcement published successfully!`);
+    setToastMsg(`Announcement published and broadcast to employee portal! 🎉`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 
   const togglePin = (id) => {
-    setAnnouncements(
-      announcements.map((a) => (a.id === id ? { ...a, pinned: !a.pinned } : a))
-    );
+    const updated = announcements.map((a) => (a.id === id ? { ...a, pinned: !a.pinned } : a));
+    saveAnnouncements(updated);
   };
 
   const handleDelete = (id) => {
-    setAnnouncements(announcements.filter((a) => a.id !== id));
+    const updated = announcements.filter((a) => a.id !== id);
+    saveAnnouncements(updated);
     setToastMsg('Announcement removed.');
     setTimeout(() => setToastMsg(''), 2500);
   };
@@ -148,7 +110,7 @@ const Announcement = () => {
     const matchesSearch =
       a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.department.toLowerCase().includes(searchQuery.toLowerCase());
+      (a.department || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat =
       categoryFilter === 'ALL' ||
       (categoryFilter === 'PINNED' ? a.pinned : a.category === categoryFilter);
@@ -176,13 +138,11 @@ const Announcement = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 1. STATS METRICS */}
-      {/* ========================================================================= */}
+      {/* STATS METRICS */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Notices</div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Bulletins</div>
             <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.total} Circulars</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
@@ -193,17 +153,17 @@ const Announcement = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pinned Notices</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.pinned} Featured</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.pinned} Pinned</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <Star className="w-5 h-5" />
+            <Star className="w-5 h-5 fill-current" />
           </div>
         </div>
 
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Events & Town Halls</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.events} Active</div>
+            <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Events & Retreats</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.events} Events</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
             <Calendar className="w-5 h-5" />
@@ -212,164 +172,151 @@ const Announcement = () => {
 
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Benefits Updates</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.benefits} Circulars</div>
+            <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Benefits & Policy</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.benefits} Policies</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+            <Tag className="w-5 h-5" />
           </div>
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 2. SEARCH & FILTER TOOLBAR */}
-      {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search announcements by title, department, or keyword..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            />
+      {/* SEARCH & FILTERS CONTROLS */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="relative flex-1 w-full">
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search circulars by title, keyword, or department..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+            {['ALL', 'PINNED', 'EVENTS', 'BENEFITS', 'MEETINGS'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  categoryFilter === cat
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                {cat === 'ALL' ? 'All' : cat === 'PINNED' ? '⭐ Pinned' : cat}
+              </button>
+            ))}
           </div>
 
           <button
             onClick={() => setIsPostModalOpen(true)}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer shrink-0 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4" />
-            <span>Publish Announcement</span>
+            <span>Post Circular</span>
           </button>
         </div>
+      </div>
 
-        {/* Category Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-          {['ALL', 'PINNED', 'EVENTS', 'BENEFITS', 'MEETINGS', 'OPERATIONS'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                categoryFilter === cat
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+      {/* ANNOUNCEMENTS LIST */}
+      <div className="space-y-4">
+        {filtered.length > 0 ? (
+          filtered.map((item) => (
+            <div
+              key={item.id}
+              className={`bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border transition-all ${
+                item.pinned
+                  ? 'border-blue-300 dark:border-blue-800/80 bg-blue-50/10 dark:bg-blue-950/10'
+                  : 'border-slate-100 dark:border-slate-800'
               }`}
             >
-              {cat === 'ALL' ? 'All Notices' : cat === 'PINNED' ? '⭐ Pinned' : cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 3. ANNOUNCEMENTS LIST */}
-      {/* ========================================================================= */}
-      <div className="space-y-4">
-        {filtered.map((item) => (
-          <div
-            key={item.id}
-            className={`bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border transition-all ${
-              item.pinned
-                ? 'border-blue-300 dark:border-blue-800/80 bg-blue-50/20 dark:bg-blue-950/10'
-                : 'border-slate-100 dark:border-slate-800'
-            }`}
-          >
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-              <div className="space-y-2 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold uppercase">
-                    {item.category}
-                  </span>
-
-                  {item.priority === 'HIGH' && (
-                    <span className="px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-[10px] font-extrabold">
-                      🔴 URGENT
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase ${
+                        item.priority === 'HIGH'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                          : item.priority === 'MEDIUM'
+                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                          : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                      }`}
+                    >
+                      {item.category} • {item.priority}
                     </span>
-                  )}
-
-                  <span className="text-xs text-slate-400 flex items-center gap-1 font-medium">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{item.date}</span>
-                  </span>
-
-                  <span className="text-xs text-slate-400 flex items-center gap-1 font-medium">
-                    <Building className="w-3.5 h-3.5" />
-                    <span>{item.department}</span>
-                  </span>
-                </div>
-
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white hover:text-blue-600 transition-colors">
-                  {item.title}
-                </h3>
-
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {item.summary}
-                </p>
-
-                <div className="pt-2 flex items-center gap-3 text-xs text-slate-400 font-medium">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={item.authorAvatar}
-                      alt={item.author}
-                      className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-                    />
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">{item.author}</span>
+                    <span className="text-[11px] text-slate-400 font-medium">{item.date}</span>
+                    <span className="text-[11px] text-slate-400 font-medium">• {item.author}</span>
                   </div>
-                  <span>•</span>
-                  <span>{item.views} Views</span>
+
+                  <h3
+                    onClick={() => setSelectedNotice(item)}
+                    className="text-base font-black text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                  >
+                    {item.title}
+                  </h3>
+
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+                    {item.summary}
+                  </p>
+
+                  <div className="flex items-center gap-4 pt-2">
+                    <button
+                      onClick={() => setSelectedNotice(item)}
+                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Read Full Notice</span>
+                    </button>
+                    <span className="text-[11px] text-slate-400">Broadcasted to employee portal</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 shrink-0 self-end sm:self-start">
-                <button
-                  onClick={() => togglePin(item.id)}
-                  title={item.pinned ? 'Unpin' : 'Pin to Top'}
-                  className={`p-2.5 rounded-2xl border transition-all cursor-pointer ${
-                    item.pinned
-                      ? 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-950/60'
-                      : 'bg-slate-50 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700 hover:text-amber-500'
-                  }`}
-                >
-                  <Star className="w-4 h-4 fill-current" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => togglePin(item.id)}
+                    className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                      item.pinned
+                        ? 'border-amber-300 bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:border-amber-800'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-500'
+                    }`}
+                    title={item.pinned ? 'Unpin' : 'Pin to Top'}
+                  >
+                    <Star className={`w-4 h-4 ${item.pinned ? 'fill-current' : ''}`} />
+                  </button>
 
-                <button
-                  onClick={() => setSelectedNotice(item)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-xs font-bold rounded-2xl flex items-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>View Notice</span>
-                </button>
-
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  title="Delete Announcement"
-                  className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 transition-all cursor-pointer"
+                    title="Delete Notice"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
+          ))
+        ) : (
+          <div className="p-12 text-center bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-100 dark:border-slate-800">
+            <Megaphone className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <h4 className="text-base font-black text-slate-900 dark:text-white">No Announcements Published Yet</h4>
+            <p className="text-xs text-slate-400 mt-1">Click "Post Circular" above to broadcast an official announcement to your employees.</p>
           </div>
-        ))}
+        )}
       </div>
 
-      {/* ========================================================================= */}
-      {/* 4. MODAL: PUBLISH ANNOUNCEMENT */}
-      {/* ========================================================================= */}
+      {/* MODAL: POST CIRCULAR */}
       {isPostModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
                   <Megaphone className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">Publish New Announcement</h3>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Broadcast Announcement</h3>
               </div>
               <button
                 onClick={() => setIsPostModalOpen(false)}
@@ -381,92 +328,68 @@ const Announcement = () => {
 
             <form onSubmit={handlePostSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Announcement Title *
-                </label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Announcement Title *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Q4 Town Hall Meeting & Product Strategy..."
+                  placeholder="e.g. Annual Company Retreat 2026 Announcement & RSVP"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Category *
-                  </label>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Category *</label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   >
                     <option value="EVENTS">Events & Retreats</option>
-                    <option value="BENEFITS">Benefits & Perks</option>
-                    <option value="MEETINGS">Town Halls & Meetings</option>
+                    <option value="BENEFITS">Benefits & Health</option>
+                    <option value="MEETINGS">Meetings & Town Halls</option>
                     <option value="OPERATIONS">Operations & IT</option>
-                    <option value="CORPORATE">Corporate Policy</option>
+                    <option value="CORPORATE">Corporate Circular</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Priority Tier *
-                  </label>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Priority Level</label>
                   <select
                     value={form.priority}
                     onChange={(e) => setForm({ ...form, priority: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   >
-                    <option value="HIGH">High (Urgent)</option>
-                    <option value="MEDIUM">Medium (Standard)</option>
-                    <option value="INFO">Informational</option>
+                    <option value="HIGH">High Priority (Red Alert)</option>
+                    <option value="MEDIUM">Medium Priority (Amber)</option>
+                    <option value="INFO">Informational (Blue)</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Target Audience
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. All Departments"
-                    value={form.department}
-                    onChange={(e) => setForm({ ...form, department: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Detailed Circular Content *
-                </label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Detailed Notice Body *</label>
                 <textarea
                   rows={4}
                   required
-                  placeholder="Enter full notice body, instructions, and links..."
+                  placeholder="Full circular details, instructions, action links..."
                   value={form.content}
                   onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
+              <label className="flex items-center gap-2 cursor-pointer pt-1">
                 <input
                   type="checkbox"
-                  id="pinCheck"
                   checked={form.pinned}
                   onChange={(e) => setForm({ ...form, pinned: e.target.checked })}
-                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  className="w-4 h-4 text-blue-600 rounded"
                 />
-                <label htmlFor="pinCheck" className="text-slate-700 dark:text-slate-300 font-bold cursor-pointer">
-                  Pin this circular to top of all employee dashboards
-                </label>
-              </div>
+                <span className="font-bold text-slate-700 dark:text-slate-200">Pin this circular to top of Employee Notice Board</span>
+              </label>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
@@ -480,7 +403,7 @@ const Announcement = () => {
                   type="submit"
                   className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
                 >
-                  Publish Notice
+                  Publish & Broadcast
                 </button>
               </div>
             </form>
@@ -488,20 +411,17 @@ const Announcement = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 5. MODAL: VIEW FULL NOTICE */}
-      {/* ========================================================================= */}
+      {/* DETAIL MODAL */}
       {selectedNotice && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
             <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div>
-                <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold uppercase">
-                  {selectedNotice.category}
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+                  {selectedNotice.category} • {selectedNotice.priority}
                 </span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white mt-1.5">
-                  {selectedNotice.title}
-                </h3>
+                <h3 className="text-base font-black text-slate-900 dark:text-white mt-1">{selectedNotice.title}</h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">{selectedNotice.date} • {selectedNotice.author}</p>
               </div>
               <button
                 onClick={() => setSelectedNotice(null)}
@@ -511,15 +431,14 @@ const Announcement = () => {
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
               {selectedNotice.content}
-            </p>
+            </div>
 
-            <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <span>Published by {selectedNotice.author} on {selectedNotice.date}</span>
+            <div className="flex justify-end pt-2">
               <button
                 onClick={() => setSelectedNotice(null)}
-                className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold cursor-pointer"
+                className="px-5 py-2 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-xs font-bold cursor-pointer"
               >
                 Close
               </button>

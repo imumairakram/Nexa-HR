@@ -10,10 +10,13 @@ const { checkRole } = require('../middlewares/rbac.middleware');
 
 router.use(verifyToken, requireTenant);
 
+const canAccessAdminDashboard = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+
 // Admin / HR Dashboard Portal
-router.get('/admin', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), getAdminDashboard);
+router.get('/admin', canAccessAdminDashboard, getAdminDashboard);
 
 // Employee Self-Service Dashboard Portal
 router.get('/employee', getEmployeeDashboard);
 
 module.exports = router;
+

@@ -11,13 +11,16 @@ const { verifyToken } = require('../middlewares/auth.middleware');
 const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 
-// Apply Auth and Tenant Isolation middlewares to all routes
 router.use(verifyToken, requireTenant);
 
-router.post('/', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), createDepartment);
+const canManageDepartments = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+
+router.post('/', canManageDepartments, createDepartment);
 router.get('/', getDepartments);
 router.get('/:id', getDepartmentById);
-router.put('/:id', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), updateDepartment);
-router.delete('/:id', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), deleteDepartment);
+router.put('/:id', canManageDepartments, updateDepartment);
+router.patch('/:id', canManageDepartments, updateDepartment);
+router.delete('/:id', canManageDepartments, deleteDepartment);
 
 module.exports = router;
+

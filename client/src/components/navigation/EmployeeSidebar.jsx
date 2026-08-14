@@ -68,16 +68,15 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
     { label: 'My Attendance', path: '/employee/attendance', icon: Clock },
     { label: 'My Leaves', path: '/employee/leaves', icon: CalendarDays },
     { label: 'My Payslips', path: '/employee/payslips', icon: CreditCard },
-    { label: 'My Projects', path: '/employee/projects', icon: FolderKanban },
     { label: 'Company Directory', path: '/employee/directory', icon: Users },
     { label: 'Announcements', path: '/employee/announcements', icon: Megaphone },
-    { label: 'Awards & Kudos', path: '/employee/awards', icon: Award },
     { label: 'Company Holidays', path: '/employee/holidays', icon: Calendar },
     { label: 'Helpdesk & Support', path: '/employee/helpdesk', icon: LifeBuoy },
     { label: 'Documents & Policies', path: '/employee/documents', icon: BookOpen },
     { label: 'My Profile', path: '/employee/profile', icon: User },
     { label: 'Settings', path: '/employee/settings', icon: Settings },
   ];
+
 
   return (
     <aside

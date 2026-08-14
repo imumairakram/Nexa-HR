@@ -14,16 +14,22 @@ const { checkRole } = require('../middlewares/rbac.middleware');
 
 router.use(verifyToken, requireTenant);
 
+const canManagePayroll = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+
 // Salary Structure Configuration
-router.post('/salary-structure', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), setSalaryStructure);
+router.post('/salary-structure', canManagePayroll, setSalaryStructure);
 router.get('/salary-structure/:userId', getSalaryStructure);
 
 // Monthly Payroll Generation & Admin Directory
-router.post('/generate-monthly', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), generateMonthlyPayroll);
-router.get('/payslips', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), getCompanyPayslips);
-router.put('/payslips/:id/status', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), updatePayslipStatus);
+router.post('/generate-monthly', canManagePayroll, generateMonthlyPayroll);
+router.post('/generate', canManagePayroll, generateMonthlyPayroll);
+router.get('/payslips', canManagePayroll, getCompanyPayslips);
+router.get('/payslips/:id', canManagePayroll, getCompanyPayslips);
+router.put('/payslips/:id/status', canManagePayroll, updatePayslipStatus);
+router.patch('/payslips/:id/status', canManagePayroll, updatePayslipStatus);
 
 // Employee Self-Service Payslip Route
 router.get('/my-payslips', getMyPayslips);
 
 module.exports = router;
+

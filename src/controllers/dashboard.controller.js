@@ -61,11 +61,11 @@ const getAdminDashboard = async (req, res) => {
 
     const workforcePresence = activeEmployeesCount > 0
       ? Math.round((presentTodayCount / activeEmployeesCount) * 100)
-      : 85;
+      : 0;
 
     const onTimeArrival = presentTodayCount > 0
       ? Number(((onTimeCount / presentTodayCount) * 100).toFixed(1))
-      : 92.5;
+      : 0;
 
     const absentToday = Math.max(0, activeEmployeesCount - presentTodayCount);
 
@@ -92,12 +92,12 @@ const getAdminDashboard = async (req, res) => {
       });
 
       const dayCount = dayRecords.filter((r) => ['PRESENT', 'LATE', 'HALF_DAY'].includes(r.status)).length;
-      const formattedDate = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+      const formattedDate = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
       
       weeklyTrend.push({
         date: formattedDate,
-        attendance: dayCount > 0 ? dayCount : Math.floor(Math.random() * 20) + 85,
-        peak: (dayCount > 0 ? dayCount : 90) + 15,
+        attendance: dayCount,
+        peak: Math.max(dayCount, activeEmployeesCount),
       });
     }
 
@@ -121,28 +121,17 @@ const getAdminDashboard = async (req, res) => {
 
     const departmentAttendance = Object.values(deptAttendanceMap);
 
-    const finalDeptAttendance = departmentAttendance.length > 0 ? departmentAttendance : [
-      { name: '05 Jun', onTime: 80, late: -5 },
-      { name: '07 Jun', onTime: 12, late: -2 },
-      { name: '09 Jun', onTime: 45, late: -12 },
-      { name: '11 Jun', onTime: 25, late: -8 },
-      { name: '13 Jun', onTime: 18, late: -18 },
-      { name: '15 Jun', onTime: 35, late: -6 },
-      { name: '17 Jun', onTime: 28, late: -4 },
-      { name: '19 Jun', onTime: 40, late: -10 },
-    ];
-
     // Department Performance (Radar)
     const departmentPerformance = [
-      { subject: 'Punctuality', scoreA: Math.round(onTimeArrival * 1.2), scoreB: 85 },
-      { subject: 'Attendance%', scoreA: Math.round(workforcePresence * 1.3), scoreB: 95 },
-      { subject: 'Leave Rate', scoreA: Math.min(100, pendingLeavesCount * 15 + 20), scoreB: 60 },
-      { subject: 'Overtime', scoreA: 110, scoreB: 90 },
-      { subject: 'Compliance', scoreA: 95, scoreB: 115 },
+      { subject: 'Punctuality', scoreA: Math.round(onTimeArrival), scoreB: 100 },
+      { subject: 'Presence%', scoreA: Math.round(workforcePresence), scoreB: 100 },
+      { subject: 'Pending Leaves', scoreA: pendingLeavesCount, scoreB: Math.max(pendingLeavesCount, 5) },
+      { subject: 'Active Staff', scoreA: activeEmployeesCount, scoreB: Math.max(activeEmployeesCount, 10) },
+      { subject: 'Departments', scoreA: departmentsCount, scoreB: Math.max(departmentsCount, 5) },
     ];
 
-    // Recent Biometric Logs (Top 5)
-    const recentLogs = todayAttendances.slice(0, 5).map((log) => {
+    // Recent Biometric Logs
+    const recentLogs = todayAttendances.slice(0, 10).map((log) => {
       const checkInDate = new Date(log.checkInTime);
       const timeFormatted = checkInDate.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -158,40 +147,33 @@ const getAdminDashboard = async (req, res) => {
         date: dateFormatted,
         empCode: log.user.employeeCode || 'EMP-100',
         employeeName: `${log.user.firstName} ${log.user.lastName}`,
+        department: log.user.profile?.department?.name || 'General',
         time: timeFormatted,
         status: log.status,
       };
     });
 
-    const finalRecentLogs = recentLogs.length > 0 ? recentLogs : [
-      { date: '06/07/2026', empCode: 'EMP-101', time: '08:55 AM', status: 'PRESENT' },
-      { date: '06/08/2026', empCode: 'EMP-102', time: '09:12 AM', status: 'PRESENT' },
-      { date: '06/09/2026', empCode: 'EMP-103', time: '09:45 AM', status: 'LATE' },
-      { date: '06/10/2026', empCode: 'EMP-104', time: '08:48 AM', status: 'PRESENT' },
-      { date: '06/11/2026', empCode: 'EMP-105', time: '10:05 AM', status: 'LATE' },
-    ];
-
     return res.status(200).json({
       success: true,
       data: {
         summary: {
-          totalActiveEmployees: activeEmployeesCount || 124,
-          totalDepartments: departmentsCount || 5,
-          pendingLeaveRequests: pendingLeavesCount || 4,
+          totalActiveEmployees: activeEmployeesCount,
+          totalDepartments: departmentsCount,
+          pendingLeaveRequests: pendingLeavesCount,
         },
         metrics: {
-          totalActiveEmployees: activeEmployeesCount || 124,
-          pendingLeaveRequests: pendingLeavesCount || 4,
+          totalActiveEmployees: activeEmployeesCount,
+          pendingLeaveRequests: pendingLeavesCount,
           workforcePresence,
           onTimeArrival,
-          absentToday: absentToday || 3,
+          absentToday,
         },
         charts: {
           weeklyTrend,
-          departmentAttendance: finalDeptAttendance,
+          departmentAttendance,
           departmentPerformance,
         },
-        recentLogs: finalRecentLogs,
+        recentLogs,
         todayAttendance: {
           date: today.toISOString().split('T')[0],
           totalRecords: todayAttendances.length,
@@ -202,7 +184,7 @@ const getAdminDashboard = async (req, res) => {
           },
         },
         latestPayroll: {
-          totalPayslipsGenerated: latestPayrollSummary._count.id,
+          totalPayslipsGenerated: latestPayrollSummary._count.id || 0,
           totalGrossSalaryPayout: latestPayrollSummary._sum.grossSalary || 0,
           totalNetSalaryPayout: latestPayrollSummary._sum.netSalary || 0,
           totalTaxWithheld: latestPayrollSummary._sum.taxDeductions || 0,
@@ -232,6 +214,7 @@ const getEmployeeDashboard = async (req, res) => {
       monthlyAttendances,
       leaveRequestsSummary,
       latestPayslip,
+      currentUser,
     ] = await Promise.all([
       prisma.attendance.findUnique({
         where: {
@@ -253,6 +236,15 @@ const getEmployeeDashboard = async (req, res) => {
       prisma.payslip.findFirst({
         where: { userId },
         orderBy: [{ year: 'desc' }, { month: 'desc' }],
+      }),
+      prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          profile: {
+            include: { department: true, designation: true },
+          },
+          salaryStructure: true,
+        },
       }),
     ]);
 
@@ -281,6 +273,18 @@ const getEmployeeDashboard = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
+        user: {
+          id: currentUser?.id,
+          employeeCode: currentUser?.employeeCode,
+          firstName: currentUser?.firstName,
+          lastName: currentUser?.lastName,
+          email: currentUser?.email,
+          role: currentUser?.role,
+          department: currentUser?.profile?.department?.name,
+          designation: currentUser?.profile?.designation?.title,
+          joiningDate: currentUser?.profile?.joiningDate,
+          salaryStructure: currentUser?.salaryStructure,
+        },
         todayClockStatus: todayAttendance
           ? {
               synced: true,
@@ -321,3 +325,4 @@ module.exports = {
   getAdminDashboard,
   getEmployeeDashboard,
 };
+

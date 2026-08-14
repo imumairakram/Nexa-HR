@@ -12,9 +12,13 @@ const { checkRole } = require('../middlewares/rbac.middleware');
 
 router.use(verifyToken, requireTenant);
 
-router.post('/', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), createDesignation);
+const canManageDesignations = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+
+router.post('/', canManageDesignations, createDesignation);
 router.get('/', getDesignations);
-router.put('/:id', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), updateDesignation);
-router.delete('/:id', checkRole('COMPANY_ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'), deleteDesignation);
+router.put('/:id', canManageDesignations, updateDesignation);
+router.patch('/:id', canManageDesignations, updateDesignation);
+router.delete('/:id', canManageDesignations, deleteDesignation);
 
 module.exports = router;
+
