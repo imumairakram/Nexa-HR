@@ -16,7 +16,7 @@ const canManageEmployees = checkRole('ADMIN', 'HR_MANAGER', 'COMPANY_ADMIN', 'SU
 
 router.post('/', canManageEmployees, onboardEmployee);
 router.post('/onboard', canManageEmployees, onboardEmployee);
-router.get('/', getEmployees);
+router.get('/', canManageEmployees, getEmployees);
 router.get('/:id', getEmployeeById);
 router.put('/:id', canManageEmployees, updateEmployee);
 router.patch('/:id', canManageEmployees, updateEmployee);

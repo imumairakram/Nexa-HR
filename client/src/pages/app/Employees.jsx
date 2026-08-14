@@ -390,8 +390,8 @@ const Employees = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Personnel Information Management (PIM)"
-        subtitle="Manage employee records, onboard new talent with role & salary structures, and update team profiles."
+        title="Company Directory & Team (PIM)"
+        subtitle="Manage employee records, organizational directory, talent onboarding with role & salary structures, and department dossiers."
         loading={loading}
         actionButton={
           <button

@@ -8,7 +8,6 @@ import {
   User,
   MoreHorizontal,
   FolderKanban,
-  Users,
   Megaphone,
   Award,
   Calendar,
@@ -30,7 +29,6 @@ const EmployeeBottomNav = () => {
   ];
 
   const moreItems = [
-    { label: 'Company Directory', path: '/employee/directory', icon: Users },
     { label: 'Announcements', path: '/employee/announcements', icon: Megaphone },
     { label: 'Holidays', path: '/employee/holidays', icon: Calendar },
     { label: 'Helpdesk & Support', path: '/employee/helpdesk', icon: LifeBuoy },

@@ -59,7 +59,6 @@ import EmployeeLeaves from './pages/employee/EmployeeLeaves';
 import EmployeePayslips from './pages/employee/EmployeePayslips';
 import EmployeeAnnouncements from './pages/employee/EmployeeAnnouncements';
 import EmployeeHolidays from './pages/employee/EmployeeHolidays';
-import EmployeeDirectory from './pages/employee/EmployeeDirectory';
 import EmployeeHelpdesk from './pages/employee/EmployeeHelpdesk';
 import EmployeeDocuments from './pages/employee/EmployeeDocuments';
 import EmployeeProfile from './pages/employee/EmployeeProfile';
@@ -80,8 +79,10 @@ function App() {
           
           {/* HR Module */}
           <Route path="employees" element={<Employees />} />
+          <Route path="directory" element={<Navigate to="/app/employees" replace />} />
           <Route path="hr/new-employee" element={<NewEmployee />} />
           <Route path="hr/employee-list" element={<Navigate to="/app/employees" replace />} />
+          <Route path="hr/directory" element={<Navigate to="/app/employees" replace />} />
           <Route path="hr/roles" element={<RolePermissions />} />
           <Route path="hr/designation" element={<Designation />} />
 
@@ -137,7 +138,7 @@ function App() {
           <Route path="payslips" element={<EmployeePayslips />} />
           <Route path="announcements" element={<EmployeeAnnouncements />} />
           <Route path="holidays" element={<EmployeeHolidays />} />
-          <Route path="directory" element={<EmployeeDirectory />} />
+          <Route path="directory" element={<Navigate to="/employee/dashboard" replace />} />
           <Route path="helpdesk" element={<EmployeeHelpdesk />} />
           <Route path="documents" element={<EmployeeDocuments />} />
           <Route path="profile" element={<EmployeeProfile />} />

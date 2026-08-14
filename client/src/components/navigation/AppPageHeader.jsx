@@ -76,7 +76,7 @@ const INITIAL_NOTIFICATIONS = [
 const SEARCH_SHORTCUTS = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/app/dashboard', category: 'Pages' },
   { label: 'New Employee Onboarding', icon: User, path: '/app/hr/new-employee', category: 'HR' },
-  { label: 'Employees Directory', icon: Users, path: '/app/employees', category: 'HR' },
+  { label: 'Company Directory & Team', icon: Users, path: '/app/employees', category: 'HR' },
   { label: 'Role & Permissions', icon: Sliders, path: '/app/hr/roles', category: 'HR' },
   { label: 'Department Management', icon: Building2, path: '/app/departments', category: 'HR' },
   { label: 'Designations', icon: Building2, path: '/app/hr/designation', category: 'HR' },

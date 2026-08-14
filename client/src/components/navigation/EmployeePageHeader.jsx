@@ -52,7 +52,6 @@ const EMPLOYEE_SEARCH_SHORTCUTS = [
   { label: 'My Leave Balances & History', icon: CalendarDays, path: '/employee/leaves', category: 'Leaves' },
   { label: 'View Latest Payslip', icon: CreditCard, path: '/employee/payslips', category: 'Compensation' },
   { label: 'Salary History & Tax Breakdown', icon: CreditCard, path: '/employee/payslips', category: 'Compensation' },
-  { label: 'Company Team Directory & Roster', icon: Users, path: '/employee/directory', category: 'Company' },
   { label: 'Company Announcements & Notices', icon: Megaphone, path: '/employee/announcements', category: 'Notices' },
   { label: 'Upcoming Public Holidays', icon: Calendar, path: '/employee/holidays', category: 'Calendar' },
   { label: 'Helpdesk & Support Requests', icon: LifeBuoy, path: '/employee/helpdesk', category: 'Support' },
@@ -106,8 +105,15 @@ const EmployeePageHeader = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifyOpen, setIsNotifyOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userAvatar, setUserAvatar] = useState(DEFAULT_AVATAR);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [userAvatar, setUserAvatar] = useState(() => localStorage.getItem('user_avatar') || DEFAULT_AVATAR);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [clockedIn, setClockedIn] = useState(false);
@@ -305,13 +311,13 @@ const EmployeePageHeader = ({
 
   const userInitials = currentUser
     ? `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}`.toUpperCase()
-    : 'AM';
+    : 'U';
 
   const userFullName = currentUser
     ? `${currentUser.firstName} ${currentUser.lastName}`
-    : 'Alex Mercer';
+    : 'Employee User';
 
-  const userRole = currentUser?.designation || 'Senior Full-Stack Engineer';
+  const userRole = currentUser?.designation || (currentUser?.role === 'ADMIN' ? 'System Administrator' : 'Staff Member');
 
   const filteredShortcuts = EMPLOYEE_SEARCH_SHORTCUTS.filter((s) =>
     s.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -553,7 +559,7 @@ const EmployeePageHeader = ({
                   {userFullName}
                 </div>
                 <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold leading-none">
-                  Employee
+                  {currentUser?.role === 'ADMIN' ? 'Administrator' : 'Employee'}
                 </div>
               </div>
             </button>

@@ -70,7 +70,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
   };
 
   const menuStructure = [
-    { type: 'link', label: 'DASHBOARD', path: '/app/dashboard', icon: LayoutGrid },
+    { type: 'link', label: 'Dashboard', path: '/app/dashboard', icon: LayoutGrid },
 
     {
       type: 'accordion',
@@ -80,7 +80,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       defaultPath: '/app/employees',
       children: [
         { label: 'New Employee', path: '/app/hr/new-employee' },
-        { label: 'Employee List', path: '/app/employees' },
+        { label: 'Company Directory & Team', path: '/app/employees' },
         { label: 'Role & Permissions', path: '/app/hr/roles' },
         { label: 'Department', path: '/app/departments' },
         { label: 'Designation', path: '/app/hr/designation' },
@@ -118,7 +118,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
     { type: 'link', label: 'Leave Policy', path: '/app/leave-policy', icon: FileText },
     { type: 'link', label: 'Announcement', path: '/app/announcement', icon: Megaphone },
-    { type: 'link', label: 'ACCOUNTS', path: '/app/accounts', icon: Landmark },
+    { type: 'link', label: 'Accounts', path: '/app/accounts', icon: Landmark },
     { type: 'link', label: 'Reports', path: '/app/reports', icon: BarChart3 },
     { type: 'link', label: 'Award', path: '/app/award', icon: Award },
     { type: 'link', label: 'Project', path: '/app/project', icon: FolderKanban },
@@ -148,16 +148,14 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
   return (
     <aside
-      className={`hidden lg:flex flex-col justify-between py-5 bg-white dark:bg-[#1E293B] rounded-[32px] fixed left-3 top-3 bottom-3 shadow-soft border border-slate-100/80 dark:border-slate-800 shrink-0 z-40 transition-all duration-300 ${
-        isCollapsed ? 'w-20 px-2 items-center' : 'w-64 px-3'
-      }`}
+      className={`hidden lg:flex flex-col justify-between py-5 bg-white dark:bg-[#1E293B] rounded-[32px] fixed left-3 top-3 bottom-3 shadow-soft border border-slate-100/80 dark:border-slate-800 shrink-0 z-40 transition-all duration-300 ${isCollapsed ? 'w-20 px-2 items-center' : 'w-64 px-3'
+        }`}
     >
       {/* Top Section: Brand Header & Scrollable Nav */}
       <div className="w-full flex-1 flex flex-col min-h-0">
         <div
-          className={`flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 ${
-            isCollapsed ? 'flex-col space-y-3 items-center justify-center px-0' : 'flex-row px-2'
-          }`}
+          className={`flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'flex-col space-y-3 items-center justify-center px-0' : 'flex-row px-2'
+            }`}
         >
           {/* Logo Brand */}
           <Logo collapsed={isCollapsed} />
@@ -184,9 +182,8 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
         {/* Scrollable Navigation Items */}
         <nav
-          className={`flex-1 overflow-y-auto overflow-x-hidden pt-3 space-y-1 w-full ${
-            isCollapsed ? 'no-scrollbar px-0' : 'custom-scrollbar pr-1'
-          }`}
+          className={`flex-1 overflow-y-auto overflow-x-hidden pt-3 space-y-1 w-full ${isCollapsed ? 'no-scrollbar px-0' : 'custom-scrollbar pr-1'
+            }`}
         >
           {menuStructure.map((item, index) => {
             if (item.type === 'link') {
@@ -197,25 +194,22 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                   to={item.path}
                   title={isCollapsed ? item.label : undefined}
                   className={({ isActive }) =>
-                    `flex items-center transition-all duration-200 ${
-                      isCollapsed
-                        ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
-                        : 'gap-3 px-3 py-2 rounded-2xl text-xs font-semibold'
-                    } ${
-                      isActive
-                        ? 'bg-[#E6F4EA] dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-400 font-bold shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                    `flex items-center transition-all duration-200 ${isCollapsed
+                      ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
+                      : 'gap-3 px-3 py-2 rounded-2xl text-xs font-semibold'
+                    } ${isActive
+                      ? 'bg-[#E6F4EA] dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-400 font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       <Icon
-                        className={`w-4 h-4 shrink-0 stroke-[2] ${
-                          isActive
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-slate-500 dark:text-slate-400'
-                        }`}
+                        className={`w-4 h-4 shrink-0 stroke-[2] ${isActive
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-slate-500 dark:text-slate-400'
+                          }`}
                       />
                       {!isCollapsed && <span className="truncate">{item.label}</span>}
                     </>
@@ -234,23 +228,20 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                   <button
                     onClick={() => handleAccordionClick(item)}
                     title={isCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center justify-between transition-all duration-200 cursor-pointer ${
-                      isCollapsed
-                        ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
-                        : 'px-3 py-2 rounded-2xl text-xs font-semibold'
-                    } ${
-                      isChildActive
+                    className={`w-full flex items-center justify-between transition-all duration-200 cursor-pointer ${isCollapsed
+                      ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
+                      : 'px-3 py-2 rounded-2xl text-xs font-semibold'
+                      } ${isChildActive
                         ? 'text-emerald-800 dark:text-emerald-400 font-bold bg-emerald-50/50 dark:bg-emerald-950/30'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3 truncate">
                       <Icon
-                        className={`w-4 h-4 shrink-0 stroke-[2] ${
-                          isChildActive
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-slate-500 dark:text-slate-400'
-                        }`}
+                        className={`w-4 h-4 shrink-0 stroke-[2] ${isChildActive
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-slate-500 dark:text-slate-400'
+                          }`}
                       />
                       {!isCollapsed && <span className="truncate">{item.label}</span>}
                     </div>
@@ -274,10 +265,9 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                           key={child.path}
                           to={child.path}
                           className={({ isActive }) =>
-                            `block px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all ${
-                              isActive
-                                ? 'bg-emerald-100/70 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-300 font-bold'
-                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/40'
+                            `block px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all ${isActive
+                              ? 'bg-emerald-100/70 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-300 font-bold'
+                              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/40'
                             }`
                           }
                         >
@@ -301,11 +291,10 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
         <button
           onClick={toggleTheme}
           title={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          className={`flex items-center transition-all cursor-pointer ${
-            isCollapsed
-              ? 'w-11 h-11 rounded-2xl justify-center mx-auto'
-              : 'w-full gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-          }`}
+          className={`flex items-center transition-all cursor-pointer ${isCollapsed
+            ? 'w-11 h-11 rounded-2xl justify-center mx-auto'
+            : 'w-full gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
         >
           {resolvedTheme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400 stroke-[2] shrink-0" />
@@ -319,11 +308,10 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
         <button
           onClick={handleLogout}
           title="Sign Out"
-          className={`flex items-center transition-all cursor-pointer ${
-            isCollapsed
-              ? 'w-11 h-11 rounded-2xl justify-center mx-auto text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-              : 'w-full gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400'
-          }`}
+          className={`flex items-center transition-all cursor-pointer ${isCollapsed
+            ? 'w-11 h-11 rounded-2xl justify-center mx-auto text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+            : 'w-full gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400'
+            }`}
         >
           <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
           {!isCollapsed && <span>Sign Out</span>}

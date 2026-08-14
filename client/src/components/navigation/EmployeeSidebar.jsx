@@ -22,7 +22,6 @@ import {
   Building2,
   Shield,
   ArrowRightLeft,
-  Users,
   LifeBuoy,
   BookOpen,
 } from 'lucide-react';
@@ -68,7 +67,6 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
     { label: 'My Attendance', path: '/employee/attendance', icon: Clock },
     { label: 'My Leaves', path: '/employee/leaves', icon: CalendarDays },
     { label: 'My Payslips', path: '/employee/payslips', icon: CreditCard },
-    { label: 'Company Directory', path: '/employee/directory', icon: Users },
     { label: 'Announcements', path: '/employee/announcements', icon: Megaphone },
     { label: 'Company Holidays', path: '/employee/holidays', icon: Calendar },
     { label: 'Helpdesk & Support', path: '/employee/helpdesk', icon: LifeBuoy },
