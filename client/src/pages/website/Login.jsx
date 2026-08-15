@@ -166,7 +166,7 @@ const Login = () => {
     try {
       const u = JSON.parse(localStorage.getItem('user'));
       if (u && u.role) storedRole = u.role;
-    } catch {}
+    } catch { }
     return <Navigate to={storedRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard'} replace />;
   }
 
@@ -235,7 +235,7 @@ const Login = () => {
 
       {/* Main Container Card: Premium Full Card on Mobile, Dual Column on Desktop */}
       <div className="w-full max-w-[460px] lg:max-w-[1240px] bg-white dark:bg-slate-900 rounded-[32px] sm:rounded-[40px] lg:rounded-[44px] shadow-[0_20px_70px_-15px_rgba(0,0,0,0.07)] dark:shadow-[0_25px_80px_-20px_rgba(0,0,0,0.6)] border border-slate-200/70 dark:border-slate-800/80 p-5 sm:p-8 lg:p-10 flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-10 items-stretch overflow-hidden relative z-10">
-        
+
         {/* ========================================================================= */}
         {/* LEFT COLUMN: AUTHENTICATION FORM (PREMIUM RESPONSIVE DESIGN) */}
         {/* ========================================================================= */}
@@ -271,11 +271,10 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('employee')}
-                className={`flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${
-                  loginRole === 'employee'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-600/50'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
+                className={`flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
               >
                 <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Employee</span>
@@ -285,11 +284,10 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('admin')}
-                className={`flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${
-                  loginRole === 'admin'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-600/50'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
+                className={`flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'admin'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
               >
                 <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>HR (Admin)</span>
@@ -314,7 +312,7 @@ const Login = () => {
               {/* Email Address */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  {loginRole === 'admin' ? 'HR Admin Email Address' : 'Employee Work Email'} <span className="text-blue-600 dark:text-blue-400">*</span>
+                  {loginRole === 'admin' ? 'HR/System Admin Email Address' : 'Employee Work Email'} <span className="text-blue-600 dark:text-blue-400">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
@@ -389,11 +387,10 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] ${
-                  loginRole === 'admin'
-                    ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/25'
-                    : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
-                }`}
+                className={`w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] ${loginRole === 'admin'
+                  ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/25'
+                  : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
+                  }`}
               >
                 {loading ? (
                   <>
@@ -657,11 +654,10 @@ const Login = () => {
                 type="button"
                 onClick={() => setActiveSlide(index)}
                 aria-label={`Go to slide ${index + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-                  activeSlide === index
-                    ? 'w-10 sm:w-14 bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
-                    : 'w-6 sm:w-8 bg-white/25 hover:bg-white/45'
-                }`}
+                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${activeSlide === index
+                  ? 'w-10 sm:w-14 bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
+                  : 'w-6 sm:w-8 bg-white/25 hover:bg-white/45'
+                  }`}
               />
             ))}
           </div>
