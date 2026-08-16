@@ -8,6 +8,8 @@ const {
   initiateForgotPassword,
   verifyPasswordResetOtp,
   resetPassword,
+  updateMyProfile,
+  changeMyPassword,
 } = require('../controllers/auth.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
 
@@ -15,6 +17,8 @@ const { verifyToken } = require('../middlewares/auth.middleware');
 router.post('/register-admin', registerAdmin);
 router.post('/login', login);
 router.get('/me', verifyToken, getMe);
+router.put('/profile', verifyToken, updateMyProfile);
+router.put('/change-password', verifyToken, changeMyPassword);
 
 // Password Recovery & OTP Security Routes
 router.post('/forgot-password/check', checkRecoveryUser);

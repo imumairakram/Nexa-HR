@@ -27,19 +27,7 @@ import {
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
-
-const ALL_HOLIDAYS_MASTER = [
-  { id: 1, name: 'Independence Day (Youm-e-Azadi)', date: '2026-08-14', displayDate: 'Aug 14, 2026', day: 'Friday', type: 'Gazetted National', isLongWeekend: true },
-  { id: 2, name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2026-08-25', displayDate: 'Aug 25, 2026', day: 'Tuesday', type: 'Gazetted Religious', isLongWeekend: false },
-  { id: 3, name: 'Iqbal Day (Allama Iqbal Memorial)', date: '2026-11-09', displayDate: 'Nov 09, 2026', day: 'Monday', type: 'Gazetted National', isLongWeekend: true },
-  { id: 4, name: 'Quaid-e-Azam Day / Christmas', date: '2026-12-25', displayDate: 'Dec 25, 2026', day: 'Friday', type: 'Gazetted National', isLongWeekend: true },
-  { id: 5, name: 'Kashmir Solidarity Day', date: '2027-02-05', displayDate: 'Feb 05, 2027', day: 'Friday', type: 'Gazetted National', isLongWeekend: true },
-  { id: 6, name: 'Pakistan Day (Resolution Day)', date: '2027-03-23', displayDate: 'Mar 23, 2027', day: 'Tuesday', type: 'Gazetted National', isLongWeekend: false },
-  { id: 7, name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2027-04-10', displayDate: 'Apr 10, 2027', day: 'Saturday', type: 'Gazetted Religious', isLongWeekend: true },
-  { id: 8, name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2027-04-11', displayDate: 'Apr 11, 2027', day: 'Sunday', type: 'Gazetted Religious', isLongWeekend: true },
-  { id: 9, name: 'Labour Day (May Day)', date: '2027-05-01', displayDate: 'May 01, 2027', day: 'Saturday', type: 'Gazetted National', isLongWeekend: true },
-  { id: 10, name: 'Eid-ul-Adha (Feast of Sacrifice)', date: '2027-06-16', displayDate: 'Jun 16, 2027', day: 'Wednesday', type: 'Gazetted Religious', isLongWeekend: true },
-];
+import { getYearHolidays } from '../../utils/holidayEngine';
 
 const INITIAL_ANNOUNCEMENTS = [
   {
@@ -158,31 +146,20 @@ const EmployeeDashboard = () => {
   const leavesSummary = dashboardData?.leavesSummary || { pending: 0, approved: 0, rejected: 0 };
   const latestPayslip = dashboardData?.latestPayslip || null;
 
+  const { timezone, dateFormat } = useRegionalSettings();
+
   // Compute dynamic upcoming holidays with live day count
   const dynamicUpcomingHolidays = useMemo(() => {
     const now = new Date();
-    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const currentYear = now.getFullYear();
+    const holidaysThisYear = getYearHolidays(currentYear, timezone, dateFormat);
+    const holidaysNextYear = getYearHolidays(currentYear + 1, timezone, dateFormat);
+    const combined = [...holidaysThisYear, ...holidaysNextYear];
 
-    return ALL_HOLIDAYS_MASTER.map((h) => {
-      const hDate = new Date(h.date);
-      const hMidnight = new Date(hDate.getFullYear(), hDate.getMonth(), hDate.getDate()).getTime();
-      const diffDays = Math.round((hMidnight - todayMidnight) / (1000 * 60 * 60 * 24));
-
-      let countdown = '';
-      if (diffDays === 0) countdown = 'Today • Active';
-      else if (diffDays === 1) countdown = 'Tomorrow';
-      else if (diffDays > 1) countdown = `In ${diffDays} Days`;
-      else countdown = 'Observed';
-
-      return {
-        ...h,
-        diffDays,
-        countdown,
-      };
-    })
-      .filter((h) => h.diffDays >= 0)
+    return combined
+      .filter((h) => h.status === 'UPCOMING' || h.status === 'ACTIVE_TODAY')
       .slice(0, 4);
-  }, [currentTime]);
+  }, [currentTime, timezone, dateFormat]);
 
   // Compute dynamic leave quota & balances from real database leave types and requests
   const dynamicLeaveBalances = useMemo(() => {

@@ -51,8 +51,10 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
     };
 
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('user_profile_updated', handleStorageChange);
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('user_profile_updated', handleStorageChange);
     };
   }, []);
 

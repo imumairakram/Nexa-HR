@@ -144,6 +144,10 @@ const Employees = () => {
 
   useEffect(() => {
     fetchEmployeesData();
+    window.addEventListener('user_profile_updated', fetchEmployeesData);
+    return () => {
+      window.removeEventListener('user_profile_updated', fetchEmployeesData);
+    };
   }, []);
 
   // Handle Onboard Submit

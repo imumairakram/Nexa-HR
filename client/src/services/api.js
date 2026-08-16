@@ -69,6 +69,20 @@ export const api = {
     return await fetchAPI('/auth/me');
   },
 
+  updateMyProfile: async (profileData) => {
+    return await fetchAPI('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  },
+
+  changeMyPassword: async (passwordData) => {
+    return await fetchAPI('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(passwordData),
+    });
+  },
+
   // --- Password Recovery & OTP Security ---
   checkRecoveryUser: async (email) => {
     return await fetchAPI('/auth/forgot-password/check', {

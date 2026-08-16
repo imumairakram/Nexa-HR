@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   CalendarDays,
@@ -12,8 +12,9 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react';
+import { useRegionalSettings } from '../../../context/RegionalSettingsContext';
 
-const DAYS = [
+const DEFAULT_DAYS = [
   { id: 'mon', name: 'Monday', isWeekend: false, standardHours: '8.0 Hours', shiftName: 'General Morning Shift' },
   { id: 'tue', name: 'Tuesday', isWeekend: false, standardHours: '8.0 Hours', shiftName: 'General Morning Shift' },
   { id: 'wed', name: 'Wednesday', isWeekend: false, standardHours: '8.0 Hours', shiftName: 'General Morning Shift' },
@@ -24,17 +25,39 @@ const DAYS = [
 ];
 
 const WeeklyHoliday = () => {
-  const [schedule, setSchedule] = useState(DAYS);
+  const { companySettings, updateCompanySettings } = useRegionalSettings();
+
+  const [schedule, setSchedule] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_weekly_holiday_schedule');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return DEFAULT_DAYS;
+  });
+
   const [toastMsg, setToastMsg] = useState('');
 
   const toggleDay = (id) => {
-    setSchedule(
-      schedule.map((d) => (d.id === id ? { ...d, isWeekend: !d.isWeekend } : d))
+    setSchedule((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, isWeekend: !d.isWeekend } : d))
     );
   };
 
   const handleSave = () => {
-    setToastMsg('Weekly holiday schedule policy updated successfully!');
+    try {
+      localStorage.setItem('nexahr_weekly_holiday_schedule', JSON.stringify(schedule));
+      const workDays = schedule.filter((d) => !d.isWeekend).map((d) => d.name);
+      const workWeekStr = `${workDays[0] || 'Monday'} - ${workDays[workDays.length - 1] || 'Friday'}`;
+      updateCompanySettings({
+        workWeek: `${workWeekStr} (${schedule.filter((d) => d.isWeekend).map((d) => d.name.substring(0, 3)).join('/')} Off)`,
+      });
+      window.dispatchEvent(new Event('storage'));
+    } catch (e) {
+      console.error(e);
+    }
+    setToastMsg('Weekly holiday schedule & working shift policy updated successfully!');
     setTimeout(() => setToastMsg(''), 3000);
   };
 
@@ -90,7 +113,7 @@ const WeeklyHoliday = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Shift Policy</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">Standard 5/2</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">Standard {workDaysCount}/{weekendDaysCount}</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
             <ShieldCheck className="w-5 h-5" />

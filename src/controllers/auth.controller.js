@@ -643,6 +643,198 @@ const resetPassword = async (req, res) => {
   }
 };
 
+/**
+ * Update Current Authenticated User Profile
+ * PUT /api/auth/profile
+ */
+const updateMyProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const {
+      firstName,
+      lastName,
+      phone,
+      email,
+      address,
+      emergencyContact,
+      gender,
+      dateOfBirth,
+      departmentId,
+      designationId,
+    } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User profile not found.',
+      });
+    }
+
+    // Check if new email is already taken by another user
+    if (email && email.toLowerCase().trim() !== user.email.toLowerCase().trim()) {
+      const cleanEmail = email.toLowerCase().trim();
+      const emailExists = await prisma.user.findFirst({
+        where: {
+          email: cleanEmail,
+          NOT: { id: userId },
+        },
+      });
+      if (emailExists) {
+        return res.status(409).json({
+          success: false,
+          message: 'This email address is already in use by another account.',
+        });
+      }
+    }
+
+    const updatedUser = await prisma.$transaction(async (tx) => {
+      // 1. Update User basic fields
+      const userUpdates = {};
+      if (firstName !== undefined && firstName.trim()) userUpdates.firstName = firstName.trim();
+      if (lastName !== undefined && lastName.trim()) userUpdates.lastName = lastName.trim();
+      if (phone !== undefined) userUpdates.phone = phone ? phone.trim() : null;
+      if (email !== undefined && email.trim()) userUpdates.email = email.toLowerCase().trim();
+
+      await tx.user.update({
+        where: { id: userId },
+        data: userUpdates,
+      });
+
+      // 2. Update or Create EmployeeProfile
+      const profileUpdates = {};
+      if (address !== undefined) profileUpdates.address = address ? address.trim() : null;
+      if (emergencyContact !== undefined) profileUpdates.emergencyContact = emergencyContact ? emergencyContact.trim() : null;
+      if (gender !== undefined) profileUpdates.gender = gender ? gender.trim() : null;
+      if (dateOfBirth !== undefined) profileUpdates.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
+      if (departmentId !== undefined) profileUpdates.departmentId = departmentId || null;
+      if (designationId !== undefined) profileUpdates.designationId = designationId || null;
+
+      if (user.profile) {
+        await tx.employeeProfile.update({
+          where: { userId },
+          data: profileUpdates,
+        });
+      } else {
+        await tx.employeeProfile.create({
+          data: {
+            userId,
+            ...profileUpdates,
+          },
+        });
+      }
+
+      return await tx.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          employeeCode: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          profile: {
+            include: {
+              department: true,
+              designation: true,
+            },
+          },
+        },
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile information updated successfully.',
+      data: { user: updatedUser },
+    });
+  } catch (error) {
+    console.error('Error in updateMyProfile:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update profile.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Change Current Authenticated User Password
+ * PUT /api/auth/change-password
+ */
+const changeMyPassword = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide both current password and new password.',
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 6 characters long.',
+      });
+    }
+
+    if (confirmPassword && newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password and confirmation password do not match.',
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.',
+      });
+    }
+
+    const isMatch = await comparePassword(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: 'Incorrect current password. Please try again.',
+      });
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password credentials changed successfully.',
+    });
+  } catch (error) {
+    console.error('Error in changeMyPassword:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to change password.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerAdmin,
   login,
@@ -651,5 +843,8 @@ module.exports = {
   initiateForgotPassword,
   verifyPasswordResetOtp,
   resetPassword,
+  updateMyProfile,
+  changeMyPassword,
 };
+
 

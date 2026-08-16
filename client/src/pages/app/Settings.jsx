@@ -17,6 +17,7 @@ import {
   Clock,
   Calendar,
   DollarSign,
+  Sparkles,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -33,7 +34,9 @@ const Settings = () => {
     timeFormat,
     dateFormat,
     currency,
+    companySettings: savedCompanySettings,
     updateSettings,
+    updateCompanySettings,
     formatTime,
     formatDate,
     formatCurrency,
@@ -41,30 +44,33 @@ const Settings = () => {
 
   const [toastMsg, setToastMsg] = useState('');
 
-  const [companySettings, setCompanySettings] = useState({
-    companyName: 'NexaHR Enterprise Systems Inc. (Pakistan Operations)',
-    domain: 'nexahr.pk',
-    fiscalYearStart: 'July',
+  const [formState, setFormState] = useState({
+    companyName: savedCompanySettings?.companyName || 'NexaHR Enterprise Systems Inc. (Pakistan Operations)',
+    domain: savedCompanySettings?.domain || 'nexahr.pk',
+    fiscalYearStart: savedCompanySettings?.fiscalYearStart || 'July',
+    workWeek: savedCompanySettings?.workWeek || 'Monday - Friday (Sat/Sun Off)',
+    autoClockoutHours: savedCompanySettings?.autoClockoutHours || '12',
+    biometricPort: savedCompanySettings?.biometricPort || '8080',
+    biometricSecret: savedCompanySettings?.biometricSecret || 'nexahr_biometric_hardware_secret_2026',
     currency,
     timezone,
     timeFormat,
     dateFormat,
-    workWeek: 'Monday - Friday (Sat/Sun Off)',
-    autoClockoutHours: '12',
-    biometricPort: '8080',
-    biometricSecret: '••••••••••••••••••••••••',
   });
 
   // Sync state if context changes externally
   useEffect(() => {
-    setCompanySettings((prev) => ({
+    setFormState((prev) => ({
       ...prev,
       timezone,
       timeFormat,
       dateFormat,
       currency,
+      companyName: savedCompanySettings?.companyName || prev.companyName,
+      domain: savedCompanySettings?.domain || prev.domain,
+      workWeek: savedCompanySettings?.workWeek || prev.workWeek,
     }));
-  }, [timezone, timeFormat, dateFormat, currency]);
+  }, [timezone, timeFormat, dateFormat, currency, savedCompanySettings]);
 
   const [notifications, setNotifications] = useState({
     emailOnLeaveRequest: true,
@@ -76,17 +82,26 @@ const Settings = () => {
   const handleSave = (e) => {
     e.preventDefault();
     updateSettings({
-      timezone: companySettings.timezone,
-      timeFormat: companySettings.timeFormat,
-      dateFormat: companySettings.dateFormat,
-      currency: companySettings.currency,
+      timezone: formState.timezone,
+      timeFormat: formState.timeFormat,
+      dateFormat: formState.dateFormat,
+      currency: formState.currency,
     });
-    setToastMsg('Enterprise Regional Settings updated successfully across the entire system.');
+    updateCompanySettings({
+      companyName: formState.companyName,
+      domain: formState.domain,
+      fiscalYearStart: formState.fiscalYearStart,
+      workWeek: formState.workWeek,
+      autoClockoutHours: formState.autoClockoutHours,
+      biometricPort: formState.biometricPort,
+      biometricSecret: formState.biometricSecret,
+    });
+    setToastMsg('Enterprise Regional Settings and Company Profile updated successfully across the entire system.');
     setTimeout(() => setToastMsg(''), 3500);
   };
 
   const applyPakistanPreset = () => {
-    setCompanySettings((prev) => ({
+    setFormState((prev) => ({
       ...prev,
       timezone: 'Asia/Karachi',
       timeFormat: '12h',
@@ -99,12 +114,12 @@ const Settings = () => {
       dateFormat: 'DD/MM/YYYY',
       currency: 'PKR',
     });
-    setToastMsg('Enterprise set to Pakistan Standards (PKT UTC+5, PKR Rs., DD/MM/YYYY).');
+    setToastMsg('Enterprise parameters set to Pakistan Standards (PKT UTC+5, PKR Rs., DD/MM/YYYY, 12h).');
     setTimeout(() => setToastMsg(''), 3500);
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
         title="Enterprise System Settings & Preferences"
         subtitle="Configure company parameters, localization, biometric hardware ports, automated alerts, and theme preferences."
@@ -152,8 +167,8 @@ const Settings = () => {
                 <span>Primary Timezone</span>
               </label>
               <select
-                value={companySettings.timezone}
-                onChange={(e) => setCompanySettings({ ...companySettings, timezone: e.target.value })}
+                value={formState.timezone}
+                onChange={(e) => setFormState({ ...formState, timezone: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
               >
                 {TIMEZONE_OPTIONS.map((tz) => (
@@ -170,8 +185,8 @@ const Settings = () => {
                 <span>Base System Currency</span>
               </label>
               <select
-                value={companySettings.currency}
-                onChange={(e) => setCompanySettings({ ...companySettings, currency: e.target.value })}
+                value={formState.currency}
+                onChange={(e) => setFormState({ ...formState, currency: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
               >
                 {CURRENCY_OPTIONS.map((curr) => (
@@ -188,8 +203,8 @@ const Settings = () => {
                 <span>Time Display Format</span>
               </label>
               <select
-                value={companySettings.timeFormat}
-                onChange={(e) => setCompanySettings({ ...companySettings, timeFormat: e.target.value })}
+                value={formState.timeFormat}
+                onChange={(e) => setFormState({ ...formState, timeFormat: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
               >
                 <option value="12h">12-Hour Format (e.g. 09:30 AM / 05:35 PM)</option>
@@ -203,8 +218,8 @@ const Settings = () => {
                 <span>Date Display Format</span>
               </label>
               <select
-                value={companySettings.dateFormat}
-                onChange={(e) => setCompanySettings({ ...companySettings, dateFormat: e.target.value })}
+                value={formState.dateFormat}
+                onChange={(e) => setFormState({ ...formState, dateFormat: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
               >
                 {DATE_FORMAT_OPTIONS.map((df) => (
@@ -220,16 +235,16 @@ const Settings = () => {
             <div>
               <span className="font-bold text-blue-900 dark:text-blue-300">Live Format Preview:</span>
               <div className="text-[11px] text-blue-700/80 dark:text-blue-400/80 mt-0.5">
-                Timezone: <span className="font-mono font-bold">{companySettings.timezone}</span>
+                Active Timezone: <span className="font-mono font-bold">{formState.timezone}</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono font-bold text-blue-800 dark:text-blue-200 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800">
-                {formatDate(new Date(), companySettings.dateFormat, companySettings.timezone)} •{' '}
-                {formatTime(new Date(), true, companySettings.timezone, companySettings.timeFormat)}
+                {formatDate(new Date(), formState.dateFormat, formState.timezone)} •{' '}
+                {formatTime(new Date(), true, formState.timezone, formState.timeFormat)}
               </span>
               <span className="font-mono font-bold text-blue-800 dark:text-blue-200 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800">
-                {formatCurrency(250000, companySettings.currency)}
+                {formatCurrency(250000, formState.currency)}
               </span>
             </div>
           </div>
@@ -252,8 +267,8 @@ const Settings = () => {
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Legal Company Name</label>
               <input
                 type="text"
-                value={companySettings.companyName}
-                onChange={(e) => setCompanySettings({ ...companySettings, companyName: e.target.value })}
+                value={formState.companyName}
+                onChange={(e) => setFormState({ ...formState, companyName: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>
@@ -262,8 +277,8 @@ const Settings = () => {
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Corporate Domain</label>
               <input
                 type="text"
-                value={companySettings.domain}
-                onChange={(e) => setCompanySettings({ ...companySettings, domain: e.target.value })}
+                value={formState.domain}
+                onChange={(e) => setFormState({ ...formState, domain: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>
@@ -272,8 +287,8 @@ const Settings = () => {
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Standard Work Week</label>
               <input
                 type="text"
-                value={companySettings.workWeek}
-                onChange={(e) => setCompanySettings({ ...companySettings, workWeek: e.target.value })}
+                value={formState.workWeek}
+                onChange={(e) => setFormState({ ...formState, workWeek: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>
@@ -282,8 +297,8 @@ const Settings = () => {
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Auto Clock-Out Threshold</label>
               <input
                 type="text"
-                value={`${companySettings.autoClockoutHours} Hours`}
-                onChange={(e) => setCompanySettings({ ...companySettings, autoClockoutHours: e.target.value.replace(/\D/g, '') })}
+                value={`${formState.autoClockoutHours} Hours`}
+                onChange={(e) => setFormState({ ...formState, autoClockoutHours: e.target.value.replace(/\D/g, '') })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>
@@ -307,8 +322,8 @@ const Settings = () => {
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Gateway Listener Port</label>
               <input
                 type="text"
-                value={companySettings.biometricPort}
-                onChange={(e) => setCompanySettings({ ...companySettings, biometricPort: e.target.value })}
+                value={formState.biometricPort}
+                onChange={(e) => setFormState({ ...formState, biometricPort: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>
@@ -317,8 +332,8 @@ const Settings = () => {
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Hardware Webhook Secret</label>
               <input
                 type="password"
-                value={companySettings.biometricSecret}
-                onChange={(e) => setCompanySettings({ ...companySettings, biometricSecret: e.target.value })}
+                value={formState.biometricSecret}
+                onChange={(e) => setFormState({ ...formState, biometricSecret: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
               />
             </div>

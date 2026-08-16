@@ -24,10 +24,50 @@ import {
   ShieldCheck,
   Check,
   RefreshCw,
+  Landmark,
+  FileCheck,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import { api } from '../../services/api';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+
+// Helper to reliably parse Emergency Contact string into individual fields
+const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / Guardian', fallbackPhone = '') => {
+  if (!rawStr || typeof rawStr !== 'string') {
+    return {
+      emergencyName: fallbackName,
+      emergencyRelation: fallbackRel,
+      emergencyPhone: fallbackPhone,
+    };
+  }
+
+  // Matches formatted string: "Muhammad Akram (Parent / Guardian) - +92 300 2983659" or "Elena Mercer (Spouse) - 03001234567"
+  const fullMatch = rawStr.match(/^(.+?)\s*\((.+?)\)\s*[-:]\s*(.+)$/);
+  if (fullMatch) {
+    return {
+      emergencyName: fullMatch[1].trim(),
+      emergencyRelation: fullMatch[2].trim(),
+      emergencyPhone: fullMatch[3].trim(),
+    };
+  }
+
+  // Check if rawStr is just phone number (e.g. "+92 300 2983659" or "03001234567")
+  const isPurePhone = /^[+\d\s()-]+$/.test(rawStr.trim());
+  if (isPurePhone) {
+    return {
+      emergencyName: fallbackName,
+      emergencyRelation: fallbackRel,
+      emergencyPhone: rawStr.trim(),
+    };
+  }
+
+  return {
+    emergencyName: fallbackName || rawStr.trim(),
+    emergencyRelation: fallbackRel,
+    emergencyPhone: fallbackPhone,
+  };
+};
 
 const EmployeeProfile = () => {
   const [toastMsg, setToastMsg] = useState('');
@@ -37,13 +77,14 @@ const EmployeeProfile = () => {
 
   // Profile Form State
   const [formData, setFormData] = useState({
-    firstName: 'Alex',
-    lastName: 'Mercer',
-    email: 'employee@company.com',
-    phone: '+1 (555) 438-9201',
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     designation: 'Senior Full-Stack Engineer',
     department: 'Engineering & DevOps',
-    location: 'Silicon Valley, CA (HQ)',
+    location: '',
     empCode: 'EMP-101',
     joinDate: 'Mar 15, 2022',
     employmentType: 'Full-Time / Permanent',
@@ -52,10 +93,16 @@ const EmployeeProfile = () => {
     dob: '1992-06-18',
     gender: 'Male',
     bloodGroup: 'O+ Positive',
-    address: '742 Evergreen Terrace, Palo Alto, CA 94301',
-    emergencyName: 'Elena Mercer',
-    emergencyRelation: 'Spouse',
-    emergencyPhone: '+1 (555) 891-2244',
+    address: '',
+    emergencyName: '',
+    emergencyRelation: 'Parent / Guardian',
+    emergencyPhone: '',
+    // Payroll & Bank Details
+    bankName: 'Standard Chartered Bank (Corporate Wing)',
+    accountNumber: 'PK72SCBL0000001234567801',
+    ntnNumber: 'NTN-9842104-7',
+    taxStatus: 'Verified Active Filer',
+    providentFund: 'Enrolled (8.33% Tier)',
   });
 
   // Password state
@@ -67,30 +114,87 @@ const EmployeeProfile = () => {
 
   const showToast = (msg) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3000);
+    setTimeout(() => setToastMsg(''), 3500);
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const u = JSON.parse(storedUser);
-        setFormData((prev) => ({
-          ...prev,
-          firstName: u.firstName || prev.firstName,
-          lastName: u.lastName || prev.lastName,
-          email: u.email || prev.email,
-          phone: u.phone || prev.phone,
-          designation: u.designation || prev.designation,
-          department: u.department || prev.department,
-          address: u.address || prev.address,
-        }));
-      } catch (e) {
-        console.warn(e);
+    const loadData = async () => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const u = JSON.parse(storedUser);
+          const userAddr = u.profile?.address || u.address || u.location || '';
+          const parsedEmergency = parseEmergencyInfo(
+            u.profile?.emergencyContact || u.emergencyContact,
+            u.emergencyName,
+            u.emergencyRelation,
+            u.emergencyPhone
+          );
+
+          setFormData((prev) => ({
+            ...prev,
+            id: u.id || prev.id,
+            firstName: u.firstName || prev.firstName,
+            lastName: u.lastName || prev.lastName,
+            email: u.email || prev.email,
+            phone: u.phone || prev.phone,
+            designation: u.profile?.designation?.title || u.designation || prev.designation,
+            department: u.profile?.department?.name || u.department || prev.department,
+            address: userAddr || prev.address,
+            location: userAddr || prev.location || prev.address,
+            empCode: u.employeeCode || prev.empCode,
+            emergencyName: u.emergencyName || parsedEmergency.emergencyName || prev.emergencyName,
+            emergencyRelation: u.emergencyRelation || parsedEmergency.emergencyRelation || prev.emergencyRelation,
+            emergencyPhone: u.emergencyPhone || parsedEmergency.emergencyPhone || prev.emergencyPhone,
+          }));
+        } catch (e) {
+          console.warn(e);
+        }
       }
-    }
-    const storedAvatar = localStorage.getItem('user_avatar');
-    if (storedAvatar) setAvatar(storedAvatar);
+      const storedAvatar = localStorage.getItem('user_avatar');
+      if (storedAvatar) setAvatar(storedAvatar);
+
+      // Fetch live user from database
+      try {
+        const res = await api.getMe();
+        if (res?.success && res.data?.user) {
+          const u = res.data.user;
+          const userAddr = u.profile?.address || u.address || '';
+          const parsedEmergency = parseEmergencyInfo(
+            u.profile?.emergencyContact,
+            formData.emergencyName,
+            formData.emergencyRelation,
+            formData.emergencyPhone
+          );
+
+          setFormData((prev) => ({
+            ...prev,
+            id: u.id,
+            firstName: u.firstName || prev.firstName,
+            lastName: u.lastName || prev.lastName,
+            email: u.email || prev.email,
+            phone: u.phone || prev.phone,
+            empCode: u.employeeCode || prev.empCode,
+            designation: u.profile?.designation?.title || prev.designation,
+            department: u.profile?.department?.name || prev.department,
+            address: userAddr || prev.address,
+            location: userAddr || prev.location || prev.address,
+            emergencyName: parsedEmergency.emergencyName || prev.emergencyName,
+            emergencyRelation: parsedEmergency.emergencyRelation || prev.emergencyRelation,
+            emergencyPhone: parsedEmergency.emergencyPhone || prev.emergencyPhone,
+            gender: u.profile?.gender || prev.gender,
+            dob: u.profile?.dateOfBirth ? u.profile.dateOfBirth.split('T')[0] : prev.dob,
+            joinDate: u.profile?.joiningDate
+              ? new Date(u.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : prev.joinDate,
+          }));
+        }
+      } catch (err) {
+        console.warn('Live employee profile fetch:', err.message);
+      }
+    };
+
+    loadData();
   }, []);
 
   const handleAvatarChange = (e) => {
@@ -100,38 +204,94 @@ const EmployeeProfile = () => {
       reader.onloadend = () => {
         const base64Image = reader.result;
         setAvatar(base64Image);
-        localStorage.setItem('user_avatar', base64Image);
-        window.dispatchEvent(new Event('user_profile_updated'));
-        showToast('Profile avatar updated successfully!');
+        try {
+          localStorage.setItem('user_avatar', base64Image);
+          const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+          localStorage.setItem('user', JSON.stringify({ ...currentU, avatar: base64Image }));
+          window.dispatchEvent(new Event('user_profile_updated'));
+          window.dispatchEvent(new Event('storage'));
+        } catch (err) {
+          console.error(err);
+        }
+        showToast('Profile photo updated and synchronized across the platform!');
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    setTimeout(() => {
+
+    try {
+      // Clean, structured emergency contact summary
+      const contactSummary = formData.emergencyName
+        ? `${formData.emergencyName} (${formData.emergencyRelation || 'Parent / Guardian'}) - ${formData.emergencyPhone}`
+        : formData.emergencyPhone;
+
+      const updatePayload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        address: formData.address,
+        gender: formData.gender,
+        dateOfBirth: formData.dob,
+        emergencyContact: contactSummary,
+      };
+
+      const res = await api.updateMyProfile(updatePayload);
+
+      // Update local storage and broadcast
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
       const updatedUser = {
+        ...storedUser,
         ...formData,
+        address: formData.address,
+        location: formData.address,
+        emergencyName: formData.emergencyName,
+        emergencyRelation: formData.emergencyRelation,
+        emergencyPhone: formData.emergencyPhone,
+        emergencyContact: contactSummary,
+        ...(res?.data?.user || {}),
         avatar,
         role: 'EMPLOYEE',
       };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       window.dispatchEvent(new Event('user_profile_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      showToast('Personal information & Emergency Contact updated successfully!');
+    } catch (err) {
+      console.warn('Backend update notice (saving locally):', err.message);
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const updatedUser = {
+        ...storedUser,
+        ...formData,
+        address: formData.address,
+        location: formData.address,
+        emergencyName: formData.emergencyName,
+        emergencyRelation: formData.emergencyRelation,
+        emergencyPhone: formData.emergencyPhone,
+        avatar,
+        role: 'EMPLOYEE',
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      window.dispatchEvent(new Event('user_profile_updated'));
+      window.dispatchEvent(new Event('storage'));
+      showToast('Profile information saved successfully!');
+    } finally {
       setIsSaving(false);
-      showToast('Personal information updated successfully!');
-    }, 400);
+    }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (!passwords.current) {
       showToast('Please enter your current password.');
       return;
     }
     if (!passwords.newPass || passwords.newPass.length < 6) {
-      showToast('New password must be at least 6 characters.');
+      showToast('New password must be at least 6 characters long.');
       return;
     }
     if (passwords.newPass !== passwords.confirmPass) {
@@ -140,18 +300,26 @@ const EmployeeProfile = () => {
     }
 
     setIsSavingPassword(true);
-    setTimeout(() => {
+    try {
+      await api.changeMyPassword({
+        currentPassword: passwords.current,
+        newPassword: passwords.newPass,
+        confirmPassword: passwords.confirmPass,
+      });
       setPasswords({ current: '', newPass: '', confirmPass: '' });
+      showToast('Password credentials updated successfully in database!');
+    } catch (err) {
+      showToast(err.message || 'Failed to update password. Check your current password.');
+    } finally {
       setIsSavingPassword(false);
-      showToast('Password credentials updated successfully!');
-    }, 500);
+    }
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <EmployeePageHeader
         title="My Profile"
-        subtitle="Manage your personal dossier, verified employment information, and security credentials."
+        subtitle="Manage your personal profile, verified employment details, and security credentials."
       />
 
       {toastMsg && (
@@ -162,11 +330,11 @@ const EmployeeProfile = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. HERO PROFILE CARD (SLEEK DASHBOARD AESTHETIC) */}
+      {/* 1. HERO PROFILE CARD (ROYAL VIOLET / PURPLE GRADIENT AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white p-6 sm:p-8 shadow-2xl border border-slate-700/50">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-indigo-800/40">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-center gap-6">
           {/* Avatar with Camera upload button */}
@@ -187,7 +355,7 @@ const EmployeeProfile = () => {
           <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                {formData.firstName} {formData.lastName}
+                {formData.firstName || 'Employee'} {formData.lastName || ''}
               </h2>
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -210,12 +378,12 @@ const EmployeeProfile = () => {
               <span className="hidden sm:inline text-slate-600">•</span>
               <span className="flex items-center gap-1.5 text-slate-300">
                 <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{formData.phone}</span>
+                <span>{formData.phone || 'Phone Not Added'}</span>
               </span>
               <span className="hidden sm:inline text-slate-600">•</span>
               <span className="flex items-center gap-1.5 text-slate-300">
                 <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                <span>{formData.location}</span>
+                <span>{formData.address || formData.location || 'Address Not Added'}</span>
               </span>
             </div>
           </div>
@@ -223,12 +391,12 @@ const EmployeeProfile = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. GRID LAYOUT: EMPLOYMENT, PERSONAL, EMERGENCY & SECURITY */}
+      {/* 2. GRID LAYOUT: PERSONAL (EDITABLE), SECURITY, EMPLOYMENT & BANK DETAILS */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LEFT COLUMN: PERSONAL DETAILS (EDITABLE - 2 COLS WIDE) */}
+        {/* LEFT COLUMN: PERSONAL DETAILS & EMERGENCY CONTACT (EDITABLE - 2 COLS WIDE) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* CARD 2: PERSONAL DETAILS (EDITABLE FORM) */}
+          {/* CARD 2: PERSONAL DETAILS & EMERGENCY CONTACT (EDITABLE FORM) */}
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
               <div className="flex items-center gap-3">
@@ -237,7 +405,7 @@ const EmployeeProfile = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Personal Information</h3>
-                  <p className="text-xs text-slate-400 font-medium">Update your contact information and residential address</p>
+                  <p className="text-xs text-slate-400 font-medium">Update your contact details, residential address, and emergency contact point</p>
                 </div>
               </div>
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
@@ -245,7 +413,8 @@ const EmployeeProfile = () => {
               </span>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveProfile} className="space-y-5 text-xs">
+              {/* Primary Personal Info */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">First Name *</label>
@@ -296,7 +465,7 @@ const EmployeeProfile = () => {
                     type="date"
                     value={formData.dob}
                     onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer"
                   />
                 </div>
 
@@ -320,10 +489,66 @@ const EmployeeProfile = () => {
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Plot 135, Sector A/8, Karachi, Pakistan"
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value, location: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                 />
+              </div>
+
+              {/* ========================================================================= */}
+              {/* EMERGENCY CONTACT POINT SECTION (MATCHED ICON & HEADING WITH PERSONAL INFO) */}
+              {/* ========================================================================= */}
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <HeartHandshake className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Emergency Contact Point</h3>
+                    <p className="text-xs text-slate-400 font-medium">Designated next-of-kin or emergency respondent</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                  <div>
+                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Contact Person Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Muhammad Akram"
+                      value={formData.emergencyName}
+                      onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Relationship</label>
+                    <select
+                      value={formData.emergencyRelation}
+                      onChange={(e) => setFormData({ ...formData, emergencyRelation: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all cursor-pointer"
+                    >
+                      <option value="Parent / Guardian">Parent / Guardian</option>
+                      <option value="Spouse">Spouse</option>
+                      <option value="Sibling">Sibling (Brother / Sister)</option>
+                      <option value="Child">Child (Son / Daughter)</option>
+                      <option value="Relative">Family Relative</option>
+                      <option value="Friend">Friend / Colleague</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Emergency Phone Number</label>
+                    <input
+                      type="tel"
+                      placeholder="e.g. +92 300 2983659"
+                      value={formData.emergencyPhone}
+                      onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
@@ -411,9 +636,9 @@ const EmployeeProfile = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: READ-ONLY EMPLOYMENT & EMERGENCY CONTACT (1 COL WIDE) */}
+        {/* RIGHT COLUMN: READ-ONLY EMPLOYMENT & BANK DETAILS (1 COL WIDE) */}
         <div className="space-y-6">
-          {/* CARD 1: EMPLOYMENT INFORMATION (READ-ONLY DOSSIER) */}
+          {/* CARD 1: EMPLOYMENT INFORMATION (READ-ONLY) */}
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
               <div className="flex items-center gap-3">
@@ -421,8 +646,8 @@ const EmployeeProfile = () => {
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Employment Dossier</h3>
-                  <p className="text-xs text-slate-400 font-medium">Corporate HR verified data</p>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Employment Details</h3>
+                  <p className="text-xs text-slate-400 font-medium">Verified corporate employment details</p>
                 </div>
               </div>
               <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
@@ -459,28 +684,51 @@ const EmployeeProfile = () => {
             </div>
           </div>
 
-          {/* CARD 3: EMERGENCY CONTACT (HIGHLIGHTED CARD) */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-            <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <HeartHandshake className="w-5 h-5" />
+          {/* CARD 3: BANK DETAILS (VERIFIED BY HR) */}
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <Landmark className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Bank Details</h3>
+                  <p className="text-xs text-slate-400 font-medium">Corporate salary account</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Emergency Contact</h3>
-                <p className="text-xs text-slate-400 font-medium">Designated emergency contact point</p>
-              </div>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Verified by HR</span>
+              </span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-slate-900 dark:text-white">{formData.emergencyName}</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/80 dark:text-amber-200">
-                  {formData.emergencyRelation}
+            {/* Clean Key-Value List */}
+            <div className="space-y-3 text-xs">
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-slate-400 font-semibold">Bank Name</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName}</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-slate-400 font-semibold">Account Title</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  {formData.firstName || 'Employee'} {formData.lastName || ''}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300 pt-1">
-                <Phone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                <span>{formData.emergencyPhone}</span>
+
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-slate-400 font-semibold">Account / IBAN</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber}</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-slate-400 font-semibold">Branch Code</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">0142 (Corporate Wing)</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-slate-400 font-semibold">Payout Method</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">Direct Bank Transfer</span>
               </div>
             </div>
           </div>
