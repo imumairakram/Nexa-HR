@@ -97,6 +97,8 @@ const EmployeePageHeader = ({
   onSearch = null,
   onRefresh = null,
   loading = false,
+  action = null,
+  children = null,
 }) => {
   const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -334,19 +336,21 @@ const EmployeePageHeader = ({
       )}
 
       {/* Top Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Left Side Title & Subtitle */}
-        <div className="min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 w-full">
+        {/* Left Column (Title & Subtitle) */}
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {title}
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xl leading-relaxed">
             {displaySubtitle}
           </p>
         </div>
 
-        {/* Right Side Controls */}
+        {/* Right Column (Actions) */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+          {action || children}
+
           {/* Search Bar & Interactive Palette */}
           <div className="relative min-w-[140px] sm:w-56 md:w-64 lg:w-72" ref={searchRef}>
             <div className="relative flex items-center">

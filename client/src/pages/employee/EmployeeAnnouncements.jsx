@@ -11,10 +11,11 @@ import {
   Share2,
   X,
   Bell,
+  Sparkles,
+  Pin,
+  Bookmark,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
-
-import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 
 const EmployeeAnnouncements = () => {
@@ -65,92 +66,120 @@ const EmployeeAnnouncements = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
         title="Company Notice Board"
-        subtitle="Official circulars, executive communications, retreat updates, and HR bulletins."
+        subtitle="Official circulars, executive broadcasts, benefits updates, and department memos."
         onRefresh={loadAnnouncements}
+        loading={loading}
       />
 
-      {/* Category Filter Chips */}
-      {announcements.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          {['ALL', 'PINNED', 'EVENTS', 'BENEFITS', 'MEETINGS'].map((cat) => (
+      {/* ========================================================================= */}
+      {/* 1. SEGMENTED CATEGORY TABS (SLEEK PILLS) */}
+      {/* ========================================================================= */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl flex-wrap">
+          {[
+            { id: 'ALL', label: 'All Circulars' },
+            { id: 'PINNED', label: 'Pinned Only' },
+            { id: 'EVENTS', label: 'Events' },
+            { id: 'BENEFITS', label: 'Benefits' },
+            { id: 'MEETINGS', label: 'Meetings & All-Hands' },
+          ].map((cat) => (
             <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                filter === cat
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                  : 'bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50'
+              key={cat.id}
+              onClick={() => setFilter(cat.id)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                filter === cat.id
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
-              {cat === 'ALL' ? 'All Notices' : cat === 'PINNED' ? 'Pinned' : cat}
+              {cat.label}
             </button>
           ))}
         </div>
-      )}
 
-      {/* Announcements List */}
+        <span className="text-xs font-semibold text-slate-400">
+          Showing {filtered.length} notices
+        </span>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. ANNOUNCEMENTS LIST (PREMIUM PURE WHITE CARDS) */}
+      {/* ========================================================================= */}
       <div className="space-y-4">
         {filtered.length > 0 ? (
           filtered.map((item) => (
             <div
               key={item.id}
-              className={`bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border transition-all ${
+              className={`rounded-3xl p-6 shadow-soft border transition-all hover:shadow-md ${
                 item.pinned
-                  ? 'border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10'
-                  : 'border-slate-100 dark:border-slate-800'
+                  ? 'bg-gradient-to-r from-amber-500/5 via-indigo-500/5 to-white dark:to-[#1E293B] border-amber-200/70 dark:border-amber-900/40'
+                  : 'bg-white dark:bg-[#1E293B] border-slate-100 dark:border-slate-800'
               }`}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
+                <div className="space-y-2.5 flex-1 min-w-0">
+                  {/* Category & Metadata Row */}
                   <div className="flex flex-wrap items-center gap-2">
+                    {item.pinned && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-300/60">
+                        <Pin className="w-2.5 h-2.5" />
+                        <span>PINNED NOTICE</span>
+                      </span>
+                    )}
+
                     <span
-                      className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                         item.priority === 'HIGH'
-                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
                           : item.priority === 'MEDIUM'
-                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                          : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
+                          : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/60'
                       }`}
                     >
-                      {item.category} • {item.priority}
+                      {item.category} • {item.priority || 'GENERAL'}
                     </span>
+
                     <span className="text-[11px] text-slate-400 font-medium">{item.date}</span>
-                    <span className="text-[11px] text-slate-400 font-medium">• {item.author}</span>
+                    <span className="text-[11px] text-slate-400 font-medium">• By {item.author || 'HR Dept'}</span>
                   </div>
 
+                  {/* Title */}
                   <h3
                     onClick={() => setSelectedItem(item)}
-                    className="text-base font-black text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors"
+                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors"
                   >
                     {item.title}
                   </h3>
 
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-                    {item.summary}
+                  {/* Description / Summary */}
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-4xl">
+                    {item.summary || item.desc}
                   </p>
 
+                  {/* Footer Actions */}
                   <div className="flex items-center gap-4 pt-2">
                     <button
                       onClick={() => setSelectedItem(item)}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span>Read Full Announcement</span>
+                      <span>Read Full Notice</span>
                     </button>
-                    <span className="text-[11px] text-slate-400">Broadcast to all staff</span>
+                    <span className="text-[11px] text-slate-400 font-medium">Broadcasted to all personnel</span>
                   </div>
                 </div>
 
+                {/* Star / Pin Button */}
                 <button
                   onClick={() => togglePin(item.id, item.pinned)}
                   className={`p-2.5 rounded-2xl border transition-all cursor-pointer shrink-0 ${
                     item.pinned
                       ? 'border-amber-300 bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:border-amber-800'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:text-amber-500 hover:bg-slate-50'
+                      : 'border-slate-200/70 dark:border-slate-800 text-slate-400 hover:text-amber-500 hover:bg-slate-50'
                   }`}
-                  title={item.pinned ? 'Unpin' : 'Pin to Top'}
+                  title={item.pinned ? 'Unpin Announcement' : 'Pin to Top'}
                 >
-                  <Star className={`w-4 h-4 ${item.pinned ? 'fill-current' : ''}`} />
+                  <Star className={`w-4 h-4 ${item.pinned ? 'fill-amber-500 text-amber-500' : ''}`} />
                 </button>
               </div>
             </div>
@@ -158,25 +187,26 @@ const EmployeeAnnouncements = () => {
         ) : (
           <div className="p-12 text-center bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center">
             <Megaphone className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-            <h4 className="text-base font-black text-slate-900 dark:text-white">No Company Announcements Posted Yet</h4>
+            <h4 className="text-base font-black text-slate-900 dark:text-white">No Notices in This Category</h4>
             <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              Official circulars, retreat notices, and policy broadcasts from HR Management will appear here in real-time.
+              All official memos and circulars will be published here as soon as executive broadcasts are posted.
             </p>
           </div>
         )}
       </div>
 
-      {/* DETAIL MODAL */}
+      {/* ========================================================================= */}
+      {/* 3. FULL ANNOUNCEMENT MODAL READER */}
+      {/* ========================================================================= */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
-                  {selectedItem.category} • {selectedItem.priority}
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
+                  {selectedItem.category}
                 </span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white mt-1.5">{selectedItem.title}</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">{selectedItem.date} • {selectedItem.author}</p>
+                <span className="text-xs text-slate-400">{selectedItem.date}</span>
               </div>
               <button
                 onClick={() => setSelectedItem(null)}
@@ -186,14 +216,22 @@ const EmployeeAnnouncements = () => {
               </button>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
-              {selectedItem.content || selectedItem.summary}
+            <div className="space-y-3">
+              <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                {selectedItem.title}
+              </h2>
+              <div className="text-xs font-semibold text-slate-400">
+                Author: {selectedItem.author || 'People Operations'}
+              </div>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                {selectedItem.summary || selectedItem.desc}
+              </p>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setSelectedItem(null)}
-                className="px-5 py-2.5 bg-emerald-600 text-white rounded-2xl text-xs font-bold hover:bg-emerald-700 shadow-md shadow-emerald-600/20 cursor-pointer"
+                className="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold transition-colors cursor-pointer"
               >
                 Close Notice
               </button>
