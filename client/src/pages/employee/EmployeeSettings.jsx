@@ -109,16 +109,6 @@ const EmployeeSettings = () => {
       <EmployeePageHeader
         title="Settings"
         subtitle="Configure appearance themes, notification channels, and regional formats."
-        action={
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 text-xs font-bold rounded-full flex items-center gap-2 shadow-sm cursor-pointer transition-all hover:scale-105 disabled:opacity-50"
-          >
-            {isSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-            <span>Save Preferences</span>
-          </button>
-        }
       />
 
       {toastMsg && (

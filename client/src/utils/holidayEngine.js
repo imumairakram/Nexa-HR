@@ -1,4 +1,17 @@
-// Dynamic Multi-Year Holiday Calendar Engine for NexaHR
+export const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 /**
  * Astronomical & Gazette Lunar Ephemeris Table for Islamic Lunar Holidays (2024 - 2035)

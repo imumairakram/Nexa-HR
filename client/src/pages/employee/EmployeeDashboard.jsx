@@ -680,11 +680,6 @@ const EmployeeDashboard = () => {
                     >
                       {holiday.countdown}
                     </span>
-                    {holiday.isLongWeekend && (
-                      <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400">
-                        Long Weekend
-                      </span>
-                    )}
                   </div>
                 </div>
               ))}

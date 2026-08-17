@@ -160,6 +160,10 @@ const EmployeeLeaves = () => {
     };
   });
 
+  const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
+  const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
+  const totalPendingRequests = requests.filter((r) => r.status === 'PENDING').length;
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
@@ -186,7 +190,70 @@ const EmployeeLeaves = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. LEAVE QUOTA CARDS (MODERN METRIC PROGRESS CARDS) */}
+      {/* 1. HERO LEAVE & TIME-OFF BANNER (EMERALD-TEAL LIGHT THEME AESTHETIC) */}
+      {/* ========================================================================= */}
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left Side: Leave Entitlement Info */}
+          <div className="space-y-3 flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold border border-emerald-600/20 dark:border-emerald-500/30">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Annual Leave Quota Active</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-600/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 text-xs font-semibold border border-teal-600/20 dark:border-teal-500/30">
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <span>HR Policy Synchronized</span>
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              Time-Off & Leave Entitlement
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
+              Track your remaining annual vacation, medical days, and casual leave quotas. Time-off requests are routed automatically for department supervisor approval.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+                <CalendarDays className="w-3.5 h-3.5" />
+                <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves || 34})</span>
+              </span>
+              {totalPendingRequests > 0 && (
+                <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{totalPendingRequests} Request{totalPendingRequests > 1 ? 's' : ''} Pending Review</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right Side: Quick Action Glassmorphic Card */}
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[240px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <Plus className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Planning Time Off?</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Submit instant leave request</div>
+            </div>
+            <button
+              onClick={() => setIsApplyOpen(true)}
+              className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+            >
+              <span>Apply for Leave</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. LEAVE QUOTA CARDS (MODERN METRIC PROGRESS CARDS) */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {quotaCards.map((item, idx) => (

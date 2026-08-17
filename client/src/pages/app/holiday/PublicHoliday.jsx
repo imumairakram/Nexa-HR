@@ -94,7 +94,6 @@ const PublicHoliday = () => {
       // Category filter
       if (categoryFilter === 'NATIONAL' && !h.type.includes('National')) return false;
       if (categoryFilter === 'RELIGIOUS' && !h.type.includes('Religious')) return false;
-      if (categoryFilter === 'LONG_WEEKEND' && !h.isLongWeekend) return false;
       if (categoryFilter === 'CUSTOM' && !h.isCustom) return false;
 
       // Month filter
@@ -119,9 +118,9 @@ const PublicHoliday = () => {
   const stats = useMemo(() => {
     const total = allHolidays.length;
     const upcoming = allHolidays.filter((h) => h.status === 'UPCOMING' || h.status === 'ACTIVE_TODAY').length;
-    const longWeekends = allHolidays.filter((h) => h.isLongWeekend).length;
+    const gazettedCount = allHolidays.filter((h) => !h.isCustom).length;
     const activeToday = allHolidays.find((h) => h.status === 'ACTIVE_TODAY');
-    return { total, upcoming, longWeekends, activeToday };
+    return { total, upcoming, gazettedCount, activeToday };
   }, [allHolidays]);
 
   const handleAddSubmit = (e) => {
@@ -293,9 +292,9 @@ const PublicHoliday = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              Long Weekends
+              Official Gazetted
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.longWeekends} Occasions</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.gazettedCount} Days</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <Sparkles className="w-5 h-5" />
@@ -344,13 +343,12 @@ const PublicHoliday = () => {
               { id: 'ALL', label: 'All Holidays' },
               { id: 'NATIONAL', label: 'National' },
               { id: 'RELIGIOUS', label: 'Religious' },
-              { id: 'LONG_WEEKEND', label: 'Long Weekends' },
               { id: 'CUSTOM', label: 'Custom Company' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setCategoryFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   categoryFilter === tab.id
                     ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -449,11 +447,6 @@ const PublicHoliday = () => {
                       <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                         <div className="flex items-center gap-2">
                           <span>{h.name}</span>
-                          {h.isLongWeekend && (
-                            <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                              Long Weekend
-                            </span>
-                          )}
                           {h.isCustom && (
                             <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
                               Custom
@@ -689,16 +682,6 @@ const PublicHoliday = () => {
               </div>
 
               <div className="flex flex-col gap-2 pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 font-semibold">
-                  <input
-                    type="checkbox"
-                    checked={form.isLongWeekend}
-                    onChange={(e) => setForm({ ...form, isLongWeekend: e.target.checked })}
-                    className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
-                  />
-                  <span>Mark as Long Weekend Observance</span>
-                </label>
-
                 <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 font-semibold">
                   <input
                     type="checkbox"
