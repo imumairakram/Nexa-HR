@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   CreditCard,
   DollarSign,
@@ -17,6 +17,7 @@ import {
   X,
   Building,
   RefreshCw,
+  Zap,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { api } from '../../services/api';

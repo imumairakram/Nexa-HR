@@ -13,6 +13,7 @@ import {
   Mail,
   Phone,
   Calendar,
+  Clock,
   Lock,
   Briefcase,
 } from 'lucide-react';

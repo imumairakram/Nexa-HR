@@ -32,6 +32,7 @@ import {
   Eye,
   FileText,
   UserX,
+  List,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import {
