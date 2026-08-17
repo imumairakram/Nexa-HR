@@ -8,17 +8,17 @@ echo.
 
 cd /d "%~dp0"
 
-:: Check if root .env exists
+:: 1. Check if root .env exists
 if not exist ".env" (
     echo [!] .env file not found in root directory.
     if exist ".env.example" (
         echo [+] Creating .env from .env.example...
         copy .env.example .env
-        echo [*] .env file created. Please make sure database credentials match your setup.
+        echo [*] .env file created. Please ensure database credentials match your setup.
     )
 )
 
-:: Check root dependencies
+:: 2. Check root dependencies
 if not exist "node_modules\" (
     echo [*] Installing backend dependencies (npm install)...
     call npm install
@@ -29,12 +29,20 @@ if not exist "node_modules\" (
     )
 )
 
-:: Check client dependencies
+:: 3. Generate Prisma client if needed
+if exist "prisma\" (
+    if not exist "node_modules\.prisma\" (
+        echo [*] Generating Prisma Client...
+        call npx prisma generate
+    )
+)
+
+:: 4. Check client dependencies
 if not exist "client\node_modules\" (
     echo [*] Installing frontend dependencies (npm install in client)...
-    cd client
+    pushd client
     call npm install
-    cd /d "%~dp0"
+    popd
     if errorlevel 1 (
         echo [X] Failed to install frontend dependencies.
         pause
@@ -43,11 +51,11 @@ if not exist "client\node_modules\" (
 )
 
 echo.
-echo [*] Starting Backend Server (Express + Prisma)...
-start "NexaHR Backend (Port 5000)" cmd /k "cd /d "%~dp0" && npm run dev"
+echo [*] Starting Backend Server (Express + Prisma on Port 5000)...
+start "NexaHR Backend (Port 5000)" /D "%~dp0" cmd /k npm run dev:backend
 
-echo [*] Starting Frontend Client (Vite + React)...
-start "NexaHR Frontend (Port 5173)" cmd /k "cd /d "%~dp0client" && npm run dev"
+echo [*] Starting Frontend Client (Vite + React on Port 5173)...
+start "NexaHR Frontend (Port 5173)" /D "%~dp0client" cmd /k npm run dev
 
 echo.
 echo ========================================================
