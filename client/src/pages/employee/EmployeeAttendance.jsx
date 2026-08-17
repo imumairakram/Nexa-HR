@@ -212,79 +212,108 @@ const EmployeeAttendance = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STATS ROW (DASHBOARD-MATCHED PURE WHITE CARDS) */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Present Days */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Verified Present</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
+      {/* 2. STATS ROW (EXECUTIVE BIOMETRIC TELEMETRY CARDS) */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Card 1: Present Days */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Verified Present
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {totalDaysPresent} {totalDaysPresent === 1 ? 'Day' : 'Days'}
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {totalDaysPresent} <span className="text-base font-bold text-slate-400">{totalDaysPresent === 1 ? 'Day' : 'Days'}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{onTimePercentage}% On-Time Rate</span>
+              <span className="text-slate-400">Punches Synced</span>
+            </div>
           </div>
-          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-2">
-            {onTimePercentage}% On-Time Arrival Rate
-          </p>
         </div>
 
-        {/* Late Entries */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Late Arrivals</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <AlertTriangle className="w-4 h-4" />
+        {/* Card 2: Late Entries */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Late Arrivals
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <AlertTriangle className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-amber-500">
-              {lateArrivals} {lateArrivals === 1 ? 'Day' : 'Days'}
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
+              {lateArrivals} <span className="text-base font-bold text-slate-400">{lateArrivals === 1 ? 'Day' : 'Days'}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-amber-600 dark:text-amber-400 font-bold">15 Mins Grace (09:15 AM)</span>
+              <span className="text-slate-400">Standard Shift</span>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">
-            Grace period: 30 minutes
-          </p>
         </div>
 
-        {/* Total Work Hours */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Logged Hours</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+        {/* Card 3: Total Work Hours */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Logged Hours
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Clock className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {totalHoursLogged.toFixed(1)} hrs
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {totalHoursLogged.toFixed(1)} <span className="text-base font-bold text-slate-400">hrs</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-indigo-600 dark:text-indigo-400 font-bold">+{totalOvertime.toFixed(1)}h Overtime</span>
+              <span className="text-slate-400">Cumulative Total</span>
+            </div>
           </div>
-          <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold mt-2">
-            +{totalOvertime.toFixed(1)}h Overtime Logged
-          </p>
         </div>
 
-        {/* Terminal Sync Logs */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">PostgreSQL Records</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-              <Fingerprint className="w-4 h-4" />
+        {/* Card 4: Terminal Sync Logs */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Biometric Logs
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Fingerprint className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {logs.length} {logs.length === 1 ? 'Entry' : 'Entries'}
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {logs.length} <span className="text-base font-bold text-slate-400">{logs.length === 1 ? 'Entry' : 'Entries'}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-purple-600 dark:text-purple-400 font-bold">Biometric Hardware</span>
+              <span className="text-slate-400">Auto-Reconciled</span>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">
-            Biometric Hardware Source
-          </p>
         </div>
       </div>
 

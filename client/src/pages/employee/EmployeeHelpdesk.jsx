@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   LifeBuoy,
   Plus,
@@ -22,6 +22,11 @@ import {
   Check,
   Zap,
   Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Headphones,
+  UserCheck,
+  RotateCcw,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
@@ -37,19 +42,22 @@ const DEFAULT_TICKETS = [
     createdDate: '2026-08-07',
     lastUpdated: 'Today, 11:30 AM',
     assignedTo: 'Marcus Vance (IT Ops)',
-    description: 'Would like to request an approved Dell UltraSharp 27" 4K monitor for home ergonomics per remote engineering equipment allowance.',
+    description:
+      'Would like to request an approved Dell UltraSharp 27" 4K monitor for home ergonomics per remote engineering equipment allowance.',
     replies: [
       {
         id: 1,
         sender: 'Alex Mercer (You)',
         time: 'Aug 07, 09:15 AM',
-        message: 'Hello IT team, I submitted an equipment stipend requisition for a secondary display monitor. Please let me know if any invoice receipt is required.',
+        message:
+          'Hello IT team, I submitted an equipment stipend requisition for a secondary display monitor. Please let me know if any invoice receipt is required.',
       },
       {
         id: 2,
         sender: 'Marcus Vance (IT Ops)',
         time: 'Today, 11:30 AM',
-        message: 'Hi Alex! Your request has been approved by your department lead. We will dispatch the shipment via FedEx tracking tomorrow morning.',
+        message:
+          'Hi Alex! Your request has been approved by your department lead. We will dispatch the shipment via courier tracking tomorrow morning.',
       },
     ],
   },
@@ -63,19 +71,22 @@ const DEFAULT_TICKETS = [
     createdDate: '2026-08-01',
     lastUpdated: 'Aug 03, 04:15 PM',
     assignedTo: 'Lucas Morales (Finance)',
-    description: 'Noticed a minor change in state tax deductions in the July 2026 payslip following the new fiscal year brackets.',
+    description:
+      'Noticed a minor change in state tax deductions in the July 2026 payslip following the new fiscal year brackets.',
     replies: [
       {
         id: 1,
         sender: 'Alex Mercer (You)',
         time: 'Aug 01, 10:00 AM',
-        message: 'Hi Finance, could you please verify if the updated California state tax tax bracket adjustments were applied in July?',
+        message:
+          'Hi Finance, could you please verify if the updated progressive tax bracket adjustments were applied in July?',
       },
       {
         id: 2,
         sender: 'Lucas Morales (Finance)',
         time: 'Aug 03, 04:15 PM',
-        message: 'Hi Alex, yes! The FY26 progressive state tax adjustment was applied starting with the July cycle. Your W-4 withholding remains standard. Full breakdown attached to your Payslips tab.',
+        message:
+          'Hi Alex, yes! The FY26 progressive tax adjustment was applied starting with the July cycle. Your withholding remains standard. Full breakdown is available in your Payslips tab.',
       },
     ],
   },
@@ -89,35 +100,38 @@ const DEFAULT_TICKETS = [
     createdDate: '2026-07-20',
     lastUpdated: 'Jul 22, 02:00 PM',
     assignedTo: 'Chloe Bennett (People Ops)',
-    description: 'Looking to add my spouse to the premium dental insurance plan during the mid-year qualifying life event window.',
+    description:
+      'Looking to add my spouse to the premium dental insurance plan during the mid-year qualifying life event window.',
     replies: [
       {
         id: 1,
         sender: 'Alex Mercer (You)',
         time: 'Jul 20, 02:30 PM',
-        message: 'Hi HR, please guide me on what verification documents are needed to enroll my spouse into the dental insurance tier.',
+        message:
+          'Hi HR, please guide me on what verification documents are needed to enroll my spouse into the dental insurance tier.',
       },
       {
         id: 2,
         sender: 'Chloe Bennett (People Ops)',
         time: 'Jul 22, 02:00 PM',
-        message: 'Hi Alex! Marriage certificate uploaded and spouse coverage is active immediately under BlueCross Dental Plan. Happy to help!',
+        message:
+          'Hi Alex! Marriage certificate uploaded and spouse coverage is active immediately under the corporate Dental Plan. Happy to help!',
       },
     ],
   },
 ];
 
 const CATEGORY_OPTIONS = [
-  { id: 'ALL', label: 'All Categories' },
+  { id: 'ALL', label: 'All Inquiries', icon: LifeBuoy },
   { id: 'IT_HARDWARE', label: 'IT & Equipment', icon: Laptop },
   { id: 'PAYROLL', label: 'Payroll & Tax', icon: CreditCard },
   { id: 'BENEFITS', label: 'Benefits & Insurance', icon: HeartHandshake },
-  { id: 'WORKPLACE', label: 'Workplace & Facilities', icon: Building },
-  { id: 'GENERAL_HR', label: 'General HR Inquiry', icon: HelpCircle },
+  { id: 'WORKPLACE', label: 'Workplace & Admin', icon: Building },
+  { id: 'GENERAL_HR', label: 'General HR', icon: HelpCircle },
 ];
 
 const EmployeeHelpdesk = () => {
-  const { formatDate, formatTime } = useRegionalSettings();
+  const { formatDate } = useRegionalSettings();
   const [tickets, setTickets] = useState(() => {
     try {
       const saved = localStorage.getItem('nexahr_helpdesk_tickets');
@@ -142,6 +156,11 @@ const EmployeeHelpdesk = () => {
     description: '',
   });
 
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 3500);
+  };
+
   const saveTickets = (updated) => {
     setTickets(updated);
     try {
@@ -154,8 +173,7 @@ const EmployeeHelpdesk = () => {
   const handleCreateTicket = (e) => {
     e.preventDefault();
     if (!newTicketForm.subject.trim() || !newTicketForm.description.trim()) {
-      setToastMsg('Please enter a ticket subject and description');
-      setTimeout(() => setToastMsg(''), 2500);
+      showToast('Please enter a ticket subject and description');
       return;
     }
 
@@ -176,7 +194,7 @@ const EmployeeHelpdesk = () => {
       replies: [
         {
           id: 1,
-          sender: 'You',
+          sender: 'Alex Mercer (You)',
           time: 'Just now',
           message: newTicketForm.description.trim(),
         },
@@ -192,8 +210,7 @@ const EmployeeHelpdesk = () => {
       priority: 'MEDIUM',
       description: '',
     });
-    setToastMsg(`Ticket ${ticketId} created successfully!`);
-    setTimeout(() => setToastMsg(''), 3000);
+    showToast(`Support Ticket #${ticketId} created and dispatched to HR Ops!`);
   };
 
   const handleSendReply = (ticketId) => {
@@ -205,7 +222,7 @@ const EmployeeHelpdesk = () => {
           ...(t.replies || []),
           {
             id: Date.now(),
-            sender: 'You',
+            sender: 'Alex Mercer (You)',
             time: 'Just now',
             message: replyText.trim(),
           },
@@ -222,41 +239,58 @@ const EmployeeHelpdesk = () => {
     saveTickets(updated);
     setSelectedTicket(updated.find((t) => t.id === ticketId));
     setReplyText('');
-    setToastMsg('Reply posted!');
-    setTimeout(() => setToastMsg(''), 2500);
+    showToast('Your message has been posted to the support thread.');
   };
 
-  const handleMarkResolved = (ticketId) => {
-    const updated = tickets.map((t) => (t.id === ticketId ? { ...t, status: 'RESOLVED', lastUpdated: 'Just now' } : t));
+  const handleToggleResolved = (ticketId) => {
+    const updated = tickets.map((t) => {
+      if (t.id === ticketId) {
+        const nextStatus = t.status === 'RESOLVED' ? 'IN_PROGRESS' : 'RESOLVED';
+        return {
+          ...t,
+          status: nextStatus,
+          lastUpdated: 'Just now',
+        };
+      }
+      return t;
+    });
     saveTickets(updated);
-    setSelectedTicket(updated.find((t) => t.id === ticketId));
-    setToastMsg('Ticket marked as RESOLVED!');
-    setTimeout(() => setToastMsg(''), 2500);
+    const target = updated.find((t) => t.id === ticketId);
+    setSelectedTicket(target);
+    showToast(target?.status === 'RESOLVED' ? 'Ticket officially marked as RESOLVED.' : 'Ticket reopened for further review.');
   };
 
-  const filteredTickets = tickets.filter((t) => {
-    const matchesSearch =
-      t.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredTickets = useMemo(() => {
+    return tickets.filter((t) => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        t.subject.toLowerCase().includes(q) ||
+        t.id.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.assignedTo.toLowerCase().includes(q);
 
-    const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
-    const matchesCat = categoryFilter === 'ALL' || t.category === categoryFilter;
+      const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
+      const matchesCat = categoryFilter === 'ALL' || t.category === categoryFilter;
 
-    return matchesSearch && matchesStatus && matchesCat;
-  });
+      return matchesSearch && matchesStatus && matchesCat;
+    });
+  }, [tickets, searchQuery, statusFilter, categoryFilter]);
 
-  const stats = {
-    total: tickets.length,
-    inProgress: tickets.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'OPEN').length,
-    resolved: tickets.filter((t) => t.status === 'RESOLVED').length,
-  };
+  const stats = useMemo(() => {
+    return {
+      total: tickets.length,
+      inProgress: tickets.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'OPEN').length,
+      resolved: tickets.filter((t) => t.status === 'RESOLVED').length,
+      avgSla: '< 3.8h',
+    };
+  }, [tickets]);
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <EmployeePageHeader
         title="Helpdesk & Support"
-        subtitle="Submit inquiry tickets, track equipment requests, and resolve HR queries."
+        subtitle="Submit inquiry tickets, track equipment requests, and resolve HR queries with dedicated operations specialists."
         action={
           <button
             onClick={() => setIsNewTicketOpen(true)}
@@ -276,123 +310,262 @@ const EmployeeHelpdesk = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. METRICS OVERVIEW CARDS (CLEAN DASHBOARD STYLE - NO CHUNKY GREEN BANNER) */}
+      {/* 1. DYNAMIC HELPDESK HERO BANNER (ROSE-LAVENDER LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Total Inquiries</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <LifeBuoy className="w-4 h-4" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-rose-50/90 via-pink-50/70 to-purple-50/60 dark:from-rose-950/40 dark:via-pink-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-rose-200/70 dark:border-rose-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-400/15 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left Side: Telemetry Info */}
+          <div className="space-y-3 flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-600/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 text-xs font-extrabold border border-rose-600/20 dark:border-rose-500/30">
+                <Headphones className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                <span>Dedicated Employee Support Live</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-600/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-semibold border border-purple-600/20 dark:border-purple-500/30">
+                <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <span>Ops Team Online</span>
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              Enterprise Resolution & Helpdesk Hub
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
+              Submit support tickets for hardware equipment requisitions, payroll adjustments, benefit claims, or workplace amenities.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+              <span className="flex items-center gap-1.5 text-rose-700 dark:text-rose-300 font-bold bg-rose-100/60 dark:bg-rose-950/60 px-3 py-1 rounded-xl border border-rose-200 dark:border-rose-800/60">
+                <Zap className="w-3.5 h-3.5" />
+                <span>Average First Response: {stats.avgSla}</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-purple-700 dark:text-purple-300 font-bold bg-purple-100/60 dark:bg-purple-950/60 px-3 py-1 rounded-xl border border-purple-200 dark:border-purple-800/60">
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>{stats.inProgress} Active Tickets Under Review</span>
+              </span>
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {stats.total} {stats.total === 1 ? 'Ticket' : 'Tickets'}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">All-time raised issues</p>
-        </div>
 
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-400">In Progress</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+          {/* Right Side: Quick Action Glassmorphic Card */}
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-rose-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+              <LifeBuoy className="w-5 h-5 stroke-[2.5]" />
             </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {stats.inProgress} {stats.inProgress === 1 ? 'Ticket' : 'Tickets'}
-            </span>
-          </div>
-          <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-2">Under active review</p>
-        </div>
-
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Resolved</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
+            <div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Need HR or IT Help?</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Direct ticket routing to specialists</div>
             </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-              {stats.resolved} Closed
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">Resolution confirmed</p>
-        </div>
-
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Avg Resolution SLA</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Zap className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
-              &lt; 4.2 Hours
-            </span>
-          </div>
-          <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold mt-2">Fast response guaranteed</p>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 2. SEARCH & SEGMENTED CONTROLS */}
-      {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Status segmented pills */}
-        <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl w-full md:w-auto">
-          {[
-            { id: 'ALL', label: 'All Tickets' },
-            { id: 'IN_PROGRESS', label: 'In Progress' },
-            { id: 'RESOLVED', label: 'Resolved' },
-          ].map((st) => (
             <button
-              key={st.id}
-              onClick={() => setStatusFilter(st.id)}
-              className={`flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === st.id
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
+              onClick={() => setIsNewTicketOpen(true)}
+              className="w-full px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
-              {st.label}
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Create New Ticket</span>
             </button>
-          ))}
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search tickets by ID or title..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-emerald-500/20"
-          />
+          </div>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODERN TICKET LIST */}
+      {/* 2. STITCH-INSPIRED KPI TELEMETRY CARDS */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Card 1: Total Inquiries */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Total Inquiries
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <LifeBuoy className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {stats.total} <span className="text-base font-bold text-slate-400">{stats.total === 1 ? 'Ticket' : 'Tickets'}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-blue-600 dark:text-blue-400 font-bold">Lifetime Logged</span>
+              <span className="text-slate-400">Self-Service</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2: In Progress */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Under Review
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Clock className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
+              {stats.inProgress} <span className="text-base font-bold text-slate-400">{stats.inProgress === 1 ? 'Ticket' : 'Tickets'}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-amber-600 dark:text-amber-400 font-bold">Active Investigation</span>
+              <span className="text-slate-400">In Progress</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: Resolved Closed */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Resolved Issues
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              {stats.resolved} <span className="text-base font-bold text-slate-400">Closed</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Satisfaction</span>
+              <span className="text-slate-400">Verified</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Avg Resolution SLA */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-rose-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-rose-500/10 blur-2xl pointer-events-none group-hover:bg-rose-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Avg Resolution SLA
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200/60 dark:border-rose-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Zap className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 font-mono tracking-tight">
+              {stats.avgSla}
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-rose-600 dark:text-rose-400 font-bold">Fast Lane Active</span>
+              <span className="text-slate-400">Enterprise Grade</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. SEARCH & CATEGORY FILTER TOOLBAR */}
+      {/* ========================================================================= */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by ticket ID, subject, assignee..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-10 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Status Pills */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl">
+            {[
+              { id: 'ALL', label: 'All Tickets' },
+              { id: 'IN_PROGRESS', label: 'In Progress' },
+              { id: 'RESOLVED', label: 'Resolved' },
+            ].map((st) => (
+              <button
+                key={st.id}
+                onClick={() => setStatusFilter(st.id)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  statusFilter === st.id
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                {st.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+          {CATEGORY_OPTIONS.map((cat) => {
+            const Icon = cat.icon;
+            const count =
+              cat.id === 'ALL'
+                ? tickets.length
+                : tickets.filter((t) => t.category === cat.id).length;
+
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setCategoryFilter(cat.id)}
+                className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  categoryFilter === cat.id
+                    ? 'bg-slate-900 text-white dark:bg-indigo-600 dark:text-white shadow-xs scale-102'
+                    : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{cat.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${categoryFilter === cat.id ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4. ENTERPRISE TICKET LIST */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-              Support Inquiry Log
+              Support Inquiries & Service Log
             </h3>
             <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Click any ticket to view the live conversation thread and assigned representative
+              Click any ticket card to open the live conversation thread and view staff replies
             </p>
           </div>
-          <span className="text-xs font-bold text-slate-400">
-            {filteredTickets.length} Tickets
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+            {filteredTickets.length} Tickets Found
           </span>
         </div>
 
@@ -404,18 +577,16 @@ const EmployeeHelpdesk = () => {
                 onClick={() => setSelectedTicket(t)}
                 className="p-5 sm:p-6 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
               >
-                <div className="space-y-1.5 flex-1 min-w-0">
+                <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                      {t.id}
+                    <span className="text-xs font-mono font-black text-indigo-600 dark:text-indigo-400 group-hover:underline">
+                      #{t.id}
                     </span>
 
-                    {/* Category */}
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
                       {t.categoryLabel}
                     </span>
 
-                    {/* Priority badge (Subtle) */}
                     <span
                       className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                         t.priority === 'HIGH'
@@ -425,19 +596,20 @@ const EmployeeHelpdesk = () => {
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200/60'
                       }`}
                     >
-                      {t.priority}
+                      {t.priority} Priority
                     </span>
 
                     <span className="text-[11px] text-slate-400 font-medium">
                       Updated {t.lastUpdated}
                     </span>
+                    <span className="text-[11px] text-slate-400 font-medium">• Assigned: <strong className="text-slate-700 dark:text-slate-300">{t.assignedTo}</strong></span>
                   </div>
 
-                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">
                     {t.subject}
                   </h4>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 max-w-3xl">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 max-w-4xl font-medium">
                     {t.description}
                   </p>
                 </div>
@@ -447,49 +619,188 @@ const EmployeeHelpdesk = () => {
                     className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                       t.status === 'RESOLVED'
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
-                        : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200/60 dark:border-blue-800/40'
+                        : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                     }`}
                   >
                     {t.status === 'RESOLVED' ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     ) : (
-                      <Clock className="w-3.5 h-3.5 text-blue-500" />
+                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
                     )}
                     <span>{t.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}</span>
                   </span>
 
-                  <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all" />
+                  <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white flex items-center justify-center transition-colors">
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-12 text-center flex flex-col items-center justify-center">
-            <LifeBuoy className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-            <h4 className="text-base font-black text-slate-900 dark:text-white">No Tickets Found</h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              Need assistance? Click the "+ New Ticket" button above to submit your inquiry.
+          <div className="p-12 text-center text-slate-400 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
+              <Search className="w-6 h-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">No support tickets match your search</h4>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              Try adjusting your query or create a new support ticket using the button above.
             </p>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setStatusFilter('ALL');
+                setCategoryFilter('ALL');
+              }}
+              className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white text-xs font-bold cursor-pointer"
+            >
+              Reset Filters
+            </button>
           </div>
         )}
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. NEW TICKET MODAL */}
+      {/* 5. TICKET LIVE CONVERSATION THREAD DRAWER / MODAL */}
+      {/* ========================================================================= */}
+      {selectedTicket && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 max-h-[90vh] flex flex-col">
+            {/* Drawer Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4 shrink-0">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-black text-indigo-600 dark:text-indigo-400">
+                    #{selectedTicket.id}
+                  </span>
+                  <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    {selectedTicket.categoryLabel}
+                  </span>
+                  <span
+                    className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                      selectedTicket.status === 'RESOLVED'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                    }`}
+                  >
+                    {selectedTicket.status}
+                  </span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-snug">
+                  {selectedTicket.subject}
+                </h3>
+                <div className="text-xs text-slate-400 font-medium">
+                  Assigned Specialist: <strong className="text-slate-700 dark:text-slate-200">{selectedTicket.assignedTo}</strong>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedTicket(null)}
+                className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Conversation Messages Thread */}
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700 space-y-1 text-xs">
+                <span className="font-extrabold text-slate-800 dark:text-white block">Initial Ticket Description:</span>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                  {selectedTicket.description}
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                {selectedTicket.replies?.map((rep) => {
+                  const isMe = rep.sender.includes('You');
+                  return (
+                    <div
+                      key={rep.id}
+                      className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1`}
+                    >
+                      <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold px-1">
+                        <span>{rep.sender}</span>
+                        <span>•</span>
+                        <span>{rep.time}</span>
+                      </div>
+                      <div
+                        className={`p-4 rounded-2xl max-w-lg text-xs leading-relaxed font-medium shadow-xs ${
+                          isMe
+                            ? 'bg-indigo-600 text-white rounded-br-none'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-bl-none'
+                        }`}
+                      >
+                        {rep.message}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Reply Bar & Action Footer */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Type your response to support..."
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSendReply(selectedTicket.id);
+                  }}
+                  className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                />
+                <button
+                  onClick={() => handleSendReply(selectedTicket.id)}
+                  disabled={!replyText.trim()}
+                  className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-md transition-all"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => handleToggleResolved(selectedTicket.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    selectedTicket.status === 'RESOLVED'
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                  }`}
+                >
+                  {selectedTicket.status === 'RESOLVED' ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+                  <span>{selectedTicket.status === 'RESOLVED' ? 'Reopen Ticket' : 'Mark Ticket Resolved'}</span>
+                </button>
+
+                <span className="text-[11px] text-slate-400 font-medium">
+                  Resolution Protocol: NexaHR Standard SLA
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6. CREATE NEW SUPPORT TICKET MODAL */}
       {/* ========================================================================= */}
       {isNewTicketOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
                   <LifeBuoy className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-slate-900 dark:text-white">Raise Support Ticket</h3>
-                  <p className="text-xs text-slate-400">Our HR & IT ops team will respond within 4 hours</p>
+                  <p className="text-xs text-slate-400 font-medium">Direct routing to operations lead</p>
                 </div>
               </div>
+
               <button
                 onClick={() => setIsNewTicketOpen(false)}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
@@ -500,56 +811,64 @@ const EmployeeHelpdesk = () => {
 
             <form onSubmit={handleCreateTicket} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Subject *</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                  Subject / Summary *
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="Brief summary of your query or request..."
+                  placeholder="e.g. Ergonomic chair replacement requisition"
                   value={newTicketForm.subject}
                   onChange={(e) => setNewTicketForm({ ...newTicketForm, subject: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Category *</label>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                    Category Type *
+                  </label>
                   <select
                     value={newTicketForm.category}
                     onChange={(e) => setNewTicketForm({ ...newTicketForm, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none cursor-pointer"
                   >
-                    {CATEGORY_OPTIONS.filter((c) => c.id !== 'ALL').map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.label}
-                      </option>
-                    ))}
+                    <option value="IT_HARDWARE">IT & Hardware</option>
+                    <option value="PAYROLL">Payroll & Compensation</option>
+                    <option value="BENEFITS">Benefits & Health Insurance</option>
+                    <option value="WORKPLACE">Workplace & Admin</option>
+                    <option value="GENERAL_HR">General HR Inquiry</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Priority *</label>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                    Priority Level *
+                  </label>
                   <select
                     value={newTicketForm.priority}
                     onChange={(e) => setNewTicketForm({ ...newTicketForm, priority: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none cursor-pointer"
                   >
-                    <option value="LOW">Low</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HIGH">High (Urgent)</option>
+                    <option value="LOW">Low (General Query)</option>
+                    <option value="MEDIUM">Medium (Standard Request)</option>
+                    <option value="HIGH">High (Urgent Impact)</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Detailed Description *</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                  Detailed Description *
+                </label>
                 <textarea
                   rows={4}
                   required
-                  placeholder="Provide all relevant details, error messages, or equipment requirements..."
+                  placeholder="Provide all necessary details, invoice numbers, or equipment requirements..."
                   value={newTicketForm.description}
                   onChange={(e) => setNewTicketForm({ ...newTicketForm, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none"
                 />
               </div>
 
@@ -557,130 +876,18 @@ const EmployeeHelpdesk = () => {
                 <button
                   type="button"
                   onClick={() => setIsNewTicketOpen(false)}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold transition-all hover:scale-105 cursor-pointer shadow-md"
+                  className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 cursor-pointer transition-all"
                 >
                   Submit Ticket
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 5. TICKET DETAILS & CONVERSATION MODAL */}
-      {/* ========================================================================= */}
-      {selectedTicket && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95 max-h-[90vh] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 shrink-0">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                    {selectedTicket.id}
-                  </span>
-                  <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    {selectedTicket.categoryLabel}
-                  </span>
-                  <span
-                    className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
-                      selectedTicket.status === 'RESOLVED'
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200'
-                        : 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-200'
-                    }`}
-                  >
-                    {selectedTicket.status}
-                  </span>
-                </div>
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  {selectedTicket.subject}
-                </h3>
-              </div>
-
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Conversation Timeline */}
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-400 mb-1">
-                  <span>Initial Ticket Description</span>
-                  <span>{selectedTicket.createdDate}</span>
-                </div>
-                <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
-                  {selectedTicket.description}
-                </p>
-              </div>
-
-              {/* Replies */}
-              {selectedTicket.replies?.map((rep) => (
-                <div
-                  key={rep.id}
-                  className={`p-4 rounded-2xl space-y-1 ${
-                    rep.sender.includes('You')
-                      ? 'bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 ml-6'
-                      : 'bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 mr-6'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className={rep.sender.includes('You') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-900 dark:text-white'}>
-                      {rep.sender}
-                    </span>
-                    <span className="text-[10px] text-slate-400">{rep.time}</span>
-                  </div>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                    {rep.message}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Reply Input Bar */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3 shrink-0">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Type a follow-up reply..."
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSendReply(selectedTicket.id);
-                  }}
-                  className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                />
-                <button
-                  onClick={() => handleSendReply(selectedTicket.id)}
-                  className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Send</span>
-                </button>
-              </div>
-
-              {selectedTicket.status !== 'RESOLVED' && (
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => handleMarkResolved(selectedTicket.id)}
-                    className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Mark Ticket as Resolved</span>
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       )}

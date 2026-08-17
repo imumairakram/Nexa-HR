@@ -325,90 +325,118 @@ const EmployeeDashboard = () => {
         </div>
       </div>
 
-      {/* TOP METRICS CARDS (100% DYNAMIC) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* TOP METRICS CARDS (100% DYNAMIC ENTERPRISE KPI GRID) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Card 1: Days Present */}
         <div
           onClick={() => navigate('/employee/attendance')}
-          className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
+          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Present This Month</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <CheckCircle2 className="w-4 h-4" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Present This Month
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {monthlyAttendance.presentDays} Days
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {monthlyAttendance.presentDays} <span className="text-base font-bold text-slate-400">{monthlyAttendance.presentDays === 1 ? 'Day' : 'Days'}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% On-Time Rate</span>
+              <span className="text-slate-400">{monthlyAttendance.lateDays} Late check-ins</span>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">
-            {monthlyAttendance.lateDays} Late check-ins
-          </p>
         </div>
 
         {/* Card 2: Leave Summary */}
         <div
           onClick={() => navigate('/employee/leaves')}
-          className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
+          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Approved Leaves</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <CalendarDays className="w-4 h-4" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Approved Leaves
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CalendarDays className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {leavesSummary.approved} Approved
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {leavesSummary.approved} <span className="text-base font-bold text-slate-400">Approved</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-blue-600 dark:text-blue-400 font-bold">{leavesSummary.pending} Pending review</span>
+              <span className="text-slate-400">Annual Quota</span>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">
-            {leavesSummary.pending} Pending review
-          </p>
         </div>
 
         {/* Card 3: Total Work Hours */}
         <div
           onClick={() => navigate('/employee/attendance')}
-          className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
+          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Logged Hours (Month)</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Clock className="w-4 h-4" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Logged Hours (Month)
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Clock className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {monthlyAttendance.totalWorkHours} h
-            </span>
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {monthlyAttendance.totalWorkHours} <span className="text-base font-bold text-slate-400">hrs</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Live Synced</span>
+              <span className="text-slate-400">09:00 – 17:30 Shift</span>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">
-            Computed from live timestamps
-          </p>
         </div>
 
         {/* Card 4: Latest Payslip */}
         <div
           onClick={() => navigate('/employee/payslips')}
-          className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer group"
+          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Latest Net Salary</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <CreditCard className="w-4 h-4" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Latest Net Salary
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CreditCard className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
               {netSalaryAmount}
-            </span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-purple-600 dark:text-purple-400 font-bold">{payslipPeriod}</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Disbursed</span>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2 font-medium">
-            {payslipPeriod}
-          </p>
         </div>
       </div>
 

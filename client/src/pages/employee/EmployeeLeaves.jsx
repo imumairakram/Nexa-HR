@@ -253,41 +253,49 @@ const EmployeeLeaves = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. LEAVE QUOTA CARDS (MODERN METRIC PROGRESS CARDS) */}
+      {/* 2. LEAVE QUOTA CARDS (MODERN ENTERPRISE METRIC PROGRESS CARDS) */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {quotaCards.map((item, idx) => (
           <div
             key={idx}
-            className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between hover:shadow-md transition-all group"
+            className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 flex flex-col justify-between group"
           >
+            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${item.theme.gradient} opacity-80 group-hover:opacity-100 transition-opacity`} />
+            <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-slate-500/5 blur-2xl pointer-events-none group-hover:bg-emerald-500/15 transition-all" />
+
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${item.theme.iconBg}`}>
-                    <CalendarDays className="w-4 h-4" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 ${item.theme.iconBg} group-hover:scale-110 transition-transform shadow-xs`}>
+                    <CalendarDays className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{item.type}</span>
+                  <div>
+                    <span className="text-xs font-black text-slate-800 dark:text-white block">{item.type}</span>
+                    <span className="text-[10px] text-slate-400 font-medium">Annual Quota</span>
+                  </div>
                 </div>
-                <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${item.theme.badgeBg}`}>
+                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${item.theme.badgeBg}`}>
                   {item.used} Used
                 </span>
               </div>
 
-              <div className="flex items-baseline justify-between mt-2">
+              <div className="flex items-baseline justify-between mt-3">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">
+                  <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                     {item.available}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400">
+                  <span className="text-xs font-bold text-slate-400">
                     / {item.total} Days Left
                   </span>
                 </div>
-                <span className="text-xs font-bold text-slate-400">{item.percent}%</span>
+                <span className="text-xs font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  {item.percent}%
+                </span>
               </div>
             </div>
 
-            <div className="mt-5 space-y-2">
+            <div className="mt-5 space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
               <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                 <div
                   className={`h-full rounded-full bg-gradient-to-r ${item.theme.gradient} transition-all duration-500`}
@@ -295,10 +303,12 @@ const EmployeeLeaves = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold pt-0.5">
                 <span>{item.used} days taken this year</span>
-                {item.pending > 0 && (
-                  <span className="text-amber-500 font-bold">{item.pending} pending</span>
+                {item.pending > 0 ? (
+                  <span className="text-amber-500 font-bold">{item.pending} pending approval</span>
+                ) : (
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Available</span>
                 )}
               </div>
             </div>
