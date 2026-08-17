@@ -177,7 +177,7 @@ const Payroll = () => {
       <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="space-y-2 text-center sm:text-left">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-extrabold">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Zap className="w-3.5 h-3.5" />
             <span>Pay Run Engine: {MONTH_NAMES[runMonth - 1]} {runYear}</span>
           </span>
           <h2 className="text-2xl sm:text-3xl font-black">Generate & Disburse Monthly Payroll</h2>

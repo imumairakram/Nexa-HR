@@ -392,7 +392,7 @@ const EmployeeAnnouncements = () => {
                   <span>Featured Broadcast</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-400/30">
-                  <Sparkles className="w-3 h-3 text-purple-300" />
+                  <Tag className="w-3 h-3 text-purple-300" />
                   <span>{heroNotice.categoryLabel || 'Executive Circular'}</span>
                 </span>
                 <span className="text-xs text-slate-400 font-medium">

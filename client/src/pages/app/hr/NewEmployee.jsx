@@ -107,7 +107,7 @@ const NewEmployee = () => {
             <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">4 In Progress</div>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+            <CheckCircle2 className="w-5 h-5" />
           </div>
         </div>
 
