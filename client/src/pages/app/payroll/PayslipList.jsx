@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   FileText,
@@ -12,21 +12,52 @@ import {
   DollarSign,
   Building,
   Calendar,
+  RefreshCw,
 } from 'lucide-react';
+import { api } from '../../../services/api';
 
-const INITIAL_PAYSLIPS = [
-  { id: 'PSL-2026-07-101', employee: 'Alex Mercer', code: 'EMP-101', dept: 'Engineering', month: 'July 2026', gross: 11700, deductions: 2150, net: 9550, date: 'Jul 31, 2026', status: 'PAID' },
-  { id: 'PSL-2026-07-102', employee: 'Sarah Jenkins', code: 'EMP-102', dept: 'Product & Design', month: 'July 2026', gross: 10660, deductions: 2025, net: 8635, date: 'Jul 31, 2026', status: 'PAID' },
-  { id: 'PSL-2026-07-103', employee: 'David Miller', code: 'EMP-103', dept: 'Engineering', month: 'July 2026', gross: 13100, deductions: 2480, net: 10620, date: 'Jul 31, 2026', status: 'PAID' },
-  { id: 'PSL-2026-07-104', employee: 'Marcus Vance', code: 'EMP-104', dept: 'Engineering', month: 'July 2026', gross: 12410, deductions: 2350, net: 10060, date: 'Jul 31, 2026', status: 'PAID' },
-  { id: 'PSL-2026-07-105', employee: 'Emily Zhang', code: 'EMP-105', dept: 'Product & Design', month: 'July 2026', gross: 13750, deductions: 2750, net: 11000, date: 'Jul 31, 2026', status: 'PAID' },
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
 const PayslipList = () => {
-  const [payslips, setPayslips] = useState(INITIAL_PAYSLIPS);
+  const [payslips, setPayslips] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSlip, setSelectedSlip] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadPayslips = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getPayslips();
+      if (res?.success && res.data?.payslips) {
+        const mapped = res.data.payslips.map((p) => ({
+          id: `PSL-${p.year}-${String(p.month).padStart(2, '0')}-${p.user?.employeeCode || p.userId.slice(0, 4)}`,
+          rawId: p.id,
+          employee: `${p.user?.firstName || 'Staff'} ${p.user?.lastName || 'Member'}`,
+          code: p.user?.employeeCode || 'EMP-100',
+          dept: p.user?.profile?.department?.name || 'Operations',
+          month: `${MONTH_NAMES[p.month - 1]} ${p.year}`,
+          gross: Number(p.grossSalary || 0),
+          deductions: Number(p.taxDeductions || 0) + Number(p.otherDeductions || 0) + Number(p.unpaidLeaveDeduction || 0),
+          net: Number(p.netSalary || 0),
+          date: p.generatedAt ? new Date(p.generatedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'N/A',
+          status: p.status || 'PAID',
+        }));
+        setPayslips(mapped);
+      }
+    } catch (err) {
+      console.error('Failed to load payslips:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPayslips();
+  }, []);
 
   const filtered = payslips.filter((p) =>
     p.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||

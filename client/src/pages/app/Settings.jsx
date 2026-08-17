@@ -43,6 +43,21 @@ const Settings = () => {
 
   const [toastMsg, setToastMsg] = useState('');
 
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_admin_notification_settings');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Failed to parse notifications settings:', e);
+    }
+    return {
+      emailOnLeaveRequest: true,
+      emailOnPayrollRun: true,
+    };
+  });
+
   const [formState, setFormState] = useState({
     companyName: savedCompanySettings?.companyName || 'NexaHR Enterprise Systems Inc. (Pakistan Operations)',
     domain: savedCompanySettings?.domain || 'nexahr.pk',
@@ -93,6 +108,11 @@ const Settings = () => {
       biometricPort: formState.biometricPort,
       biometricSecret: formState.biometricSecret,
     });
+    try {
+      localStorage.setItem('nexahr_admin_notification_settings', JSON.stringify(notifications));
+    } catch (e) {
+      console.warn('Failed to save notification settings:', e);
+    }
     setToastMsg('Enterprise Regional Settings and Company Profile updated successfully across the entire system.');
     setTimeout(() => setToastMsg(''), 3500);
   };

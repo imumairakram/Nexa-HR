@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   CalendarDays,
@@ -9,79 +9,13 @@ import {
   Clock,
   Shield,
   FileText,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_POLICIES = [
-  {
-    id: 1,
-    name: 'Annual Paid Vacation Leave',
-    code: 'ANNUAL',
-    days: 14,
-    type: 'PAID',
-    accrual: '1.16 Days / Month',
-    carryover: 'Max 5 Days Carryover',
-    color: 'from-emerald-500 to-teal-600',
-    description: 'Mandatory standard paid time off for rest, holidays, and family vacations. Accrues monthly from start date.',
-  },
-  {
-    id: 2,
-    name: 'Casual / Personal Leave',
-    code: 'CASUAL',
-    days: 6,
-    type: 'PAID',
-    accrual: 'Annual Lump Sum (Jan 1)',
-    carryover: 'No Carryover (Expires Dec 31)',
-    color: 'from-blue-500 to-indigo-600',
-    description: 'Short-notice time off for urgent personal appointments, family events, or emergency errands.',
-  },
-  {
-    id: 3,
-    name: 'Sick & Medical Emergency Leave',
-    code: 'SICK',
-    days: 8,
-    type: 'PAID',
-    accrual: 'Annual Lump Sum',
-    carryover: 'Max 3 Days Carryover',
-    color: 'from-amber-500 to-orange-600',
-    description: 'Covers temporary illness, medical consultations, dental procedures, and doctor appointments.',
-  },
-  {
-    id: 4,
-    name: 'Maternity & Paternity Parental Leave',
-    code: 'PARENTAL',
-    days: 30,
-    type: 'PAID',
-    accrual: 'Event-Based (Qualifying Event)',
-    carryover: 'Used within 12 Months',
-    color: 'from-purple-500 to-pink-600',
-    description: 'Full-salary parental bonding leave for new parents, childbirth, and legal adoption placement.',
-  },
-  {
-    id: 5,
-    name: 'Compassionate & Bereavement Leave',
-    code: 'BEREAVEMENT',
-    days: 5,
-    type: 'PAID',
-    accrual: 'Event-Based',
-    carryover: 'No Carryover',
-    color: 'from-slate-600 to-slate-800',
-    description: 'Paid compassionate leave provided upon the loss of an immediate family member.',
-  },
-  {
-    id: 6,
-    name: 'Unpaid Sabbatical / Extended Leave',
-    code: 'UNPAID',
-    days: 60,
-    type: 'UNPAID',
-    accrual: 'Requires Board Approval',
-    carryover: 'No Accrual',
-    color: 'from-rose-500 to-red-600',
-    description: 'Extended leave without compensation for academic pursuits, career breaks, or personal sabbaticals.',
-  },
-];
+import { api } from '../../services/api';
 
 const LeavePolicy = () => {
-  const [policies, setPolicies] = useState(INITIAL_POLICIES);
+  const [policies, setPolicies] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -89,19 +23,57 @@ const LeavePolicy = () => {
   const [form, setForm] = useState({
     name: '',
     code: '',
-    days: 10,
+    days: 12,
     type: 'PAID',
     accrual: 'Monthly Accrual',
     carryover: 'Max 3 Days',
     description: '',
   });
 
+  const loadLeavePolicies = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getLeaveTypes();
+      if (res?.success && res.data?.leaveTypes) {
+        const mapped = res.data.leaveTypes.map((lt, idx) => {
+          const colors = [
+            'from-emerald-500 to-teal-600',
+            'from-blue-500 to-indigo-600',
+            'from-amber-500 to-orange-600',
+            'from-purple-500 to-pink-600',
+            'from-slate-600 to-slate-800',
+          ];
+          return {
+            id: lt.id,
+            name: lt.name,
+            code: lt.code,
+            days: lt.daysAllowed,
+            type: lt.isPaid ? 'PAID' : 'UNPAID',
+            accrual: `${(lt.daysAllowed / 12).toFixed(1)} Days / Month`,
+            carryover: lt.isPaid ? 'Max 3-5 Days Carryover' : 'No Carryover',
+            color: colors[idx % colors.length],
+            description: lt.description || `${lt.name} entitlement governed by corporate human resources handbook.`,
+          };
+        });
+        setPolicies(mapped);
+      }
+    } catch (err) {
+      console.error('Failed to load leave types:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLeavePolicies();
+  }, []);
+
   const handleCreatePolicy = (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.code.trim()) return;
 
     const newPolicy = {
-      id: Date.now(),
+      id: Date.now().toString(),
       name: form.name,
       code: form.code.toUpperCase(),
       days: parseInt(form.days) || 10,
@@ -123,7 +95,7 @@ const LeavePolicy = () => {
       carryover: 'Max 3 Days',
       description: '',
     });
-    setToastMsg(`Leave policy "${form.name}" created successfully!`);
+    setToastMsg(`Leave policy "${form.name}" registered successfully!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 

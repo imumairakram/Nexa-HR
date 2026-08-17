@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Briefcase, Plus, CheckCircle2, X, Search, Clock, Users, ShieldCheck } from 'lucide-react';
-
-const INITIAL = [
-  { id: 1, name: 'Full-Time Permanent', code: 'FT', hours: '40 hrs / week', benefits: 'Full Health & 401(k)', count: 12 },
-  { id: 2, name: 'Fixed-Term Contract', code: 'CON', hours: 'Flexible (Project Scope)', benefits: 'Standard Stipend', count: 2 },
-  { id: 3, name: 'Full-Time Remote', code: 'REM', hours: '40 hrs / week (Flexible)', benefits: 'Full Remote Stipend', count: 4 },
-  { id: 4, name: 'Internship / Co-op', code: 'INT', hours: '20 - 40 hrs / week', benefits: 'Mentorship & Perks', count: 2 },
-];
+import { Briefcase, Plus, CheckCircle2, X, Search, Clock, Users, ShieldCheck, RefreshCw } from 'lucide-react';
 
 const JobType = () => {
-  const [types, setTypes] = useState(INITIAL);
+  const [types, setTypes] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_job_types');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return [
+      { id: 1, name: 'Full-Time Permanent', code: 'FT', hours: '40 hrs / week', benefits: 'Full Health & Insurance', count: 0 },
+      { id: 2, name: 'Fixed-Term Contract', code: 'CON', hours: 'Project Scope Based', benefits: 'Standard Hourly Stipend', count: 0 },
+      { id: 3, name: 'Full-Time Remote', code: 'REM', hours: '40 hrs / week (Async)', benefits: 'Home Office Allowance', count: 0 },
+      { id: 4, name: 'Internship / Graduate Fellow', code: 'INT', hours: '20 - 40 hrs / week', benefits: 'Learning Stipend & Mentorship', count: 0 },
+    ];
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newType, setNewType] = useState({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
@@ -18,11 +25,27 @@ const JobType = () => {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!newType.name) return;
-    setTypes([...types, { id: Date.now(), name: newType.name, code: newType.code.toUpperCase() || 'TYPE', hours: newType.hours, benefits: newType.benefits, count: 0 }]);
+    if (!newType.name.trim()) return;
+    const updated = [
+      ...types,
+      {
+        id: Date.now(),
+        name: newType.name.trim(),
+        code: newType.code.toUpperCase().trim() || 'TYPE',
+        hours: newType.hours,
+        benefits: newType.benefits,
+        count: 0,
+      },
+    ];
+    setTypes(updated);
+    try {
+      localStorage.setItem('nexahr_job_types', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
     setIsAddOpen(false);
     setNewType({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
-    setToastMsg('Employment type created successfully!');
+    setToastMsg('Employment contract arrangement created successfully!');
     setTimeout(() => setToastMsg(''), 2500);
   };
 

@@ -13,6 +13,7 @@ import Payroll from './pages/app/Payroll';
 import Departments from './pages/app/Departments';
 import Settings from './pages/app/Settings';
 import Profile from './pages/app/Profile';
+import UserAccessControl from './pages/app/UserAccessControl';
 
 // HR Sub-pages
 import NewEmployee from './pages/app/hr/NewEmployee';
@@ -127,6 +128,8 @@ function App() {
           <Route path="departments" element={<Departments />} />
           <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="access-control" element={<UserAccessControl />} />
+          <Route path="access" element={<Navigate to="/app/access-control" replace />} />
         </Route>
 
         {/* Authenticated Employee Self-Service Portal Routes */}

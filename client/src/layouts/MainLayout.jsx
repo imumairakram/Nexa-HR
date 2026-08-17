@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from '../components/navigation/Sidebar';
 import MobileBottomNav from '../components/navigation/MobileBottomNav';
+import ErrorBoundary from '../components/common/ErrorBoundary';
 
 const MainLayout = () => {
   const [authToken] = useState(() => localStorage.getItem('token'));
@@ -40,7 +41,9 @@ const MainLayout = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0 transition-all duration-300">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       {/* Mobile Navigation */}

@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Clock, Plus, CheckCircle2, Search, X, Users, Award, ShieldCheck, Briefcase } from 'lucide-react';
-
-const INITIAL = [
-  { id: 1, label: 'Entry Level (0 - 2 Years)', code: 'ENTRY', minYears: 0, maxYears: 2, salaryRange: '$85k - $110k', count: 2 },
-  { id: 2, label: 'Mid-Level Professional (2 - 5 Years)', code: 'MID', minYears: 2, maxYears: 5, salaryRange: '$110k - $140k', count: 6 },
-  { id: 3, label: 'Senior Specialist (5 - 8 Years)', code: 'SENIOR', minYears: 5, maxYears: 8, salaryRange: '$140k - $175k', count: 6 },
-  { id: 4, label: 'Staff / Principal / Director (8+ Years)', code: 'LEAD', minYears: 8, maxYears: 15, salaryRange: '$175k - $220k', count: 2 },
-];
+import { Clock, Plus, CheckCircle2, Search, X, Users, Award, ShieldCheck, Briefcase, RefreshCw } from 'lucide-react';
 
 const JobExperience = () => {
-  const [items, setItems] = useState(INITIAL);
+  const [items, setItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_job_experiences');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return [
+      { id: 1, label: 'Entry Level (0 - 2 Years)', code: 'ENTRY', minYears: 0, maxYears: 2, salaryRange: '$85k - $110k', count: 0 },
+      { id: 2, label: 'Mid-Level Professional (2 - 5 Years)', code: 'MID', minYears: 2, maxYears: 5, salaryRange: '$110k - $140k', count: 0 },
+      { id: 3, label: 'Senior Specialist (5 - 8 Years)', code: 'SENIOR', minYears: 5, maxYears: 8, salaryRange: '$140k - $175k', count: 0 },
+      { id: 4, label: 'Staff / Principal / Director (8+ Years)', code: 'LEAD', minYears: 8, maxYears: 15, salaryRange: '$175k - $220k', count: 0 },
+    ];
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newItem, setNewItem] = useState({ label: '', code: '', salaryRange: '$100k - $130k' });
@@ -18,8 +25,25 @@ const JobExperience = () => {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!newItem.label) return;
-    setItems([...items, { id: Date.now(), label: newItem.label, code: newItem.code.toUpperCase() || 'EXP', minYears: 1, maxYears: 3, salaryRange: newItem.salaryRange, count: 0 }]);
+    if (!newItem.label.trim()) return;
+    const updated = [
+      ...items,
+      {
+        id: Date.now(),
+        label: newItem.label.trim(),
+        code: newItem.code.toUpperCase().trim() || 'EXP',
+        minYears: 1,
+        maxYears: 3,
+        salaryRange: newItem.salaryRange,
+        count: 0,
+      },
+    ];
+    setItems(updated);
+    try {
+      localStorage.setItem('nexahr_job_experiences', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
     setIsAddOpen(false);
     setNewItem({ label: '', code: '', salaryRange: '$100k - $130k' });
     setToastMsg('Experience seniority track added successfully!');

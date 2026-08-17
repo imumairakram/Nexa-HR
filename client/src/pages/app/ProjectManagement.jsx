@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   FolderKanban,
@@ -16,98 +16,14 @@ import {
   X,
   ChevronRight,
   Layers,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_PROJECTS = [
-  {
-    id: 1,
-    name: 'NexaHR Mobile App V2',
-    client: 'Internal Enterprise Core',
-    category: 'Mobile & PWA',
-    progress: 75,
-    lead: 'Alex Mercer',
-    leadAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    deadline: 'Aug 28, 2026',
-    members: 6,
-    priority: 'HIGH',
-    status: 'IN_PROGRESS',
-    budget: '$45,000',
-    spent: '$32,500',
-    tasksTotal: 24,
-    tasksDone: 18,
-  },
-  {
-    id: 2,
-    name: 'Biometric Hardware Gateway API',
-    client: 'IoT Infrastructure Division',
-    category: 'IoT & Webhooks',
-    progress: 100,
-    lead: 'Marcus Vance',
-    leadAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    deadline: 'Aug 10, 2026',
-    members: 4,
-    priority: 'HIGH',
-    status: 'COMPLETED',
-    budget: '$30,000',
-    spent: '$28,400',
-    tasksTotal: 16,
-    tasksDone: 16,
-  },
-  {
-    id: 3,
-    name: 'Payroll Auto-Tax Engine FY26',
-    client: 'Finance & Compliance Dept',
-    category: 'Fintech & Rules',
-    progress: 40,
-    lead: 'David Miller',
-    leadAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-    deadline: 'Sep 15, 2026',
-    members: 5,
-    priority: 'MEDIUM',
-    status: 'IN_PROGRESS',
-    budget: '$50,000',
-    spent: '$19,800',
-    tasksTotal: 30,
-    tasksDone: 12,
-  },
-  {
-    id: 4,
-    name: 'Executive Talent Careers Portal',
-    client: 'Recruitment & People Ops',
-    category: 'ATS & Portal',
-    progress: 20,
-    lead: 'Emily Zhang',
-    leadAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=120&q=80',
-    deadline: 'Oct 01, 2026',
-    members: 3,
-    priority: 'LOW',
-    status: 'ON_HOLD',
-    budget: '$25,000',
-    spent: '$5,200',
-    tasksTotal: 18,
-    tasksDone: 4,
-  },
-  {
-    id: 5,
-    name: 'SOC-2 Compliance & Audit Shield',
-    client: 'Information Security Office',
-    category: 'Security & Governance',
-    progress: 88,
-    lead: 'Marcus Vance',
-    leadAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    deadline: 'Aug 20, 2026',
-    members: 5,
-    priority: 'HIGH',
-    status: 'IN_PROGRESS',
-    budget: '$38,000',
-    spent: '$33,000',
-    tasksTotal: 22,
-    tasksDone: 19,
-  },
-];
+import { api } from '../../services/api';
 
 const ProjectManagement = () => {
-  const [projects, setProjects] = useState(INITIAL_PROJECTS);
+  const [projects, setProjects] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
@@ -117,48 +33,91 @@ const ProjectManagement = () => {
   // Form State
   const [projectForm, setProjectForm] = useState({
     name: '',
-    client: '',
-    category: 'Software Engineering',
-    lead: 'Alex Mercer',
-    deadline: '2026-09-30',
-    priority: 'MEDIUM',
-    budget: '$35,000',
+    client: 'Internal Enterprise',
+    category: 'Engineering & Product',
+    lead: '',
+    leadId: '',
+    deadline: '',
+    budget: '$25,000',
+    priority: 'HIGH',
   });
+
+  const loadProjectsData = async () => {
+    setLoading(true);
+    try {
+      let savedProjects = [];
+      try {
+        const saved = localStorage.getItem('nexahr_projects');
+        if (saved) savedProjects = JSON.parse(saved);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      const res = await api.getEmployees();
+      if (res?.success && res.data?.employees) {
+        const emps = res.data.employees;
+        setEmployees(emps);
+        if (emps.length > 0 && !projectForm.lead) {
+          setProjectForm((prev) => ({
+            ...prev,
+            lead: `${emps[0].firstName} ${emps[0].lastName}`,
+            leadId: emps[0].id,
+          }));
+        }
+      }
+
+      setProjects(savedProjects);
+    } catch (err) {
+      console.error('Failed to load projects:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProjectsData();
+  }, []);
 
   const handleCreateProject = (e) => {
     e.preventDefault();
     if (!projectForm.name.trim()) return;
 
-    const newProj = {
+    const matchedEmp = employees.find((emp) => `${emp.firstName} ${emp.lastName}` === projectForm.lead || emp.id === projectForm.leadId);
+
+    const newProject = {
       id: Date.now(),
-      name: projectForm.name,
-      client: projectForm.client || 'Internal Initiative',
+      name: projectForm.name.trim(),
+      client: projectForm.client || 'Internal Core',
       category: projectForm.category,
-      progress: 5,
-      lead: projectForm.lead,
-      leadAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-      deadline: new Date(projectForm.deadline).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      members: 4,
+      progress: 10,
+      lead: projectForm.lead || 'Engineering Lead',
+      leadAvatar: matchedEmp?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      deadline: projectForm.deadline || 'Dec 31, 2026',
+      members: 3,
       priority: projectForm.priority,
       status: 'IN_PROGRESS',
       budget: projectForm.budget,
       spent: '$0',
       tasksTotal: 10,
-      tasksDone: 0,
+      tasksDone: 1,
     };
 
-    setProjects([newProj, ...projects]);
+    const updated = [newProject, ...projects];
+    setProjects(updated);
+    try {
+      localStorage.setItem('nexahr_projects', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+
     setIsNewProjectOpen(false);
-    setProjectForm({
+    setProjectForm((prev) => ({
+      ...prev,
       name: '',
-      client: '',
-      category: 'Software Engineering',
-      lead: 'Alex Mercer',
-      deadline: '2026-09-30',
-      priority: 'MEDIUM',
-      budget: '$35,000',
-    });
-    setToastMsg(`Project "${projectForm.name}" created successfully!`);
+      client: 'Internal Enterprise',
+      deadline: '',
+    }));
+    setToastMsg(`Project initiative "${newProject.name}" initiated successfully!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 
@@ -556,14 +515,24 @@ const ProjectManagement = () => {
                   </label>
                   <select
                     value={projectForm.lead}
-                    onChange={(e) => setProjectForm({ ...projectForm, lead: e.target.value })}
+                    onChange={(e) => {
+                      const emp = employees.find((x) => `${x.firstName} ${x.lastName}` === e.target.value);
+                      setProjectForm({
+                        ...projectForm,
+                        lead: e.target.value,
+                        leadId: emp ? emp.id : '',
+                      });
+                    }}
                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   >
-                    <option value="Alex Mercer">Alex Mercer (Lead Engineer)</option>
-                    <option value="David Miller">David Miller (Backend Architect)</option>
-                    <option value="Marcus Vance">Marcus Vance (DevOps Lead)</option>
-                    <option value="Emily Zhang">Emily Zhang (VP Product)</option>
-                    <option value="Sarah Jenkins">Sarah Jenkins (Design Lead)</option>
+                    {employees.map((emp) => (
+                      <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
+                        {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || emp.employeeCode})
+                      </option>
+                    ))}
+                    {employees.length === 0 && (
+                      <option value="Lead Engineer">Engineering Staff</option>
+                    )}
                   </select>
                 </div>
 

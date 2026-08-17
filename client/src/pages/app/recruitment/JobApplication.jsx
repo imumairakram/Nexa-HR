@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   FileText,
@@ -12,18 +12,21 @@ import {
   Phone,
   Eye,
   X,
+  UserPlus,
+  RefreshCw,
 } from 'lucide-react';
 
-const INITIAL_APPLICATIONS = [
-  { id: 'APP-901', name: 'Maya Lin', role: 'Staff Distributed Systems Engineer', email: 'maya.lin@gmail.com', phone: '+1 (555) 234-8901', rating: 4.8, stage: 'APPLIED', date: 'Aug 06, 2026', resume: 'maya_lin_resume.pdf' },
-  { id: 'APP-902', name: 'James Wilson', role: 'Senior Product Designer', email: 'j.wilson@design.io', phone: '+1 (555) 789-0123', rating: 4.5, stage: 'SCREENING', date: 'Aug 04, 2026', resume: 'james_wilson_portfolio.pdf' },
-  { id: 'APP-903', name: 'Elena Rostova', role: 'DevOps & Security Lead', email: 'elena.rostova@cloud.com', phone: '+1 (555) 456-7890', rating: 5.0, stage: 'INTERVIEWING', date: 'Aug 02, 2026', resume: 'elena_rostova_cv.pdf' },
-  { id: 'APP-904', name: 'Devon Vance', role: 'IoT & Firmware Specialist', email: 'devon.v@hardware.dev', phone: '+1 (555) 321-6549', rating: 4.9, stage: 'INTERVIEWING', date: 'Jul 29, 2026', resume: 'devon_firmware_cv.pdf' },
-  { id: 'APP-905', name: 'Lucas Scott', role: 'Full-Stack Developer', email: 'lucas.scott@code.org', phone: '+1 (555) 654-9870', rating: 5.0, stage: 'OFFER', date: 'Jul 25, 2026', resume: 'lucas_scott_resume.pdf' },
-];
-
 const JobApplication = () => {
-  const [applications, setApplications] = useState(INITIAL_APPLICATIONS);
+  const [applications, setApplications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_recruitment_applications');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return [];
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
@@ -145,7 +148,7 @@ const JobApplication = () => {
           <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
 
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">High Match (>4.8)</span>
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">High Match (&gt;4.8)</span>
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
               <Star className="w-5 h-5" />
             </div>

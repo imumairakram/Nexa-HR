@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   Calendar,
@@ -11,27 +11,60 @@ import {
   X,
   User,
   Users,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_INTERVIEWS = [
-  { id: 1, candidate: 'Elena Rostova', role: 'DevOps & Security Lead', interviewer: 'Marcus Vance', date: 'Aug 10, 2026', time: '02:00 PM EST', type: 'Technical Architecture Round', link: 'https://meet.google.com/nxa-hr-tech', status: 'SCHEDULED' },
-  { id: 2, candidate: 'Devon Vance', role: 'Firmware Specialist', interviewer: 'Alex Mercer', date: 'Aug 11, 2026', time: '11:00 AM EST', type: 'Live IoT Systems Test', link: 'https://meet.google.com/nxa-iot-eval', status: 'SCHEDULED' },
-  { id: 3, candidate: 'Maya Lin', role: 'Staff Systems Engineer', interviewer: 'David Miller', date: 'Aug 12, 2026', time: '04:00 PM EST', type: 'System Design Deep Dive', link: 'https://meet.google.com/nxa-sys-arch', status: 'SCHEDULED' },
-];
+import { api } from '../../../services/api';
 
 const JobInterview = () => {
-  const [interviews, setInterviews] = useState(INITIAL_INTERVIEWS);
+  const [interviews, setInterviews] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
   const [form, setForm] = useState({
     candidate: '',
     role: 'Senior Software Engineer',
-    interviewer: 'Alex Mercer',
-    date: '2026-08-14',
+    interviewer: '',
+    date: new Date().toISOString().split('T')[0],
     time: '14:00',
     type: 'Technical Interview',
   });
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      let savedInterviews = [];
+      try {
+        const saved = localStorage.getItem('nexahr_recruitment_interviews');
+        if (saved) savedInterviews = JSON.parse(saved);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      const res = await api.getEmployees();
+      if (res?.success && res.data?.employees) {
+        const emps = res.data.employees;
+        setEmployees(emps);
+        if (emps.length > 0 && !form.interviewer) {
+          setForm((prev) => ({
+            ...prev,
+            interviewer: `${emps[0].firstName} ${emps[0].lastName}`,
+          }));
+        }
+      }
+
+      setInterviews(savedInterviews);
+    } catch (err) {
+      console.error('Failed to load interviews:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleSchedule = (e) => {
     e.preventDefault();
@@ -39,9 +72,9 @@ const JobInterview = () => {
 
     const newInt = {
       id: Date.now(),
-      candidate: form.candidate,
+      candidate: form.candidate.trim(),
       role: form.role,
-      interviewer: form.interviewer,
+      interviewer: form.interviewer || 'Hiring Lead',
       date: form.date,
       time: form.time,
       type: form.type,
@@ -49,9 +82,20 @@ const JobInterview = () => {
       status: 'SCHEDULED',
     };
 
-    setInterviews([...interviews, newInt]);
+    const updated = [newInt, ...interviews];
+    setInterviews(updated);
+    try {
+      localStorage.setItem('nexahr_recruitment_interviews', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+
     setIsAddOpen(false);
-    setToastMsg(`Interview scheduled with ${form.candidate}!`);
+    setForm((prev) => ({
+      ...prev,
+      candidate: '',
+    }));
+    setToastMsg(`Interview scheduled for ${newInt.candidate}!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 

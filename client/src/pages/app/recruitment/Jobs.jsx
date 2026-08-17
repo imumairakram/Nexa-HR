@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   Briefcase,
@@ -12,29 +12,56 @@ import {
   Clock,
   X,
   MoreVertical,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_JOBS = [
-  { id: 1, title: 'Staff Distributed Systems Engineer', dept: 'Engineering & DevOps', location: 'San Francisco HQ / Remote', type: 'Full-Time', salary: '$160k - $195k', applicants: 34, status: 'ACTIVE', posted: 'Aug 01, 2026' },
-  { id: 2, title: 'Senior Product Designer (Design Tokens)', dept: 'Product & Design', location: 'Remote (US/Canada)', type: 'Full-Time', salary: '$130k - $160k', applicants: 48, status: 'ACTIVE', posted: 'Jul 28, 2026' },
-  { id: 3, title: 'IoT & Biometric Firmware Specialist', dept: 'Engineering & DevOps', location: 'San Francisco HQ', type: 'Full-Time', salary: '$145k - $175k', applicants: 18, status: 'ACTIVE', posted: 'Aug 04, 2026' },
-  { id: 4, title: 'Global People Operations Coordinator', dept: 'People Ops & HR', location: 'New York Hub', type: 'Full-Time', salary: '$95k - $120k', applicants: 62, status: 'ACTIVE', posted: 'Jul 15, 2026' },
-  { id: 5, title: 'Enterprise Growth Marketing Manager', dept: 'Marketing & Sales', location: 'Remote (US)', type: 'Full-Time', salary: '$120k - $150k', applicants: 29, status: 'ON_HOLD', posted: 'Jun 20, 2026' },
-];
+import { api } from '../../../services/api';
 
 const Jobs = () => {
-  const [jobs, setJobs] = useState(INITIAL_JOBS);
+  const [jobs, setJobs] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
   const [form, setForm] = useState({
     title: '',
-    dept: 'Engineering & DevOps',
-    location: 'San Francisco HQ / Remote',
+    dept: 'Engineering',
+    location: 'Islamabad HQ / Remote',
     type: 'Full-Time',
     salary: '$140k - $170k',
   });
+
+  const loadJobsData = async () => {
+    setLoading(true);
+    try {
+      let savedJobs = [];
+      try {
+        const saved = localStorage.getItem('nexahr_recruitment_jobs');
+        if (saved) savedJobs = JSON.parse(saved);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      const res = await api.getDepartments();
+      if (res?.success && res.data?.departments) {
+        setDepartments(res.data.departments);
+        if (res.data.departments.length > 0 && !form.dept) {
+          setForm((prev) => ({ ...prev, dept: res.data.departments[0].name }));
+        }
+      }
+
+      setJobs(savedJobs);
+    } catch (err) {
+      console.error('Failed to load recruitment jobs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadJobsData();
+  }, []);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -42,7 +69,7 @@ const Jobs = () => {
 
     const newJob = {
       id: Date.now(),
-      title: form.title,
+      title: form.title.trim(),
       dept: form.dept,
       location: form.location,
       type: form.type,
@@ -52,8 +79,19 @@ const Jobs = () => {
       posted: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
     };
 
-    setJobs([newJob, ...jobs]);
+    const updated = [newJob, ...jobs];
+    setJobs(updated);
+    try {
+      localStorage.setItem('nexahr_recruitment_jobs', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+
     setIsAddOpen(false);
+    setForm((prev) => ({
+      ...prev,
+      title: '',
+    }));
     setToastMsg(`Job requisition "${form.title}" published!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
@@ -341,10 +379,14 @@ const Jobs = () => {
                     onChange={(e) => setForm({ ...form, dept: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   >
-                    <option value="Engineering & DevOps">Engineering & DevOps</option>
-                    <option value="Product & Design">Product & Design</option>
-                    <option value="People Ops & HR">People Ops & HR</option>
-                    <option value="Marketing & Sales">Marketing & Sales</option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.name}>
+                        {dept.name}
+                      </option>
+                    ))}
+                    {departments.length === 0 && (
+                      <option value="Engineering">Engineering</option>
+                    )}
                   </select>
                 </div>
                 <div>

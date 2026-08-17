@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
@@ -14,6 +14,22 @@ import {
 
 const JobDesk = () => {
   const navigate = useNavigate();
+  const [jobsCount, setJobsCount] = useState(0);
+  const [candidatesCount, setCandidatesCount] = useState(0);
+  const [interviewsCount, setInterviewsCount] = useState(0);
+
+  useEffect(() => {
+    try {
+      const jobs = JSON.parse(localStorage.getItem('nexahr_recruitment_jobs') || '[]');
+      const apps = JSON.parse(localStorage.getItem('nexahr_recruitment_applications') || '[]');
+      const interviews = JSON.parse(localStorage.getItem('nexahr_recruitment_interviews') || '[]');
+      setJobsCount(jobs.length);
+      setCandidatesCount(apps.length);
+      setInterviewsCount(interviews.length);
+    } catch (e) {
+      console.warn(e);
+    }
+  }, []);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -54,11 +70,11 @@ const JobDesk = () => {
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
               <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
                 <Briefcase className="w-3.5 h-3.5" />
-                <span>16 Open Positions</span>
+                <span>{jobsCount} Open Positions</span>
               </span>
               <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <Users className="w-3.5 h-3.5" />
-                <span>184 Active Candidates in Pipeline</span>
+                <span>{candidatesCount} Active Candidates in Pipeline</span>
               </span>
             </div>
           </div>

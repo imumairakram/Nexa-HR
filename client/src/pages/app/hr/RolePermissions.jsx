@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   Shield,
@@ -10,6 +11,8 @@ import {
   Check,
   Plus,
   Key,
+  KeyRound,
+  ArrowRight,
 } from 'lucide-react';
 
 const MODULES = [
@@ -22,27 +25,65 @@ const MODULES = [
   { id: 'settings', name: 'System Administration', desc: 'Global settings, theme, and API security keys' },
 ];
 
+const DEFAULT_PERMISSIONS = {
+  SUPER_ADMIN: {
+    pim: { view: true, create: true, edit: true, delete: true },
+    attendance: { view: true, create: true, edit: true, delete: true },
+    leaves: { view: true, create: true, edit: true, delete: true },
+    payroll: { view: true, create: true, edit: true, delete: true },
+    recruitment: { view: true, create: true, edit: true, delete: true },
+    reports: { view: true, create: true, edit: true, delete: true },
+    settings: { view: true, create: true, edit: true, delete: true },
+  },
+  HR_MANAGER: {
+    pim: { view: true, create: true, edit: true, delete: false },
+    attendance: { view: true, create: true, edit: true, delete: true },
+    leaves: { view: true, create: true, edit: true, delete: true },
+    payroll: { view: true, create: true, edit: true, delete: false },
+    recruitment: { view: true, create: true, edit: true, delete: true },
+    reports: { view: true, create: false, edit: false, delete: false },
+    settings: { view: false, create: false, edit: false, delete: false },
+  },
+  DEPARTMENT_HEAD: {
+    pim: { view: true, create: false, edit: false, delete: false },
+    attendance: { view: true, create: true, edit: true, delete: false },
+    leaves: { view: true, create: true, edit: true, delete: false },
+    payroll: { view: false, create: false, edit: false, delete: false },
+    recruitment: { view: true, create: true, edit: true, delete: false },
+    reports: { view: true, create: false, edit: false, delete: false },
+    settings: { view: false, create: false, edit: false, delete: false },
+  },
+  STAFF_EMPLOYEE: {
+    pim: { view: true, create: false, edit: false, delete: false },
+    attendance: { view: true, create: true, edit: false, delete: false },
+    leaves: { view: true, create: true, edit: false, delete: false },
+    payroll: { view: true, create: false, edit: false, delete: false },
+    recruitment: { view: false, create: false, edit: false, delete: false },
+    reports: { view: false, create: false, edit: false, delete: false },
+    settings: { view: false, create: false, edit: false, delete: false },
+  },
+};
+
 const RolePermissions = () => {
+  const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState('HR_MANAGER');
   const [toastMsg, setToastMsg] = useState('');
 
-  const [permissions, setPermissions] = useState({
-    HR_MANAGER: {
-      pim: { view: true, create: true, edit: true, delete: false },
-      attendance: { view: true, create: true, edit: true, delete: true },
-      leaves: { view: true, create: true, edit: true, delete: true },
-      payroll: { view: true, create: true, edit: true, delete: false },
-      recruitment: { view: true, create: true, edit: true, delete: true },
-      reports: { view: true, create: false, edit: false, delete: false },
-      settings: { view: false, create: false, edit: false, delete: false },
-    },
+  const [permissions, setPermissions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_role_permissions');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return DEFAULT_PERMISSIONS;
   });
 
   const togglePerm = (moduleId, action) => {
     const rolePerms = permissions[selectedRole] || {};
     const modPerms = rolePerms[moduleId] || { view: false, create: false, edit: false, delete: false };
 
-    setPermissions({
+    const updated = {
       ...permissions,
       [selectedRole]: {
         ...rolePerms,
@@ -51,11 +92,17 @@ const RolePermissions = () => {
           [action]: !modPerms[action],
         },
       },
-    });
+    };
+    setPermissions(updated);
   };
 
   const handleSave = () => {
-    setToastMsg(`Permissions updated for role ${selectedRole}!`);
+    try {
+      localStorage.setItem('nexahr_role_permissions', JSON.stringify(permissions));
+    } catch (e) {
+      console.error(e);
+    }
+    setToastMsg(`Security ACL permissions saved for role "${selectedRole}"!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 
@@ -129,6 +176,14 @@ const RolePermissions = () => {
             >
               <Save className="w-3.5 h-3.5" />
               <span>Save Permissions</span>
+            </button>
+            <button
+              onClick={() => navigate('/app/access-control')}
+              className="w-full px-4 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer transition-all border border-indigo-200 dark:border-indigo-800"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>Configure Per-User Access</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>

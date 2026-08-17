@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   Users,
@@ -14,31 +14,57 @@ import {
   X,
   Edit2,
   UserCheck,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_STATUS_DATA = [
-  { id: 'EMP-101', name: 'Alex Mercer', role: 'Senior Full-Stack Engineer', department: 'Engineering', employmentType: 'FULL_TIME', location: 'San Francisco HQ', shift: 'General (09:00 - 17:30)', status: 'ACTIVE', joinDate: 'Mar 15, 2022' },
-  { id: 'EMP-102', name: 'Sarah Jenkins', role: 'Lead Product Designer', department: 'Product & Design', employmentType: 'REMOTE', location: 'Seattle, WA', shift: 'Flexible Remote', status: 'ACTIVE', joinDate: 'Jun 10, 2023' },
-  { id: 'EMP-103', name: 'David Miller', role: 'Staff Backend Architect', department: 'Engineering', employmentType: 'FULL_TIME', location: 'San Francisco HQ', shift: 'General (09:00 - 17:30)', status: 'ACTIVE', joinDate: 'Jan 05, 2021' },
-  { id: 'EMP-104', name: 'Marcus Vance', role: 'Senior DevOps & Security Lead', department: 'Engineering', employmentType: 'FULL_TIME', location: 'New York Hub', shift: 'Night Shift / Escalations', status: 'ACTIVE', joinDate: 'Nov 20, 2022' },
-  { id: 'EMP-105', name: 'Emily Zhang', role: 'VP of Product Management', department: 'Product & Design', employmentType: 'FULL_TIME', location: 'San Francisco HQ', shift: 'General (09:00 - 17:30)', status: 'ON_LEAVE', joinDate: 'Feb 01, 2020' },
-  { id: 'EMP-106', name: 'Lucas Morales', role: 'Global Payroll Specialist', department: 'Finance', employmentType: 'CONTRACT', location: 'Austin, TX', shift: 'General (09:00 - 17:30)', status: 'ACTIVE', joinDate: 'Apr 12, 2024' },
-  { id: 'EMP-107', name: 'Chloe Bennett', role: 'People Operations Partner', department: 'People Ops', employmentType: 'PROBATION', location: 'San Francisco HQ', shift: 'General (09:00 - 17:30)', status: 'PROBATION', joinDate: 'Jul 01, 2026' },
-];
+import { api } from '../../services/api';
 
 const EmploymentStatus = () => {
-  const [employees, setEmployees] = useState(INITIAL_STATUS_DATA);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadEmployees = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getEmployees();
+      if (res?.success && res.data?.employees) {
+        const mapped = res.data.employees.map((emp) => {
+          const isProbation = emp.profile?.joiningDate && (new Date() - new Date(emp.profile.joiningDate)) < 90 * 24 * 60 * 60 * 1000;
+          return {
+            id: emp.employeeCode || `EMP-${emp.id.slice(0, 4)}`,
+            rawId: emp.id,
+            name: `${emp.firstName} ${emp.lastName}`,
+            role: emp.profile?.designation?.title || 'Staff Specialist',
+            department: emp.profile?.department?.name || 'General Operations',
+            employmentType: emp.role === 'ADMIN' ? 'FULL_TIME' : (emp.isActive ? (isProbation ? 'PROBATION' : 'FULL_TIME') : 'CONTRACT'),
+            location: emp.profile?.address || 'Islamabad HQ',
+            shift: 'General Morning (09:00 - 17:30)',
+            status: emp.isActive ? 'ACTIVE' : 'INACTIVE',
+            joinDate: emp.profile?.joiningDate ? new Date(emp.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Jan 15, 2024',
+          };
+        });
+        setEmployees(mapped);
+      }
+    } catch (err) {
+      console.error('Failed to load employee statuses:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
 
   const handleUpdateStatus = (e) => {
     e.preventDefault();
     if (!selectedEmp) return;
     setEmployees(employees.map((emp) => (emp.id === selectedEmp.id ? selectedEmp : emp)));
     setSelectedEmp(null);
-    setToastMsg(`Status updated for ${selectedEmp.name}!`);
+    setToastMsg(`Employment record updated for ${selectedEmp.name}!`);
     setTimeout(() => setToastMsg(''), 2500);
   };
 

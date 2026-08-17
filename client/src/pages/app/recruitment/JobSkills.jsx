@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers } from 'lucide-react';
-
-const INITIAL_SKILLS = [
-  { id: 1, name: 'React.js & TypeScript', category: 'Frontend', assessmentsCount: 42, proficiency: 'Advanced', weight: 'Mandatory' },
-  { id: 2, name: 'Node.js & Microservices', category: 'Backend', assessmentsCount: 38, proficiency: 'Advanced', weight: 'Mandatory' },
-  { id: 3, name: 'PostgreSQL & Prisma ORM', category: 'Databases', assessmentsCount: 29, proficiency: 'Intermediate', weight: 'Preferred' },
-  { id: 4, name: 'Kubernetes & CI/CD Pipelines', category: 'DevOps', assessmentsCount: 19, proficiency: 'Expert', weight: 'Mandatory' },
-  { id: 5, name: 'Figma Token Systems', category: 'Design', assessmentsCount: 31, proficiency: 'Advanced', weight: 'Preferred' },
-  { id: 6, name: 'Biometric API Protocols', category: 'IoT & Hardware', assessmentsCount: 14, proficiency: 'Intermediate', weight: 'Mandatory' },
-];
+import { Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers, RefreshCw } from 'lucide-react';
 
 const JobSkills = () => {
-  const [skills, setSkills] = useState(INITIAL_SKILLS);
+  const [skills, setSkills] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_job_skills');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return [
+      { id: 1, name: 'React.js & Tailwind CSS', category: 'Frontend', assessmentsCount: 0, proficiency: 'Advanced', weight: 'Mandatory' },
+      { id: 2, name: 'Node.js & Express Architecture', category: 'Backend', assessmentsCount: 0, proficiency: 'Advanced', weight: 'Mandatory' },
+      { id: 3, name: 'PostgreSQL & Relational Data Modeling', category: 'Databases', assessmentsCount: 0, proficiency: 'Intermediate', weight: 'Preferred' },
+      { id: 4, name: 'Docker & Microservices', category: 'DevOps', assessmentsCount: 0, proficiency: 'Intermediate', weight: 'Preferred' },
+    ];
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
@@ -37,15 +42,33 @@ const JobSkills = () => {
       weight: form.weight,
     };
 
-    setSkills([newSkill, ...skills]);
+    const updated = [newSkill, ...skills];
+    setSkills(updated);
+    try {
+      localStorage.setItem('nexahr_job_skills', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+
     setIsAddOpen(false);
-    setForm({ name: '', category: 'Engineering', proficiency: 'Advanced', weight: 'Mandatory' });
-    setToastMsg(`Skill "${newSkill.name}" added to candidate evaluation matrix.`);
+    setForm({
+      name: '',
+      category: 'Engineering',
+      proficiency: 'Advanced',
+      weight: 'Mandatory',
+    });
+    setToastMsg(`Skill "${form.name}" registered into taxonomy!`);
     setTimeout(() => setToastMsg(''), 2500);
   };
 
   const handleDelete = (id) => {
-    setSkills(skills.filter((s) => s.id !== id));
+    const updated = skills.filter((s) => s.id !== id);
+    setSkills(updated);
+    try {
+      localStorage.setItem('nexahr_job_skills', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
     setToastMsg('Skill removed.');
     setTimeout(() => setToastMsg(''), 2500);
   };

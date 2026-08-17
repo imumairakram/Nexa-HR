@@ -1,28 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { Tag, Plus, Search, CheckCircle2, X, Trash2, Layers, Briefcase, Building } from 'lucide-react';
-
-const INITIAL = [
-  { id: 1, name: 'Software Engineering & Cloud Architecture', code: 'ENG', count: 8, lead: 'Alex Mercer', status: 'ACTIVE' },
-  { id: 2, name: 'Product Management & UI/UX Design', code: 'PROD', count: 4, lead: 'Emily Zhang', status: 'ACTIVE' },
-  { id: 3, name: 'People Operations & Talent Acquisition', code: 'HR', count: 2, lead: 'Chloe Bennett', status: 'ACTIVE' },
-  { id: 4, name: 'Enterprise Marketing & Growth', code: 'MKT', count: 2, lead: 'Sarah Jenkins', status: 'ACTIVE' },
-  { id: 5, name: 'Corporate Finance & Global Payroll', code: 'FIN', count: 1, lead: 'David Miller', status: 'ACTIVE' },
-];
+import { Tag, Plus, Search, CheckCircle2, X, Trash2, Layers, Briefcase, Building, RefreshCw } from 'lucide-react';
+import { api } from '../../../services/api';
 
 const JobCategory = () => {
-  const [categories, setCategories] = useState(INITIAL);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newCat, setNewCat] = useState({ name: '', code: '', lead: 'Alex Mercer' });
+  const [newCat, setNewCat] = useState({ name: '', code: '', lead: 'Department Lead' });
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadCategories = async () => {
+    setLoading(true);
+    try {
+      let saved = [];
+      try {
+        const local = localStorage.getItem('nexahr_job_categories');
+        if (local) saved = JSON.parse(local);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      if (saved.length === 0) {
+        // Sync with real departments as starting categories if not yet stored
+        const res = await api.getDepartments();
+        if (res?.success && res.data?.departments && res.data.departments.length > 0) {
+          saved = res.data.departments.map((d, idx) => ({
+            id: d.id || idx + 1,
+            name: d.name,
+            code: d.code || 'DEPT',
+            count: 0,
+            lead: 'Department Head',
+            status: 'ACTIVE',
+          }));
+        }
+      }
+
+      setCategories(saved);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!newCat.name) return;
-    setCategories([...categories, { id: Date.now(), name: newCat.name, code: newCat.code.toUpperCase() || 'CAT', count: 0, lead: newCat.lead, status: 'ACTIVE' }]);
+    if (!newCat.name.trim()) return;
+    const updated = [
+      ...categories,
+      {
+        id: Date.now(),
+        name: newCat.name.trim(),
+        code: newCat.code.toUpperCase().trim() || 'CAT',
+        count: 0,
+        lead: newCat.lead || 'Department Head',
+        status: 'ACTIVE',
+      },
+    ];
+    setCategories(updated);
+    try {
+      localStorage.setItem('nexahr_job_categories', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
     setIsAddOpen(false);
-    setNewCat({ name: '', code: '', lead: 'Alex Mercer' });
+    setNewCat({ name: '', code: '', lead: 'Department Head' });
     setToastMsg('Job Category created successfully!');
     setTimeout(() => setToastMsg(''), 2500);
   };

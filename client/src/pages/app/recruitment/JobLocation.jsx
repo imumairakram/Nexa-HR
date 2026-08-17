@@ -1,27 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import { MapPin, Plus, CheckCircle2, X, Search, Building2, Globe } from 'lucide-react';
-
-const INITIAL = [
-  { id: 1, name: 'San Francisco Global Headquarters (Floor 4-5)', city: 'San Francisco, CA', country: 'United States', timezone: 'PST (UTC-8)', count: 8, status: 'PRIMARY_HQ' },
-  { id: 2, name: 'New York Innovation & Sales Hub', city: 'New York, NY', country: 'United States', timezone: 'EST (UTC-5)', count: 4, status: 'REGIONAL_HUB' },
-  { id: 3, name: 'Seattle Engineering Distributed Center', city: 'Seattle, WA', country: 'United States', timezone: 'PST (UTC-8)', count: 2, status: 'TECH_HUB' },
-  { id: 4, name: 'Fully Distributed Remote (US & Canada)', city: 'Remote / Async', country: 'North America', timezone: 'All US Timezones', count: 4, status: 'REMOTE' },
-];
+import { MapPin, Plus, CheckCircle2, X, Search, Building2, Globe, RefreshCw } from 'lucide-react';
 
 const JobLocation = () => {
-  const [locations, setLocations] = useState(INITIAL);
+  const [locations, setLocations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_job_locations');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return [
+      { id: 1, name: 'Islamabad HQ & Innovation Campus', city: 'Islamabad', country: 'Pakistan', timezone: 'PKT (UTC+5)', count: 0, status: 'PRIMARY_HQ' },
+      { id: 2, name: 'Remote & Distributed Async', city: 'Remote', country: 'Global', timezone: 'Flexible Timezones', count: 0, status: 'REMOTE' },
+    ];
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newLoc, setNewLoc] = useState({ name: '', city: '', country: 'United States', timezone: 'PST (UTC-8)' });
+  const [newLoc, setNewLoc] = useState({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)' });
   const [toastMsg, setToastMsg] = useState('');
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!newLoc.name) return;
-    setLocations([...locations, { id: Date.now(), name: newLoc.name, city: newLoc.city, country: newLoc.country, timezone: newLoc.timezone, count: 0, status: 'BRANCH' }]);
+    if (!newLoc.name.trim()) return;
+    const updated = [
+      ...locations,
+      {
+        id: Date.now(),
+        name: newLoc.name.trim(),
+        city: newLoc.city.trim(),
+        country: newLoc.country,
+        timezone: newLoc.timezone,
+        count: 0,
+        status: 'BRANCH',
+      },
+    ];
+    setLocations(updated);
+    try {
+      localStorage.setItem('nexahr_job_locations', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
     setIsAddOpen(false);
-    setNewLoc({ name: '', city: '', country: 'United States', timezone: 'PST (UTC-8)' });
+    setNewLoc({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)' });
     setToastMsg('Office location registered successfully!');
     setTimeout(() => setToastMsg(''), 2500);
   };

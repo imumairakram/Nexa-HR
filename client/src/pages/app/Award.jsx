@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   Award as AwardIcon,
@@ -14,103 +14,108 @@ import {
   X,
   Flame,
   Users,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_AWARDS = [
-  {
-    id: 1,
-    recipient: 'Alex Mercer',
-    recipientAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    title: 'Star Engineer of the Month',
-    department: 'Engineering & DevOps',
-    month: 'July 2026',
-    gift: '$1,000 Spot Bonus',
-    reason: 'Outstanding leadership and architecting high-throughput Biometric API Gateway under tight timelines.',
-    claps: 28,
-  },
-  {
-    id: 2,
-    recipient: 'Sarah Jenkins',
-    recipientAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-    title: 'Design Innovation Excellence',
-    department: 'Product & Design',
-    month: 'Q2 2026',
-    gift: '$500 Wellness Card',
-    reason: 'Pioneered the NexaHR enterprise design token system and delivered 100% positive usability scores.',
-    claps: 34,
-  },
-  {
-    id: 3,
-    recipient: 'Marcus Vance',
-    recipientAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    title: 'Punctuality & Reliability Champion',
-    department: 'Engineering & DevOps',
-    month: 'June 2026',
-    gift: 'MacBook Pro M3 Max',
-    reason: 'Maintained 100% on-time check-in and 99.99% infrastructure uptime across 6 consecutive months.',
-    claps: 41,
-  },
-  {
-    id: 4,
-    recipient: 'Chloe Bennett',
-    recipientAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-    title: 'People Champion & Top Mentor',
-    department: 'People Operations & HR',
-    month: 'May 2026',
-    gift: '$750 Travel Stipend',
-    reason: 'Voted top onboarding mentor and conducted high-impact engineering culture workshops.',
-    claps: 22,
-  },
-];
+import { api } from '../../services/api';
 
 const Award = () => {
-  const [awards, setAwards] = useState(INITIAL_AWARDS);
+  const [awards, setAwards] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNominateOpen, setIsNominateOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
   // Form State
   const [form, setForm] = useState({
-    recipient: 'David Miller',
-    title: 'Innovation Excellence Award',
+    recipient: '',
+    recipientId: '',
+    title: 'Star Performer of the Month',
     department: 'Engineering & DevOps',
-    month: 'August 2026',
+    month: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
     gift: '$500 Spot Bonus',
     reason: '',
   });
 
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      let savedAwards = [];
+      try {
+        const saved = localStorage.getItem('nexahr_awards');
+        if (saved) savedAwards = JSON.parse(saved);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      const res = await api.getEmployees();
+      if (res?.success && res.data?.employees) {
+        const emps = res.data.employees;
+        setEmployees(emps);
+        if (emps.length > 0 && !form.recipient) {
+          setForm((prev) => ({
+            ...prev,
+            recipient: `${emps[0].firstName} ${emps[0].lastName}`,
+            recipientId: emps[0].id,
+            department: emps[0].profile?.department?.name || 'Engineering',
+          }));
+        }
+      }
+      setAwards(savedAwards);
+    } catch (err) {
+      console.error('Failed to load awards data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const handleCreateAward = (e) => {
     e.preventDefault();
-    if (!form.reason.trim()) return;
+    if (!form.reason.trim() || !form.recipient) return;
+
+    const matchedEmp = employees.find((emp) => `${emp.firstName} ${emp.lastName}` === form.recipient || emp.id === form.recipientId);
 
     const newAward = {
       id: Date.now(),
       recipient: form.recipient,
-      recipientAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
+      recipientAvatar: matchedEmp?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
       title: form.title,
       department: form.department,
       month: form.month,
       gift: form.gift,
-      reason: form.reason,
+      reason: form.reason.trim(),
       claps: 1,
     };
 
-    setAwards([newAward, ...awards]);
+    const updated = [newAward, ...awards];
+    setAwards(updated);
+    try {
+      localStorage.setItem('nexahr_awards', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+
     setIsNominateOpen(false);
-    setForm({
-      recipient: 'David Miller',
-      title: 'Innovation Excellence Award',
-      department: 'Engineering & DevOps',
-      month: 'August 2026',
-      gift: '$500 Spot Bonus',
+    setForm((prev) => ({
+      ...prev,
       reason: '',
-    });
-    setToastMsg(`Award conferred to ${form.recipient} successfully.`);
+    }));
+    setToastMsg(`Award successfully presented to ${form.recipient}!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 
   const handleClap = (id) => {
-    setAwards(awards.map((a) => (a.id === id ? { ...a, claps: a.claps + 1 } : a)));
+    const updated = awards.map((a) => (a.id === id ? { ...a, claps: (a.claps || 0) + 1 } : a));
+    setAwards(updated);
+    try {
+      localStorage.setItem('nexahr_awards', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const filtered = awards.filter(
@@ -414,15 +419,25 @@ const Award = () => {
                   </label>
                   <select
                     value={form.recipient}
-                    onChange={(e) => setForm({ ...form, recipient: e.target.value })}
+                    onChange={(e) => {
+                      const emp = employees.find((x) => `${x.firstName} ${x.lastName}` === e.target.value);
+                      setForm({
+                        ...form,
+                        recipient: e.target.value,
+                        recipientId: emp ? emp.id : '',
+                        department: emp?.profile?.department?.name || form.department,
+                      });
+                    }}
                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   >
-                    <option value="David Miller">David Miller (Backend Architect)</option>
-                    <option value="Alex Mercer">Alex Mercer (Lead Engineer)</option>
-                    <option value="Sarah Jenkins">Sarah Jenkins (Design Lead)</option>
-                    <option value="Marcus Vance">Marcus Vance (DevOps Lead)</option>
-                    <option value="Chloe Bennett">Chloe Bennett (People Ops)</option>
-                    <option value="Lucas Morales">Lucas Morales (Payroll Lead)</option>
+                    {employees.map((emp) => (
+                      <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
+                        {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || emp.employeeCode})
+                      </option>
+                    ))}
+                    {employees.length === 0 && (
+                      <option value="Staff Member">No employees registered</option>
+                    )}
                   </select>
                 </div>
 

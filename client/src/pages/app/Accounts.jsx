@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   DollarSign,
@@ -29,75 +29,11 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-
-const DEPARTMENT_SPEND_DATA = [
-  { name: 'Engineering', spend: 145000, color: '#3B82F6' },
-  { name: 'Product & Design', spend: 68000, color: '#10B981' },
-  { name: 'Marketing & Sales', spend: 52000, color: '#8B5CF6' },
-  { name: 'People Ops & HR', spend: 34000, color: '#F59E0B' },
-  { name: 'Finance & Legal', spend: 28000, color: '#EC4899' },
-];
-
-const INITIAL_TRANSACTIONS = [
-  {
-    id: 'TXN-9021',
-    title: 'July 2026 Monthly Payroll Batch Disbursement',
-    category: 'PAYROLL',
-    amount: 198500,
-    type: 'EXPENSE',
-    department: 'Company-Wide',
-    date: 'Jul 31, 2026',
-    status: 'COMPLETED',
-    ref: 'ACH-DIRECT-PAY-2026-07',
-  },
-  {
-    id: 'TXN-9018',
-    title: 'Comprehensive Health Insurance Premium Q3',
-    category: 'BENEFITS',
-    amount: 24500,
-    type: 'EXPENSE',
-    department: 'People Operations',
-    date: 'Jul 25, 2026',
-    status: 'COMPLETED',
-    ref: 'BLUCROSS-CORP-948',
-  },
-  {
-    id: 'TXN-9015',
-    title: 'Biometric Gateway Firmware & IoT Hardware Stipends',
-    category: 'HARDWARE',
-    amount: 12400,
-    type: 'EXPENSE',
-    department: 'Engineering',
-    date: 'Jul 18, 2026',
-    status: 'COMPLETED',
-    ref: 'DELL-CORP-INVOICE-84',
-  },
-  {
-    id: 'TXN-9010',
-    title: 'HQ Office Lease & Facilities Utilities (SF & NY)',
-    category: 'FACILITIES',
-    amount: 38000,
-    type: 'EXPENSE',
-    department: 'Operations',
-    date: 'Jul 01, 2026',
-    status: 'COMPLETED',
-    ref: 'WEWORK-ENTERPRISE-JUL',
-  },
-  {
-    id: 'TXN-9005',
-    title: 'Q2 Engineering Milestone Completion Grant',
-    category: 'INCOME',
-    amount: 85000,
-    type: 'INCOME',
-    department: 'Engineering',
-    date: 'Jun 30, 2026',
-    status: 'COMPLETED',
-    ref: 'CORP-GRANT-WIRE-01',
-  },
-];
+import { api } from '../../services/api';
 
 const Accounts = () => {
-  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [isRecordOpen, setIsRecordOpen] = useState(false);
@@ -113,23 +49,78 @@ const Accounts = () => {
     ref: '',
   });
 
+  const loadAccountsData = async () => {
+    setLoading(true);
+    try {
+      let persistentTxns = [];
+      try {
+        const saved = localStorage.getItem('nexahr_accounts_transactions');
+        if (saved) persistentTxns = JSON.parse(saved);
+      } catch (e) {
+        console.warn('LocalStorage accounts read error:', e);
+      }
+
+      // Fetch live payroll batch disbursements
+      const res = await api.getPayslips();
+      let payrollTxns = [];
+      if (res?.success && res.data?.payslips && res.data.payslips.length > 0) {
+        // Group by batch
+        const batchMap = {};
+        res.data.payslips.forEach((p) => {
+          const key = `${p.year}-${p.month}`;
+          if (!batchMap[key]) {
+            batchMap[key] = {
+              id: `TXN-PR-${p.year}-${String(p.month).padStart(2, '0')}`,
+              title: `Monthly Payroll Batch Disbursement (${p.month}/${p.year})`,
+              category: 'PAYROLL',
+              amount: 0,
+              type: 'EXPENSE',
+              department: 'Company-Wide',
+              date: p.generatedAt ? new Date(p.generatedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'N/A',
+              status: 'COMPLETED',
+              ref: `ACH-PR-${p.year}-${p.month}`,
+            };
+          }
+          batchMap[key].amount += Number(p.netSalary || 0);
+        });
+        payrollTxns = Object.values(batchMap);
+      }
+
+      // Combine persistent corporate transactions + live payroll disbursements
+      const combined = [...payrollTxns, ...persistentTxns];
+      setTransactions(combined);
+    } catch (err) {
+      console.error('Failed to load accounts ledger:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAccountsData();
+  }, []);
+
   const handleRecordSubmit = (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.amount) return;
 
     const newTxn = {
       id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: form.title,
+      title: form.title.trim(),
       category: form.category,
-      amount: parseFloat(form.amount) || 0,
+      amount: parseFloat(form.amount),
       type: form.type,
       department: form.department,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       status: 'COMPLETED',
-      ref: form.ref || 'INTERNAL-VOUCHER',
+      ref: form.ref.trim() || `REF-${Date.now().toString().slice(-6)}`,
     };
 
-    setTransactions([newTxn, ...transactions]);
+    const currentSaved = JSON.parse(localStorage.getItem('nexahr_accounts_transactions') || '[]');
+    const updated = [newTxn, ...currentSaved];
+    localStorage.setItem('nexahr_accounts_transactions', JSON.stringify(updated));
+
+    setTransactions((prev) => [newTxn, ...prev]);
     setIsRecordOpen(false);
     setForm({
       title: '',
@@ -139,7 +130,7 @@ const Accounts = () => {
       department: 'Engineering & DevOps',
       ref: '',
     });
-    setToastMsg(`Transaction ${newTxn.id} recorded successfully!`);
+    setToastMsg(`Transaction "${newTxn.title}" posted to corporate ledger!`);
     setTimeout(() => setToastMsg(''), 3000);
   };
 
@@ -152,6 +143,30 @@ const Accounts = () => {
     const matchesCategory = categoryFilter === 'ALL' || t.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
+
+  // Dynamic calculations from live transactions
+  const totalExpenses = transactions.filter((t) => t.type === 'EXPENSE').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const payrollTotal = transactions.filter((t) => t.category === 'PAYROLL').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const benefitsTotal = transactions.filter((t) => t.category === 'BENEFITS').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const totalIncome = transactions.filter((t) => t.type === 'INCOME').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+
+  // Group departmental spend dynamically
+  const deptColorPalette = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899', '#06B6D4', '#64748B'];
+  const deptMap = {};
+  transactions.forEach((t) => {
+    if (t.type === 'EXPENSE') {
+      const deptName = t.department || 'General Operations';
+      deptMap[deptName] = (deptMap[deptName] || 0) + Number(t.amount || 0);
+    }
+  });
+
+  const departmentSpendData = Object.keys(deptMap).length > 0
+    ? Object.entries(deptMap).map(([name, spend], idx) => ({
+        name,
+        spend,
+        color: deptColorPalette[idx % deptColorPalette.length],
+      }))
+    : [{ name: 'Operations', spend: totalExpenses || 1000, color: '#3B82F6' }];
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -245,11 +260,11 @@ const Accounts = () => {
           </div>
           <div className="space-y-1">
             <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              $273,400
+              ${totalExpenses.toLocaleString()}
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
               <span className="text-blue-600 dark:text-blue-400 font-bold">All Categories</span>
-              <span className="text-slate-400">MTD Spend</span>
+              <span className="text-slate-400">MTD Outflow</span>
             </div>
           </div>
         </div>
@@ -267,10 +282,10 @@ const Accounts = () => {
           </div>
           <div className="space-y-1">
             <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
-              $198,500
+              ${payrollTotal.toLocaleString()}
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">72.6% of Budget</span>
+              <span className="text-indigo-600 dark:text-indigo-400 font-bold">{totalExpenses > 0 ? ((payrollTotal / totalExpenses) * 100).toFixed(0) : 0}% of Budget</span>
               <span className="text-slate-400">Salaries</span>
             </div>
           </div>
@@ -289,11 +304,11 @@ const Accounts = () => {
           </div>
           <div className="space-y-1">
             <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              $24,500
+              ${benefitsTotal.toLocaleString()}
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Healthcare & Gym</span>
-              <span className="text-slate-400">Wellness</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Healthcare & Wellness</span>
+              <span className="text-slate-400">Perks</span>
             </div>
           </div>
         </div>
@@ -304,18 +319,18 @@ const Accounts = () => {
           <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
 
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Operating Reserve</span>
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Operating Balance</span>
             <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
               <Building className="w-5 h-5" />
             </div>
           </div>
           <div className="space-y-1">
             <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              $1,450,000
+              ${(totalIncome - totalExpenses).toLocaleString()}
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">5.3 Months Runway</span>
-              <span className="text-slate-400">Liquid</span>
+              <span className="text-amber-600 dark:text-amber-400 font-bold">{transactions.length} Vouchers Recorded</span>
+              <span className="text-slate-400">Audited</span>
             </div>
           </div>
         </div>
@@ -338,7 +353,7 @@ const Accounts = () => {
 
           <div className="h-64 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={DEPARTMENT_SPEND_DATA} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+              <BarChart data={departmentSpendData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} tickLine={false} />
                 <YAxis
                   stroke="#94A3B8"
@@ -347,11 +362,11 @@ const Accounts = () => {
                   tickFormatter={(v) => `$${v / 1000}k`}
                 />
                 <Tooltip
-                  formatter={(value) => [`$${value.toLocaleString()}`, 'Monthly Spend']}
+                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Monthly Spend']}
                   contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '16px', color: '#fff', fontSize: '12px' }}
                 />
                 <Bar dataKey="spend" radius={[12, 12, 0, 0]}>
-                  {DEPARTMENT_SPEND_DATA.map((entry, index) => (
+                  {departmentSpendData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
@@ -368,8 +383,8 @@ const Accounts = () => {
           </div>
 
           <div className="space-y-2.5">
-            {DEPARTMENT_SPEND_DATA.map((dept) => {
-              const total = DEPARTMENT_SPEND_DATA.reduce((acc, d) => acc + d.spend, 0);
+            {departmentSpendData.map((dept) => {
+              const total = departmentSpendData.reduce((acc, d) => acc + d.spend, 0) || 1;
               const pct = Math.round((dept.spend / total) * 100);
               return (
                 <div key={dept.name} className="space-y-1">
@@ -390,7 +405,7 @@ const Accounts = () => {
 
           <div className="p-3 rounded-2xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 text-center">
             <span className="text-xs font-extrabold text-blue-700 dark:text-blue-300">
-              Total Budget Tracked: $327,000 / mo
+              Total Budget Tracked: ${totalExpenses.toLocaleString()} / mo
             </span>
           </div>
         </div>

@@ -22,7 +22,9 @@ import {
   Award,
   FolderKanban,
   Briefcase,
-  Calendar
+  Calendar,
+  KeyRound,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import Logo from '../common/Logo';
@@ -82,6 +84,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
         { label: 'New Employee', path: '/app/hr/new-employee' },
         { label: 'Company Directory & Team', path: '/app/employees' },
         { label: 'Role & Permissions', path: '/app/hr/roles' },
+        { label: 'User Feature Access', path: '/app/access-control' },
         { label: 'Department', path: '/app/departments' },
         { label: 'Designation', path: '/app/hr/designation' },
       ],
@@ -143,6 +146,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       ],
     },
 
+    { type: 'link', label: 'Access Control', path: '/app/access-control', icon: KeyRound },
     { type: 'link', label: 'Settings', path: '/app/settings', icon: Settings },
   ];
 

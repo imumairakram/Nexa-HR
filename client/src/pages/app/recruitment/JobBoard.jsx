@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   Users,
@@ -10,26 +10,16 @@ import {
   Mail,
   Phone,
   CheckCircle2,
+  UserPlus,
+  RefreshCw,
 } from 'lucide-react';
 
-const INITIAL_COLUMNS = {
-  APPLIED: [
-    { id: 'C-01', name: 'Maya Lin', role: 'Staff Systems Engineer', rating: 4.8, exp: '7 yrs', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80' },
-    { id: 'C-02', name: 'James Wilson', role: 'Product Designer', rating: 4.5, exp: '4 yrs', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80' },
-  ],
-  SCREENING: [
-    { id: 'C-03', name: 'Elena Rostova', role: 'DevOps & Security Lead', rating: 5.0, exp: '8 yrs', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80' },
-  ],
-  INTERVIEWING: [
-    { id: 'C-04', name: 'Devon Vance', role: 'Firmware Specialist', rating: 4.9, exp: '6 yrs', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80' },
-    { id: 'C-05', name: 'Aaliyah Patel', role: 'Growth Marketing Lead', rating: 4.7, exp: '5 yrs', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80' },
-  ],
-  OFFER: [
-    { id: 'C-06', name: 'Lucas Scott', role: 'Full-Stack Developer', rating: 5.0, exp: '5 yrs', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80' },
-  ],
-  HIRED: [
-    { id: 'C-07', name: 'Jordan Hayes', role: 'Senior Frontend Engineer', rating: 5.0, exp: '6 yrs', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80' },
-  ],
+const EMPTY_COLUMNS = {
+  APPLIED: [],
+  SCREENING: [],
+  INTERVIEWING: [],
+  OFFER: [],
+  HIRED: [],
 };
 
 const STAGES = [
@@ -41,20 +31,35 @@ const STAGES = [
 ];
 
 const JobBoard = () => {
-  const [columns, setColumns] = useState(INITIAL_COLUMNS);
+  const [columns, setColumns] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_recruitment_kanban');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn(e);
+    }
+    return EMPTY_COLUMNS;
+  });
+
   const [toastMsg, setToastMsg] = useState('');
 
   const moveCandidate = (candidate, fromCol, toCol) => {
-    setColumns({
+    const updated = {
       ...columns,
-      [fromCol]: columns[fromCol].filter((c) => c.id !== candidate.id),
-      [toCol]: [...columns[toCol], candidate],
-    });
+      [fromCol]: (columns[fromCol] || []).filter((c) => c.id !== candidate.id),
+      [toCol]: [...(columns[toCol] || []), candidate],
+    };
+    setColumns(updated);
+    try {
+      localStorage.setItem('nexahr_recruitment_kanban', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
     setToastMsg(`Moved ${candidate.name} to ${toCol.replace('_', ' ')}!`);
     setTimeout(() => setToastMsg(''), 2500);
   };
 
-  const totalCandidates = Object.values(columns).reduce((acc, list) => acc + list.length, 0);
+  const totalCandidates = Object.values(columns).reduce((acc, list) => acc + (list ? list.length : 0), 0);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -219,6 +224,11 @@ const JobBoard = () => {
           </div>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 3. KANBAN BOARD STAGES */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
         {STAGES.map((stage, sIdx) => {
           const list = columns[stage.key] || [];
 

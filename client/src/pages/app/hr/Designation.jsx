@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   Building2,
@@ -12,53 +12,117 @@ import {
   Edit2,
   Shield,
   Layers,
+  RefreshCw,
 } from 'lucide-react';
-
-const INITIAL_DESIGNATIONS = [
-  { id: 1, title: 'Senior Full-Stack Engineer', department: 'Engineering & DevOps', level: 'Senior (L5)', salaryBand: '$130k - $160k', activeStaff: 18 },
-  { id: 2, title: 'Staff Backend Architect', department: 'Engineering & DevOps', level: 'Staff (L6)', salaryBand: '$150k - $185k', activeStaff: 8 },
-  { id: 3, title: 'Senior DevOps & Security Lead', department: 'Engineering & DevOps', level: 'Senior (L5)', salaryBand: '$135k - $165k', activeStaff: 6 },
-  { id: 4, title: 'Lead Product Designer', department: 'Product & Design', level: 'Lead (L5)', salaryBand: '$125k - $155k', activeStaff: 5 },
-  { id: 5, title: 'VP of Product Management', department: 'Product & Design', level: 'Executive (L7)', salaryBand: '$165k - $210k', activeStaff: 2 },
-  { id: 6, title: 'Senior People Operations Partner', department: 'People Operations & HR', level: 'Senior (L5)', salaryBand: '$105k - $130k', activeStaff: 4 },
-];
+import { api } from '../../../services/api';
 
 const Designation = () => {
-  const [designations, setDesignations] = useState(INITIAL_DESIGNATIONS);
+  const [designations, setDesignations] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     title: '',
-    department: 'Engineering & DevOps',
+    departmentId: '',
+    description: '',
     level: 'Senior (L5)',
     salaryBand: '$120k - $150k',
   });
 
-  const handleCreate = (e) => {
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 3000);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [desigRes, deptRes, empRes] = await Promise.allSettled([
+        api.getDesignations(),
+        api.getDepartments(),
+        api.getEmployees(),
+      ]);
+
+      let loadedDesigs = [];
+      let loadedDepts = [];
+      let loadedEmps = [];
+
+      if (desigRes.status === 'fulfilled' && desigRes.value?.data?.designations) {
+        loadedDesigs = desigRes.value.data.designations;
+      }
+      if (deptRes.status === 'fulfilled' && deptRes.value?.data?.departments) {
+        loadedDepts = deptRes.value.data.departments;
+        setDepartments(loadedDepts);
+        if (loadedDepts.length > 0 && !form.departmentId) {
+          setForm((prev) => ({ ...prev, departmentId: loadedDepts[0].id }));
+        }
+      }
+      if (empRes.status === 'fulfilled' && empRes.value?.data?.employees) {
+        loadedEmps = empRes.value.data.employees;
+        setEmployees(loadedEmps);
+      }
+
+      // Map dynamic active staff counts
+      const mapped = loadedDesigs.map((d) => {
+        const staffCount = loadedEmps.filter(
+          (e) => e.profile?.designationId === d.id || e.profile?.designation?.title === d.title
+        ).length;
+        return {
+          id: d.id,
+          title: d.title,
+          department: d.department?.name || loadedDepts.find((dept) => dept.id === d.departmentId)?.name || 'General Operations',
+          departmentId: d.departmentId,
+          level: d.description?.includes('Level:') ? d.description.split('Level:')[1].trim() : 'Professional',
+          salaryBand: d.salaryBand || '$110k - $145k',
+          activeStaff: staffCount,
+        };
+      });
+
+      setDesignations(mapped);
+    } catch (err) {
+      console.error('Failed to load designations data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleCreate = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
 
-    const newDesig = {
-      id: Date.now(),
-      title: form.title,
-      department: form.department,
-      level: form.level,
-      salaryBand: form.salaryBand,
-      activeStaff: 0,
-    };
+    setSubmitting(true);
+    try {
+      await api.createDesignation({
+        title: form.title.trim(),
+        departmentId: form.departmentId || null,
+        description: `Level: ${form.level} | Band: ${form.salaryBand}`,
+      });
 
-    setDesignations([...designations, newDesig]);
-    setIsAddOpen(false);
-    setForm({
-      title: '',
-      department: 'Engineering & DevOps',
-      level: 'Senior (L5)',
-      salaryBand: '$120k - $150k',
-    });
-    setToastMsg(`Designation "${form.title}" created successfully!`);
-    setTimeout(() => setToastMsg(''), 3000);
+      showToast(`Designation "${form.title}" created successfully in database!`);
+      setIsAddOpen(false);
+      setForm({
+        title: '',
+        departmentId: departments[0]?.id || '',
+        description: '',
+        level: 'Senior (L5)',
+        salaryBand: '$120k - $150k',
+      });
+      await loadData();
+    } catch (err) {
+      console.error('Create designation error:', err);
+      showToast(err.message || 'Could not create designation', 'error');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filtered = designations.filter(
@@ -327,14 +391,18 @@ const Designation = () => {
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Department *</label>
                 <select
-                  value={form.department}
-                  onChange={(e) => setForm({ ...form, department: e.target.value })}
+                  value={form.departmentId}
+                  onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                 >
-                  <option value="Engineering & DevOps">Engineering & DevOps</option>
-                  <option value="Product & Design">Product & Design</option>
-                  <option value="People Operations & HR">People Operations & HR</option>
-                  <option value="Marketing & Sales">Marketing & Sales</option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name} ({dept.code})
+                    </option>
+                  ))}
+                  {departments.length === 0 && (
+                    <option value="">General Corporate Operations</option>
+                  )}
                 </select>
               </div>
 
