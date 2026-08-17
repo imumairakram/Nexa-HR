@@ -11,10 +11,8 @@ import {
   FileText,
   AlertCircle,
   Building,
-  User,
   Check,
   RefreshCw,
-  Sparkles,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { api } from '../../services/api';
@@ -175,45 +173,156 @@ const Leaves = () => {
         </div>
       )}
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Applications</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.total}</div>
+      {/* ========================================================================= */}
+      {/* 1. DYNAMIC LEAVES HERO BANNER (EMERALD-TEAL LIGHT THEME AESTHETIC) */}
+      {/* ========================================================================= */}
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left Side: Leave Telemetry */}
+          <div className="space-y-3 flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold border border-emerald-600/20 dark:border-emerald-500/30">
+                <CalendarDays className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Time-Off Management Active</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-600/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 text-xs font-semibold border border-teal-600/20 dark:border-teal-500/30">
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <span>Department Supervisor Routing</span>
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              Leave Applications & Quota Approvals
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
+              Review incoming vacation, casual, and medical time-off requests. Approve or reject applications with audit notes and quota deductions.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{stats.approved} Leaves Approved</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{stats.pending} Applications Pending Review</span>
+              </span>
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <CalendarDays className="w-5 h-5" />
+
+          {/* Right Side: Action Glassmorphic Card */}
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <Plus className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Admin Time-Off Entry</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Apply on behalf of staff</div>
+            </div>
+            <button
+              onClick={() => setIsApplyOpen(true)}
+              className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Apply On Behalf</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Card 1 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Applications</span>
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CalendarDays className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {stats.total} <span className="text-base font-bold text-slate-400">Requests</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-blue-600 dark:text-blue-400 font-bold">Lifetime Total</span>
+              <span className="text-slate-400">All Types</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pending Review</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.pending}</div>
+        {/* Card 2 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Pending Review</span>
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Clock className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <Clock className="w-5 h-5" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
+              {stats.pending} <span className="text-base font-bold text-slate-400">Awaiting</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-amber-600 dark:text-amber-400 font-bold">Action Required</span>
+              <span className="text-slate-400">HR Queue</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Approved Leaves</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.approved}</div>
+        {/* Card 3 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Approved Leaves</span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <CheckCircle2 className="w-5 h-5" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              {stats.approved} <span className="text-base font-bold text-slate-400">Granted</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Synchronized</span>
+              <span className="text-slate-400">Approved</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Declined</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.rejected}</div>
+        {/* Card 4 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-rose-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-rose-500/10 blur-2xl pointer-events-none group-hover:bg-rose-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Declined / Rejected</span>
+            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200/60 dark:border-rose-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <XCircle className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-            <XCircle className="w-5 h-5" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
+              {stats.rejected} <span className="text-base font-bold text-slate-400">Declined</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-rose-600 dark:text-rose-400 font-bold">Audit Reason Logged</span>
+              <span className="text-slate-400">Rejected</span>
+            </div>
           </div>
         </div>
       </div>

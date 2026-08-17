@@ -21,7 +21,6 @@ import {
   Paperclip,
   Check,
   Zap,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Headphones,

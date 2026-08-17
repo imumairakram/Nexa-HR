@@ -10,9 +10,7 @@ import {
   Calendar,
   XCircle,
   ArrowRight,
-  ShieldAlert,
   RefreshCw,
-  Sparkles,
   Layers,
   Check,
 } from 'lucide-react';

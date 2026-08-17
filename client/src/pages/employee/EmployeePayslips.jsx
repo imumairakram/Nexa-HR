@@ -15,7 +15,6 @@ import {
   CalendarDays,
   ArrowDownRight,
   ArrowUpRight,
-  Sparkles,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { api } from '../../services/api';

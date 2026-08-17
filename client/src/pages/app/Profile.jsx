@@ -18,7 +18,6 @@ import {
   Laptop,
   RefreshCw,
   AlertCircle,
-  Sparkles,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
@@ -236,52 +235,59 @@ const Profile = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. HERO PROFILE CARD */}
+      {/* 1. DYNAMIC ADMIN PROFILE HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center md:items-start gap-6">
-        <div className="relative group shrink-0">
-          <img
-            src={avatar}
-            alt="Admin Profile"
-            className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-blue-500/20 shadow-md bg-slate-800"
-          />
-          <label
-            title="Upload New Profile Picture"
-            className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-blue-600 text-white shadow-md hover:bg-blue-700 cursor-pointer transition-all hover:scale-110 border-2 border-white dark:border-slate-900"
-          >
-            <Camera className="w-3.5 h-3.5" />
-            <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
-          </label>
-        </div>
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex-1 text-center md:text-left space-y-2">
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              {profile.firstName} {profile.lastName}
-            </h2>
-            <span className="px-3 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] font-extrabold uppercase">
-              {profile.role}
-            </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-mono font-bold">
-              {profile.employeeCode}
-            </span>
+        <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="relative group shrink-0">
+            <img
+              src={avatar}
+              alt="Admin Profile"
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-indigo-500/30 shadow-xl bg-slate-800"
+            />
+            <label
+              title="Upload New Profile Picture"
+              className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-indigo-600 text-white shadow-md hover:bg-indigo-700 cursor-pointer transition-all hover:scale-110 border-2 border-white dark:border-slate-900"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+            </label>
           </div>
 
-          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">{profile.designation}</p>
+          <div className="flex-1 text-center md:text-left space-y-2.5">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-600/20 dark:border-indigo-500/30">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Super Administrator Tier</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
+                {profile.employeeCode}
+              </span>
+            </div>
 
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400 pt-1 font-medium">
-            <span className="flex items-center gap-1.5">
-              <Building className="w-3.5 h-3.5" />
-              <span>{profile.department}</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
-              <span>{profile.location}</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Member since {profile.joiningDate}</span>
-            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              {profile.firstName} {profile.lastName}
+            </h2>
+
+            <p className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-400">{profile.designation}</p>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1 font-semibold">
+              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                <Building className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>{profile.department}</span>
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>{profile.location}</span>
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>Member since {profile.joiningDate}</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>

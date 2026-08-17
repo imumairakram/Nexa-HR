@@ -19,7 +19,6 @@ import {
   Eye,
   AlertCircle,
   Clock,
-  Sparkles,
   HeartHandshake,
   ShieldCheck,
   Check,

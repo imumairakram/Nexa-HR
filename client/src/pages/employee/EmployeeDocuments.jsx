@@ -14,7 +14,6 @@ import {
   Search,
   BookOpen,
   Calendar,
-  Sparkles,
   ExternalLink,
   Grid,
   List,

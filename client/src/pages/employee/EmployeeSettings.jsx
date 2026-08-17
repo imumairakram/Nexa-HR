@@ -13,7 +13,6 @@ import {
   DollarSign,
   Calendar,
   Sliders,
-  Sparkles,
   Smartphone,
   Mail,
   Lock,
