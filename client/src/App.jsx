@@ -63,6 +63,20 @@ import EmployeeDocuments from './pages/employee/EmployeeDocuments';
 import EmployeeProfile from './pages/employee/EmployeeProfile';
 import EmployeeSettings from './pages/employee/EmployeeSettings';
 
+// Admin Route Guard Component - strictly for System Admin (ADMIN)
+const AdminRoute = ({ children }) => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isAdmin = user.role === 'ADMIN' || user.email === 'admin@company.com';
+    if (!isAdmin) {
+      return <Navigate to="/app/dashboard" replace />;
+    }
+  } catch {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <Router>
@@ -127,7 +141,14 @@ function App() {
           <Route path="departments" element={<Departments />} />
           <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="access-control" element={<UserAccessControl />} />
+          <Route
+            path="access-control"
+            element={
+              <AdminRoute>
+                <UserAccessControl />
+              </AdminRoute>
+            }
+          />
           <Route path="access" element={<Navigate to="/app/access-control" replace />} />
         </Route>
 

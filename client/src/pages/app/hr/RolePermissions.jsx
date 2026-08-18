@@ -69,6 +69,16 @@ const RolePermissions = () => {
   const [selectedRole, setSelectedRole] = useState('HR_MANAGER');
   const [toastMsg, setToastMsg] = useState('');
 
+  const [currentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch {
+      return {};
+    }
+  });
+
+  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.email === 'admin@company.com';
+
   const [permissions, setPermissions] = useState(() => {
     try {
       const saved = localStorage.getItem('nexahr_role_permissions');
@@ -166,14 +176,16 @@ const RolePermissions = () => {
               <Save className="w-3.5 h-3.5" />
               <span>Save Permissions</span>
             </button>
-            <button
-              onClick={() => navigate('/app/access-control')}
-              className="w-full px-4 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer transition-all border border-indigo-200 dark:border-indigo-800"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Configure Per-User Access</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => navigate('/app/access-control')}
+                className="w-full px-4 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer transition-all border border-indigo-200 dark:border-indigo-800"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>Configure Per-User Access</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
         </div>
       </div>

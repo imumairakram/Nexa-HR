@@ -23,15 +23,23 @@ import Logo from '../../components/common/Logo';
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal';
 
 
-// Preset credentials for HR Admin and Employee
+// Preset credentials for System Admin, HR Admin, and Employee
 export const DEMO_CREDENTIALS = {
   admin: {
     role: 'ADMIN',
     name: 'System Administrator',
     email: 'admin@company.com',
     password: 'admin123',
-    designation: 'HR Executive / Administrator',
-    department: 'People Operations & Executive Board',
+    designation: 'Chief Systems Administrator & Security Officer',
+    department: 'Executive IT & Infrastructure',
+  },
+  hr: {
+    role: 'HR_MANAGER',
+    name: 'HR Administrator',
+    email: 'hr@company.com',
+    password: 'hr123',
+    designation: 'HR Lead Operations Manager',
+    department: 'Human Resources & People Ops',
   },
   employee: {
     role: 'EMPLOYEE',
@@ -93,7 +101,7 @@ const Login = () => {
   const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Active Login Role: 'employee' | 'admin'
+  // Active Login Role: 'admin' | 'hr' | 'employee'
   const [loginRole, setLoginRole] = useState('admin');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -107,22 +115,15 @@ const Login = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
 
-
-  // Handle Tab Switch (Employee vs HR Admin)
+  // Handle Tab Switch (System Admin vs HR Admin vs Employee)
   const handleRoleTabChange = (role) => {
     setLoginRole(role);
     setError(null);
-    if (role === 'admin') {
-      setFormData({
-        email: DEMO_CREDENTIALS.admin.email,
-        password: DEMO_CREDENTIALS.admin.password,
-      });
-    } else {
-      setFormData({
-        email: DEMO_CREDENTIALS.employee.email,
-        password: DEMO_CREDENTIALS.employee.password,
-      });
-    }
+    const targetPreset = DEMO_CREDENTIALS[role] || DEMO_CREDENTIALS.admin;
+    setFormData({
+      email: targetPreset.email,
+      password: targetPreset.password,
+    });
   };
 
   // Carousel Slide State
@@ -181,7 +182,7 @@ const Login = () => {
         password: formData.password,
       });
       if (res && res.success) {
-        const userRole = res.data?.user?.role || (loginRole === 'employee' ? 'EMPLOYEE' : 'ADMIN');
+        const userRole = res.data?.user?.role || DEMO_CREDENTIALS[loginRole]?.role || 'ADMIN';
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
         fallbackLocalLogin();
@@ -195,15 +196,15 @@ const Login = () => {
   };
 
   const fallbackLocalLogin = () => {
-    const isEmp = loginRole === 'employee';
-    const profile = isEmp ? DEMO_CREDENTIALS.employee : DEMO_CREDENTIALS.admin;
+    const profile = DEMO_CREDENTIALS[loginRole] || DEMO_CREDENTIALS.admin;
+    const isEmp = profile.role === 'EMPLOYEE';
 
     localStorage.setItem('token', 'nexahr_jwt_internal_token_2026');
     localStorage.setItem(
       'user',
       JSON.stringify({
-        firstName: isEmp ? 'Alex' : 'System',
-        lastName: isEmp ? 'Mercer' : 'Administrator',
+        firstName: profile.name.split(' ')[0] || 'User',
+        lastName: profile.name.split(' ').slice(1).join(' ') || 'Account',
         email: formData.email,
         role: profile.role,
         designation: profile.designation,
@@ -252,45 +253,61 @@ const Login = () => {
           </div>
 
           {/* Center Form Section */}
-          <div className="my-auto py-5 sm:py-7 max-w-md w-full mx-auto">
+          {/* Center Form Section */}
+          <div className="my-auto py-4 sm:py-6 max-w-md w-full mx-auto">
             {/* Header Text */}
-            <div className="text-center mb-5 sm:mb-6">
+            <div className="text-center mb-4 sm:mb-5">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {loginRole === 'admin' ? 'Welcome, HR Administrator' : 'Welcome, Employee'}
+                {loginRole === 'admin' && 'Welcome, System Administrator'}
+                {loginRole === 'hr' && 'Welcome, HR Administrator'}
+                {loginRole === 'employee' && 'Welcome, Employee'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 sm:mt-2">
-                {loginRole === 'admin'
-                  ? 'Sign in with your administrative credentials to manage company operations.'
-                  : 'Sign in to access your attendance, leaves, payslips & self-service roster.'}
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                {loginRole === 'admin' && 'Sign in with root administrative credentials for system governance & access controls.'}
+                {loginRole === 'hr' && 'Sign in with HR credentials to manage employees, attendance, leaves, and payroll.'}
+                {loginRole === 'employee' && 'Sign in to access your personal dashboard, clock-in records, leaves & payslips.'}
               </p>
             </div>
 
-            {/* Segmented Tab Switcher: Employee vs HR (Admin) */}
-            <div className="bg-slate-100 dark:bg-slate-800/90 p-1.5 rounded-2xl flex items-center mb-5 sm:mb-6 border border-slate-200/60 dark:border-slate-700/60 shadow-inner">
+            {/* Segmented 3-Way Role Switcher */}
+            <div className="bg-slate-100 dark:bg-slate-800/90 p-1 sm:p-1.5 rounded-2xl flex items-center mb-5 border border-slate-200/60 dark:border-slate-700/60 shadow-inner gap-1">
+              {/* System Admin Tab */}
+              <button
+                type="button"
+                onClick={() => handleRoleTabChange('admin')}
+                className={`flex-1 py-2 text-[11px] sm:text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${loginRole === 'admin'
+                  ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span className="truncate">System Admin</span>
+              </button>
+
+              {/* HR Admin Tab */}
+              <button
+                type="button"
+                onClick={() => handleRoleTabChange('hr')}
+                className={`flex-1 py-2 text-[11px] sm:text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${loginRole === 'hr'
+                  ? 'bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+              >
+                <UserCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                <span className="truncate">HR Admin</span>
+              </button>
+
               {/* Employee Tab */}
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('employee')}
-                className={`flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                className={`flex-1 py-2 text-[11px] sm:text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${loginRole === 'employee'
+                  ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
-                <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Employee</span>
-              </button>
-
-              {/* HR (Admin) Tab */}
-              <button
-                type="button"
-                onClick={() => handleRoleTabChange('admin')}
-                className={`flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'admin'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-600/50'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
-              >
-                <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>HR (Admin)</span>
+                <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate">Employee</span>
               </button>
             </div>
 
@@ -312,13 +329,22 @@ const Login = () => {
               {/* Email Address */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  {loginRole === 'admin' ? 'HR/System Admin Email Address' : 'Employee Work Email'} <span className="text-blue-600 dark:text-blue-400">*</span>
+                  {loginRole === 'admin' && 'System Admin Email Address'}
+                  {loginRole === 'hr' && 'HR Admin Work Email'}
+                  {loginRole === 'employee' && 'Employee Work Email'}{' '}
+                  <span className="text-blue-600 dark:text-blue-400">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
                   <input
                     type="email"
-                    placeholder={loginRole === 'admin' ? 'admin@company.com' : 'employee@company.com'}
+                    placeholder={
+                      loginRole === 'admin'
+                        ? 'admin@company.com'
+                        : loginRole === 'hr'
+                        ? 'hr@company.com'
+                        : 'employee@company.com'
+                    }
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full pl-11 pr-4 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
@@ -387,10 +413,13 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] ${loginRole === 'admin'
-                  ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/25'
-                  : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
-                  }`}
+                className={`w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] ${
+                  loginRole === 'admin'
+                    ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/25'
+                    : loginRole === 'hr'
+                    ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 shadow-purple-600/25'
+                    : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
+                }`}
               >
                 {loading ? (
                   <>
@@ -399,7 +428,9 @@ const Login = () => {
                   </>
                 ) : (
                   <span>
-                    {loginRole === 'admin' ? 'Sign In as HR Admin' : 'Sign In as Employee'}
+                    {loginRole === 'admin' && 'Sign In as System Admin'}
+                    {loginRole === 'hr' && 'Sign In as HR Admin'}
+                    {loginRole === 'employee' && 'Sign In as Employee'}
                   </span>
                 )}
               </button>

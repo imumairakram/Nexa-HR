@@ -305,7 +305,7 @@ const UserAccessControl = () => {
               System Administrator Access Only
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              The User Feature Access & Clearance Control Center is restricted to root system administrators. You are currently authenticated as an HR or Staff member.
+              The User Feature Access & Clearance Control Center is restricted strictly to root System Administrators. HR Managers and staff members do not have permission to modify system security clearance or role access.
             </p>
           </div>
           <button

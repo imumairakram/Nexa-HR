@@ -69,6 +69,16 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     window.location.href = '/';
   };
 
+  const [currentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch {
+      return {};
+    }
+  });
+
+  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.email === 'admin@company.com';
+
   const menuStructure = [
     { type: 'link', label: 'Dashboard', path: '/app/dashboard', icon: LayoutGrid },
 
@@ -82,7 +92,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
         { label: 'New Employee', path: '/app/hr/new-employee' },
         { label: 'Company Directory & Team', path: '/app/employees' },
         { label: 'Role & Permissions', path: '/app/hr/roles' },
-        { label: 'User Feature Access', path: '/app/access-control' },
         { label: 'Department', path: '/app/departments' },
         { label: 'Designation', path: '/app/hr/designation' },
       ],
@@ -131,7 +140,9 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       ],
     },
 
-    { type: 'link', label: 'Access Control', path: '/app/access-control', icon: KeyRound },
+    ...(isAdmin
+      ? [{ type: 'link', label: 'Access Control', path: '/app/access-control', icon: KeyRound }]
+      : []),
     { type: 'link', label: 'Settings', path: '/app/settings', icon: Settings },
   ];
 
