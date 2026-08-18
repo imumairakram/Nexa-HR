@@ -124,17 +124,6 @@ const LeavePolicy = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Policy Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-600/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs font-extrabold border border-blue-600/20 dark:border-blue-500/30">
-                <Shield className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span>Statutory Labor Entitlements Active</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-semibold border border-indigo-600/20 dark:border-indigo-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>FY26 Rules Synchronized</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Corporate Leave Policies & Accrual Matrix
             </h2>
@@ -330,112 +319,213 @@ const LeavePolicy = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. MODAL: ADD POLICY */}
+      {/* 4. MODAL: ADD LEAVE POLICY (STITCH LUXURY DESIGN) */}
       {/* ========================================================================= */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
-                  <Plus className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+                  <CalendarDays className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">Create Leave Policy</h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Create Leave Policy
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Configure statutory leave quotas, accrual intervals, and payroll wage compensation rules.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreatePolicy} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Policy Name *
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleCreatePolicy} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+              {/* Policy Name & Code */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Policy Title <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Study / Exam Leave"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
+                  <div className="relative">
+                    <CalendarDays className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Study & Development Leave"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Policy Code *
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Policy Code <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. STUDY"
-                    value={form.code}
-                    onChange={(e) => setForm({ ...form, code: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. STUDY"
+                      value={form.code}
+                      onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                      className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-black focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400 text-center"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Days Allowed (Per Year) *
+              {/* Annual Quota & Compensation Type */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Annual Quota Allocation (Days) <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="number"
-                    required
-                    value={form.days}
-                    onChange={(e) => setForm({ ...form, days: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
+                  <div className="relative">
+                    <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="number"
+                      min={1}
+                      max={365}
+                      required
+                      value={form.days}
+                      onChange={(e) => setForm({ ...form, days: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Compensation Type *
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Wage Compensation <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, type: 'PAID' })}
+                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        form.type === 'PAID'
+                          ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Fully Paid</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, type: 'UNPAID' })}
+                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        form.type === 'UNPAID'
+                          ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
+                      }`}
+                    >
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>Unpaid</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accrual Rules */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Accrual Model
                   </label>
                   <select
-                    value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    value={form.accrual}
+                    onChange={(e) => setForm({ ...form, accrual: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
                   >
-                    <option value="PAID">Fully Paid Leave</option>
-                    <option value="UNPAID">Unpaid Leave</option>
+                    <option value="Monthly Accrual">Monthly Pro-Rata Accrual</option>
+                    <option value="Frontloaded Annual">Frontloaded on Jan 1st</option>
+                    <option value="Post Probation">Unlocked Post-Probation</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Year-End Carryover
+                  </label>
+                  <select
+                    value={form.carryover}
+                    onChange={(e) => setForm({ ...form, carryover: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="Max 3 Days">Max 3 Days Rollover</option>
+                    <option value="Max 5 Days">Max 5 Days Rollover</option>
+                    <option value="No Carryover (Use or Lose)">No Carryover (Use or Lose)</option>
+                    <option value="Full Encashment">Full Encashment on Dec 31</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Policy Summary Description
+              {/* Description */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Eligibility & Documentation Summary
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Provide details on eligibility and proof required..."
+                  placeholder="Provide details on required notice period, approvals, and supporting documentation..."
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+                  className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Preview Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-teal-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    {form.days || '0'}d
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                      {form.name.trim() || 'Leave Policy Preview'}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                      {form.accrual} • {form.carryover}
+                    </div>
+                  </div>
+                </div>
+                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${
+                  form.type === 'PAID'
+                    ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                    : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                }`}>
+                  {form.type === 'PAID' ? '100% Paid' : 'Unpaid'}
+                </span>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
-                  Save Policy
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>Save Policy</span>
                 </button>
               </div>
             </form>

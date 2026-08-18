@@ -183,17 +183,6 @@ const Leaves = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Leave Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold border border-emerald-600/20 dark:border-emerald-500/30">
-                <CalendarDays className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Time-Off Management Active</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-600/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 text-xs font-semibold border border-teal-600/20 dark:border-teal-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-                <span>Department Supervisor Routing</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Leave Applications & Quota Approvals
             </h2>

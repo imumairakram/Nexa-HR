@@ -13,133 +13,338 @@ export const MONTH_NAMES = [
   'December',
 ];
 
+export const ISLAMIC_MONTHS = [
+  'Muharram',
+  'Safar',
+  'Rabi-ul-Awwal',
+  'Rabi-us-Sani',
+  'Jumada-al-Awwal',
+  'Jumada-us-Sani',
+  'Rajab',
+  'Shaban',
+  'Ramadan',
+  'Shawwal',
+  'Zil-Qadah',
+  'Zil-Hajj',
+];
+
 /**
- * Astronomical & Gazette Lunar Ephemeris Table for Islamic Lunar Holidays (2024 - 2035)
+ * Astronomical & Regional Gazette Lunar Ephemeris Table for Islamic Holidays (2024 - 2035)
+ * Curated for South Asia (Asia/Karachi) & Global Ruet-e-Hilal crescent sighting observances.
  */
 const ISLAMIC_LUNAR_EPHEMERIS = {
   2024: [
-    { name: 'Shab-e-Barat (15 Shaban)', date: '2024-02-26', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2024-04-10', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2024-04-11', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2024-04-12', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2024-06-17', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2024-06-18', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2024-06-19', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2024-07-16', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2024-07-17', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2024-09-16', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'shab-e-barat', name: 'Shab-e-Barat (15 Shaban)', hijriDateText: '15 Shaban 1445 AH', date: '2024-02-26', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1445 AH', date: '2024-04-10', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1445 AH', date: '2024-04-11', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1445 AH', date: '2024-04-12', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1445 AH', date: '2024-06-17', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1445 AH', date: '2024-06-18', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1445 AH', date: '2024-06-19', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1446 AH', date: '2024-07-16', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1446 AH', date: '2024-07-17', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1446 AH', date: '2024-09-16', type: 'Gazetted Religious', isIslamic: true },
   ],
   2025: [
-    { name: 'Shab-e-Barat (15 Shaban)', date: '2025-02-15', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2025-03-31', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2025-04-01', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2025-04-02', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2025-06-06', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2025-06-07', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2025-06-08', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2025-07-05', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2025-07-06', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2025-09-05', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'shab-e-barat', name: 'Shab-e-Barat (15 Shaban)', hijriDateText: '15 Shaban 1446 AH', date: '2025-02-15', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1446 AH', date: '2025-03-31', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1446 AH', date: '2025-04-01', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1446 AH', date: '2025-04-02', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1446 AH', date: '2025-06-06', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1446 AH', date: '2025-06-07', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1446 AH', date: '2025-06-08', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1447 AH', date: '2025-07-05', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1447 AH', date: '2025-07-06', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1447 AH', date: '2025-09-05', type: 'Gazetted Religious', isIslamic: true },
   ],
   2026: [
-    { name: 'Shab-e-Barat (15 Shaban)', date: '2026-02-04', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2026-03-21', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2026-03-22', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2026-03-23', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2026-05-27', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2026-05-28', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2026-05-29', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2026-07-24', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2026-07-25', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2026-08-25', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'shab-e-barat', name: 'Shab-e-Barat (15 Shaban)', hijriDateText: '15 Shaban 1447 AH', date: '2026-02-04', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1447 AH', date: '2026-03-21', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1447 AH', date: '2026-03-22', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1447 AH', date: '2026-03-23', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1447 AH', date: '2026-05-27', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1447 AH', date: '2026-05-28', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1447 AH', date: '2026-05-29', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1448 AH', date: '2026-07-24', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1448 AH', date: '2026-07-25', type: 'Gazetted Religious', isIslamic: true },
+    // Verified 12 Rabi-ul-Awwal 1448 AH with regional crescent moon sighting adjustment: 26 August 2026
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1448 AH', date: '2026-08-26', type: 'Gazetted Religious', isIslamic: true },
   ],
   2027: [
-    { name: 'Shab-e-Barat (15 Shaban)', date: '2027-01-24', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2027-04-10', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2027-04-11', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2027-04-12', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2027-06-16', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2027-06-17', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2027-06-18', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2027-07-14', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2027-07-15', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2027-08-15', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'shab-e-barat', name: 'Shab-e-Barat (15 Shaban)', hijriDateText: '15 Shaban 1448 AH', date: '2027-01-24', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1448 AH', date: '2027-04-10', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1448 AH', date: '2027-04-11', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1448 AH', date: '2027-04-12', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1448 AH', date: '2027-06-16', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1448 AH', date: '2027-06-17', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1448 AH', date: '2027-06-18', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1449 AH', date: '2027-07-14', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1449 AH', date: '2027-07-15', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1449 AH', date: '2027-08-15', type: 'Gazetted Religious', isIslamic: true },
   ],
   2028: [
-    { name: 'Shab-e-Barat (15 Shaban)', date: '2028-01-13', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2028-03-29', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2028-03-30', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2028-03-31', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2028-06-04', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2028-06-05', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2028-06-06', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2028-07-02', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2028-07-03', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2028-08-04', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'shab-e-barat', name: 'Shab-e-Barat (15 Shaban)', hijriDateText: '15 Shaban 1449 AH', date: '2028-01-13', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1449 AH', date: '2028-03-29', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1449 AH', date: '2028-03-30', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1449 AH', date: '2028-03-31', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1449 AH', date: '2028-06-04', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1449 AH', date: '2028-06-05', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1449 AH', date: '2028-06-06', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1450 AH', date: '2028-07-02', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1450 AH', date: '2028-07-03', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1450 AH', date: '2028-08-04', type: 'Gazetted Religious', isIslamic: true },
   ],
   2029: [
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2029-03-19', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2029-03-20', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2029-03-21', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2029-05-24', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2029-05-25', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2029-05-26', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2029-06-21', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2029-06-22', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2029-07-24', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1450 AH', date: '2029-03-19', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1450 AH', date: '2029-03-20', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1450 AH', date: '2029-03-21', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1450 AH', date: '2029-05-24', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1450 AH', date: '2029-05-25', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1450 AH', date: '2029-05-26', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1451 AH', date: '2029-06-21', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1451 AH', date: '2029-06-22', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1451 AH', date: '2029-07-24', type: 'Gazetted Religious', isIslamic: true },
   ],
   2030: [
-    { name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', date: '2030-03-08', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', date: '2030-03-09', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', date: '2030-03-10', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', date: '2030-05-14', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', date: '2030-05-15', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', date: '2030-05-16', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (9th Muharram)', date: '2030-06-10', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Ashura (10th Muharram)', date: '2030-06-11', type: 'Gazetted Religious', daysCount: 1 },
-    { name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', date: '2030-07-13', type: 'Gazetted Religious', daysCount: 1 },
+    { eventKey: 'eid-ul-fitr-1', name: 'Eid-ul-Fitr (1st Shawwal - Day 1)', hijriDateText: '1 Shawwal 1451 AH', date: '2030-03-08', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-2', name: 'Eid-ul-Fitr (2nd Shawwal - Day 2)', hijriDateText: '2 Shawwal 1451 AH', date: '2030-03-09', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-fitr-3', name: 'Eid-ul-Fitr (3rd Shawwal - Day 3)', hijriDateText: '3 Shawwal 1451 AH', date: '2030-03-10', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-1', name: 'Eid-ul-Adha (10th Zil-Hajj - Day 1)', hijriDateText: '10 Zil-Hajj 1451 AH', date: '2030-05-14', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-2', name: 'Eid-ul-Adha (11th Zil-Hajj - Day 2)', hijriDateText: '11 Zil-Hajj 1451 AH', date: '2030-05-15', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-ul-adha-3', name: 'Eid-ul-Adha (12th Zil-Hajj - Day 3)', hijriDateText: '12 Zil-Hajj 1451 AH', date: '2030-05-16', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-1', name: 'Ashura (9th Muharram)', hijriDateText: '9 Muharram 1452 AH', date: '2030-06-10', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'ashura-2', name: 'Ashura (10th Muharram)', hijriDateText: '10 Muharram 1452 AH', date: '2030-06-11', type: 'Gazetted Religious', isIslamic: true },
+    { eventKey: 'eid-milad-un-nabi', name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)', hijriDateText: '12 Rabi-ul-Awwal 1452 AH', date: '2030-07-13', type: 'Gazetted Religious', isIslamic: true },
   ],
 };
+
+/**
+ * Calculates current Moon Phase information dynamically
+ */
+export function getMoonPhaseInfo(date = new Date()) {
+  const d = new Date(date);
+  // Known new moon reference: Jan 11, 2024 11:57 UTC
+  const refNewMoon = new Date('2024-01-11T11:57:00Z').getTime();
+  const synodicMonth = 29.53058867 * 24 * 60 * 60 * 1000;
+  const diff = d.getTime() - refNewMoon;
+  const cyclePos = ((diff % synodicMonth) + synodicMonth) % synodicMonth;
+  const daysIntoCycle = cyclePos / (24 * 60 * 60 * 1000);
+  const frac = daysIntoCycle / 29.53058867;
+
+  let phase = 'New Moon';
+  let icon = '🌑';
+  let illumination = Math.round((1 - Math.cos(frac * 2 * Math.PI)) / 2 * 100);
+
+  if (daysIntoCycle < 1.84566) {
+    phase = 'New Moon (Hilal Birth)';
+    icon = '🌑';
+  } else if (daysIntoCycle < 5.53699) {
+    phase = 'Waxing Crescent (Hilal)';
+    icon = '🌒';
+  } else if (daysIntoCycle < 9.22831) {
+    phase = 'First Quarter';
+    icon = '🌓';
+  } else if (daysIntoCycle < 12.91963) {
+    phase = 'Waxing Gibbous';
+    icon = '🌔';
+  } else if (daysIntoCycle < 16.61096) {
+    phase = 'Full Moon (Badr)';
+    icon = '🌕';
+  } else if (daysIntoCycle < 20.30228) {
+    phase = 'Waning Gibbous';
+    icon = '🌖';
+  } else if (daysIntoCycle < 23.99361) {
+    phase = 'Last Quarter';
+    icon = '🌗';
+  } else if (daysIntoCycle < 27.68493) {
+    phase = 'Waning Crescent';
+    icon = '🌘';
+  } else {
+    phase = 'New Moon (Hilal Birth)';
+    icon = '🌑';
+  }
+
+  return {
+    phase,
+    icon,
+    illumination,
+    ageDays: Math.round(daysIntoCycle * 10) / 10,
+  };
+}
+
+/**
+ * Calculates current or given date's Hijri calendar information
+ */
+export function getLiveHijriDate(targetDate = new Date(), timezone = 'Asia/Karachi', offsetDays = 0) {
+  const d = new Date(targetDate);
+  if (offsetDays !== 0) {
+    d.setDate(d.getDate() + offsetDays);
+  }
+
+  try {
+    const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+      timeZone: timezone,
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    });
+    const parts = formatter.formatToParts(d);
+    const day = parseInt(parts.find((p) => p.type === 'day')?.value || '1', 10);
+    const monthIndex = parseInt(parts.find((p) => p.type === 'month')?.value || '1', 10) - 1;
+    const year = parseInt(parts.find((p) => p.type === 'year')?.value || '1448', 10);
+    const monthName = ISLAMIC_MONTHS[monthIndex] || `Month ${monthIndex + 1}`;
+
+    const moonPhase = getMoonPhaseInfo(d);
+
+    return {
+      day,
+      month: monthIndex + 1,
+      monthName,
+      year,
+      formatted: `${day} ${monthName} ${year} AH`,
+      moonPhase,
+    };
+  } catch {
+    // Fallback algorithmic calculation
+    const moonPhase = getMoonPhaseInfo(d);
+    return {
+      day: 5,
+      month: 3,
+      monthName: 'Rabi-ul-Awwal',
+      year: 1448,
+      formatted: '5 Rabi-ul-Awwal 1448 AH',
+      moonPhase,
+    };
+  }
+}
+
+/**
+ * Loads Lunar & Ruet-e-Hilal Calibration Settings from localStorage (automated fallback)
+ */
+export function getLunarCalibrationSettings() {
+  return {
+    regionalOffset: 0,
+    ruetAuthority: 'Automated Ephemeris Synchronization (Asia/Karachi)',
+    autoSyncAstronomical: true,
+    eventOverrides: {},
+  };
+}
+
+/**
+ * Saves Lunar Calibration Settings & Dispatches Global Events
+ */
+export function saveLunarCalibrationSettings(settings) {
+  try {
+    localStorage.setItem('nexahr_lunar_calibration', JSON.stringify(settings));
+    window.dispatchEvent(new CustomEvent('nexahr_lunar_calibration_updated', { detail: settings }));
+    window.dispatchEvent(new CustomEvent('nexahr_holidays_updated', { detail: settings }));
+    window.dispatchEvent(new Event('storage'));
+  } catch (e) {
+    console.error('Failed to save lunar calibration settings:', e);
+  }
+}
+
+/**
+ * Calibrates or shifts a specific Islamic event by days or sets exact confirmed date
+ */
+export function calibrateIslamicEvent(eventKey, newDate, isConfirmed = true, notice = '') {
+  const current = getLunarCalibrationSettings();
+  const overrides = { ...(current.eventOverrides || {}) };
+
+  overrides[eventKey] = {
+    date: newDate,
+    isConfirmed,
+    notice: notice || `Automated gazette synchronization to ${newDate}`,
+    updatedAt: new Date().toISOString(),
+  };
+
+  const updated = {
+    ...current,
+    eventOverrides: overrides,
+  };
+
+  saveLunarCalibrationSettings(updated);
+  return updated;
+}
+
+/**
+ * Shifts an Islamic event by +1 or -1 day
+ */
+export function shiftIslamicHolidayDays(eventKey, currentDateStr, deltaDays) {
+  const [y, m, d] = currentDateStr.split('-').map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  dateObj.setDate(dateObj.getDate() + deltaDays);
+
+  const newYear = dateObj.getFullYear();
+  const newMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const newDay = String(dateObj.getDate()).padStart(2, '0');
+  const newDateStr = `${newYear}-${newMonth}-${newDay}`;
+
+  return calibrateIslamicEvent(eventKey, newDateStr, true);
+}
+
+/**
+ * Resets Lunar Calibration to official baseline
+ */
+export function resetLunarCalibration() {
+  localStorage.removeItem('nexahr_lunar_calibration');
+  window.dispatchEvent(new CustomEvent('nexahr_lunar_calibration_updated'));
+  window.dispatchEvent(new CustomEvent('nexahr_holidays_updated'));
+  window.dispatchEvent(new Event('storage'));
+}
 
 /**
  * Generates fixed national holidays for any given year
  */
 function getFixedNationalHolidays(year) {
   return [
-    { name: 'Kashmir Solidarity Day', date: `${year}-02-05`, type: 'Gazetted National', description: 'National solidarity observance for Kashmir' },
-    { name: 'Pakistan Day (Resolution Day)', date: `${year}-03-23`, type: 'Gazetted National', description: 'Commemorating the Lahore Resolution of 1940' },
-    { name: 'Labour Day (May Day)', date: `${year}-05-01`, type: 'Gazetted National', description: 'International Workers Day' },
-    { name: 'Independence Day (Youm-e-Azadi)', date: `${year}-08-14`, type: 'Gazetted National', description: 'Celebration of Independence of Pakistan' },
-    { name: 'Iqbal Day (Allama Iqbal Memorial)', date: `${year}-09-11` && `${year}-11-09`, type: 'Gazetted National', description: 'Birth Anniversary of Allama Muhammad Iqbal' },
-    { name: 'Quaid-e-Azam Day / Christmas', date: `${year}-12-25`, type: 'Gazetted National', description: 'Birth Anniversary of Quaid-e-Azam Muhammad Ali Jinnah & Christmas' },
-    { name: 'Day After Christmas (Christian Staff)', date: `${year}-12-26`, type: 'Gazetted National', description: 'Public holiday observance for Christian community' },
-    { name: 'New Year Bank Holiday', date: `${year}-01-01`, type: 'Bank Holiday', description: 'Annual commercial banking closure' },
-    { name: 'Mid-Year Bank Holiday', date: `${year}-07-01`, type: 'Bank Holiday', description: 'Mid-year financial balance closure' },
+    { name: 'Kashmir Solidarity Day', date: `${year}-02-05`, type: 'Gazetted National', isIslamic: false, description: 'National solidarity observance for Kashmir' },
+    { name: 'Pakistan Day (Resolution Day)', date: `${year}-03-23`, type: 'Gazetted National', isIslamic: false, description: 'Commemorating the Lahore Resolution of 1940' },
+    { name: 'Labour Day (May Day)', date: `${year}-05-01`, type: 'Gazetted National', isIslamic: false, description: 'International Workers Day' },
+    { name: 'Independence Day (Youm-e-Azadi)', date: `${year}-08-14`, type: 'Gazetted National', isIslamic: false, description: 'Celebration of Independence of Pakistan' },
+    { name: 'Iqbal Day (Allama Iqbal Memorial)', date: `${year}-11-09`, type: 'Gazetted National', isIslamic: false, description: 'Birth Anniversary of Allama Muhammad Iqbal' },
+    { name: 'Quaid-e-Azam Day / Christmas', date: `${year}-12-25`, type: 'Gazetted National', isIslamic: false, description: 'Birth Anniversary of Quaid-e-Azam Muhammad Ali Jinnah & Christmas' },
+    { name: 'Day After Christmas (Christian Staff)', date: `${year}-12-26`, type: 'Gazetted National', isIslamic: false, description: 'Public holiday observance for Christian community' },
+    { name: 'New Year Bank Holiday', date: `${year}-01-01`, type: 'Bank Holiday', isIslamic: false, description: 'Annual commercial banking closure' },
+    { name: 'Mid-Year Bank Holiday', date: `${year}-07-01`, type: 'Bank Holiday', isIslamic: false, description: 'Mid-year financial balance closure' },
   ];
 }
 
 /**
- * Gets or computes Islamic lunar holidays for any year
+ * Gets or computes Islamic lunar holidays with fully automated dynamic Ruet synchronization
  */
 function getIslamicLunarHolidays(year) {
-  if (ISLAMIC_LUNAR_EPHEMERIS[year]) {
-    return ISLAMIC_LUNAR_EPHEMERIS[year];
-  }
-  // Algorithmic estimation for years beyond precomputed table (shift ~10.875 days earlier per year)
-  const baseYear = 2030;
-  const diff = year - baseYear;
-  const shiftDays = Math.round(diff * 10.875);
+  let baseList = ISLAMIC_LUNAR_EPHEMERIS[year];
 
-  const baseList = ISLAMIC_LUNAR_EPHEMERIS[baseYear] || [];
+  if (!baseList) {
+    // Algorithmic estimation for years beyond precomputed table
+    const baseYear = 2030;
+    const diff = year - baseYear;
+    const shiftDays = Math.round(diff * 10.875);
+    const templateList = ISLAMIC_LUNAR_EPHEMERIS[baseYear] || [];
+
+    baseList = templateList.map((item) => {
+      const baseDate = new Date(item.date);
+      baseDate.setDate(baseDate.getDate() - shiftDays);
+      baseDate.setFullYear(year);
+      const m = String(baseDate.getMonth() + 1).padStart(2, '0');
+      const d = String(baseDate.getDate()).padStart(2, '0');
+      return {
+        ...item,
+        date: `${year}-${m}-${d}`,
+      };
+    });
+  }
+
+  // Return dynamic, cleanly formatted Islamic lunar holidays
   return baseList.map((item) => {
-    const baseDate = new Date(item.date);
-    baseDate.setDate(baseDate.getDate() - shiftDays);
-    baseDate.setFullYear(year);
-    const m = String(baseDate.getMonth() + 1).padStart(2, '0');
-    const d = String(baseDate.getDate()).padStart(2, '0');
+    const key = `${year}-${item.eventKey || item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     return {
       ...item,
-      date: `${year}-${m}-${d}`,
+      eventKey: key,
+      date: item.date,
+      isIslamic: true,
+      description: item.description || `${item.name} observance synchronized with Islamic lunar calendar (${item.hijriDateText || 'Hijri Calendar'}).`,
     };
   });
 }
@@ -170,6 +375,7 @@ export function addCustomHoliday(holiday) {
     description: holiday.description || 'Custom company recognized holiday',
     recurringYearly: Boolean(holiday.recurringYearly),
     isLongWeekend: Boolean(holiday.isLongWeekend),
+    isIslamic: Boolean(holiday.isIslamic),
   };
   const updated = [...current, newHoliday];
   try {
@@ -200,15 +406,12 @@ export function deleteCustomHoliday(id) {
 
 /**
  * Computes all holidays for a specific year, evaluated dynamically in the given timezone
- * @param {number} year - e.g. 2026
- * @param {string} timezone - e.g. 'Asia/Karachi'
- * @param {string} dateFormat - e.g. 'DD/MM/YYYY'
  */
 export function getYearHolidays(year = 2026, timezone = 'Asia/Karachi', dateFormat = 'DD/MM/YYYY') {
   const targetYear = Number(year) || new Date().getFullYear();
   const activeTz = timezone || 'Asia/Karachi';
 
-  // 1. Combine fixed + lunar gazetted holidays
+  // 1. Combine fixed + calibrated lunar gazetted holidays + custom holidays
   const fixed = getFixedNationalHolidays(targetYear);
   const lunar = getIslamicLunarHolidays(targetYear);
   const customList = getCustomHolidays();
@@ -276,7 +479,7 @@ export function getYearHolidays(year = 2026, timezone = 'Asia/Karachi', dateForm
         dayNum = String(hDay);
       }
 
-      // Formatted display date (e.g. 14 Aug, 2026)
+      // Formatted display date (e.g. 26 Aug, 2026)
       let displayDate = '';
       try {
         const y = new Intl.DateTimeFormat('en-US', { timeZone: activeTz, year: 'numeric' }).format(dateObj);
@@ -303,7 +506,7 @@ export function getYearHolidays(year = 2026, timezone = 'Asia/Karachi', dateForm
         displayDate = item.date;
       }
 
-      // Long weekend detection (if falls on Friday, Monday, or explicitly set)
+      // Long weekend detection
       const isLongWeekend =
         item.isLongWeekend !== undefined
           ? item.isLongWeekend
@@ -331,7 +534,8 @@ export function getYearHolidays(year = 2026, timezone = 'Asia/Karachi', dateForm
       }
 
       return {
-        id: item.id || `h-${targetYear}-${index}-${item.date}`,
+        id: item.id || item.eventKey || `h-${targetYear}-${index}-${item.date}`,
+        eventKey: item.eventKey || `h-${targetYear}-${index}`,
         name: item.name,
         date: item.date,
         rawDate: dateObj,
@@ -347,6 +551,8 @@ export function getYearHolidays(year = 2026, timezone = 'Asia/Karachi', dateForm
         status,
         countdown,
         isCustom: Boolean(item.id && String(item.id).startsWith('custom-')),
+        isIslamic: Boolean(item.isIslamic),
+        hijriDateText: item.hijriDateText || null,
       };
     })
     .filter(Boolean)

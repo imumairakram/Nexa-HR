@@ -21,7 +21,6 @@ import {
   Sliders,
   LayoutDashboard,
   Megaphone,
-  Award,
   Briefcase,
   Layers,
   ArrowRight
@@ -83,7 +82,6 @@ const SEARCH_SHORTCUTS = [
   { label: 'Attendance & Logs', icon: Clock, path: '/app/attendance', category: 'Attendance' },
   { label: 'Employment Status', icon: User, path: '/app/employment-status', category: 'Attendance' },
   { label: 'Leave Requests', icon: FileText, path: '/app/leaves', category: 'Leaves' },
-  { label: 'Weekly Holiday', icon: Clock, path: '/app/holiday/weekly', category: 'Leaves' },
   { label: 'Public Holiday', icon: Clock, path: '/app/holiday/public', category: 'Leaves' },
   { label: 'Leave Policy', icon: FileText, path: '/app/leave-policy', category: 'Leaves' },
   { label: 'Calculate Payroll', icon: DollarSign, path: '/app/payroll/calculate', category: 'Payroll' },
@@ -92,7 +90,6 @@ const SEARCH_SHORTCUTS = [
   { label: 'Accounts & Ledger', icon: DollarSign, path: '/app/accounts', category: 'Finance' },
   { label: 'Exportable Reports', icon: FileText, path: '/app/reports', category: 'Analytics' },
   { label: 'Announcements', icon: Megaphone, path: '/app/announcement', category: 'Operations' },
-  { label: 'Awards & Recognition', icon: Award, path: '/app/award', category: 'Operations' },
   { label: 'Project Portfolio', icon: Building2, path: '/app/project', category: 'Operations' },
   { label: 'Recruitment - Job Desk', icon: Briefcase, path: '/app/recruitment/desk', category: 'Recruitment' },
   { label: 'Recruitment - Active Jobs', icon: Users, path: '/app/recruitment/jobs', category: 'Recruitment' },

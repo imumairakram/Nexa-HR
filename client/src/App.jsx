@@ -24,7 +24,6 @@ import Designation from './pages/app/hr/Designation';
 import EmploymentStatus from './pages/app/EmploymentStatus';
 
 // Leave & Holiday
-import WeeklyHoliday from './pages/app/holiday/WeeklyHoliday';
 import PublicHoliday from './pages/app/holiday/PublicHoliday';
 import LeavePolicy from './pages/app/LeavePolicy';
 
@@ -38,7 +37,6 @@ import Reports from './pages/app/Reports';
 
 // Engagement & Operations
 import Announcement from './pages/app/Announcement';
-import Award from './pages/app/Award';
 import ProjectManagement from './pages/app/ProjectManagement';
 
 // Recruitment Module Sub-pages
@@ -94,7 +92,8 @@ function App() {
           {/* Leave & Holiday */}
           <Route path="leaves" element={<Leaves />} />
           <Route path="leave" element={<Navigate to="/app/leaves" replace />} />
-          <Route path="holiday/weekly" element={<WeeklyHoliday />} />
+          <Route path="holiday" element={<Navigate to="/app/holiday/public" replace />} />
+          <Route path="holiday/weekly" element={<Navigate to="/app/holiday/public" replace />} />
           <Route path="holiday/public" element={<PublicHoliday />} />
           <Route path="leave-policy" element={<LeavePolicy />} />
 
@@ -109,7 +108,7 @@ function App() {
 
           {/* Engagement & Operations */}
           <Route path="announcement" element={<Announcement />} />
-          <Route path="award" element={<Award />} />
+          <Route path="award" element={<Navigate to="/app/announcement" replace />} />
           <Route path="project" element={<ProjectManagement />} />
 
           {/* Recruitment Module */}

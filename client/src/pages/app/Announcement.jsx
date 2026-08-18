@@ -171,17 +171,6 @@ const Announcement = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Broadcast Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-600/20 dark:border-indigo-500/30">
-                <Megaphone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Executive Broadcast Hub Active</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-600/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-semibold border border-purple-600/20 dark:border-purple-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                <span>All Employees Notified</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Company Announcements & Notice Board
             </h2>
@@ -441,45 +430,65 @@ const Announcement = () => {
         )}
       </div>
 
-      {/* MODAL: POST CIRCULAR */}
+      {/* ========================================================================= */}
+      {/* MODAL: POST CIRCULAR (STITCH LUXURY DESIGN) */}
+      {/* ========================================================================= */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
-                  <Megaphone className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+                  <Megaphone className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">Broadcast Announcement</h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Broadcast Announcement
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Publish company circulars, executive updates, and important operational memos to all employees.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsPostModalOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handlePostSubmit} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Announcement Title *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Annual Company Retreat 2026 Announcement & RSVP"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                />
+            {/* Scrollable Form Body */}
+            <form onSubmit={handlePostSubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+              {/* Title */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Announcement Title <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Megaphone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Annual Company Retreat 2026 Announcement & Itinerary"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Category *</label>
+              {/* Category & Priority */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Category Scope <span className="text-rose-500">*</span>
+                  </label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="EVENTS">Events & Retreats</option>
                     <option value="BENEFITS">Benefits & Health</option>
@@ -489,55 +498,77 @@ const Announcement = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Priority Level</label>
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Priority Urgency <span className="text-rose-500">*</span>
+                  </label>
                   <select
                     value={form.priority}
                     onChange={(e) => setForm({ ...form, priority: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
                   >
-                    <option value="HIGH">High Priority (Red Alert)</option>
-                    <option value="MEDIUM">Medium Priority (Amber)</option>
-                    <option value="INFO">Informational (Blue)</option>
+                    <option value="HIGH">High Priority (Urgent Red Alert)</option>
+                    <option value="MEDIUM">Medium Priority (Standard Amber)</option>
+                    <option value="INFO">Informational Bulletin (Blue)</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Detailed Notice Body *</label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Full circular details, instructions, action links..."
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
-                />
+              {/* Detailed Notice Body */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Detailed Circular Body <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Full announcement text, schedule of events, guidelines, links..."
+                    value={form.content}
+                    onChange={(e) => setForm({ ...form, content: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
+                  />
+                </div>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer pt-1">
-                <input
-                  type="checkbox"
-                  checked={form.pinned}
-                  onChange={(e) => setForm({ ...form, pinned: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-                <span className="font-bold text-slate-700 dark:text-slate-200">Pin this circular to top of Employee Notice Board</span>
-              </label>
+              {/* Pin Switch Toggle Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white text-xs">Pin to Top of Notice Board</div>
+                  <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                    Ensures all employees see this notice immediately upon portal login.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, pinned: !form.pinned })}
+                  className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                    form.pinned ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                      form.pinned ? 'right-1' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsPostModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
-                  Publish & Broadcast
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>Publish & Broadcast</span>
                 </button>
               </div>
             </form>

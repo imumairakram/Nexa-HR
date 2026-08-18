@@ -134,17 +134,6 @@ const Payroll = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Payroll Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-600/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs font-extrabold border border-blue-600/20 dark:border-blue-500/30">
-                <Zap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span>Pay Run Engine: {MONTH_NAMES[runMonth - 1]} {runYear}</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-semibold border border-indigo-600/20 dark:border-indigo-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Direct Bank Wire Ready</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Global Payroll Processing & Auto-Tax Engine
             </h2>
@@ -363,35 +352,47 @@ const Payroll = () => {
         )}
       </div>
 
-      {/* MODAL: RUN PAYROLL BATCH */}
+      {/* ========================================================================= */}
+      {/* MODAL: RUN PAYROLL BATCH (STITCH LUXURY DESIGN) */}
+      {/* ========================================================================= */}
       {isRunModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
-                  <Play className="w-5 h-5 fill-current" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-emerald-50/60 via-teal-50/40 to-sky-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-sky-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/25">
+                  <Play className="w-6 h-6 fill-current stroke-none" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                  Execute {MONTH_NAMES[runMonth - 1]} {runYear} Pay Run
-                </h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Execute Payroll Batch
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Process salary disbursements, tax computations, and automated payslip generation.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsRunModalOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Pay Month</label>
+            {/* Scrollable Form Body */}
+            <div className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+              {/* Month & Year Selectors */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Target Pay Month <span className="text-rose-500">*</span>
+                  </label>
                   <select
                     value={runMonth}
                     onChange={(e) => setRunMonth(parseInt(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     {MONTH_NAMES.map((m, idx) => (
                       <option key={m} value={idx + 1}>
@@ -400,39 +401,59 @@ const Payroll = () => {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Pay Year</label>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Pay Year <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="number"
                     value={runYear}
                     onChange={(e) => setRunYear(parseInt(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
                   />
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 space-y-2">
+              {/* Policy & Automation Notice Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-emerald-100 dark:border-slate-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="font-extrabold text-slate-900 dark:text-white text-xs flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>Automated Batch Computation</span>
+                  </div>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                    {MONTH_NAMES[runMonth - 1]} {runYear} Cycle
+                  </span>
+                </div>
                 <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-[11px]">
                   Executing this payroll batch will automatically evaluate all active employee salary structures, calculate tax withholdings, deduct unpaid leaves from attendance records, and generate encrypted monthly payslips in PostgreSQL.
                 </p>
               </div>
-            </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-              <button
-                onClick={() => setIsRunModalOpen(false)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRunPayroll}
-                disabled={submitting}
-                className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-              >
-                {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>Confirm & Generate</span>
-              </button>
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => setIsRunModalOpen(false)}
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRunPayroll}
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 hover:from-emerald-700 hover:to-sky-700 text-white font-bold text-xs shadow-md shadow-emerald-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  {submitting ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  )}
+                  <span>Confirm & Generate Batch</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

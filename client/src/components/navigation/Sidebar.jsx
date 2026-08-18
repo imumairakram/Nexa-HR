@@ -19,7 +19,6 @@ import {
   Megaphone,
   Landmark,
   BarChart3,
-  Award,
   FolderKanban,
   Briefcase,
   Calendar,
@@ -40,7 +39,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     return {
       hr: path.includes('/app/hr') || path === '/app/employees' || path === '/app/departments',
       payroll: path.includes('/app/payroll'),
-      holiday: path.includes('/app/holiday'),
       recruitment: path.includes('/app/recruitment'),
     };
   });
@@ -106,24 +104,11 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
     { type: 'link', label: 'Employment Status', path: '/app/employment-status', icon: UserCheck },
     { type: 'link', label: 'Leave', path: '/app/leaves', icon: CalendarDays },
-
-    {
-      type: 'accordion',
-      key: 'holiday',
-      label: 'Holiday',
-      icon: Calendar,
-      defaultPath: '/app/holiday/public',
-      children: [
-        { label: 'Weekly Holiday', path: '/app/holiday/weekly' },
-        { label: 'Public Holiday', path: '/app/holiday/public' },
-      ],
-    },
-
+    { type: 'link', label: 'Holiday', path: '/app/holiday/public', icon: Calendar },
     { type: 'link', label: 'Leave Policy', path: '/app/leave-policy', icon: FileText },
     { type: 'link', label: 'Announcement', path: '/app/announcement', icon: Megaphone },
     { type: 'link', label: 'Accounts', path: '/app/accounts', icon: Landmark },
     { type: 'link', label: 'Reports', path: '/app/reports', icon: BarChart3 },
-    { type: 'link', label: 'Award', path: '/app/award', icon: Award },
     { type: 'link', label: 'Project', path: '/app/project', icon: FolderKanban },
 
     {

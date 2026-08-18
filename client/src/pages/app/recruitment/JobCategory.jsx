@@ -104,17 +104,6 @@ const JobCategory = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Category Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-600/20 dark:border-indigo-500/30">
-                <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Job Taxonomy & Categories Active</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-600/20 dark:border-emerald-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Portal Requisitions Tagged</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Job Categories Master Table & Requisition Taxonomy
             </h2>
@@ -301,40 +290,124 @@ const JobCategory = () => {
         </div>
       </div>
 
+      {/* ========================================================================= */}
+      {/* MODAL: ADD JOB CATEGORY (STITCH LUXURY DESIGN) */}
+      {/* ========================================================================= */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 space-y-4 shadow-2xl border border-slate-100 dark:border-slate-800 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-black text-slate-900 dark:text-white">Add Job Category</h3>
-              <button onClick={() => setIsAddOpen(false)} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+                  <Layers className="w-6 h-6 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Add Job Category
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Create functional talent classification disciplines and recruitment sourcing channels.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddOpen(false)}
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleAdd} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Category Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Artificial Intelligence & Machine Learning"
-                  value={newCat.name}
-                  onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                />
+
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleAdd} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+              {/* Category Name */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Category Name <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Layers className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Artificial Intelligence & Machine Learning"
+                    value={newCat.name}
+                    onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Code *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. AIML"
-                  value={newCat.code}
-                  onChange={(e) => setNewCat({ ...newCat, code: e.target.value })}
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-slate-900 dark:text-white"
-                />
+
+              {/* Code & Lead */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Category Code <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Tag className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. AIML"
+                      value={newCat.code}
+                      onChange={(e) => setNewCat({ ...newCat, code: e.target.value.toUpperCase() })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Supervising Lead
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Department Lead / VP"
+                    value={newCat.lead}
+                    onChange={(e) => setNewCat({ ...newCat, lead: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
               </div>
-              <div className="flex justify-end gap-2 pt-3">
-                <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 font-bold">Cancel</button>
-                <button type="submit" className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">Save Category</button>
+
+              {/* Preview Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-blue-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-black text-xs shadow-sm">
+                    {newCat.code.trim() || 'CAT'}
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                      {newCat.name.trim() || 'Category Discipline Preview'}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                      {newCat.lead || 'Supervised by Department Lead'}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  Active
+                </span>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => setIsAddOpen(false)}
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                >
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>Save Category</span>
+                </button>
               </div>
             </form>
           </div>

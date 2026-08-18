@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Calendar,
   ChevronLeft,
@@ -16,6 +16,7 @@ import {
   Layers,
   ArrowRight,
   HelpCircle,
+  Moon,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
@@ -31,13 +32,26 @@ const EmployeeHolidays = () => {
   const [selectedYear, setSelectedYear] = useState(currentYearNow);
   const [filter, setFilter] = useState('ALL');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const handleUpdate = () => setRefreshKey((k) => k + 1);
+    window.addEventListener('nexahr_holidays_updated', handleUpdate);
+    window.addEventListener('nexahr_lunar_calibration_updated', handleUpdate);
+    window.addEventListener('nexahr_regional_settings_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('nexahr_holidays_updated', handleUpdate);
+      window.removeEventListener('nexahr_lunar_calibration_updated', handleUpdate);
+      window.removeEventListener('nexahr_regional_settings_updated', handleUpdate);
+    };
+  }, []);
 
   const availableYears = useMemo(() => getAvailableYears(), []);
 
   // Compute live holidays for the selected year and timezone
   const allYearHolidays = useMemo(() => {
     return getYearHolidays(selectedYear, timezone, dateFormat);
-  }, [selectedYear, timezone, dateFormat]);
+  }, [selectedYear, timezone, dateFormat, refreshKey]);
 
   // Filtered list based on active category
   const filteredHolidays = useMemo(() => {
@@ -76,17 +90,6 @@ const EmployeeHolidays = () => {
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-3 flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-400/20 backdrop-blur-md text-sky-200 text-xs font-bold border border-sky-300/30">
-                  <PartyPopper className="w-3.5 h-3.5 text-sky-300" />
-                  <span>{featuredHoliday.type} • {timezone}</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-400/30">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  <span>Gazetted Official</span>
-                </span>
-              </div>
-
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight leading-tight">
                 {featuredHoliday.name}
               </h2>
@@ -285,13 +288,19 @@ const EmployeeHolidays = () => {
                       {/* Column 2: Holiday Title & Details */}
                       <td className="py-4 px-6">
                         <div className="space-y-1 max-w-md">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                               {h.name}
                             </span>
                             {h.isCustom && (
                               <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/60">
                                 Company Special
+                              </span>
+                            )}
+                            {h.isIslamic && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center gap-1">
+                                <Moon className="w-2.5 h-2.5 text-emerald-500" />
+                                <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                               </span>
                             )}
                           </div>

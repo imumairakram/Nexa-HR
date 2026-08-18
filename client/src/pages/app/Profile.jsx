@@ -258,16 +258,6 @@ const Profile = () => {
           </div>
 
           <div className="flex-1 text-center md:text-left space-y-2.5">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-600/20 dark:border-indigo-500/30">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Super Administrator Tier</span>
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
-                {profile.employeeCode}
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               {profile.firstName} {profile.lastName}
             </h2>

@@ -318,17 +318,6 @@ const EmployeeHelpdesk = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Telemetry Info */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-600/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 text-xs font-extrabold border border-rose-600/20 dark:border-rose-500/30">
-                <Headphones className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                <span>Dedicated Employee Support Live</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-600/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-semibold border border-purple-600/20 dark:border-purple-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                <span>Ops Team Online</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Enterprise Resolution & Helpdesk Hub
             </h2>
@@ -784,106 +773,140 @@ const EmployeeHelpdesk = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 6. CREATE NEW SUPPORT TICKET MODAL */}
+      {/* 6. CREATE NEW SUPPORT TICKET MODAL (STITCH LUXURY DESIGN) */}
       {/* ========================================================================= */}
       {isNewTicketOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-                  <LifeBuoy className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/60 via-indigo-50/40 to-slate-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 via-indigo-600 to-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25">
+                  <LifeBuoy className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">Raise Support Ticket</h3>
-                  <p className="text-xs text-slate-400 font-medium">Direct routing to operations lead</p>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Raise Support Ticket
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Direct routing to internal workplace operations, IT equipment, and HR administrators.
+                  </p>
                 </div>
               </div>
-
               <button
                 onClick={() => setIsNewTicketOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateTicket} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Subject / Summary *
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleCreateTicket} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+              {/* Subject */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Subject / Summary <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ergonomic chair replacement requisition"
+                  placeholder="e.g. Ergonomic chair replacement or VPN configuration inquiry"
                   value={newTicketForm.subject}
                   onChange={(e) => setNewTicketForm({ ...newTicketForm, subject: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all placeholder:text-slate-400"
                 />
               </div>
 
+              {/* Category & Priority */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Category Type *
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Category Scope <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={newTicketForm.category}
                     onChange={(e) => setNewTicketForm({ ...newTicketForm, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all cursor-pointer appearance-none"
                   >
-                    <option value="IT_HARDWARE">IT & Hardware</option>
+                    <option value="IT_HARDWARE">IT & Hardware Gear</option>
                     <option value="PAYROLL">Payroll & Compensation</option>
                     <option value="BENEFITS">Benefits & Health Insurance</option>
-                    <option value="WORKPLACE">Workplace & Admin</option>
+                    <option value="WORKPLACE">Workplace & Office Admin</option>
                     <option value="GENERAL_HR">General HR Inquiry</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Priority Level *
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Urgency Priority <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={newTicketForm.priority}
                     onChange={(e) => setNewTicketForm({ ...newTicketForm, priority: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all cursor-pointer appearance-none"
                   >
-                    <option value="LOW">Low (General Query)</option>
-                    <option value="MEDIUM">Medium (Standard Request)</option>
-                    <option value="HIGH">High (Urgent Impact)</option>
+                    <option value="LOW">Low (Standard Inquiry)</option>
+                    <option value="MEDIUM">Medium (Normal Operational Need)</option>
+                    <option value="HIGH">High (Critical Blocker)</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Detailed Description *
+              {/* Detailed Description */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Detailed Description <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={4}
                   required
-                  placeholder="Provide all necessary details, invoice numbers, or equipment requirements..."
+                  placeholder="Provide explicit context, model specifications, error logs, or relevant ticket attachments..."
                   value={newTicketForm.description}
                   onChange={(e) => setNewTicketForm({ ...newTicketForm, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none"
+                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all resize-none placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Preview Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-rose-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    <LifeBuoy className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                      {newTicketForm.subject.trim() || 'Support Requisition Preview'}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                      Category: {newTicketForm.category} • Priority: {newTicketForm.priority}
+                    </div>
+                  </div>
+                </div>
+                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full ${
+                  newTicketForm.priority === 'HIGH'
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                    : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                }`}>
+                  {newTicketForm.priority}
+                </span>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsNewTicketOpen(false)}
-                  className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 cursor-pointer transition-all"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 via-indigo-600 to-amber-600 hover:from-rose-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
-                  Submit Ticket
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>Submit Ticket</span>
                 </button>
               </div>
             </form>

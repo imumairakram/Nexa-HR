@@ -39,7 +39,7 @@ export const FEATURE_MODULES = [
       { key: 'approve_reject_leaves', label: 'Approve & Reject Leave Requests', description: 'Make authorization decisions on pending leaves' },
       { key: 'apply_behalf_leave', label: 'Apply Leave on Behalf of Staff', description: 'Submit time-off requests for other team members' },
       { key: 'configure_leave_policies', label: 'Configure Leave Quotas & Policies', description: 'Set statutory leave rules, accruals, and carryovers' },
-      { key: 'manage_company_holidays', label: 'Manage Public & Weekly Holidays', description: 'Configure gazetted holidays and workweek schedules' },
+      { key: 'manage_company_holidays', label: 'Manage Public Holidays', description: 'Configure gazetted holidays and corporate calendar' },
     ],
   },
   {
@@ -76,7 +76,6 @@ export const FEATURE_MODULES = [
     features: [
       { key: 'post_announcements', label: 'Broadcast Official Announcements', description: 'Publish company-wide announcements and pin alerts' },
       { key: 'manage_accounts_ledger', label: 'Record Ledger Vouchers & Accounts', description: 'Post department expenses, invoices, and income' },
-      { key: 'confer_awards', label: 'Confer Employee Recognition Awards', description: 'Nominate staff for monthly spotlight awards' },
       { key: 'manage_projects', label: 'Manage Projects & Sprint Delivery', description: 'Initiate company projects, milestones, and budgets' },
       { key: 'generate_executive_reports', label: 'Generate Intelligence & Audit Reports', description: 'Export analytics, headcount forecasts, and liability audits' },
     ],
@@ -150,7 +149,6 @@ export const ROLE_PRESETS = {
       manage_recruitment_taxonomy: true,
       // Operations
       post_announcements: true,
-      confer_awards: true,
       manage_projects: true,
       generate_executive_reports: true,
     },
@@ -199,7 +197,6 @@ export const ROLE_PRESETS = {
       approve_reject_leaves: true,
       manage_projects: true,
       schedule_interviews: true,
-      confer_awards: true,
     },
   },
   STANDARD_EMPLOYEE: {

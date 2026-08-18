@@ -386,42 +386,27 @@ const EmployeeAnnouncements = () => {
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             {/* Left Column: Spotlight details */}
             <div className="space-y-3.5 flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 backdrop-blur-md text-rose-300 text-xs font-black tracking-wide uppercase border border-rose-500/40">
-                  <Flame className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
-                  <span>Featured Broadcast</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-400/30">
-                  <Tag className="w-3 h-3 text-purple-300" />
-                  <span>{heroNotice.categoryLabel || 'Executive Circular'}</span>
-                </span>
-                <span className="text-xs text-slate-400 font-medium">
-                  Posted {heroNotice.timeAgo} by {heroNotice.author}
-                </span>
-
-                {/* Live Banner Slider Switchers if multiple */}
-                {heroCandidates.length > 1 && (
-                  <div className="flex items-center gap-1 ml-auto bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
-                    <button
-                      onClick={handlePrevHero}
-                      title="Previous Notice"
-                      className="p-1 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <ChevronLeft className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-[10px] font-mono font-bold px-1 text-slate-300">
-                      {(((heroIndex % heroCandidates.length) + heroCandidates.length) % heroCandidates.length) + 1} / {heroCandidates.length}
-                    </span>
-                    <button
-                      onClick={handleNextHero}
-                      title="Next Notice"
-                      className="p-1 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-              </div>
+              {heroCandidates.length > 1 && (
+                <div className="flex items-center gap-1 w-fit bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10 mb-2">
+                  <button
+                    onClick={handlePrevHero}
+                    title="Previous Notice"
+                    className="p-1 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="text-[10px] font-mono font-bold px-1 text-slate-300">
+                    {(((heroIndex % heroCandidates.length) + heroCandidates.length) % heroCandidates.length) + 1} / {heroCandidates.length}
+                  </span>
+                  <button
+                    onClick={handleNextHero}
+                    title="Next Notice"
+                    className="p-1 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
 
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
                 {heroNotice.title}

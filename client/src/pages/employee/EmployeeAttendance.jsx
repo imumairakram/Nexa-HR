@@ -123,17 +123,6 @@ const EmployeeAttendance = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Biometric Hardware Live Pulse */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-400 text-xs font-bold border border-white/10">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>Biometric Hardware Station Online</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 backdrop-blur-md text-blue-300 text-xs font-semibold border border-blue-400/20">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                <span>Database Sync Active</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight leading-tight">
               {todayLog?.checkIn && todayLog.checkIn !== '--:--'
                 ? `Today's Entry: ${todayLog.checkIn} (Verified)`

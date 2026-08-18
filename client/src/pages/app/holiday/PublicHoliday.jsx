@@ -19,6 +19,21 @@ import {
   PartyPopper,
   Info,
   CalendarRange,
+  Sparkles,
+  Globe,
+  CalendarCheck2,
+  Moon,
+  CalendarPlus,
+  Tag,
+  Landmark,
+  Star,
+  Building2,
+  Building,
+  Bot,
+  Sun,
+  FileText,
+  ShieldCheck,
+  Users,
 } from 'lucide-react';
 import { useRegionalSettings } from '../../../context/RegionalSettingsContext';
 import {
@@ -27,6 +42,7 @@ import {
   addCustomHoliday,
   deleteCustomHoliday,
   getCustomHolidays,
+  getLiveHijriDate,
 } from '../../../utils/holidayEngine';
 
 const MONTH_NAMES = [
@@ -34,8 +50,56 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const CATEGORY_OPTIONS = [
+  {
+    id: 'Gazetted National',
+    title: 'Gazetted National',
+    desc: 'Statutory compliance',
+    icon: Landmark,
+    color: 'blue',
+    activeClass: 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/90 dark:bg-blue-950/60 text-blue-950 dark:text-blue-200 shadow-xs',
+    iconClass: 'text-blue-600 dark:text-blue-400',
+  },
+  {
+    id: 'Gazetted Religious',
+    title: 'Gazetted Religious',
+    desc: 'Cultural observance',
+    icon: Moon,
+    color: 'purple',
+    activeClass: 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/90 dark:bg-purple-950/60 text-purple-950 dark:text-purple-200 shadow-xs',
+    iconClass: 'text-purple-600 dark:text-purple-400',
+  },
+  {
+    id: 'Company Recognized',
+    title: 'Company Special',
+    desc: 'Internal organization',
+    icon: Star,
+    color: 'indigo',
+    activeClass: 'border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-50/90 dark:bg-indigo-950/60 text-indigo-950 dark:text-indigo-200 shadow-xs',
+    iconClass: 'text-indigo-600 dark:text-indigo-400',
+  },
+  {
+    id: 'Bank Holiday',
+    title: 'Bank Holiday',
+    desc: 'Financial sector closure',
+    icon: Building2,
+    color: 'emerald',
+    activeClass: 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/90 dark:bg-emerald-950/60 text-emerald-950 dark:text-emerald-200 shadow-xs',
+    iconClass: 'text-emerald-600 dark:text-emerald-400',
+  },
+  {
+    id: 'Optional Holiday',
+    title: 'Optional / Festive',
+    desc: 'Floating employee choice',
+    icon: PartyPopper,
+    color: 'amber',
+    activeClass: 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/90 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 shadow-xs',
+    iconClass: 'text-amber-600 dark:text-amber-400',
+  },
+];
+
 const PublicHoliday = () => {
-  const { timezone, dateFormat, timeFormat, formatTime, formatDate } = useRegionalSettings();
+  const { timezone, dateFormat } = useRegionalSettings();
 
   const currentYearNow = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(2026);
@@ -47,10 +111,14 @@ const PublicHoliday = () => {
   // Custom Holiday Form State
   const [form, setForm] = useState({
     name: '',
-    date: `${selectedYear}-08-25`,
-    type: 'Gazetted National',
+    date: `${selectedYear}-08-26`,
+    type: 'Company Recognized',
     isLongWeekend: true,
     recurringYearly: false,
+    paidCoverage: true,
+    autoWaivePenalty: true,
+    scopeLocation: 'All Duty Stations (HQ + Regional + Remote)',
+    scopeDepartment: 'Organization-Wide (All Employees)',
     description: '',
   });
 
@@ -58,9 +126,24 @@ const PublicHoliday = () => {
   useEffect(() => {
     setForm((prev) => ({
       ...prev,
-      date: `${selectedYear}-08-14`,
+      date: `${selectedYear}-08-26`,
     }));
   }, [selectedYear]);
+
+  // Live dynamic info for currently chosen form date
+  const formDateInfo = useMemo(() => {
+    if (!form.date) return { dayName: '', formattedDate: '', isLongWeekend: false };
+    try {
+      const [y, m, d] = form.date.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d, 12, 0, 0);
+      const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(dateObj);
+      const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(dateObj);
+      const isLongWeekend = dayName === 'Friday' || dayName === 'Monday' || dayName === 'Saturday' || dayName === 'Sunday';
+      return { dayName, formattedDate, isLongWeekend };
+    } catch {
+      return { dayName: '', formattedDate: form.date, isLongWeekend: false };
+    }
+  }, [form.date]);
 
   // Load enriched holidays dynamically for the chosen year and timezone
   const [holidaysRefreshKey, setHolidaysRefreshKey] = useState(0);
@@ -71,9 +154,11 @@ const PublicHoliday = () => {
     };
 
     window.addEventListener('nexahr_holidays_updated', handleHolidaysUpdate);
+    window.addEventListener('nexahr_lunar_calibration_updated', handleHolidaysUpdate);
     window.addEventListener('nexahr_regional_settings_updated', handleHolidaysUpdate);
     return () => {
       window.removeEventListener('nexahr_holidays_updated', handleHolidaysUpdate);
+      window.removeEventListener('nexahr_lunar_calibration_updated', handleHolidaysUpdate);
       window.removeEventListener('nexahr_regional_settings_updated', handleHolidaysUpdate);
     };
   }, []);
@@ -82,19 +167,23 @@ const PublicHoliday = () => {
     return getYearHolidays(selectedYear, timezone, dateFormat);
   }, [selectedYear, timezone, dateFormat, holidaysRefreshKey]);
 
+  // Live Today's Hijri Date & Moon Phase (dynamically calculated)
+  const liveHijri = useMemo(() => {
+    return getLiveHijriDate(new Date(), timezone, 0);
+  }, [timezone, holidaysRefreshKey]);
+
   // Filter holidays by search
   const filteredHolidays = useMemo(() => {
     return allHolidays.filter((h) => {
-      // Search filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchName = h.name.toLowerCase().includes(query);
         const matchType = h.type.toLowerCase().includes(query);
         const matchDay = h.day.toLowerCase().includes(query);
         const matchDate = h.displayDate.toLowerCase().includes(query);
-        if (!matchName && !matchType && !matchDay && !matchDate) return false;
+        const matchHijri = h.hijriDateText && h.hijriDateText.toLowerCase().includes(query);
+        if (!matchName && !matchType && !matchDay && !matchDate && !matchHijri) return false;
       }
-
       return true;
     });
   }, [allHolidays, searchQuery]);
@@ -105,8 +194,13 @@ const PublicHoliday = () => {
     const total = allHolidays.length;
     const upcoming = allHolidays.filter((h) => h.status === 'UPCOMING' || h.status === 'ACTIVE_TODAY').length;
     const gazettedCount = allHolidays.filter((h) => !h.isCustom).length;
+    const islamicCount = allHolidays.filter((h) => h.isIslamic).length;
     const activeToday = allHolidays.find((h) => h.status === 'ACTIVE_TODAY');
-    return { total, upcoming, gazettedCount, activeToday };
+    return { total, upcoming, gazettedCount, islamicCount, activeToday };
+  }, [allHolidays]);
+
+  const nextHoliday = useMemo(() => {
+    return allHolidays.find((h) => h.status === 'ACTIVE_TODAY' || h.status === 'UPCOMING');
   }, [allHolidays]);
 
   const handleAddSubmit = (e) => {
@@ -117,19 +211,27 @@ const PublicHoliday = () => {
       name: form.name.trim(),
       date: form.date,
       type: form.type,
-      isLongWeekend: form.isLongWeekend,
+      isLongWeekend: formDateInfo.isLongWeekend,
       recurringYearly: form.recurringYearly,
-      description: form.description.trim() || 'Company Recognized Holiday',
+      paidCoverage: form.paidCoverage,
+      autoWaivePenalty: form.autoWaivePenalty,
+      scopeLocation: form.scopeLocation,
+      scopeDepartment: form.scopeDepartment,
+      description: form.description.trim() || `${form.type} — Scheduled Company Holiday`,
     });
 
     setIsAddOpen(false);
     setToastMsg(`Holiday "${form.name}" successfully added to ${selectedYear} calendar!`);
     setForm({
       name: '',
-      date: `${selectedYear}-08-14`,
-      type: 'Gazetted National',
+      date: `${selectedYear}-08-26`,
+      type: 'Company Recognized',
       isLongWeekend: true,
       recurringYearly: false,
+      paidCoverage: true,
+      autoWaivePenalty: true,
+      scopeLocation: 'All Duty Stations (HQ + Regional + Remote)',
+      scopeDepartment: 'Organization-Wide (All Employees)',
       description: '',
     });
     setTimeout(() => setToastMsg(''), 3500);
@@ -156,7 +258,66 @@ const PublicHoliday = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. STITCH-INSPIRED TELEMETRY KPI CARDS (TOP SECTION) */}
+      {/* 1. DYNAMIC PUBLIC HOLIDAY HERO BANNER (SKY-INDIGO-EMERALD AESTHETIC) */}
+      {/* ========================================================================= */}
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-indigo-50/80 to-emerald-50/60 dark:from-slate-900/90 dark:via-indigo-950/40 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-slate-800 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-10 left-10 w-48 h-48 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left Side: Telemetry & Holiday Highlights */}
+          <div className="space-y-3 flex-1 min-w-0">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              Gazetted Holidays & Corporate Calendar
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl font-medium">
+              Automated Islamic lunar ephemeris and gazetted statutory calendar synchronization. Real-time timezone and lunar calendar alignment ensures 100% accurate holiday schedules, automated attendance waivers, and workforce payroll compliance.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+              {stats.activeToday ? (
+                <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/80 dark:bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-300 dark:border-emerald-800 animate-pulse">
+                  <PartyPopper className="w-3.5 h-3.5" />
+                  <span>Today is {stats.activeToday.name}!</span>
+                </span>
+              ) : nextHoliday ? (
+                <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/70 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
+                </span>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Right Side: Quick Action Glassmorphic Card */}
+          <div className="bg-white/85 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/70 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[230px] sm:min-w-[260px] shrink-0 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20">
+              <PartyPopper className="w-6 h-6 stroke-[2.2]" />
+            </div>
+            <div>
+              <div className="text-xs font-black text-slate-900 dark:text-white">Custom Holiday Entry</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Add company-specific floating day
+              </div>
+            </div>
+            <button
+              onClick={() => setIsAddOpen(true)}
+              className="w-full px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-sky-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Add Custom Holiday</span>
+            </button>
+            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              Active Year: {selectedYear}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS (TOP SECTION) */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Card 1 */}
@@ -175,7 +336,7 @@ const PublicHoliday = () => {
               {stats.total} <span className="text-base font-bold text-slate-400">Days</span>
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Gazetted & Optional</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{stats.islamicCount} Islamic Lunar</span>
               <span className="text-slate-400">Annual</span>
             </div>
           </div>
@@ -251,7 +412,7 @@ const PublicHoliday = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. UNIFIED COMMAND & CONTROLS TOOLBAR */}
+      {/* 3. UNIFIED COMMAND & CONTROLS TOOLBAR */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-3.5">
         {/* Row 1: Search Bar + View Toggle & Add Holiday Button */}
@@ -260,7 +421,7 @@ const PublicHoliday = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder={`Search ${selectedYear} holidays by title, day, or category...`}
+              placeholder={`Search ${selectedYear} holidays by title, day, hijri date, or category...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-9 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
@@ -343,17 +504,17 @@ const PublicHoliday = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. VIEW MODE: TABULAR LIST VIEW */}
+      {/* 4. VIEW MODE: TABULAR LIST VIEW */}
       {/* ========================================================================= */}
       {viewMode === 'list' && (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Official Gazetted & Corporate Calendar — Year {selectedYear}
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>Official Gazetted & Corporate Calendar — Year {selectedYear}</span>
               </h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Automatically calculated according to timezone: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{timezone}</span>
+                Synchronized with regional timezone: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{timezone}</span>
               </p>
             </div>
             <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 self-start sm:self-auto">
@@ -407,13 +568,19 @@ const PublicHoliday = () => {
                       {/* Column 2: Holiday Title & Details */}
                       <td className="py-4 px-6">
                         <div className="space-y-1 max-w-md">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                               {h.name}
                             </span>
                             {h.isCustom && (
                               <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/60">
                                 Company Special
+                              </span>
+                            )}
+                            {h.isIslamic && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center gap-1">
+                                <Moon className="w-2.5 h-2.5 text-emerald-500" />
+                                <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                               </span>
                             )}
                           </div>
@@ -447,9 +614,9 @@ const PublicHoliday = () => {
                         </span>
                       </td>
 
-                      {/* Column 5: Status, Countdown & Actions */}
+                      {/* Column 5: Status & Actions */}
                       <td className="py-4 px-6 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2.5">
+                        <div className="flex items-center justify-end gap-2">
                           <span
                             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold border ${
                               h.status === 'ACTIVE_TODAY'
@@ -483,7 +650,7 @@ const PublicHoliday = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 6. VIEW MODE: 12-MONTH INTERACTIVE CALENDAR GRID */}
+      {/* 5. VIEW MODE: 12-MONTH INTERACTIVE CALENDAR GRID */}
       {/* ========================================================================= */}
       {viewMode === 'calendar' && (
         <div className="space-y-6">
@@ -521,12 +688,10 @@ const PublicHoliday = () => {
 
                     {/* Days Matrix */}
                     <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                      {/* Empty cells before month start */}
                       {Array.from({ length: firstDayOfWeek }).map((_, i) => (
                         <div key={`empty-${i}`} className="h-7" />
                       ))}
 
-                      {/* Day cells */}
                       {Array.from({ length: daysInMonth }).map((_, dIdx) => {
                         const day = dIdx + 1;
                         const dateStr = `${selectedYear}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -537,13 +702,15 @@ const PublicHoliday = () => {
                         return (
                           <div
                             key={day}
-                            title={hasHoliday ? matchingHolidays.map((h) => h.name).join(' • ') : ''}
+                            title={hasHoliday ? matchingHolidays.map((h) => `${h.name} (${h.hijriDateText || h.type})`).join(' • ') : ''}
                             className={`h-7 rounded-xl flex items-center justify-center font-bold text-[11px] transition-all cursor-default ${
                               hasHoliday
-                                ? 'bg-emerald-500 text-white shadow-xs font-black'
-                                : isWeekend
-                                ? 'text-slate-400 dark:text-slate-500 font-medium'
-                                : 'text-slate-700 dark:text-slate-300'
+                                ? matchingHolidays.some((h) => h.isIslamic)
+                                ? 'bg-emerald-600 text-white shadow-xs font-black'
+                                : 'bg-blue-600 text-white shadow-xs font-black'
+                              : isWeekend
+                              ? 'text-slate-400 dark:text-slate-500 font-medium'
+                              : 'text-slate-700 dark:text-slate-300'
                             }`}
                           >
                             {day}
@@ -561,11 +728,12 @@ const PublicHoliday = () => {
                           key={h.id}
                           className="flex items-start gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"
                         >
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                          <div className="min-w-0">
+                          <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${h.isIslamic ? 'bg-emerald-500' : 'bg-blue-500'}`} />
+                          <div className="min-w-0 flex-1">
                             <span className="font-bold text-slate-900 dark:text-white truncate block">{h.name}</span>
-                            <span className="text-[10px] text-slate-400 font-medium">
-                              {h.dayNum} {h.monthShort} ({h.day})
+                            <span className="text-[10px] text-slate-400 font-medium flex items-center justify-between">
+                              <span>{h.dayNum} {h.monthShort} ({h.day})</span>
+                              {h.isIslamic && <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{h.hijriDateText}</span>}
                             </span>
                           </div>
                         </div>
@@ -580,103 +748,277 @@ const PublicHoliday = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 7. ADD CUSTOM HOLIDAY MODAL */}
+      {/* 6. STITCH-INSPIRED LUXURY ADD CUSTOM HOLIDAY MODAL */}
       {/* ========================================================================= */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
-                  <Calendar className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-2xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/50 via-indigo-50/30 to-emerald-50/30 dark:from-slate-900/60 dark:via-slate-900/40 dark:to-slate-900/60">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20">
+                  <CalendarPlus className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">Add Custom Holiday</h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Add Custom Holiday
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md line-clamp-1 sm:line-clamp-none">
+                    Configure attendance rules, payroll wage coverage, and duty station waivers for this corporate event.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddSubmit} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Holiday Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Annual Company Foundation Day"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
-                />
-              </div>
-
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleAddSubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-6 custom-scrollbar text-xs">
+              {/* Section 1: Basic Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Holiday Date *</label>
-                  <input
-                    type="date"
-                    required
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
-                  />
+                {/* Holiday Name */}
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Holiday Name <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Tag className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Annual Company Foundation Day"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Category Type</label>
-                  <select
-                    value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
+                {/* Holiday Date */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                      Holiday Date <span className="text-rose-500">*</span>
+                    </label>
+                    {formDateInfo.formattedDate && (
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+                        {formDateInfo.dayName} • {formDateInfo.formattedDate}
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="date"
+                      required
+                      value={form.date}
+                      onChange={(e) => setForm({ ...form, date: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Interactive Classification Category Segmented Cards */}
+              <div className="space-y-2">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Classification Category
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {CATEGORY_OPTIONS.map((cat) => {
+                    const Icon = cat.icon;
+                    const isSelected = form.type === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setForm({ ...form, type: cat.id })}
+                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 relative ${
+                          isSelected
+                            ? cat.activeClass
+                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                        }`}
+                      >
+                        <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-white dark:bg-slate-900 shadow-xs' : 'bg-slate-100 dark:bg-slate-700/60'}`}>
+                          <Icon className={`w-4 h-4 ${isSelected ? cat.iconClass : 'text-slate-500'}`} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-extrabold text-xs text-slate-900 dark:text-white flex items-center justify-between">
+                            <span>{cat.title}</span>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
+                          </div>
+                          <div className="text-[10px] text-slate-400 dark:text-slate-400 mt-0.5 font-medium truncate">
+                            {cat.desc}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Section 3: Scope & Target Applicability */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Duty Stations / Locations
+                  </label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={form.scopeLocation}
+                      onChange={(e) => setForm({ ...form, scopeLocation: e.target.value })}
+                      className="w-full pl-10 pr-8 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
+                    >
+                      <option value="All Duty Stations (HQ + Regional + Remote)">All Duty Stations (HQ + Regional + Remote)</option>
+                      <option value="Headquarters Office Only">Headquarters Office Only</option>
+                      <option value="Regional Operational Branches">Regional Operational Branches</option>
+                      <option value="Remote & Field Staff Only">Remote & Field Staff Only</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Target Departments
+                  </label>
+                  <div className="relative">
+                    <Users className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={form.scopeDepartment}
+                      onChange={(e) => setForm({ ...form, scopeDepartment: e.target.value })}
+                      className="w-full pl-10 pr-8 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
+                    >
+                      <option value="Organization-Wide (All Employees)">Organization-Wide (All Employees)</option>
+                      <option value="Engineering & Product Teams">Engineering & Product Teams</option>
+                      <option value="Operations & Support">Operations & Support</option>
+                      <option value="Sales & Business Development">Sales & Business Development</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: Smart Policy & Automation Glassmorphic Card */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-slate-800/70 dark:via-slate-800/40 dark:to-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-3.5 relative overflow-hidden">
+                <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/70 dark:border-slate-700/60">
+                  <div className="flex items-center gap-2 font-black text-slate-900 dark:text-white text-xs">
+                    <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                    <span>Payroll & Attendance Automation</span>
+                  </div>
+                  {formDateInfo.isLongWeekend && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800 animate-pulse">
+                      <Sun className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                      <span>Long Weekend Detected</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Toggle 1: Recur annually */}
+                <label className="flex items-center justify-between gap-3 cursor-pointer py-1">
+                  <div>
+                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Annual Recurrence</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      Automatically synchronize on this date across future calendars.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, recurringYearly: !form.recurringYearly })}
+                    className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                      form.recurringYearly ? 'bg-sky-600' : 'bg-slate-300 dark:bg-slate-700'
+                    }`}
                   >
-                    <option value="Gazetted National">Gazetted National</option>
-                    <option value="Gazetted Religious">Gazetted Religious</option>
-                    <option value="Company Recognized">Company Recognized Holiday</option>
-                    <option value="Bank Holiday">Bank Holiday</option>
-                    <option value="Optional Holiday">Optional / Festive Holiday</option>
-                  </select>
-                </div>
-              </div>
+                    <div
+                      className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                        form.recurringYearly ? 'right-1' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </label>
 
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Notes / Description</label>
-                <input
-                  type="text"
-                  placeholder="Optional details or employee instructions..."
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
-                />
-              </div>
+                {/* Toggle 2: Paid Wage Coverage */}
+                <label className="flex items-center justify-between gap-3 cursor-pointer py-1">
+                  <div>
+                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">100% Wage Coverage</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      Process payroll as statutory paid non-working hours without deductions.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, paidCoverage: !form.paidCoverage })}
+                    className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                      form.paidCoverage ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
+                    }`}
+                  >
+                    <div
+                      className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                        form.paidCoverage ? 'right-1' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </label>
 
-              <div className="flex flex-col gap-2 pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 font-semibold">
-                  <input
-                    type="checkbox"
-                    checked={form.recurringYearly}
-                    onChange={(e) => setForm({ ...form, recurringYearly: e.target.checked })}
-                    className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
-                  />
-                  <span>Recur annually on this date every year</span>
+                {/* Toggle 3: Auto-waive penalty */}
+                <label className="flex items-center justify-between gap-3 cursor-pointer py-1">
+                  <div>
+                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Auto-Waive Shift Penalties</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      Do not flag scheduled roster absences as AWOL on this date.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, autoWaivePenalty: !form.autoWaivePenalty })}
+                    className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                      form.autoWaivePenalty ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                    }`}
+                  >
+                    <div
+                      className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                        form.autoWaivePenalty ? 'right-1' : 'left-1'
+                      }`}
+                    />
+                  </button>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Section 5: Administrative Memo / Notes */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Administrative Memo & Instructions (Optional)
+                </label>
+                <div className="relative">
+                  <FileText className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                  <textarea
+                    rows={3}
+                    placeholder="Enter internal HR notes, employee guidelines, or station instructions..."
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400 resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 cursor-pointer transition-all"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 hover:from-emerald-700 hover:to-sky-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
-                  Save Holiday
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>Save & Apply Holiday</span>
                 </button>
               </div>
             </form>

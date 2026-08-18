@@ -109,17 +109,6 @@ const EmploymentStatus = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Employment Status Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-600/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-extrabold border border-amber-600/20 dark:border-amber-500/30">
-                <UserCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                <span>Workforce Classifications Active</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-600/10 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 text-xs font-semibold border border-orange-600/20 dark:border-orange-500/30">
-                <Shield className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
-                <span>Statutory Labor Compliance</span>
-              </span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Workforce Classifications & Shift Roster
             </h2>
