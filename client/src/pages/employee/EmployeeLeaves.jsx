@@ -65,6 +65,8 @@ const EmployeeLeaves = () => {
 
   useEffect(() => {
     fetchMyLeaves();
+    window.addEventListener('nexahr_leaves_updated', fetchMyLeaves);
+    return () => window.removeEventListener('nexahr_leaves_updated', fetchMyLeaves);
   }, []);
 
   const calculateDays = () => {
@@ -92,6 +94,7 @@ const EmployeeLeaves = () => {
       });
 
       await fetchMyLeaves();
+      window.dispatchEvent(new Event('nexahr_leaves_updated'));
       setIsApplyOpen(false);
       setLeaveForm({
         leaveTypeId: leaveTypes[0]?.id || '',

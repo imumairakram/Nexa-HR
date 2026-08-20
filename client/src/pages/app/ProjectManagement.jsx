@@ -91,7 +91,7 @@ const ProjectManagement = () => {
       category: projectForm.category,
       progress: 10,
       lead: projectForm.lead || 'Engineering Lead',
-      leadAvatar: matchedEmp?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      leadAvatar: matchedEmp?.avatar || null,
       deadline: projectForm.deadline || 'Dec 31, 2026',
       members: 3,
       priority: projectForm.priority,

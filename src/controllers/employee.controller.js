@@ -5,7 +5,7 @@ const onboardEmployee = async (req, res) => {
   try {
     const {
       email,
-      password = 'admin123',
+      password,
       firstName,
       lastName,
       phone,
@@ -29,10 +29,10 @@ const onboardEmployee = async (req, res) => {
       otherDeductions = 0,
     } = req.body;
 
-    if (!email || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({
         success: false,
-        message: 'Required fields missing: email, firstName, lastName.',
+        message: 'Required fields missing: email, password, firstName, lastName.',
       });
     }
 
@@ -52,7 +52,7 @@ const onboardEmployee = async (req, res) => {
       });
     }
 
-    const hashedPassword = await hashPassword(password || 'admin123');
+    const hashedPassword = await hashPassword(password);
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Resolve Department
@@ -475,9 +475,35 @@ const updateEmployee = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in updateEmployee:', error);
+const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Employee not found.',
+      });
+    }
+
+    // Delete user and cascading profiles
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Employee '${user.firstName} ${user.lastName}' (${user.email}) deleted successfully.`,
+    });
+  } catch (error) {
+    console.error('Error in deleteEmployee:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to update employee profile.',
+      message: 'Failed to delete employee.',
       error: error.message,
     });
   }
@@ -488,5 +514,6 @@ module.exports = {
   getEmployees,
   getEmployeeById,
   updateEmployee,
+  deleteEmployee,
 };
 

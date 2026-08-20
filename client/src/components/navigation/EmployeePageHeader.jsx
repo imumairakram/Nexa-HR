@@ -31,7 +31,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+const DEFAULT_AVATAR = null;
 
 function formatRelativeTime(dateString) {
   if (!dateString) return 'Just now';
@@ -153,18 +153,20 @@ const EmployeePageHeader = ({
   }, []);
 
   const loadUserData = () => {
+    let activeAvatar = null;
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         const u = JSON.parse(storedUser);
         setCurrentUser(u);
-        if (u.avatar) setUserAvatar(u.avatar);
+        if (u.avatar && !u.avatar.includes('unsplash')) activeAvatar = u.avatar;
       } catch (e) {}
     }
     const storedAvatar = localStorage.getItem('user_avatar');
-    if (storedAvatar) {
-      setUserAvatar(storedAvatar);
+    if (storedAvatar && !storedAvatar.includes('unsplash')) {
+      activeAvatar = storedAvatar;
     }
+    setUserAvatar(activeAvatar);
     setClockedIn(localStorage.getItem('nexahr_clocked_in') === 'true');
   };
 
@@ -572,7 +574,7 @@ const EmployeePageHeader = ({
               <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
                   <div className="text-xs font-bold text-slate-900 dark:text-white">{userFullName}</div>
-                  <div className="text-[11px] text-slate-400 truncate">{currentUser?.email || 'employee@company.com'}</div>
+                  <div className="text-[11px] text-slate-400 truncate">{currentUser?.email || ''}</div>
                   <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">{userRole}</div>
                 </div>
 

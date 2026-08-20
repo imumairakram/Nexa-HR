@@ -78,6 +78,7 @@ const CalculatePayroll = () => {
       }).catch((e) => console.log('Payroll generation notice:', e.message));
 
       window.dispatchEvent(new Event('nexahr_notification_updated'));
+      window.dispatchEvent(new Event('nexahr_payroll_updated'));
       setToastMsg('Batch disbursement confirmed. Payslip records created in database and notifications dispatched to employees.');
       setTimeout(() => {
         navigate('/app/payroll');

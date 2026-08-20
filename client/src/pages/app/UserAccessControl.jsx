@@ -54,7 +54,7 @@ const UserAccessControl = () => {
     }
   });
 
-  const isAdmin = currentUser.role === 'ADMIN' || currentUser.email === 'admin@company.com';
+  const isAdmin = currentUser.role === 'ADMIN';
 
   // State
   const [employees, setEmployees] = useState([]);
@@ -120,9 +120,14 @@ const UserAccessControl = () => {
     loadData();
   }, []);
 
+  const [userRole, setUserRole] = useState('EMPLOYEE');
+  const [userActive, setUserActive] = useState(true);
+
   // Select User and compute their active feature map
   const selectUser = (emp) => {
     setSelectedUserId(emp.id);
+    setUserRole(emp.role || 'EMPLOYEE');
+    setUserActive(emp.isActive !== false);
     const access = getUserFeatureAccess(emp.id, emp.role);
     setUserPermissions(access.permissions);
     setActivePreset(access.presetKey);
@@ -216,32 +221,49 @@ const UserAccessControl = () => {
     showToast(`Reset permissions to ${selectedEmployee.role} system default.`);
   };
 
-  // Save changes to persistent storage
-  const handleSave = () => {
+  // Save changes to persistent storage and database
+  const handleSave = async () => {
     if (!selectedEmployee) return;
 
     setSubmitting(true);
-    const success = saveUserFeatureAccess(
-      selectedEmployee.id,
-      userPermissions,
-      activePreset,
-      currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName}` : 'System Administrator'
-    );
-
-    if (success) {
-      setIsCustom(true);
-      showToast(`Feature access permissions saved for ${selectedEmployee.firstName} ${selectedEmployee.lastName}!`);
-      // Reload logs
-      try {
-        const rawLogs = localStorage.getItem('nexahr_security_audit_logs');
-        if (rawLogs) setAuditLogs(JSON.parse(rawLogs));
-      } catch (e) {
-        console.warn(e);
+    try {
+      // 1. Update Database Role & Active Status if changed
+      if (userRole !== selectedEmployee.role || userActive !== selectedEmployee.isActive) {
+        await api.updateEmployee(selectedEmployee.id, {
+          role: userRole,
+          isActive: userActive,
+        });
+        setEmployees((prev) =>
+          prev.map((e) => (e.id === selectedEmployee.id ? { ...e, role: userRole, isActive: userActive } : e))
+        );
       }
-    } else {
-      showToast('Could not save user feature access.', 'error');
+
+      // 2. Save feature permissions
+      const success = saveUserFeatureAccess(
+        selectedEmployee.id,
+        userPermissions,
+        activePreset,
+        currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName}` : 'System Administrator'
+      );
+
+      if (success) {
+        setIsCustom(true);
+        showToast(`Access permissions & system role saved for ${selectedEmployee.firstName} ${selectedEmployee.lastName}!`);
+        // Reload logs
+        try {
+          const rawLogs = localStorage.getItem('nexahr_security_audit_logs');
+          if (rawLogs) setAuditLogs(JSON.parse(rawLogs));
+        } catch (e) {
+          console.warn(e);
+        }
+      } else {
+        showToast('Could not save user feature access.', 'error');
+      }
+    } catch (err) {
+      showToast(err.message || 'Failed to update user role in database.', 'error');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   // Filter employees

@@ -148,6 +148,12 @@ export const api = {
     });
   },
 
+  deleteEmployee: async (id) => {
+    return await fetchAPI(`/employees/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   // --- Attendance (Automated Biometric Database System) ---
   getAttendanceLogs: async (params = {}) => {
     const query = new URLSearchParams(params).toString();

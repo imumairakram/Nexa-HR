@@ -25,11 +25,12 @@ import {
   RefreshCw,
   Landmark,
   FileCheck,
+  Trash2,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+const DEFAULT_AVATAR = null;
 
 // Helper to reliably parse Emergency Contact string into individual fields
 const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / Guardian', fallbackPhone = '') => {
@@ -70,7 +71,10 @@ const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / G
 
 const EmployeeProfile = () => {
   const [toastMsg, setToastMsg] = useState('');
-  const [avatar, setAvatar] = useState(() => localStorage.getItem('user_avatar') || DEFAULT_AVATAR);
+  const [avatar, setAvatar] = useState(() => {
+    const stored = localStorage.getItem('user_avatar');
+    return stored && !stored.includes('unsplash') ? stored : null;
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
@@ -218,6 +222,21 @@ const EmployeeProfile = () => {
     }
   };
 
+  const handleRemoveAvatar = () => {
+    setAvatar(null);
+    localStorage.removeItem('user_avatar');
+    try {
+      const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+      delete currentU.avatar;
+      localStorage.setItem('user', JSON.stringify(currentU));
+      window.dispatchEvent(new Event('user_profile_updated'));
+      window.dispatchEvent(new Event('storage'));
+    } catch (e) {
+      console.error(e);
+    }
+    showToast('Profile photo removed! Set to NO DP.');
+  };
+
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -338,8 +357,12 @@ const EmployeeProfile = () => {
         <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-center gap-6">
           {/* Avatar with Camera upload button */}
           <div className="relative group shrink-0">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-white/20 bg-slate-800 shadow-2xl flex items-center justify-center text-white text-2xl font-bold">
-              <img src={avatar} alt="User Avatar" className="w-full h-full object-cover" />
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-white/20 bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-2xl flex items-center justify-center text-white font-black text-2xl sm:text-3xl">
+              {avatar ? (
+                <img src={avatar} alt="User Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span>{formData.firstName?.[0] || 'E'}{formData.lastName?.[0] || 'M'}</span>
+              )}
             </div>
             <label
               title="Upload New Photo"
@@ -348,6 +371,16 @@ const EmployeeProfile = () => {
               <Camera className="w-3.5 h-3.5" />
               <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
             </label>
+            {avatar && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                title="Remove Photo (Set to NO DP)"
+                className="absolute top-0 right-0 p-1.5 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-md cursor-pointer transition-all border-2 border-slate-900"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {/* User Details & Identity Badges */}

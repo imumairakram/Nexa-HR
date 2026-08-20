@@ -23,34 +23,6 @@ import Logo from '../../components/common/Logo';
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal';
 
 
-// Preset credentials for System Admin, HR Admin, and Employee
-export const DEMO_CREDENTIALS = {
-  admin: {
-    role: 'ADMIN',
-    name: 'System Administrator',
-    email: 'admin@company.com',
-    password: 'admin123',
-    designation: 'Chief Systems Administrator & Security Officer',
-    department: 'Executive IT & Infrastructure',
-  },
-  hr: {
-    role: 'HR_MANAGER',
-    name: 'HR Administrator',
-    email: 'hr@company.com',
-    password: 'hr123',
-    designation: 'HR Lead Operations Manager',
-    department: 'Human Resources & People Ops',
-  },
-  employee: {
-    role: 'EMPLOYEE',
-    name: 'Alex Mercer',
-    email: 'employee@company.com',
-    password: 'employee123',
-    designation: 'Senior Full-Stack Engineer',
-    department: 'Engineering & DevOps',
-  },
-};
-
 // High-fidelity SVG Donut Chart for Workforce Presence
 const WorkforceDonutChart = () => {
   return (
@@ -105,25 +77,20 @@ const Login = () => {
   const [loginRole, setLoginRole] = useState('admin');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Form State initialized with role defaults
+  // Form State initialized clean
   const [formData, setFormData] = useState({
-    email: DEMO_CREDENTIALS.admin.email,
-    password: DEMO_CREDENTIALS.admin.password,
+    email: '',
+    password: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
 
-  // Handle Tab Switch (System Admin vs HR Admin vs Employee)
+  // Handle Tab Switch
   const handleRoleTabChange = (role) => {
     setLoginRole(role);
     setError(null);
-    const targetPreset = DEMO_CREDENTIALS[role] || DEMO_CREDENTIALS.admin;
-    setFormData({
-      email: targetPreset.email,
-      password: targetPreset.password,
-    });
   };
 
   // Carousel Slide State
@@ -182,36 +149,16 @@ const Login = () => {
         password: formData.password,
       });
       if (res && res.success) {
-        const userRole = res.data?.user?.role || DEMO_CREDENTIALS[loginRole]?.role || 'ADMIN';
+        const userRole = res.data?.user?.role || 'ADMIN';
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
-        fallbackLocalLogin();
+        setError(res?.message || 'Invalid email or password. Please try again.');
       }
     } catch (err) {
-      console.warn('Backend login failed, using fallback session for local preview', err);
-      fallbackLocalLogin();
+      setError(err.message || 'Unable to connect to server. Please check your credentials.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const fallbackLocalLogin = () => {
-    const profile = DEMO_CREDENTIALS[loginRole] || DEMO_CREDENTIALS.admin;
-    const isEmp = profile.role === 'EMPLOYEE';
-
-    localStorage.setItem('token', 'nexahr_jwt_internal_token_2026');
-    localStorage.setItem(
-      'user',
-      JSON.stringify({
-        firstName: profile.name.split(' ')[0] || 'User',
-        lastName: profile.name.split(' ').slice(1).join(' ') || 'Account',
-        email: formData.email,
-        role: profile.role,
-        designation: profile.designation,
-        department: profile.department,
-      })
-    );
-    navigate(isEmp ? '/employee/dashboard' : '/app/dashboard');
   };
 
 
@@ -338,13 +285,7 @@ const Login = () => {
                   <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
                   <input
                     type="email"
-                    placeholder={
-                      loginRole === 'admin'
-                        ? 'admin@company.com'
-                        : loginRole === 'hr'
-                        ? 'hr@company.com'
-                        : 'employee@company.com'
-                    }
+                    placeholder="name@company.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full pl-11 pr-4 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"

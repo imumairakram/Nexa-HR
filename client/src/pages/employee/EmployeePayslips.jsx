@@ -53,6 +53,8 @@ const EmployeePayslips = () => {
 
   useEffect(() => {
     fetchMyPayslips();
+    window.addEventListener('nexahr_payroll_updated', fetchMyPayslips);
+    return () => window.removeEventListener('nexahr_payroll_updated', fetchMyPayslips);
   }, []);
 
   const handlePrint = () => {

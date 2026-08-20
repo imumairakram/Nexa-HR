@@ -77,7 +77,7 @@ const RolePermissions = () => {
     }
   });
 
-  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.email === 'admin@company.com';
+  const isAdmin = currentUser?.role === 'ADMIN';
 
   const [permissions, setPermissions] = useState(() => {
     try {

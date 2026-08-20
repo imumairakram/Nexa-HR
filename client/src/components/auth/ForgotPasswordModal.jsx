@@ -61,9 +61,9 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
       setResetToken(null);
       setPreviewOtp(null);
 
-      const targetEmail = initialEmail || (initialRole === 'admin' ? 'admin@company.com' : 'employee@company.com');
+      const targetEmail = initialEmail || '';
       setEmail(targetEmail);
-      lookupAccount(targetEmail);
+      if (targetEmail) lookupAccount(targetEmail);
     }
   }, [isOpen, initialRole, initialEmail]);
 
@@ -124,38 +124,8 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
         setUserInfo(null);
       }
     } catch (err) {
-      console.warn('Active user lookup warning:', err.message);
-      // Resilience for demo preview if backend is transitioning
-      if (emailToLookup.toLowerCase().includes('employee') || emailToLookup.toLowerCase().includes('alex')) {
-        setUserInfo({
-          email: emailToLookup,
-          employeeCode: 'EMP-103',
-          fullName: 'Alex Mercer',
-          role: 'EMPLOYEE',
-          isHrOrAdmin: false,
-          allowedChannels: ['EMAIL', 'WHATSAPP'],
-          phone: '+1 (555) 415-8882',
-          maskedEmail: emailToLookup,
-          maskedPhone: '+1 (555) 415-8882',
-          hasPhone: true,
-        });
-      } else if (emailToLookup.toLowerCase().includes('admin')) {
-        setUserInfo({
-          email: emailToLookup,
-          employeeCode: 'EMP-ADMIN-001',
-          fullName: 'System Administrator',
-          role: 'ADMIN',
-          isHrOrAdmin: true,
-          allowedChannels: ['EMAIL'],
-          phone: '+1 (555) 019-2831',
-          maskedEmail: emailToLookup,
-          maskedPhone: '+1 (555) 019-2831',
-          hasPhone: true,
-        });
-        setChannel('EMAIL');
-      } else {
-        setUserInfo(null);
-      }
+      console.warn('Active user lookup error:', err.message);
+      setUserInfo(null);
     } finally {
       setCheckingUser(false);
     }
@@ -456,7 +426,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-600 dark:text-slate-300 font-medium mt-0.5">
-                        {userInfo?.email || email || 'admin@company.com'}
+                        {userInfo?.email || email || ''}
                       </div>
                     </div>
                   </div>

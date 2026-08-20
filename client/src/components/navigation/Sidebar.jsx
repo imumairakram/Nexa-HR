@@ -77,7 +77,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     }
   });
 
-  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.email === 'admin@company.com';
+  const isAdmin = currentUser?.role === 'ADMIN';
 
   const menuStructure = [
     { type: 'link', label: 'Dashboard', path: '/app/dashboard', icon: LayoutGrid },

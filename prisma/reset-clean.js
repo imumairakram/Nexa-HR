@@ -23,26 +23,7 @@ async function resetCleanDatabase() {
 
     console.log('✅ All existing records completely purged from PostgreSQL database.');
 
-    // 2. Hash default admin password
-    const adminPasswordHash = await bcrypt.hash('admin123', 10);
-
-    // 3. Create single pristine Admin User
-    const admin = await prisma.user.create({
-      data: {
-        employeeCode: 'EMP-ADMIN-001',
-        email: 'admin@company.com',
-        password: adminPasswordHash,
-        firstName: 'System',
-        lastName: 'Administrator',
-        phone: '+1 (555) 019-2831',
-        role: 'ADMIN',
-        isActive: true,
-      },
-    });
-
-    console.log(`✅ Pristine System Administrator initialized: ${admin.email} (EMP-ADMIN-001)`);
-
-    // 4. Create baseline standard Leave Types
+    // 2. Create baseline standard Leave Types
     await prisma.leaveType.createMany({
       data: [
         { name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true },

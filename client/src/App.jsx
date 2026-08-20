@@ -67,7 +67,7 @@ import EmployeeSettings from './pages/employee/EmployeeSettings';
 const AdminRoute = ({ children }) => {
   try {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const isAdmin = user.role === 'ADMIN' || user.email === 'admin@company.com';
+    const isAdmin = user.role === 'ADMIN';
     if (!isAdmin) {
       return <Navigate to="/app/dashboard" replace />;
     }

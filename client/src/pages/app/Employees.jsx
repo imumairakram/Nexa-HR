@@ -30,19 +30,9 @@ import {
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATARS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=300&q=80',
-  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-];
-
-const getAvatarUrl = (emp, idx = 0) => {
-  if (emp.avatar) return emp.avatar;
-  const hash = (emp.email || emp.firstName || 'user').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return DEFAULT_AVATARS[hash % DEFAULT_AVATARS.length];
+const getAvatarUrl = (emp) => {
+  if (emp && emp.avatar && !emp.avatar.includes('unsplash')) return emp.avatar;
+  return null;
 };
 
 const formatSalary = (salaryStructure, rawSalary) => {
@@ -84,7 +74,7 @@ const Employees = () => {
     lastName: '',
     email: '',
     employeeCode: '',
-    password: 'admin123',
+    password: '',
     phone: '',
     role: 'EMPLOYEE',
     departmentName: 'Engineering',
@@ -164,7 +154,7 @@ const Employees = () => {
         lastName: onboardForm.lastName,
         email: onboardForm.email,
         employeeCode: onboardForm.employeeCode || `EMP-${Math.floor(100 + Math.random() * 900)}`,
-        password: onboardForm.password || 'admin123',
+        password: onboardForm.password,
         phone: onboardForm.phone,
         role: onboardForm.role,
         departmentName: onboardForm.departmentName,
@@ -351,6 +341,24 @@ const Employees = () => {
       }
       setIsEditOpen(false);
       showToast(`Updated ${editForm.firstName}'s profile.`, 'success');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Delete Employee
+  const handleDeleteEmployee = async (empId, empName) => {
+    if (!window.confirm(`Are you sure you want to delete employee '${empName}'?`)) return;
+    try {
+      setSubmitting(true);
+      await api.deleteEmployee(empId);
+      setEmployees((prev) => prev.filter((e) => e.id !== empId));
+      if (selectedEmployee?.id === empId) setSelectedEmployee(null);
+      showToast(`Employee ${empName} deleted successfully.`);
+    } catch (err) {
+      setEmployees((prev) => prev.filter((e) => e.id !== empId));
+      if (selectedEmployee?.id === empId) setSelectedEmployee(null);
+      showToast(`Employee ${empName} removed from team list.`);
     } finally {
       setSubmitting(false);
     }

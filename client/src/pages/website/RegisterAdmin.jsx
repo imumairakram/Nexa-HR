@@ -5,11 +5,11 @@ import { Mail, Lock, User, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
 const RegisterAdmin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    firstName: 'Admin',
-    lastName: 'User',
-    email: 'admin@company.com',
-    password: 'SecurePassword123!',
-    phone: '+1 800 555 0199',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    phone: '',
   });
   const [loading, setLoading] = useState(false);
 

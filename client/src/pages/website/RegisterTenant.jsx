@@ -5,15 +5,15 @@ import { Building2, Mail, Lock, User, Phone, MapPin, ArrowRight } from 'lucide-r
 const RegisterTenant = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    companyName: 'Acme Corporation',
-    slug: 'acme-corp',
-    companyEmail: 'contact@acme.com',
-    adminEmail: 'admin@acme.com',
-    password: 'SecurePassword123!',
-    firstName: 'John',
-    lastName: 'Doe',
-    phone: '+1 800 555 0199',
-    address: 'Tech Innovation Park, Suite 400',
+    companyName: '',
+    slug: '',
+    companyEmail: '',
+    adminEmail: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    address: '',
   });
   const [loading, setLoading] = useState(false);
 

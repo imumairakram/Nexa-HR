@@ -77,6 +77,8 @@ const Leaves = () => {
 
   useEffect(() => {
     fetchLeaveData();
+    window.addEventListener('nexahr_leaves_updated', fetchLeaveData);
+    return () => window.removeEventListener('nexahr_leaves_updated', fetchLeaveData);
   }, []);
 
   const handleUpdateStatus = async (reqId, newStatus) => {
@@ -102,6 +104,7 @@ const Leaves = () => {
 
       setSelectedReq(null);
       setRemarksInput('');
+      window.dispatchEvent(new Event('nexahr_leaves_updated'));
       showToast(`Leave request marked as ${newStatus}!`);
     } catch (err) {
       console.error('Failed to update leave status:', err);

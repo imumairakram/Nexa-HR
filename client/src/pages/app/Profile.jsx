@@ -18,11 +18,10 @@ import {
   Laptop,
   RefreshCw,
   AlertCircle,
+  Trash2,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
-
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
 
 const Profile = () => {
   const { timezone, formatDateTime } = useRegionalSettings();
@@ -30,20 +29,23 @@ const Profile = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
-  const [avatar, setAvatar] = useState(() => localStorage.getItem('user_avatar') || DEFAULT_AVATAR);
+  const [avatar, setAvatar] = useState(() => {
+    const stored = localStorage.getItem('user_avatar');
+    return stored && !stored.includes('unsplash') ? stored : null;
+  });
 
   const [profile, setProfile] = useState({
     id: '',
-    firstName: 'Admin',
-    lastName: 'User',
-    email: 'admin@nexahr.pk',
-    phone: '+92 300 1234567',
-    role: 'ADMIN',
-    department: 'Executive Leadership & People Operations',
-    designation: 'Chief Human Resources Officer (CHRO)',
-    location: 'Islamabad HQ (Executive Wing)',
-    employeeCode: 'NEXA-ADM-001',
-    joiningDate: 'Jan 15, 2021',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    role: '',
+    department: '',
+    designation: '',
+    location: '',
+    employeeCode: '',
+    joiningDate: '',
   });
 
   const [security, setSecurity] = useState({
@@ -142,6 +144,21 @@ const Profile = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatar(null);
+    localStorage.removeItem('user_avatar');
+    try {
+      const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+      delete currentU.avatar;
+      localStorage.setItem('user', JSON.stringify(currentU));
+      window.dispatchEvent(new Event('user_profile_updated'));
+      window.dispatchEvent(new Event('storage'));
+    } catch (e) {
+      console.error(e);
+    }
+    showToast('Profile photo removed! Set to NO DP.');
   };
 
   const handleSaveProfile = async (e) => {
@@ -243,11 +260,17 @@ const Profile = () => {
 
         <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="relative group shrink-0">
-            <img
-              src={avatar}
-              alt="Admin Profile"
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-indigo-500/30 shadow-xl bg-slate-800"
-            />
+            {avatar ? (
+              <img
+                src={avatar}
+                alt="Admin Profile"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-indigo-500/30 shadow-xl bg-slate-800"
+              />
+            ) : (
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xl ring-4 ring-indigo-500/30">
+                <span>{profile.firstName?.[0] || 'A'}{profile.lastName?.[0] || 'D'}</span>
+              </div>
+            )}
             <label
               title="Upload New Profile Picture"
               className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-indigo-600 text-white shadow-md hover:bg-indigo-700 cursor-pointer transition-all hover:scale-110 border-2 border-white dark:border-slate-900"
@@ -255,6 +278,16 @@ const Profile = () => {
               <Camera className="w-3.5 h-3.5" />
               <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
             </label>
+            {avatar && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                title="Remove Profile Picture (Set to NO DP)"
+                className="absolute -top-2 -right-2 p-1.5 rounded-xl bg-rose-600 text-white shadow-md hover:bg-rose-700 cursor-pointer transition-all hover:scale-110 border-2 border-white dark:border-slate-900"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="flex-1 text-center md:text-left space-y-2.5">
@@ -296,11 +329,10 @@ const Profile = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeTab === tab.id
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === tab.id
                   ? 'bg-white dark:bg-[#1E293B] text-blue-600 shadow-sm'
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>

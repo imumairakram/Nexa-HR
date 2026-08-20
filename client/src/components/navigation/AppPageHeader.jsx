@@ -28,7 +28,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+const DEFAULT_AVATAR = null;
 
 function formatRelativeTime(dateString) {
   if (!dateString) return 'Just now';
@@ -151,20 +151,22 @@ const AppPageHeader = ({
   }, []);
 
   const loadUserData = () => {
+    let activeAvatar = null;
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         const u = JSON.parse(storedUser);
         setCurrentUser(u);
-        if (u.avatar) setUserAvatar(u.avatar);
+        if (u.avatar && !u.avatar.includes('unsplash')) activeAvatar = u.avatar;
       } catch (e) {
         console.error('Failed to parse user from localStorage', e);
       }
     }
     const storedAvatar = localStorage.getItem('user_avatar');
-    if (storedAvatar) {
-      setUserAvatar(storedAvatar);
+    if (storedAvatar && !storedAvatar.includes('unsplash')) {
+      activeAvatar = storedAvatar;
     }
+    setUserAvatar(activeAvatar);
   };
 
   useEffect(() => {
@@ -607,7 +609,7 @@ const AppPageHeader = ({
                   <div className="overflow-hidden">
                     <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{userFullName}</p>
                     <p className="text-[10px] font-semibold text-slate-400 truncate">
-                      {userHandle} • {currentUser?.email || 'admin@company.com'}
+                      {userHandle}{currentUser?.email ? ` • ${currentUser.email}` : ''}
                     </p>
                   </div>
                 </div>
