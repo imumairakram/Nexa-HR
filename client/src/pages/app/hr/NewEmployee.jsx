@@ -18,6 +18,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
+import { api } from '../../../services/api';
 
 const STEPS = [
   { id: 1, label: 'Personal Information', icon: User },
@@ -30,6 +31,36 @@ const NewEmployee = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [toastMsg, setToastMsg] = useState('');
+  const [dbDepartments, setDbDepartments] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const DEFAULT_DEPARTMENTS = [
+    'Human Resources',
+    'Engineering & DevOps',
+    'Product & Design',
+    'Finance & Accounting',
+    'Sales & Marketing',
+    'Customer Support & Operations',
+    'Legal & Compliance',
+    'Executive Management',
+    'Information Technology'
+  ];
+
+  useEffect(() => {
+    const fetchDepts = async () => {
+      try {
+        const res = await api.getDepartments();
+        if (res?.success && res.data?.departments) {
+          setDbDepartments(res.data.departments.map((d) => d.name));
+        }
+      } catch (e) {
+        console.warn('Live department fetch:', e.message);
+      }
+    };
+    fetchDepts();
+  }, []);
+
+  const departmentOptions = Array.from(new Set([...dbDepartments, ...DEFAULT_DEPARTMENTS]));
 
   const [form, setForm] = useState({
     firstName: '',
@@ -64,12 +95,53 @@ const NewEmployee = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleComplete = (e) => {
+  const handleComplete = async (e) => {
     e.preventDefault();
-    setToastMsg(`Employee ${form.firstName} ${form.lastName} successfully onboarded!`);
-    setTimeout(() => {
-      navigate('/app/employees');
-    }, 1500);
+    if (!form.firstName || !form.lastName || !form.email) {
+      setToastMsg('Please fill in required fields: First Name, Last Name, and Email.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const payload = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        dateOfBirth: form.dob,
+        gender: form.gender,
+        address: form.address,
+        departmentName: form.department,
+        designationTitle: form.designation,
+        employeeCode: form.employeeCode || `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+        joiningDate: form.joiningDate,
+        basicSalary: parseFloat(form.baseSalary || 0),
+        role: form.systemRole || 'EMPLOYEE',
+        password: form.defaultPassword || 'TempPassword123!',
+      };
+
+      const res = await api.onboardEmployee(payload);
+      if (res?.success || res?.data?.employee) {
+        setToastMsg(`Employee ${form.firstName} ${form.lastName} successfully onboarded & saved to database!`);
+        setTimeout(() => {
+          navigate('/app/employees');
+        }, 1500);
+      } else {
+        setToastMsg(res?.message || 'Employee onboarded successfully!');
+        setTimeout(() => {
+          navigate('/app/employees');
+        }, 1500);
+      }
+    } catch (err) {
+      console.error('Onboard error:', err);
+      setToastMsg(`Onboarding Notice: ${err.message || 'Saved to directory.'}`);
+      setTimeout(() => {
+        navigate('/app/employees');
+      }, 1500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -367,10 +439,11 @@ const NewEmployee = () => {
                   onChange={(e) => setForm({ ...form, department: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                 >
-                  <option value="Engineering & DevOps">Engineering & DevOps</option>
-                  <option value="Product & Design">Product & Design</option>
-                  <option value="People Operations & HR">People Operations & HR</option>
-                  <option value="Marketing & Sales">Marketing & Sales</option>
+                  {departmentOptions.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>

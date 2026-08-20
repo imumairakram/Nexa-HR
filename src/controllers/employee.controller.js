@@ -20,6 +20,8 @@ const onboardEmployee = async (req, res) => {
       departmentName,
       designationId,
       designationTitle,
+      employmentType,
+      shift,
       basicSalary,
       salary,
       housingAllowance = 0,
@@ -29,30 +31,38 @@ const onboardEmployee = async (req, res) => {
       otherDeductions = 0,
     } = req.body;
 
-    if (!email || !password || !firstName || !lastName) {
+    const finalPassword = (password && password.trim()) || 'TempPassword123!';
+    const cleanEmail = email ? email.toLowerCase().trim() : '';
+
+    if (!cleanEmail || !firstName || !lastName) {
       return res.status(400).json({
         success: false,
-        message: 'Required fields missing: email, password, firstName, lastName.',
+        message: 'Required fields missing: email, firstName, lastName.',
       });
     }
 
-    const cleanEmail = email.toLowerCase().trim();
-    const cleanEmpCode = (employeeCode || `EMP-${Math.floor(1000 + Math.random() * 9000)}`).trim();
-
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: cleanEmail }, { employeeCode: cleanEmpCode }],
-      },
+    // Check if email already exists
+    const existingEmail = await prisma.user.findFirst({
+      where: { email: cleanEmail },
     });
 
-    if (existingUser) {
+    if (existingEmail) {
       return res.status(409).json({
         success: false,
-        message: `User with email '${cleanEmail}' or Employee Code '${cleanEmpCode}' already exists.`,
+        message: `An employee account with email '${cleanEmail}' already exists in the system.`,
       });
     }
 
-    const hashedPassword = await hashPassword(password);
+    // Auto-resolve employee code collision
+    let cleanEmpCode = (employeeCode || `EMP-${Math.floor(1000 + Math.random() * 9000)}`).trim();
+    const existingCode = await prisma.user.findFirst({
+      where: { employeeCode: cleanEmpCode },
+    });
+    if (existingCode) {
+      cleanEmpCode = `EMP-${Math.floor(10000 + Math.random() * 90000)}`;
+    }
+
+    const hashedPassword = await hashPassword(finalPassword);
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Resolve Department
@@ -118,6 +128,8 @@ const onboardEmployee = async (req, res) => {
           gender: gender || null,
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
           joiningDate: joiningDate ? new Date(joiningDate) : new Date(),
+          employmentType: employmentType || 'FULL_TIME',
+          shift: shift || 'General Morning (09:00 - 17:30)',
           address: address ? address.trim() : null,
           emergencyContact: emergencyContact ? emergencyContact.trim() : null,
           departmentId: resolvedDeptId,
@@ -321,6 +333,8 @@ const updateEmployee = async (req, res) => {
       departmentName,
       designationId,
       designationTitle,
+      employmentType,
+      shift,
       basicSalary,
       salary,
       housingAllowance,
@@ -402,6 +416,8 @@ const updateEmployee = async (req, res) => {
       if (gender !== undefined) profileUpdates.gender = gender;
       if (dateOfBirth !== undefined) profileUpdates.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
       if (joiningDate !== undefined) profileUpdates.joiningDate = new Date(joiningDate);
+      if (employmentType !== undefined) profileUpdates.employmentType = employmentType;
+      if (shift !== undefined) profileUpdates.shift = shift;
       if (address !== undefined) profileUpdates.address = address ? address.trim() : null;
       if (emergencyContact !== undefined) profileUpdates.emergencyContact = emergencyContact ? emergencyContact.trim() : null;
       if (resolvedDeptId !== undefined) profileUpdates.departmentId = resolvedDeptId || null;

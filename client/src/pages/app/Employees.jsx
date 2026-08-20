@@ -31,7 +31,7 @@ import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { api } from '../../services/api';
 
 const getAvatarUrl = (emp) => {
-  if (emp && emp.avatar && !emp.avatar.includes('unsplash')) return emp.avatar;
+  if (emp && emp.avatar && typeof emp.avatar === 'string' && !emp.avatar.includes('unsplash') && emp.avatar.trim() !== '') return emp.avatar;
   return null;
 };
 
@@ -150,17 +150,17 @@ const Employees = () => {
     try {
       setSubmitting(true);
       const payload = {
-        firstName: onboardForm.firstName,
-        lastName: onboardForm.lastName,
-        email: onboardForm.email,
-        employeeCode: onboardForm.employeeCode || `EMP-${Math.floor(100 + Math.random() * 900)}`,
-        password: onboardForm.password,
+        firstName: onboardForm.firstName.trim(),
+        lastName: onboardForm.lastName ? onboardForm.lastName.trim() : '',
+        email: onboardForm.email.trim(),
+        employeeCode: onboardForm.employeeCode ? onboardForm.employeeCode.trim() : `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+        password: onboardForm.password || 'TempPassword123!',
         phone: onboardForm.phone,
-        role: onboardForm.role,
-        departmentName: onboardForm.departmentName,
-        designationTitle: onboardForm.designationTitle,
-        address: onboardForm.location || onboardForm.address,
-        joiningDate: onboardForm.joiningDate,
+        role: onboardForm.role || 'EMPLOYEE',
+        departmentName: onboardForm.departmentName || 'Engineering & DevOps',
+        designationTitle: onboardForm.designationTitle || 'Software Engineer',
+        address: onboardForm.location || onboardForm.address || 'Headquarters',
+        joiningDate: onboardForm.joiningDate || new Date().toISOString().split('T')[0],
         basicSalary: parseFloat(onboardForm.basicSalary || 0),
         housingAllowance: parseFloat(onboardForm.housingAllowance || 0),
         transportAllowance: parseFloat(onboardForm.transportAllowance || 0),
@@ -173,13 +173,12 @@ const Employees = () => {
       };
 
       const res = await api.onboardEmployee(payload);
-      if (res.data?.employee) {
-        const createdEmp = res.data.employee;
-        setEmployees((prev) => [createdEmp, ...prev]);
-        showToast(`${createdEmp.firstName} ${createdEmp.lastName} onboarded successfully.`);
-      } else {
+      if (res?.success || res?.data?.employee) {
+        showToast(`${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully!`);
         await fetchEmployeesData();
-        showToast(`${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully.`);
+      } else {
+        showToast(res?.message || 'Employee onboarded successfully!');
+        await fetchEmployeesData();
       }
 
       setIsOnboardOpen(false);
@@ -187,31 +186,7 @@ const Employees = () => {
       setOnboardTab('basic');
     } catch (err) {
       console.error('Onboard error:', err);
-      // Fallback local addition if network issue
-      const localNew = {
-        id: `EMP-${Date.now()}`,
-        employeeCode: onboardForm.employeeCode || `EMP-${Math.floor(100 + Math.random() * 900)}`,
-        firstName: onboardForm.firstName,
-        lastName: onboardForm.lastName,
-        email: onboardForm.email,
-        phone: onboardForm.phone,
-        role: onboardForm.role,
-        isActive: true,
-        profile: {
-          department: { name: onboardForm.departmentName },
-          designation: { title: onboardForm.designationTitle },
-          joiningDate: onboardForm.joiningDate,
-          address: onboardForm.location,
-        },
-        salaryStructure: {
-          basicSalary: parseFloat(onboardForm.basicSalary || 0),
-          housingAllowance: parseFloat(onboardForm.housingAllowance || 0),
-          transportAllowance: parseFloat(onboardForm.transportAllowance || 0),
-        },
-      };
-      setEmployees((prev) => [localNew, ...prev]);
-      setIsOnboardOpen(false);
-      showToast(`${onboardForm.firstName} ${onboardForm.lastName} saved to team roster!`);
+      showToast(err.message || 'Failed to onboard employee to database. Check email or details.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -393,10 +368,20 @@ const Employees = () => {
     admins: employees.filter((e) => e.role === 'ADMIN' || e.role === 'HR_MANAGER').length,
   };
 
-  // Department options
-  const deptOptions = departments.length > 0
-    ? departments.map((d) => d.name)
-    : ['Engineering & DevOps', 'Product & Design', 'People Operations & HR', 'Finance & Accounts', 'Sales & Marketing'];
+  const DEFAULT_DEPARTMENTS = [
+    'Human Resources',
+    'Engineering & DevOps',
+    'Product & Design',
+    'Finance & Accounting',
+    'Sales & Marketing',
+    'Customer Support & Operations',
+    'Legal & Compliance',
+    'Executive Management',
+    'Information Technology'
+  ];
+
+  const dbDeptNames = (departments || []).map((d) => d.name).filter(Boolean);
+  const deptOptions = Array.from(new Set([...dbDeptNames, ...DEFAULT_DEPARTMENTS]));
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
@@ -661,20 +646,26 @@ const Employees = () => {
               <div>
                 {/* Header: Avatar, Name, Code, Role */}
                 <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={getAvatarUrl(emp, idx)}
-                      alt={emp.firstName}
-                      className="w-13 h-13 rounded-2xl object-cover ring-2 ring-slate-100 dark:ring-slate-700 shadow-sm"
-                    />
-                    <div>
-                      <h4 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {getAvatarUrl(emp) ? (
+                      <img
+                        src={getAvatarUrl(emp)}
+                        alt=""
+                        className="w-12 h-12 rounded-2xl object-cover ring-2 ring-indigo-500/20 shadow-sm shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-sm flex items-center justify-center ring-2 ring-indigo-500/20 shadow-sm shrink-0 uppercase">
+                        <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {emp.firstName} {emp.lastName}
                       </h4>
-                      <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
+                      <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5 truncate">
                         {emp.profile?.designation?.title || 'Staff Member'}
                       </p>
-                      <span className="text-[10px] text-slate-400 font-mono">{emp.employeeCode}</span>
+                      <span className="text-[10px] text-slate-400 font-mono block truncate">{emp.employeeCode}</span>
                     </div>
                   </div>
 
@@ -735,7 +726,7 @@ const Employees = () => {
                     className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                    <span>Dossier</span>
+                    <span>View Profile</span>
                   </button>
                 </div>
               </div>
@@ -761,11 +752,17 @@ const Employees = () => {
                   <tr key={emp.id || idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={getAvatarUrl(emp, idx)}
-                          alt={emp.firstName}
-                          className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-                        />
+                        {getAvatarUrl(emp) ? (
+                          <img
+                            src={getAvatarUrl(emp)}
+                            alt=""
+                            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-700 text-white font-black text-xs flex items-center justify-center shrink-0 uppercase">
+                            <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
+                          </div>
+                        )}
                         <div>
                           <div className="font-extrabold text-slate-900 dark:text-white">
                             {emp.firstName} {emp.lastName}
@@ -848,7 +845,7 @@ const Employees = () => {
             {/* Scrollable Container with Tabs */}
             <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5 custom-scrollbar text-xs">
               {/* Modal Form Tabs */}
-              <div className="flex items-center gap-1.5 p-1 bg-slate-100/80 dark:bg-slate-800/80 rounded-2xl text-xs font-bold overflow-x-auto border border-slate-200/50 dark:border-slate-700/50 shrink-0">
+              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/80 dark:bg-slate-800/80 rounded-2xl text-xs font-bold no-scrollbar overflow-x-auto border border-slate-200/50 dark:border-slate-700/50 shrink-0">
                 {[
                   { id: 'basic', label: '1. Identity & Access' },
                   { id: 'position', label: '2. Position & Org' },
@@ -1188,33 +1185,33 @@ const Employees = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. MODAL: EDIT EMPLOYEE PROFILE (Requested in 2nd Image) */}
+      {/* 5. MODAL: EDIT EMPLOYEE PROFILE (Requested in 2nd Image - Upgraded UI) */}
       {/* ========================================================================= */}
       {isEditOpen && editingEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95 my-8">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-indigo-100 dark:border-indigo-900/40 space-y-6 animate-in zoom-in-95 my-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                  <Edit3 className="w-5 h-5" />
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/25 shrink-0">
+                  <Edit3 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Edit Employee Profile: {editForm.firstName} {editForm.lastName}
                   </h3>
-                  <p className="text-xs text-slate-400 font-medium">Update role ACL, position, compensation, or personal information</p>
+                  <p className="text-xs text-slate-400 font-semibold">Update role ACL, position, compensation, or personal information</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsEditOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl text-xs font-bold overflow-x-auto">
+            <div className="flex items-center gap-1.5 p-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-2xl text-xs font-extrabold border border-slate-200/60 dark:border-slate-700/60 no-scrollbar overflow-x-auto">
               {[
                 { id: 'basic', label: '1. Identity & Role' },
                 { id: 'position', label: '2. Job Position' },
@@ -1225,10 +1222,10 @@ const Employees = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => setEditTab(tab.id)}
-                  className={`flex-1 py-2 px-3 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+                  className={`flex-1 py-2.5 px-3.5 rounded-xl transition-all whitespace-nowrap cursor-pointer text-xs ${
                     editTab === tab.id
-                      ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      ? 'bg-white dark:bg-[#0F172A] text-blue-600 dark:text-blue-400 font-black shadow-md shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-700'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold'
                   }`}
                 >
                   {tab.label}
@@ -1236,62 +1233,62 @@ const Employees = () => {
               ))}
             </div>
 
-            <form onSubmit={handleEditSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleEditSubmit} className="space-y-5 text-xs">
               {/* EDIT TAB 1: IDENTITY & ROLE */}
               {editTab === 'basic' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-4 animate-in fade-in">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">First Name *</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">First Name *</label>
                       <input
                         type="text"
                         required
                         value={editForm.firstName || ''}
                         onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Last Name *</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Last Name *</label>
                       <input
                         type="text"
                         required
                         value={editForm.lastName || ''}
                         onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Work Email</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Work Email</label>
                       <input
                         type="email"
                         required
                         value={editForm.email || ''}
                         onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Employee Code</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Employee Code</label>
                       <input
                         type="text"
                         value={editForm.employeeCode || ''}
                         onChange={(e) => setEditForm({ ...editForm, employeeCode: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Role Authorization ACL</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Role Authorization ACL</label>
                       <select
                         value={editForm.role || 'EMPLOYEE'}
                         onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none cursor-pointer transition-all"
                       >
                         <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
                         <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
@@ -1299,11 +1296,11 @@ const Employees = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Employment Status</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Employment Status</label>
                       <select
                         value={editForm.isActive ? 'true' : 'false'}
                         onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'true' })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none cursor-pointer transition-all"
                       >
                         <option value="true">Active & Verified Employee</option>
                         <option value="false">Inactive / Suspended</option>
@@ -1315,14 +1312,14 @@ const Employees = () => {
 
               {/* EDIT TAB 2: JOB POSITION */}
               {editTab === 'position' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-4 animate-in fade-in">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Department</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Department</label>
                       <select
                         value={editForm.departmentName || 'Engineering'}
                         onChange={(e) => setEditForm({ ...editForm, departmentName: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none cursor-pointer transition-all"
                       >
                         {deptOptions.map((d) => (
                           <option key={d} value={d}>
@@ -1332,34 +1329,34 @@ const Employees = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Designation Title / Position</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Designation Title / Position</label>
                       <input
                         type="text"
                         required
                         value={editForm.designationTitle || ''}
                         onChange={(e) => setEditForm({ ...editForm, designationTitle: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Workplace Location</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Workplace Location</label>
                       <input
                         type="text"
                         value={editForm.location || ''}
                         onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Joining Date</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Joining Date</label>
                       <input
                         type="date"
                         value={editForm.joiningDate || ''}
                         onChange={(e) => setEditForm({ ...editForm, joiningDate: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -1368,9 +1365,9 @@ const Employees = () => {
 
               {/* EDIT TAB 3: COMPENSATION & SALARY */}
               {editTab === 'salary' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                <div className="space-y-4 animate-in fade-in">
+                  <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
                       <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       <span className="font-bold text-emerald-900 dark:text-emerald-200 text-xs">Payroll Compensation Matrix</span>
                     </div>
@@ -1384,44 +1381,44 @@ const Employees = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Basic Base Salary ($/mo)</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Basic Base Salary ($/mo)</label>
                       <input
                         type="number"
                         value={editForm.basicSalary || ''}
                         onChange={(e) => setEditForm({ ...editForm, basicSalary: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Housing Allowance ($/mo)</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Housing Allowance ($/mo)</label>
                       <input
                         type="number"
                         value={editForm.housingAllowance || ''}
                         onChange={(e) => setEditForm({ ...editForm, housingAllowance: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Transport Allowance ($/mo)</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Transport Allowance ($/mo)</label>
                       <input
                         type="number"
                         value={editForm.transportAllowance || ''}
                         onChange={(e) => setEditForm({ ...editForm, transportAllowance: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Tax Deductions ($/mo)</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Tax Deductions ($/mo)</label>
                       <input
                         type="number"
                         value={editForm.taxDeductions || ''}
                         onChange={(e) => setEditForm({ ...editForm, taxDeductions: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -1430,23 +1427,23 @@ const Employees = () => {
 
               {/* EDIT TAB 4: PERSONAL & CONTACT */}
               {editTab === 'personal' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-4 animate-in fade-in">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Phone Number</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Phone Number</label>
                       <input
                         type="text"
                         value={editForm.phone || ''}
                         onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Gender</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Gender</label>
                       <select
                         value={editForm.gender || 'Not Specified'}
                         onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none cursor-pointer transition-all"
                       >
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -1456,23 +1453,23 @@ const Employees = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Residential Address</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Residential Address</label>
                       <input
                         type="text"
                         value={editForm.address || ''}
                         onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Emergency Contact Info</label>
+                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Emergency Contact Info</label>
                       <input
                         type="text"
                         value={editForm.emergencyContact || ''}
                         onChange={(e) => setEditForm({ ...editForm, emergencyContact: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -1480,20 +1477,20 @@ const Employees = () => {
               )}
 
               {/* Form Actions */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsEditOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                  className="px-7 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-xs shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
                 >
-                  {submitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {submitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 stroke-[2.5]" />}
                   <span>Save Profile Updates</span>
                 </button>
               </div>
@@ -1503,19 +1500,25 @@ const Employees = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 6. MODAL: EMPLOYEE DOSSIER (With direct Edit Action) */}
+      {/* 6. MODAL: EMPLOYEE PROFILE VIEW */}
       {/* ========================================================================= */}
       {selectedEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            {/* Dossier Header */}
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-indigo-100 dark:border-indigo-900/40 space-y-5 animate-in zoom-in-95">
+            {/* Profile Header */}
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <img
-                  src={getAvatarUrl(selectedEmployee)}
-                  alt={selectedEmployee.firstName}
-                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-blue-500/20 shadow-md"
-                />
+                {getAvatarUrl(selectedEmployee) ? (
+                  <img
+                    src={getAvatarUrl(selectedEmployee)}
+                    alt=""
+                    className="w-16 h-16 rounded-2xl object-cover ring-4 ring-indigo-500/20 shadow-md shrink-0"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-xl flex items-center justify-center ring-4 ring-indigo-500/20 shadow-md shrink-0 uppercase">
+                    <span>{selectedEmployee.firstName?.[0] || 'E'}{selectedEmployee.lastName?.[0] || 'M'}</span>
+                  </div>
+                )}
                 <div>
                   <h3 className="text-lg font-black text-slate-900 dark:text-white">
                     {selectedEmployee.firstName} {selectedEmployee.lastName}

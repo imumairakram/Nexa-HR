@@ -129,6 +129,8 @@ model EmployeeProfile {
   gender           String?
   dateOfBirth      DateTime?
   joiningDate      DateTime  @default(now())
+  employmentType   String?   @default("FULL_TIME")
+  shift            String?   @default("General Morning (09:00 - 17:30)")
   address          String?
   emergencyContact String?
   departmentId     String?

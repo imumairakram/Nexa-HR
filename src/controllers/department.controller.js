@@ -49,7 +49,7 @@ const createDepartment = async (req, res) => {
 
 const getDepartments = async (req, res) => {
   try {
-    const departments = await prisma.department.findMany({
+    let departments = await prisma.department.findMany({
       include: {
         _count: {
           select: { profiles: true, designations: true },
@@ -57,6 +57,37 @@ const getDepartments = async (req, res) => {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Auto-seed baseline departments if fewer than 2 exist
+    if (departments.length < 2) {
+      const baselineDepts = [
+        { name: 'Engineering & DevOps', code: 'ENG', description: 'Software Engineering & Infrastructure' },
+        { name: 'Product & Design', code: 'PROD', description: 'Product Management & UI/UX Design' },
+        { name: 'Finance & Accounting', code: 'FIN', description: 'Payroll, Ledger & Accounting' },
+        { name: 'Sales & Marketing', code: 'MKT', description: 'Growth, Marketing & Business Development' },
+        { name: 'Customer Support & Operations', code: 'OPS', description: 'Client Success & Operational Support' },
+      ];
+
+      for (const dept of baselineDepts) {
+        const existing = departments.find((d) => d.code === dept.code || d.name === dept.name);
+        if (!existing) {
+          try {
+            await prisma.department.create({ data: dept });
+          } catch (e) {
+            // Ignore if concurrently created
+          }
+        }
+      }
+
+      departments = await prisma.department.findMany({
+        include: {
+          _count: {
+            select: { profiles: true, designations: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    }
 
     return res.status(200).json({
       success: true,

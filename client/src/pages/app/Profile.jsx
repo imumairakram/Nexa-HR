@@ -237,6 +237,9 @@ const Profile = () => {
     }
   };
 
+  const isAdminAccount = profile.role === 'ADMIN' || profile.email === 'admin@nexahr.com' || profile.designation?.toLowerCase().includes('admin') || profile.firstName?.toLowerCase().includes('system');
+  const isHRAccount = profile.role === 'HR_MANAGER' || profile.role === 'HR' || profile.email === 'hr@nexahr.com' || profile.designation?.toLowerCase().includes('hr');
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
@@ -298,18 +301,52 @@ const Profile = () => {
             <p className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-400">{profile.designation}</p>
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1 font-semibold">
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
-                <Building className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>{profile.department}</span>
-              </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
-                <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>{profile.location}</span>
-              </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
-                <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Member since {profile.joiningDate}</span>
-              </span>
+              {isAdminAccount ? (
+                <>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>System Administration & Security</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>{profile.location || 'Karachi, Pakistan'}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <Shield className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Root Security Clearance</span>
+                  </span>
+                </>
+              ) : isHRAccount ? (
+                <>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <Building className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>{profile.department || 'Human Resources & Operations'}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>{profile.location || 'Karachi, Pakistan'}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>HR Operations Clearance</span>
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <Building className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>{profile.department}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>{profile.location}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-900/60 px-3 py-1 rounded-xl border border-indigo-100 dark:border-slate-800">
+                    <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>Verified System Access</span>
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>

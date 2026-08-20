@@ -21,6 +21,7 @@ import { api } from '../../services/api';
 const EmploymentStatus = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [selectedEmp, setSelectedEmp] = useState(null);
@@ -39,9 +40,9 @@ const EmploymentStatus = () => {
             name: `${emp.firstName} ${emp.lastName}`,
             role: emp.profile?.designation?.title || 'Staff Specialist',
             department: emp.profile?.department?.name || 'General Operations',
-            employmentType: emp.role === 'ADMIN' ? 'FULL_TIME' : (emp.isActive ? (isProbation ? 'PROBATION' : 'FULL_TIME') : 'CONTRACT'),
-            location: emp.profile?.address || 'Islamabad HQ',
-            shift: 'General Morning (09:00 - 17:30)',
+            employmentType: emp.profile?.employmentType || (emp.role === 'ADMIN' ? 'FULL_TIME' : (emp.isActive ? (isProbation ? 'PROBATION' : 'FULL_TIME') : 'CONTRACT')),
+            location: emp.profile?.address || 'Anum State Building, Shahrah-e-Faisal, Karachi',
+            shift: emp.profile?.shift || 'General Morning (09:00 - 17:30)',
             status: emp.isActive ? 'ACTIVE' : 'INACTIVE',
             joinDate: emp.profile?.joiningDate ? new Date(emp.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Jan 15, 2024',
           };
@@ -59,13 +60,31 @@ const EmploymentStatus = () => {
     loadEmployees();
   }, []);
 
-  const handleUpdateStatus = (e) => {
+  const handleUpdateStatus = async (e) => {
     e.preventDefault();
     if (!selectedEmp) return;
-    setEmployees(employees.map((emp) => (emp.id === selectedEmp.id ? selectedEmp : emp)));
-    setSelectedEmp(null);
-    setToastMsg(`Employment record updated for ${selectedEmp.name}!`);
-    setTimeout(() => setToastMsg(''), 2500);
+    setSaving(true);
+    try {
+      const payload = {
+        employmentType: selectedEmp.employmentType,
+        shift: selectedEmp.shift,
+        address: selectedEmp.location,
+      };
+      const res = await api.updateEmployee(selectedEmp.rawId, payload);
+      if (res?.success) {
+        setEmployees(employees.map((emp) => (emp.id === selectedEmp.id ? selectedEmp : emp)));
+        setSelectedEmp(null);
+        setToastMsg(`Employment record updated for ${selectedEmp.name}!`);
+        setTimeout(() => setToastMsg(''), 2500);
+      } else {
+        alert(res?.message || 'Failed to update employee status.');
+      }
+    } catch (err) {
+      console.error('Failed to update employee status:', err);
+      alert('Error updating status. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const filtered = employees.filter((emp) => {
@@ -376,7 +395,7 @@ const EmploymentStatus = () => {
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, shift: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                 >
-                  <option value="General (09:00 - 17:30)">General Shift (09:00 AM - 05:30 PM)</option>
+                  <option value="General Morning (09:00 - 17:30)">General Shift (09:00 AM - 05:30 PM)</option>
                   <option value="Flexible Remote">Flexible Remote (Asynchronous)</option>
                   <option value="Morning Shift (07:00 - 15:30)">Morning Shift (07:00 AM - 03:30 PM)</option>
                   <option value="Night Shift / Escalations">Night Escalations (16:00 - 00:30)</option>
@@ -400,15 +419,24 @@ const EmploymentStatus = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedEmp(null)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  disabled={saving}
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
+                  disabled={saving}
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer disabled:opacity-50 flex items-center gap-2"
                 >
-                  Save Changes
+                  {saving ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <span>Save Changes</span>
+                  )}
                 </button>
               </div>
             </form>
