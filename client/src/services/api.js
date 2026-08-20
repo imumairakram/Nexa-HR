@@ -21,16 +21,23 @@ async function fetchAPI(endpoint, options = {}) {
 
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, config);
-    const data = await response.json();
+    const text = await response.text();
+    let data = {};
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        data = { message: text || `Unexpected response format (${response.status})` };
+      }
+    }
 
     if (!response.ok) {
       if (response.status === 401 && endpoint !== '/auth/login') {
         // Only clear if token is genuinely invalid and not during normal navigation
         console.warn('Authentication expired or unauthorized on endpoint:', endpoint);
       }
-      throw new Error(data.message || `Request failed with status ${response.status}`);
+      throw new Error(data.message || `Server error (${response.status})`);
     }
-
 
     return data;
   } catch (error) {

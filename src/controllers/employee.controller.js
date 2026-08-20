@@ -475,6 +475,14 @@ const updateEmployee = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in updateEmployee:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update employee.',
+      error: error.message,
+    });
+  }
+};
+
 const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
