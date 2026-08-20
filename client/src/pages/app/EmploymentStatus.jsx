@@ -349,26 +349,36 @@ const EmploymentStatus = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODAL: UPDATE STATUS */}
+      {/* 3. MODAL: UPDATE STATUS (LEAVE POLICY MATCHED DESIGN AESTHETIC) */}
       {/* ========================================================================= */}
       {selectedEmp && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <span className="text-[10px] font-mono text-slate-400">{selectedEmp.id}</span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white mt-0.5">
-                  Update {selectedEmp.name}
-                </h3>
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-6 animate-in zoom-in-95">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 shrink-0">
+                  <Briefcase className="w-6 h-6 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                    Update {selectedEmp.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                    {selectedEmp.id} • Configure classification, shift timing, and work station.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setSelectedEmp(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
+            {/* Form Fields */}
             <form onSubmit={handleUpdateStatus} className="space-y-4 text-xs">
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
@@ -377,7 +387,7 @@ const EmploymentStatus = () => {
                 <select
                   value={selectedEmp.employmentType}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, employmentType: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer transition-all"
                 >
                   <option value="FULL_TIME">Full-Time Permanent</option>
                   <option value="REMOTE">Full-Time Remote</option>
@@ -393,7 +403,7 @@ const EmploymentStatus = () => {
                 <select
                   value={selectedEmp.shift}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, shift: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer transition-all"
                 >
                   <option value="General Morning (09:00 - 17:30)">General Shift (09:00 AM - 05:30 PM)</option>
                   <option value="Flexible Remote">Flexible Remote (Asynchronous)</option>
@@ -411,23 +421,60 @@ const EmploymentStatus = () => {
                   required
                   value={selectedEmp.location}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Live Preview Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-blue-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-extrabold text-xs shadow-sm">
+                    {selectedEmp.employmentType === 'FULL_TIME'
+                      ? 'FT'
+                      : selectedEmp.employmentType === 'REMOTE'
+                      ? 'RM'
+                      : selectedEmp.employmentType === 'CONTRACT'
+                      ? 'CT'
+                      : 'PR'}
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                      {selectedEmp.name}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                      {selectedEmp.shift} • {selectedEmp.location}
+                    </div>
+                  </div>
+                </div>
+                <span
+                  className={`text-[10px] font-extrabold px-3 py-1 rounded-full border ${
+                    selectedEmp.employmentType === 'FULL_TIME'
+                      ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                      : selectedEmp.employmentType === 'REMOTE'
+                      ? 'bg-indigo-100/80 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                      : selectedEmp.employmentType === 'CONTRACT'
+                      ? 'bg-blue-100/80 text-blue-800 dark:bg-blue-300 border-blue-200 dark:border-blue-800'
+                      : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                  }`}
+                >
+                  {selectedEmp.employmentType.replace('_', ' ')}
+                </span>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setSelectedEmp(null)}
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
                 >
                   {saving ? (
                     <>
@@ -435,7 +482,10 @@ const EmploymentStatus = () => {
                       <span>Saving...</span>
                     </>
                   ) : (
-                    <span>Save Changes</span>
+                    <>
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                      <span>Save Changes</span>
+                    </>
                   )}
                 </button>
               </div>

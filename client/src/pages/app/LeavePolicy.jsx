@@ -17,6 +17,7 @@ import { api } from '../../services/api';
 const LeavePolicy = () => {
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -69,35 +70,44 @@ const LeavePolicy = () => {
     loadLeavePolicies();
   }, []);
 
-  const handleCreatePolicy = (e) => {
+  const handleCreatePolicy = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.code.trim()) return;
 
-    const newPolicy = {
-      id: Date.now().toString(),
-      name: form.name,
-      code: form.code.toUpperCase(),
-      days: parseInt(form.days) || 10,
-      type: form.type,
-      accrual: form.accrual,
-      carryover: form.carryover,
-      color: 'from-blue-500 to-indigo-600',
-      description: form.description || 'Custom company leave policy guideline.',
-    };
+    setSubmitting(true);
+    try {
+      const payload = {
+        name: form.name.trim(),
+        code: form.code.toUpperCase().trim(),
+        daysAllowed: parseInt(form.days) || 12,
+        isPaid: form.type === 'PAID',
+        description: form.description.trim() || undefined,
+      };
 
-    setPolicies([...policies, newPolicy]);
-    setIsAddOpen(false);
-    setForm({
-      name: '',
-      code: '',
-      days: 10,
-      type: 'PAID',
-      accrual: 'Monthly Accrual',
-      carryover: 'Max 3 Days',
-      description: '',
-    });
-    setToastMsg(`Leave policy "${form.name}" registered successfully!`);
-    setTimeout(() => setToastMsg(''), 3000);
+      const res = await api.createLeaveType(payload);
+      if (res?.success || res?.data?.leaveType) {
+        setToastMsg(`Leave policy "${form.name}" registered successfully!`);
+        setIsAddOpen(false);
+        setForm({
+          name: '',
+          code: '',
+          days: 12,
+          type: 'PAID',
+          accrual: 'Monthly Accrual',
+          carryover: 'Max 3 Days',
+          description: '',
+        });
+        await loadLeavePolicies();
+        setTimeout(() => setToastMsg(''), 3000);
+      } else {
+        alert(res?.message || 'Failed to create leave policy.');
+      }
+    } catch (err) {
+      console.error('Failed to create leave policy:', err);
+      alert(err.message || 'Failed to create leave policy. Please check if policy code is unique.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -516,16 +526,27 @@ const LeavePolicy = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                  disabled={submitting}
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
-                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
-                  <span>Save Policy</span>
+                  {submitting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                      <span>Save Policy</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

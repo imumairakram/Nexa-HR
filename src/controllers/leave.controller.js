@@ -8,7 +8,7 @@ const {
 
 const createLeaveType = async (req, res) => {
   try {
-    const { name, code, daysAllowed = 12, isPaid = true } = req.body;
+    const { name, code, daysAllowed = 12, isPaid = true, description } = req.body;
 
     if (!name || !code) {
       return res.status(400).json({
@@ -36,6 +36,7 @@ const createLeaveType = async (req, res) => {
         code: formattedCode,
         daysAllowed: parseInt(daysAllowed),
         isPaid: Boolean(isPaid),
+        description: description ? description.trim() : null,
       },
     });
 
