@@ -118,6 +118,7 @@ const onboardEmployee = async (req, res) => {
           phone: phone ? phone.trim() : null,
           role: resolvedRole,
           isActive: true,
+          mustChangePassword: true,
         },
       });
 
@@ -174,6 +175,8 @@ const onboardEmployee = async (req, res) => {
           phone: result.user.phone,
           role: result.user.role,
           isActive: result.user.isActive,
+          mustChangePassword: true,
+          tempPassword: finalPassword,
           profile: result.profile,
           salaryStructure: result.salaryStructure,
         },

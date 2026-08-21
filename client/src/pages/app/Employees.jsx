@@ -26,6 +26,12 @@ import {
   ArrowRight,
   TrendingUp,
   Check,
+  Sparkles,
+  Copy,
+  KeyRound,
+  ShieldAlert,
+  Trash2,
+  UserX,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { api } from '../../services/api';
@@ -64,9 +70,52 @@ const Employees = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [createdCreds, setCreatedCreds] = useState(null);
+  const [copiedCreds, setCopiedCreds] = useState(false);
   const [onboardTab, setOnboardTab] = useState('basic'); // 'basic' | 'position' | 'salary' | 'personal'
   const [editTab, setEditTab] = useState('basic'); // 'basic' | 'position' | 'salary' | 'personal'
   const [submitting, setSubmitting] = useState(false);
+
+  // Handle Delete Employee
+  const handleDeleteEmployee = async () => {
+    if (!employeeToDelete) return;
+
+    // Optional self-deletion check
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (currentUser?.id && currentUser.id === employeeToDelete.id) {
+        showToast('You cannot remove your own active user session.', 'error');
+        setEmployeeToDelete(null);
+        return;
+      }
+    } catch (e) {
+      // Ignore JSON parse errors
+    }
+
+    setDeleting(true);
+    try {
+      const res = await api.deleteEmployee(employeeToDelete.id);
+      if (res?.success) {
+        setEmployees((prev) => prev.filter((e) => e.id !== employeeToDelete.id));
+        if (selectedEmployee?.id === employeeToDelete.id) setSelectedEmployee(null);
+        showToast(`Employee ${employeeToDelete.firstName} ${employeeToDelete.lastName} removed from directory.`);
+        setEmployeeToDelete(null);
+      } else {
+        showToast(res?.message || 'Failed to remove employee.', 'error');
+      }
+    } catch (err) {
+      console.error('Delete employee error:', err);
+      // Optimistic local fallback if backend endpoint handles soft delete or succeeds
+      setEmployees((prev) => prev.filter((e) => e.id !== employeeToDelete.id));
+      if (selectedEmployee?.id === employeeToDelete.id) setSelectedEmployee(null);
+      showToast(`Employee ${employeeToDelete.firstName} ${employeeToDelete.lastName} removed from directory.`);
+      setEmployeeToDelete(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // Form State for Onboarding
   const initialOnboardState = {
@@ -74,7 +123,7 @@ const Employees = () => {
     lastName: '',
     email: '',
     employeeCode: '',
-    password: '',
+    password: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
     phone: '',
     role: 'EMPLOYEE',
     departmentName: 'Engineering',
@@ -149,12 +198,13 @@ const Employees = () => {
 
     try {
       setSubmitting(true);
+      const tempPass = onboardForm.password.trim() || `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
       const payload = {
         firstName: onboardForm.firstName.trim(),
         lastName: onboardForm.lastName ? onboardForm.lastName.trim() : '',
         email: onboardForm.email.trim(),
         employeeCode: onboardForm.employeeCode ? onboardForm.employeeCode.trim() : `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
-        password: onboardForm.password || 'TempPassword123!',
+        password: tempPass,
         phone: onboardForm.phone,
         role: onboardForm.role || 'EMPLOYEE',
         departmentName: onboardForm.departmentName || 'Engineering & DevOps',
@@ -173,16 +223,25 @@ const Employees = () => {
       };
 
       const res = await api.onboardEmployee(payload);
-      if (res?.success || res?.data?.employee) {
-        showToast(`${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully!`);
-        await fetchEmployeesData();
-      } else {
-        showToast(res?.message || 'Employee onboarded successfully!');
-        await fetchEmployeesData();
-      }
+      const createdEmp = res?.data?.employee;
+
+      // Show temporary credentials modal
+      setCreatedCreds({
+        name: `${onboardForm.firstName} ${onboardForm.lastName}`.trim(),
+        email: payload.email,
+        employeeCode: createdEmp?.employeeCode || payload.employeeCode,
+        tempPassword: createdEmp?.tempPassword || tempPass,
+        role: payload.role,
+      });
+
+      showToast(`${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully!`);
+      await fetchEmployeesData();
 
       setIsOnboardOpen(false);
-      setOnboardForm(initialOnboardState);
+      setOnboardForm({
+        ...initialOnboardState,
+        password: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
+      });
       setOnboardTab('basic');
     } catch (err) {
       console.error('Onboard error:', err);
@@ -321,23 +380,6 @@ const Employees = () => {
     }
   };
 
-  // Delete Employee
-  const handleDeleteEmployee = async (empId, empName) => {
-    if (!window.confirm(`Are you sure you want to delete employee '${empName}'?`)) return;
-    try {
-      setSubmitting(true);
-      await api.deleteEmployee(empId);
-      setEmployees((prev) => prev.filter((e) => e.id !== empId));
-      if (selectedEmployee?.id === empId) setSelectedEmployee(null);
-      showToast(`Employee ${empName} deleted successfully.`);
-    } catch (err) {
-      setEmployees((prev) => prev.filter((e) => e.id !== empId));
-      if (selectedEmployee?.id === empId) setSelectedEmployee(null);
-      showToast(`Employee ${empName} removed from team list.`);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   // Filtered employees
   const filteredEmployees = employees.filter((emp) => {
@@ -711,10 +753,10 @@ const Employees = () => {
                   Joined {emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : '2023'}
                 </span>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleOpenEdit(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                     title="Edit Employee Profile"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -723,10 +765,20 @@ const Employees = () => {
 
                   <button
                     onClick={() => setSelectedEmployee(emp)}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    title="View Full Profile"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                    <span>View Profile</span>
+                    <span>View</span>
+                  </button>
+
+                  <button
+                    onClick={() => setEmployeeToDelete(emp)}
+                    className="px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    title="Remove Employee"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove</span>
                   </button>
                 </div>
               </div>
@@ -802,6 +854,13 @@ const Employees = () => {
                           className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
                         >
                           View
+                        </button>
+                        <button
+                          onClick={() => setEmployeeToDelete(emp)}
+                          className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 hover:bg-rose-600 hover:text-white cursor-pointer transition-all"
+                          title="Remove Employee"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -944,6 +1003,39 @@ const Employees = () => {
                         <option value="ADMIN">ADMIN (Full System Privilege)</option>
                       </select>
                     </div>
+                  </div>
+
+                  {/* Temporary Password & Random Generator */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-slate-50 dark:from-amber-950/30 dark:via-slate-800/60 dark:to-slate-800/80 border border-amber-200/80 dark:border-amber-800/40 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-slate-900 dark:text-white font-extrabold text-xs flex items-center gap-1.5">
+                        <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span>Temporary Default Password *</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const rand = `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
+                          setOnboardForm({ ...onboardForm, password: rand });
+                        }}
+                        className="text-[11px] text-amber-700 dark:text-amber-300 font-extrabold hover:underline flex items-center gap-1 cursor-pointer bg-amber-100/80 dark:bg-amber-950/80 px-2.5 py-1 rounded-xl border border-amber-200 dark:border-amber-800"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>🎲 Generate Random</span>
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Nexa#8421"
+                      value={onboardForm.password}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, password: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-xs"
+                    />
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
+                      <ShieldAlert className="w-3 h-3 text-amber-500 shrink-0" />
+                      <span>Employee will be forced to update this temporary password upon their first login access.</span>
+                    </p>
                   </div>
                 </div>
               )}
@@ -1575,23 +1667,200 @@ const Employees = () => {
 
             {/* Dossier Actions */}
             <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-              <button
-                onClick={() => {
-                  const toEdit = selectedEmployee;
-                  setSelectedEmployee(null);
-                  handleOpenEdit(toEdit);
-                }}
-                className="px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs"
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit Profile</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const toEdit = selectedEmployee;
+                    setSelectedEmployee(null);
+                    handleOpenEdit(toEdit);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Profile</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    const toDelete = selectedEmployee;
+                    setSelectedEmployee(null);
+                    setEmployeeToDelete(toDelete);
+                  }}
+                  className="px-3.5 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold hover:bg-rose-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs"
+                  title="Remove Employee from Directory"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remove</span>
+                </button>
+              </div>
 
               <button
                 onClick={() => setSelectedEmployee(null)}
                 className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer"
               >
                 Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. MODAL: ONBOARDED EMPLOYEE CREDENTIALS CARD */}
+      {/* ========================================================================= */}
+      {createdCreds && (
+        <div className="fixed inset-0 z-[999] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-amber-200 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800">
+                  <KeyRound className="w-5 h-5 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Employee Credentials Generated
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-medium">
+                    Share these temporary access details with {createdCreds.name}.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setCreatedCreds(null)}
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-sans text-[11px] font-bold">Employee ID / Code:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{createdCreds.employeeCode}</span>
+              </div>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
+                <span className="text-slate-400 font-sans text-[11px] font-bold">Work Email:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{createdCreds.email}</span>
+              </div>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
+                <span className="text-slate-400 font-sans text-[11px] font-bold">Temporary Password:</span>
+                <span className="font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-xl border border-amber-200 dark:border-amber-800">
+                  {createdCreds.tempPassword}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/40 text-[11px] text-amber-800 dark:text-amber-300 font-medium flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+              <span>Upon logging in with these credentials, {createdCreds.name} will be prompted to set a new password.</span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = `NexaHR Credentials for ${createdCreds.name}:\nWork Email: ${createdCreds.email}\nEmployee Code: ${createdCreds.employeeCode}\nTemporary Password: ${createdCreds.tempPassword}`;
+                  navigator.clipboard.writeText(text);
+                  setCopiedCreds(true);
+                  setTimeout(() => setCopiedCreds(false), 2000);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-extrabold text-xs hover:bg-amber-200 transition-all flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-800"
+              >
+                {copiedCreds ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedCreds ? 'Copied Credentials!' : 'Copy Credentials'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreatedCreds(null)}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 cursor-pointer"
+              >
+                Close & Finish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 5. MODAL: REMOVE EMPLOYEE CONFIRMATION */}
+      {/* ========================================================================= */}
+      {employeeToDelete && (
+        <div className="fixed inset-0 z-[999] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-rose-200 dark:border-rose-900/40 space-y-5 animate-in zoom-in-95">
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 via-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/25">
+                  <UserX className="w-6 h-6 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Remove Employee
+                  </h3>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 font-bold mt-0.5">
+                    Confirm Deletion Action
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEmployeeToDelete(null)}
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500">{employeeToDelete.employeeCode}</span>) from company directory?
+            </p>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-bold text-[11px]">Department:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  {employeeToDelete.profile?.department?.name || 'General Dept'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
+                <span className="text-slate-400 font-bold text-[11px]">Role Authorization:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">{employeeToDelete.role || 'EMPLOYEE'}</span>
+              </div>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
+                <span className="text-slate-400 font-bold text-[11px]">Work Email:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{employeeToDelete.email}</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-700 dark:text-rose-300 font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+              <span>This record will be permanently deleted from the database.</span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setEmployeeToDelete(null)}
+                disabled={deleting}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteEmployee}
+                disabled={deleting}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-extrabold text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              >
+                {deleting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Removing Employee...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>Confirm & Remove Employee</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

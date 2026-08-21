@@ -3,6 +3,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 import EmployeeSidebar from '../components/navigation/EmployeeSidebar';
 import EmployeeBottomNav from '../components/navigation/EmployeeBottomNav';
 import ErrorBoundary from '../components/common/ErrorBoundary';
+import FirstLoginPasswordModal from '../components/common/FirstLoginPasswordModal';
 
 const EmployeeLayout = () => {
   const [authToken] = useState(() => localStorage.getItem('token'));
@@ -36,6 +37,9 @@ const EmployeeLayout = () => {
         isCollapsed ? 'lg:pl-[112px]' : 'lg:pl-[288px]'
       }`}
     >
+      {/* Mandatory Password Change Modal for First Time Login */}
+      <FirstLoginPasswordModal />
+
       {/* Fixed Left Sidebar with Collapse/Expand */}
       <EmployeeSidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
 

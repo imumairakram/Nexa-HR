@@ -51,6 +51,7 @@ const registerAdmin = async (req, res) => {
         phone: phone ? phone.trim() : null,
         role: 'ADMIN',
         isActive: true,
+        mustChangePassword: false,
       },
     });
 
@@ -71,6 +72,7 @@ const registerAdmin = async (req, res) => {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
+          mustChangePassword: false,
         },
       },
     });
@@ -144,6 +146,7 @@ const login = async (req, res) => {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
+          mustChangePassword: user.mustChangePassword ?? false,
         },
       },
     });
@@ -174,6 +177,7 @@ const getMe = async (req, res) => {
         phone: true,
         role: true,
         isActive: true,
+        mustChangePassword: true,
         createdAt: true,
         profile: {
           include: {
@@ -818,7 +822,10 @@ const changeMyPassword = async (req, res) => {
 
     await prisma.user.update({
       where: { id: userId },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: false,
+      },
     });
 
     return res.status(200).json({
