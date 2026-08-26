@@ -251,6 +251,34 @@ const Employees = () => {
     }
   };
 
+  // Dispatch / Compose Gmail with credentials prefilled
+  const handleEmailCredentials = (creds) => {
+    if (!creds) return;
+    const recipient = creds.email || '';
+    const subject = `NexaHR Portal Access - Login Credentials for ${creds.name}`;
+    const body = `Dear ${creds.name},
+
+Welcome to NexaHR! Your employee account has been created with the following access credentials:
+
+--------------------------------------------------
+Employee ID / Code : ${creds.employeeCode}
+Work Email         : ${creds.email}
+Temporary Password : ${creds.tempPassword}
+--------------------------------------------------
+
+Portal Login URL   : ${window.location.origin}/login
+
+Important Security Note:
+Upon logging in for the first time, you will be prompted to choose a new password.
+
+Best regards,
+People Operations & HR Team
+NexaHR Workforce Systems`;
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+  };
+
   // Open Edit Modal
   const handleOpenEdit = (emp) => {
     setEditingEmployee(emp);
@@ -679,84 +707,96 @@ const Employees = () => {
       {/* 3. EMPLOYEES GRID / TABLE */}
       {/* ========================================================================= */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredEmployees.map((emp, idx) => (
             <div
               key={emp.id || idx}
-              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between group hover:shadow-lg"
+              className="relative overflow-hidden rounded-[28px] bg-white/90 dark:bg-[#1E293B]/90 backdrop-blur-xl p-6 shadow-soft hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/90 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 flex flex-col justify-between group"
             >
+              {/* Dynamic Glow Line on Hover */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-indigo-500/10 blur-2xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
+
               <div>
                 {/* Header: Avatar, Name, Code, Role */}
                 <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {getAvatarUrl(emp) ? (
-                      <img
-                        src={getAvatarUrl(emp)}
-                        alt=""
-                        className="w-12 h-12 rounded-2xl object-cover ring-2 ring-indigo-500/20 shadow-sm shrink-0"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-sm flex items-center justify-center ring-2 ring-indigo-500/20 shadow-sm shrink-0 uppercase">
-                        <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
-                      </div>
-                    )}
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="relative shrink-0">
+                      {getAvatarUrl(emp) ? (
+                        <img
+                          src={getAvatarUrl(emp)}
+                          alt=""
+                          className="w-13 h-13 rounded-2xl object-cover ring-2 ring-indigo-500/30 shadow-md group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-sm flex items-center justify-center ring-2 ring-indigo-500/30 shadow-md group-hover:scale-105 transition-transform uppercase">
+                          <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
+                        </div>
+                      )}
+                      <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-[#1E293B] rounded-full shadow-xs" title="Active Staff" />
+                    </div>
+
                     <div className="min-w-0 flex-1">
-                      <h4 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate tracking-tight">
                         {emp.firstName} {emp.lastName}
                       </h4>
-                      <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5 truncate">
+                      <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5 truncate">
                         {emp.profile?.designation?.title || 'Staff Member'}
                       </p>
-                      <span className="text-[10px] text-slate-400 font-mono block truncate">{emp.employeeCode}</span>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md truncate border border-slate-200/50 dark:border-slate-700/50">
+                          {emp.employeeCode}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase shrink-0 ${
+                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0 border shadow-xs ${
                       emp.role === 'ADMIN'
-                        ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                        ? 'bg-purple-100/80 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border-purple-200 dark:border-purple-800'
                         : emp.role === 'HR_MANAGER'
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                        ? 'bg-amber-100/80 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                        : 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                     }`}
                   >
                     {emp.role || 'EMPLOYEE'}
                   </span>
                 </div>
 
-                {/* Details Card */}
-                <div className="space-y-2 text-xs text-slate-500 dark:text-slate-400 mb-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/40">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="font-medium truncate">{emp.profile?.department?.name || 'General Dept'}</span>
+                {/* Glassmorphic Dossier Details Container */}
+                <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-4 p-4 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 backdrop-blur-md">
+                  <div className="flex items-center gap-2.5">
+                    <Building2 className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span className="font-semibold truncate">{emp.profile?.department?.name || 'General Dept'}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="font-medium truncate">{emp.profile?.address || emp.profile?.location || 'San Francisco HQ'}</span>
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span className="font-semibold truncate">{emp.profile?.address || emp.profile?.location || 'San Francisco HQ'}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="font-medium truncate">{emp.email}</span>
+                  <div className="flex items-center gap-2.5">
+                    <Mail className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span className="font-semibold truncate text-slate-700 dark:text-slate-200">{emp.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 pt-1 border-t border-slate-200/50 dark:border-slate-700/30">
-                    <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="flex items-center justify-between pt-2 mt-1 border-t border-slate-200/60 dark:border-slate-800/60">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Salary Matrix</span>
+                    <span className="font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50">
                       {formatSalary(emp.salaryStructure, emp.profile?.salary)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Card Footer: Joined Date & Action Buttons (Edit + Dossier) */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-400">
+              {/* Card Footer: Joined Date & Modern Action Pills */}
+              <div className="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-[11px] font-extrabold text-slate-400">
                   Joined {emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : '2023'}
                 </span>
 
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleOpenEdit(emp)}
-                    className="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-indigo-200/50 dark:border-indigo-800/50"
                     title="Edit Employee Profile"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -765,7 +805,7 @@ const Employees = () => {
 
                   <button
                     onClick={() => setSelectedEmployee(emp)}
-                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-slate-200/50 dark:border-slate-700/50"
                     title="View Full Profile"
                   >
                     <Eye className="w-3.5 h-3.5" />
@@ -774,7 +814,7 @@ const Employees = () => {
 
                   <button
                     onClick={() => setEmployeeToDelete(emp)}
-                    className="px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-rose-200/50 dark:border-rose-800/50"
                     title="Remove Employee"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -873,404 +913,451 @@ const Employees = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 4. MODAL: ONBOARD EMPLOYEE (STITCH LUXURY DESIGN) */}
+      {/* 4. MODAL: ONBOARD EMPLOYEE (STITCH EXECUTIVE DESIGN) */}
       {/* ========================================================================= */}
       {isOnboardOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-2xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto">
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xl flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-300">
+          <div className="bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-2xl rounded-[36px] max-w-2xl w-full shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-indigo-200/80 dark:border-indigo-500/30 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-300 my-auto relative">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
-                  <UserPlus className="w-6 h-6 stroke-[2.2]" />
+            <div className="p-6 sm:p-7 border-b border-slate-200/80 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-900/90 via-slate-900 to-purple-950/90 text-white relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30 ring-2 ring-white/20">
+                  <UserPlus className="w-7 h-7 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/30 text-indigo-200 border border-indigo-400/40">
+                      Elite Talent Provisioning
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
                     Onboard New Team Member
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <p className="text-xs text-slate-300 font-medium mt-0.5 max-w-md leading-relaxed">
                     Provision employee workspace credentials, assign departmental roles & configure baseline payroll.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOnboardOpen(false)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all cursor-pointer shrink-0 border border-white/10"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Scrollable Container with Tabs */}
-            <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5 custom-scrollbar text-xs">
-              {/* Modal Form Tabs */}
-              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/80 dark:bg-slate-800/80 rounded-2xl text-xs font-bold no-scrollbar overflow-x-auto border border-slate-200/50 dark:border-slate-700/50 shrink-0">
+            <div className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-6 custom-scrollbar text-xs relative z-10">
+              {/* Modal Form Segmented Stepper Tabs */}
+              <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-2xl text-xs font-extrabold no-scrollbar overflow-x-auto border border-slate-200/80 dark:border-slate-800/80 shrink-0 shadow-inner-light">
                 {[
-                  { id: 'basic', label: '1. Identity & Access' },
-                  { id: 'position', label: '2. Position & Org' },
-                  { id: 'salary', label: '3. Compensation & Salary' },
-                  { id: 'personal', label: '4. Personal & Emergency' },
+                  { id: 'basic', step: '01', label: 'Identity & Access' },
+                  { id: 'position', step: '02', label: 'Position & Org' },
+                  { id: 'salary', step: '03', label: 'Compensation' },
+                  { id: 'personal', step: '04', label: 'Personal & Contact' },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setOnboardTab(tab.id)}
-                    className={`flex-1 py-2 px-3 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+                    className={`flex-1 py-2.5 px-3 rounded-xl transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
                       onboardTab === tab.id
-                        ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-sm font-black'
-                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        ? 'bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white shadow-md shadow-indigo-600/30 font-black'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-bold'
                     }`}
                   >
-                    {tab.label}
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${onboardTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+                      {tab.step}
+                    </span>
+                    <span>{tab.label}</span>
                   </button>
                 ))}
               </div>
 
+              <form onSubmit={handleOnboardSubmit} className="space-y-5 text-xs">
+                {/* TAB 1: IDENTITY & ACCESS */}
+                {onboardTab === 'basic' && (
+                  <div className="space-y-4 animate-in fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          First Name <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Jordan"
+                          value={onboardForm.firstName}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, firstName: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Last Name <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Hayes"
+                          value={onboardForm.lastName}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, lastName: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
 
-            <form onSubmit={handleOnboardSubmit} className="space-y-4 text-xs">
-              {/* TAB 1: IDENTITY & ACCESS */}
-              {onboardTab === 'basic' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">First Name *</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Work Email <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="jordan.h@company.com"
+                          value={onboardForm.email}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, email: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Employee Code / ID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="EMP-108"
+                          value={onboardForm.employeeCode}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, employeeCode: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-mono font-black focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Phone Number
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="+1 (555) 019-2831"
+                          value={onboardForm.phone}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, phone: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Role Authorization ACL
+                        </label>
+                        <select
+                          value={onboardForm.role}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, role: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-extrabold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all"
+                        >
+                          <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
+                          <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
+                          <option value="ADMIN">ADMIN (Full System Privilege)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Tech Security Password Key Card */}
+                    <div className="p-4.5 rounded-3xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-purple-500/10 border border-amber-400/40 dark:border-amber-500/30 backdrop-blur-md space-y-3 relative overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-slate-900 dark:text-white font-black text-xs flex items-center gap-2">
+                          <KeyRound className="w-4 h-4 text-amber-500" />
+                          <span>Enterprise Access Key / Default Password</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const rand = `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
+                            setOnboardForm({ ...onboardForm, password: rand });
+                          }}
+                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-[11px] shadow-sm hover:shadow-md hover:shadow-amber-500/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>Generate Secure Key</span>
+                        </button>
+                      </div>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Jordan"
-                        value={onboardForm.firstName}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, firstName: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                        placeholder="e.g. Nexa#8421"
+                        value={onboardForm.password}
+                        onChange={(e) => setOnboardForm({ ...onboardForm, password: e.target.value })}
+                        className="w-full px-4 py-3 rounded-2xl bg-white dark:bg-slate-950 border border-amber-300 dark:border-amber-700/80 text-slate-900 dark:text-amber-400 font-mono font-black focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-xs tracking-wider"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Last Name *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Hayes"
-                        value={onboardForm.lastName}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, lastName: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                        <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>Employee will be prompted to replace this default access key upon their initial sign-in.</span>
+                      </p>
                     </div>
                   </div>
+                )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Work Email *</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="jordan.h@company.com"
-                        value={onboardForm.email}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, email: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
+                {/* TAB 2: POSITION & ORGANIZATION */}
+                {onboardTab === 'position' && (
+                  <div className="space-y-4 animate-in fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Department <span className="text-rose-500">*</span>
+                        </label>
+                        <select
+                          value={onboardForm.departmentName}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, departmentName: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-extrabold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all"
+                        >
+                          {deptOptions.map((d) => (
+                            <option key={d} value={d}>
+                              {d}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Designation / Position Title <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Senior Full-Stack Engineer"
+                          value={onboardForm.designationTitle}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, designationTitle: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Employee Code / ID</label>
-                      <input
-                        type="text"
-                        placeholder="EMP-108"
-                        value={onboardForm.employeeCode}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, employeeCode: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Workplace Location
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="San Francisco HQ (Floor 4) or Remote"
+                          value={onboardForm.location}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, location: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Joining Date
+                        </label>
+                        <input
+                          type="date"
+                          value={onboardForm.joiningDate}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, joiningDate: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
                     </div>
                   </div>
+                )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Phone Number</label>
-                      <input
-                        type="text"
-                        placeholder="+1 (555) 019-2831"
-                        value={onboardForm.phone}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, phone: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
+                {/* TAB 3: COMPENSATION & SALARY STRUCTURE */}
+                {onboardTab === 'salary' && (
+                  <div className="space-y-4 animate-in fade-in">
+                    <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/30 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <DollarSign className="w-6 h-6 text-emerald-500" />
+                        <div>
+                          <div className="font-extrabold text-slate-900 dark:text-white text-xs">PostgreSQL Payroll Matrix</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Automatic payroll sync & payslip generation</div>
+                        </div>
+                      </div>
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-300 dark:border-emerald-800">
+                        Net: ${(
+                          parseFloat(onboardForm.basicSalary || 0) +
+                          parseFloat(onboardForm.housingAllowance || 0) +
+                          parseFloat(onboardForm.transportAllowance || 0) -
+                          parseFloat(onboardForm.taxDeductions || 0)
+                        ).toLocaleString()} / mo
+                      </span>
                     </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Role Authorization ACL</label>
-                      <select
-                        value={onboardForm.role}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, role: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                      >
-                        <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
-                        <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
-                        <option value="ADMIN">ADMIN (Full System Privilege)</option>
-                      </select>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Basic Base Salary ($/mo) <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="8500"
+                          value={onboardForm.basicSalary}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, basicSalary: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-black focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Housing Allowance ($/mo)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="1200"
+                          value={onboardForm.housingAllowance}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, housingAllowance: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Transport Allowance ($/mo)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="500"
+                          value={onboardForm.transportAllowance}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, transportAllowance: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Estimated Tax Deductions ($/mo)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="950"
+                          value={onboardForm.taxDeductions}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, taxDeductions: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Temporary Password & Random Generator */}
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-slate-50 dark:from-amber-950/30 dark:via-slate-800/60 dark:to-slate-800/80 border border-amber-200/80 dark:border-amber-800/40 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="block text-slate-900 dark:text-white font-extrabold text-xs flex items-center gap-1.5">
-                        <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                        <span>Temporary Default Password *</span>
-                      </label>
+                {/* TAB 4: PERSONAL & EMERGENCY */}
+                {onboardTab === 'personal' && (
+                  <div className="space-y-4 animate-in fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Gender
+                        </label>
+                        <select
+                          value={onboardForm.gender}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, gender: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all"
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Non-Binary">Non-Binary</option>
+                          <option value="Not Specified">Prefer not to say</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Date of Birth
+                        </label>
+                        <input
+                          type="date"
+                          value={onboardForm.dateOfBirth}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, dateOfBirth: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Residential Address
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="100 Market St, San Francisco, CA"
+                          value={onboardForm.address}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                          Emergency Contact Info
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Jane Doe (+1 555-0192)"
+                          value={onboardForm.emergencyContact}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, emergencyContact: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Executive Form Actions Footer */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
+                  <div className="flex items-center gap-2">
+                    {onboardTab !== 'basic' && (
                       <button
                         type="button"
                         onClick={() => {
-                          const rand = `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
-                          setOnboardForm({ ...onboardForm, password: rand });
+                          const tabs = ['basic', 'position', 'salary', 'personal'];
+                          const idx = tabs.indexOf(onboardTab);
+                          if (idx > 0) setOnboardTab(tabs[idx - 1]);
                         }}
-                        className="text-[11px] text-amber-700 dark:text-amber-300 font-extrabold hover:underline flex items-center gap-1 cursor-pointer bg-amber-100/80 dark:bg-amber-950/80 px-2.5 py-1 rounded-xl border border-amber-200 dark:border-amber-800"
+                        className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>🎲 Generate Random</span>
+                        Previous
                       </button>
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Nexa#8421"
-                      value={onboardForm.password}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, password: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-xs"
-                    />
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
-                      <ShieldAlert className="w-3 h-3 text-amber-500 shrink-0" />
-                      <span>Employee will be forced to update this temporary password upon their first login access.</span>
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 2: POSITION & ORGANIZATION */}
-              {onboardTab === 'position' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Department *</label>
-                      <select
-                        value={onboardForm.departmentName}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, departmentName: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                      >
-                        {deptOptions.map((d) => (
-                          <option key={d} value={d}>
-                            {d}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Designation Title / Position *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Senior Full-Stack Engineer"
-                        value={onboardForm.designationTitle}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, designationTitle: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Work Location</label>
-                      <input
-                        type="text"
-                        placeholder="San Francisco HQ (Floor 4) or Remote"
-                        value={onboardForm.location}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, location: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Joining Date</label>
-                      <input
-                        type="date"
-                        value={onboardForm.joiningDate}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, joiningDate: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 3: COMPENSATION & SALARY STRUCTURE */}
-              {onboardTab === 'salary' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      <div>
-                        <div className="font-bold text-emerald-900 dark:text-emerald-200 text-xs">Salary & Payroll Integration</div>
-                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400">Values automatically feed into PostgreSQL Payroll & Payslips</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
-                      Net: ${(
-                        parseFloat(onboardForm.basicSalary || 0) +
-                        parseFloat(onboardForm.housingAllowance || 0) +
-                        parseFloat(onboardForm.transportAllowance || 0) -
-                        parseFloat(onboardForm.taxDeductions || 0)
-                      ).toLocaleString()} / mo
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Basic Base Salary ($/mo) *</label>
-                      <input
-                        type="number"
-                        placeholder="8500"
-                        value={onboardForm.basicSalary}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, basicSalary: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Housing Allowance ($/mo)</label>
-                      <input
-                        type="number"
-                        placeholder="1200"
-                        value={onboardForm.housingAllowance}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, housingAllowance: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Transport / Travel Allowance ($/mo)</label>
-                      <input
-                        type="number"
-                        placeholder="500"
-                        value={onboardForm.transportAllowance}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, transportAllowance: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Estimated Tax Deductions ($/mo)</label>
-                      <input
-                        type="number"
-                        placeholder="950"
-                        value={onboardForm.taxDeductions}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, taxDeductions: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 4: PERSONAL & EMERGENCY */}
-              {onboardTab === 'personal' && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Gender</label>
-                      <select
-                        value={onboardForm.gender}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, gender: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                      >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Non-Binary">Non-Binary</option>
-                        <option value="Not Specified">Prefer not to say</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Date of Birth</label>
-                      <input
-                        type="date"
-                        value={onboardForm.dateOfBirth}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, dateOfBirth: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Residential Address</label>
-                      <input
-                        type="text"
-                        placeholder="100 Market St, San Francisco, CA"
-                        value={onboardForm.address}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Emergency Contact Info</label>
-                      <input
-                        type="text"
-                        placeholder="Jane Doe (+1 555-0192)"
-                        value={onboardForm.emergencyContact}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, emergencyContact: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Form Actions */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  {onboardTab !== 'basic' && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const tabs = ['basic', 'position', 'salary', 'personal'];
-                        const idx = tabs.indexOf(onboardTab);
-                        if (idx > 0) setOnboardTab(tabs[idx - 1]);
-                      }}
-                      className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
-                    >
-                      Previous
-                    </button>
-                  )}
-                  {onboardTab !== 'personal' && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const tabs = ['basic', 'position', 'salary', 'personal'];
-                        const idx = tabs.indexOf(onboardTab);
-                        if (idx < tabs.length - 1) setOnboardTab(tabs[idx + 1]);
-                      }}
-                      className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 cursor-pointer"
-                    >
-                      Next Step →
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsOnboardOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 cursor-pointer flex items-center gap-2 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                  >
-                    {submitting ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <UserPlus className="w-4 h-4 stroke-[2.2]" />
                     )}
-                    <span>Complete Onboarding</span>
-                  </button>
+                    {onboardTab !== 'personal' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const tabs = ['basic', 'position', 'salary', 'personal'];
+                          const idx = tabs.indexOf(onboardTab);
+                          if (idx < tabs.length - 1) setOnboardTab(tabs[idx + 1]);
+                        }}
+                        className="px-4.5 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 cursor-pointer transition-all border border-indigo-200/50 dark:border-indigo-800/50"
+                      >
+                        Next Step →
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsOnboardOpen(false)}
+                      className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="px-7 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-black text-xs shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
+                    >
+                      {submitting ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <UserPlus className="w-4 h-4 stroke-[2.5]" />
+                      )}
+                      <span>Complete Onboarding</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
             </div>
           </div>
         </div>
@@ -1709,53 +1796,75 @@ const Employees = () => {
       {/* 4. MODAL: ONBOARDED EMPLOYEE CREDENTIALS CARD */}
       {/* ========================================================================= */}
       {createdCreds && (
-        <div className="fixed inset-0 z-[999] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-amber-200 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800">
+        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] sm:rounded-[36px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200/80 dark:border-slate-800 space-y-5 animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center border border-amber-200/80 dark:border-amber-800/60 shrink-0 shadow-xs">
                   <KeyRound className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                     Employee Credentials Generated
                   </h3>
-                  <p className="text-[11px] text-slate-400 font-medium">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                     Share these temporary access details with {createdCreds.name}.
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setCreatedCreds(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                title="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3 font-mono text-xs">
+            {/* Credentials details card */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/30 dark:bg-slate-800/50 border border-blue-100/80 dark:border-slate-700/60 space-y-3.5">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-sans text-[11px] font-bold">Employee ID / Code:</span>
-                <span className="font-bold text-slate-900 dark:text-white">{createdCreds.employeeCode}</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Employee ID / Code:</span>
+                <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                  {createdCreds.employeeCode}
+                </span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-                <span className="text-slate-400 font-sans text-[11px] font-bold">Work Email:</span>
-                <span className="font-bold text-slate-900 dark:text-white">{createdCreds.email}</span>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/40 pt-3">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Work Email:</span>
+                <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                  {createdCreds.email}
+                </span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-                <span className="text-slate-400 font-sans text-[11px] font-bold">Temporary Password:</span>
-                <span className="font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-xl border border-amber-200 dark:border-amber-800">
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/40 pt-3">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Temporary Password:</span>
+                <span className="font-mono font-bold text-xs sm:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/80 shadow-xs">
                   {createdCreds.tempPassword}
                 </span>
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/40 text-[11px] text-amber-800 dark:text-amber-300 font-medium flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>Upon logging in with these credentials, {createdCreds.name} will be prompted to set a new password.</span>
+            {/* Warning Callout */}
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 font-medium flex items-start sm:items-center gap-2.5 leading-relaxed">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5 sm:mt-0" />
+              <span>
+                Upon logging in with these credentials, <strong>{createdCreds.name}</strong> will be prompted to set a new password.
+              </span>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            {/* Footer Action Buttons */}
+            <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleEmailCredentials(createdCreds)}
+                className="px-4 py-2.5 rounded-2xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/70 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs border border-blue-200 dark:border-blue-800/80 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                title="Open Gmail compose with pre-filled credentials"
+              >
+                <Mail className="w-4 h-4" />
+                <span>Email via Gmail</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => {
@@ -1764,15 +1873,16 @@ const Employees = () => {
                   setCopiedCreds(true);
                   setTimeout(() => setCopiedCreds(false), 2000);
                 }}
-                className="px-4 py-2.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-extrabold text-xs hover:bg-amber-200 transition-all flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-800"
+                className="px-4 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/70 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-bold text-xs border border-amber-200 dark:border-amber-800/80 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
               >
-                {copiedCreds ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                {copiedCreds ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedCreds ? 'Copied Credentials!' : 'Copy Credentials'}</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setCreatedCreds(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 cursor-pointer"
+                className="px-5 py-2.5 rounded-2xl bg-[#0F172A] hover:bg-[#1E293B] dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition-all shadow-md cursor-pointer"
               >
                 Close & Finish
               </button>

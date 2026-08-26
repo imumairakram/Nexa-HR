@@ -61,6 +61,14 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('user_avatar');
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('user_avatar_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    sessionStorage.clear();
+    window.dispatchEvent(new Event('user_profile_updated'));
     window.location.href = '/';
   };
 

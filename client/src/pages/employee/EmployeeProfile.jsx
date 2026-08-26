@@ -72,8 +72,16 @@ const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / G
 const EmployeeProfile = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [avatar, setAvatar] = useState(() => {
-    const stored = localStorage.getItem('user_avatar');
-    return stored && !stored.includes('unsplash') ? stored : null;
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u.avatar && !u.avatar.includes('unsplash')) return u.avatar;
+      if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) return u.profile.avatarUrl;
+      if (u.id) {
+        const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+        if (scoped && !scoped.includes('unsplash')) return scoped;
+      }
+    } catch {}
+    return null;
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
@@ -150,12 +158,19 @@ const EmployeeProfile = () => {
             emergencyRelation: u.emergencyRelation || parsedEmergency.emergencyRelation || prev.emergencyRelation,
             emergencyPhone: u.emergencyPhone || parsedEmergency.emergencyPhone || prev.emergencyPhone,
           }));
+
+          if (u.avatar && !u.avatar.includes('unsplash')) {
+            setAvatar(u.avatar);
+          } else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) {
+            setAvatar(u.profile.avatarUrl);
+          } else if (u.id) {
+            const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+            if (scoped && !scoped.includes('unsplash')) setAvatar(scoped);
+          }
         } catch (e) {
           console.warn(e);
         }
       }
-      const storedAvatar = localStorage.getItem('user_avatar');
-      if (storedAvatar) setAvatar(storedAvatar);
 
       // Fetch live user from database
       try {
@@ -191,6 +206,15 @@ const EmployeeProfile = () => {
               ? new Date(u.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
               : prev.joinDate,
           }));
+
+          let resolvedAvatar = null;
+          if (u.avatar && !u.avatar.includes('unsplash')) resolvedAvatar = u.avatar;
+          else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) resolvedAvatar = u.profile.avatarUrl;
+          else if (u.id) {
+            const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+            if (scoped && !scoped.includes('unsplash')) resolvedAvatar = scoped;
+          }
+          setAvatar(resolvedAvatar);
         }
       } catch (err) {
         console.warn('Live employee profile fetch:', err.message);
@@ -208,8 +232,12 @@ const EmployeeProfile = () => {
         const base64Image = reader.result;
         setAvatar(base64Image);
         try {
-          localStorage.setItem('user_avatar', base64Image);
           const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+          const userId = formData.id || currentU.id;
+          if (userId) {
+            localStorage.setItem(`user_avatar_${userId}`, base64Image);
+          }
+          localStorage.removeItem('user_avatar'); // Remove global key
           localStorage.setItem('user', JSON.stringify({ ...currentU, avatar: base64Image }));
           window.dispatchEvent(new Event('user_profile_updated'));
           window.dispatchEvent(new Event('storage'));
@@ -224,9 +252,13 @@ const EmployeeProfile = () => {
 
   const handleRemoveAvatar = () => {
     setAvatar(null);
-    localStorage.removeItem('user_avatar');
     try {
       const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = formData.id || currentU.id;
+      if (userId) {
+        localStorage.removeItem(`user_avatar_${userId}`);
+      }
+      localStorage.removeItem('user_avatar');
       delete currentU.avatar;
       localStorage.setItem('user', JSON.stringify(currentU));
       window.dispatchEvent(new Event('user_profile_updated'));

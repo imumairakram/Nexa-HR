@@ -34,7 +34,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
   const otpInputRefs = useRef([]);
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const [previewOtp, setPreviewOtp] = useState(null);
   const [destination, setDestination] = useState('');
 
   // Password Reset State
@@ -59,7 +58,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
       setNewPassword('');
       setConfirmPassword('');
       setResetToken(null);
-      setPreviewOtp(null);
 
       const targetEmail = initialEmail || '';
       setEmail(targetEmail);
@@ -144,9 +142,8 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
       });
 
       if (res && res.success) {
-        const dest = res.data?.destination || (channel === 'WHATSAPP' ? (userInfo?.phone || userInfo?.maskedPhone) : email);
+        const dest = res.data?.destination || (channel === 'WHATSAPP' ? (userInfo?.phone || userInfo?.maskedPhone) : (userInfo?.email || email.trim()));
         setDestination(dest);
-        setPreviewOtp(res.data?.previewOtp || null);
         setCountdown(60);
         setCanResend(false);
         setStep(2);
@@ -155,21 +152,11 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
           if (otpInputRefs.current[0]) otpInputRefs.current[0].focus();
         }, 150);
       } else {
-        setError(res.message || 'Failed to dispatch OTP code.');
+        setError(res?.message || 'Failed to dispatch OTP code.');
       }
     } catch (err) {
       console.warn('Initiate OTP error:', err.message);
-      // Offline fallback OTP for uninterrupted demonstration
-      const fallbackOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      const dest = channel === 'WHATSAPP' ? (userInfo?.phone || userInfo?.maskedPhone || '+1 (555) 415-8882') : email;
-      setDestination(dest);
-      setPreviewOtp(fallbackOtp);
-      setCountdown(60);
-      setCanResend(false);
-      setStep(2);
-      setTimeout(() => {
-        if (otpInputRefs.current[0]) otpInputRefs.current[0].focus();
-      }, 150);
+      setError(err.message || 'Failed to dispatch OTP code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -239,19 +226,13 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
       });
 
       if (res && res.success) {
-        setResetToken(res.data?.resetToken || 'demo_jwt_reset_token_verified');
+        setResetToken(res.data?.resetToken);
         setStep(3);
       } else {
-        setError(res.message || 'Invalid or expired OTP code.');
+        setError(res?.message || 'Invalid or expired OTP code.');
       }
     } catch (err) {
-      // Fallback verification for preview code
-      if (previewOtp && otpCode === previewOtp) {
-        setResetToken('demo_jwt_reset_token_verified');
-        setStep(3);
-      } else {
-        setError(err.message || 'Incorrect OTP code. Please check and try again.');
-      }
+      setError(err.message || 'Incorrect OTP code. Please check and try again.');
     } finally {
       setLoading(false);
     }
@@ -593,28 +574,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEm
                 />
               ))}
             </div>
-
-            {/* Developer Test Mode Simulation Box (For instant review) */}
-            {previewOtp && (
-              <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 flex items-center justify-between text-xs text-amber-800 dark:text-amber-300">
-                <div className="flex items-center gap-2">
-                  <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                  <span>
-                    <strong>Dev Code Preview:</strong> <span className="tracking-widest font-bold">{previewOtp}</span>
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const chars = previewOtp.split('');
-                    setOtpDigits(chars);
-                  }}
-                  className="px-2 py-1 rounded-lg bg-amber-200/80 dark:bg-amber-800/60 text-amber-900 dark:text-amber-100 font-bold text-[10px] hover:bg-amber-300 cursor-pointer"
-                >
-                  Auto Fill
-                </button>
-              </div>
-            )}
 
             {/* Resend Cooldown Timer */}
             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">

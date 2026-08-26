@@ -54,6 +54,7 @@ export const api = {
       body: JSON.stringify(credentials),
     });
     if (res.data?.token) {
+      localStorage.removeItem('user_avatar');
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
     }
@@ -66,6 +67,7 @@ export const api = {
       body: JSON.stringify(adminData),
     });
     if (res.data?.token) {
+      localStorage.removeItem('user_avatar');
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
     }

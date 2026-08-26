@@ -276,7 +276,6 @@ async function sendOtpEmail({ email, name, otp, role, expiryMinutes = 10 }) {
     destination: maskEmail(email),
     dispatchedAt: new Date().toISOString(),
     message: `Security OTP successfully dispatched to corporate email ${maskEmail(email)}.`,
-    previewOtp: otp,
   };
 }
 
@@ -303,7 +302,6 @@ async function sendOtpWhatsApp({ phone, name, otp, role, expiryMinutes = 10 }) {
     destination: maskPhone(phone),
     dispatchedAt: new Date().toISOString(),
     message: `Security OTP successfully sent via WhatsApp to ${maskPhone(phone)}.`,
-    previewOtp: otp,
   };
 }
 

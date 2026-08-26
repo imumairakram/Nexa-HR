@@ -150,22 +150,49 @@ const AppPageHeader = ({
     };
   }, []);
 
-  const loadUserData = () => {
-    let activeAvatar = null;
+  const loadUserData = async () => {
+    let activeUser = null;
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        const u = JSON.parse(storedUser);
-        setCurrentUser(u);
-        if (u.avatar && !u.avatar.includes('unsplash')) activeAvatar = u.avatar;
+        activeUser = JSON.parse(storedUser);
+        setCurrentUser(activeUser);
       } catch (e) {
         console.error('Failed to parse user from localStorage', e);
       }
     }
-    const storedAvatar = localStorage.getItem('user_avatar');
-    if (storedAvatar && !storedAvatar.includes('unsplash')) {
-      activeAvatar = storedAvatar;
+
+    // Hydrate live from server to guarantee active session dossier
+    try {
+      const res = await api.getMe();
+      if (res?.success && res.data?.user) {
+        activeUser = res.data.user;
+        setCurrentUser(activeUser);
+        const currentStored = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...currentStored, ...activeUser }));
+      }
+    } catch (e) {
+      // Offline fallback
     }
+
+    if (!activeUser) {
+      setUserAvatar(null);
+      return;
+    }
+
+    // Compute avatar strictly for this active user
+    let activeAvatar = null;
+    if (activeUser.avatar && typeof activeUser.avatar === 'string' && !activeUser.avatar.includes('unsplash') && activeUser.avatar.trim() !== '') {
+      activeAvatar = activeUser.avatar;
+    } else if (activeUser.profile?.avatarUrl && typeof activeUser.profile.avatarUrl === 'string' && !activeUser.profile.avatarUrl.includes('unsplash')) {
+      activeAvatar = activeUser.profile.avatarUrl;
+    } else if (activeUser.id) {
+      const userSpecificAvatar = localStorage.getItem(`user_avatar_${activeUser.id}`);
+      if (userSpecificAvatar && !userSpecificAvatar.includes('unsplash')) {
+        activeAvatar = userSpecificAvatar;
+      }
+    }
+
     setUserAvatar(activeAvatar);
   };
 
@@ -257,6 +284,17 @@ const AppPageHeader = ({
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('user_avatar');
+    // Clear all user-scoped cached avatars
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('user_avatar_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    sessionStorage.clear();
+    setCurrentUser(null);
+    setUserAvatar(null);
+    window.dispatchEvent(new Event('user_profile_updated'));
     window.location.href = '/';
   };
 

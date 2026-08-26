@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const { hashPassword, comparePassword } = require('../utils/password');
 const { generateToken, generateResetToken, verifyResetToken } = require('../utils/jwt');
@@ -366,7 +367,7 @@ const initiateForgotPassword = async (req, res) => {
 
     // Generate 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpHash = await hashPassword(otp);
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
     const expiryMinutes = 10;
     const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000);
 
@@ -384,12 +385,11 @@ const initiateForgotPassword = async (req, res) => {
       },
     });
 
-    // Dispatch OTP via selected channel
-    let dispatchResult;
+    // Dispatch OTP via selected channel (plain text OTP only passed to notification service)
     const recipientName = `${user.firstName} ${user.lastName}`;
 
     if (selectedChannel === 'WHATSAPP') {
-      dispatchResult = await sendOtpWhatsApp({
+      await sendOtpWhatsApp({
         phone: user.phone,
         name: recipientName,
         otp,
@@ -397,7 +397,7 @@ const initiateForgotPassword = async (req, res) => {
         expiryMinutes,
       });
     } else {
-      dispatchResult = await sendOtpEmail({
+      await sendOtpEmail({
         email: user.email,
         name: recipientName,
         otp,
@@ -408,14 +408,7 @@ const initiateForgotPassword = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: dispatchResult.message,
-      data: {
-        email: user.email,
-        channel: selectedChannel,
-        destination: dispatchResult.destination,
-        expiresInMinutes: expiryMinutes,
-        previewOtp: dispatchResult.previewOtp, // Available for development/testing preview
-      },
+      message: 'OTP sent successfully',
     });
   } catch (error) {
     console.error('Error in initiateForgotPassword:', error);
@@ -494,8 +487,11 @@ const verifyPasswordResetOtp = async (req, res) => {
       });
     }
 
-    // Verify OTP hash
-    const isOtpValid = await comparePassword(cleanOtp, activeOtp.otpHash);
+    // Verify OTP hash (SHA-256)
+    const cleanOtpHash = crypto.createHash('sha256').update(cleanOtp).digest('hex');
+    const isOtpValid =
+      cleanOtpHash === activeOtp.otpHash ||
+      (activeOtp.otpHash.startsWith('$2') && (await comparePassword(cleanOtp, activeOtp.otpHash)));
 
     if (!isOtpValid) {
       // Increment attempt counter

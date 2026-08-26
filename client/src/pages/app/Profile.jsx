@@ -30,8 +30,16 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [avatar, setAvatar] = useState(() => {
-    const stored = localStorage.getItem('user_avatar');
-    return stored && !stored.includes('unsplash') ? stored : null;
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u.avatar && !u.avatar.includes('unsplash')) return u.avatar;
+      if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) return u.profile.avatarUrl;
+      if (u.id) {
+        const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+        if (scoped && !scoped.includes('unsplash')) return scoped;
+      }
+    } catch {}
+    return null;
   });
 
   const [profile, setProfile] = useState({
@@ -82,13 +90,19 @@ const Profile = () => {
             location: u.profile?.address || u.location || prev.location,
             joiningDate: u.profile?.joiningDate ? new Date(u.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : prev.joiningDate,
           }));
+
+          if (u.avatar && !u.avatar.includes('unsplash')) {
+            setAvatar(u.avatar);
+          } else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) {
+            setAvatar(u.profile.avatarUrl);
+          } else if (u.id) {
+            const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+            if (scoped && !scoped.includes('unsplash')) setAvatar(scoped);
+          }
         } catch (e) {
           console.warn(e);
         }
       }
-
-      const storedAvatar = localStorage.getItem('user_avatar');
-      if (storedAvatar) setAvatar(storedAvatar);
 
       // Fetch live from server
       try {
@@ -110,10 +124,20 @@ const Profile = () => {
             joiningDate: u.profile?.joiningDate ? new Date(u.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : prev.joiningDate,
           }));
 
+          let resolvedAvatar = null;
+          if (u.avatar && !u.avatar.includes('unsplash')) resolvedAvatar = u.avatar;
+          else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) resolvedAvatar = u.profile.avatarUrl;
+          else if (u.id) {
+            const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+            if (scoped && !scoped.includes('unsplash')) resolvedAvatar = scoped;
+          }
+          setAvatar(resolvedAvatar);
+
           // Keep localStorage in sync
           localStorage.setItem('user', JSON.stringify({
             ...JSON.parse(localStorage.getItem('user') || '{}'),
             ...u,
+            ...(resolvedAvatar ? { avatar: resolvedAvatar } : {}),
           }));
         }
       } catch (e) {
@@ -132,8 +156,12 @@ const Profile = () => {
         const base64Image = reader.result;
         setAvatar(base64Image);
         try {
-          localStorage.setItem('user_avatar', base64Image);
           const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+          const userId = profile.id || currentU.id;
+          if (userId) {
+            localStorage.setItem(`user_avatar_${userId}`, base64Image);
+          }
+          localStorage.removeItem('user_avatar'); // Remove unscoped global key
           localStorage.setItem('user', JSON.stringify({ ...currentU, avatar: base64Image }));
           window.dispatchEvent(new Event('user_profile_updated'));
           window.dispatchEvent(new Event('storage'));
@@ -148,9 +176,13 @@ const Profile = () => {
 
   const handleRemoveAvatar = () => {
     setAvatar(null);
-    localStorage.removeItem('user_avatar');
     try {
       const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = profile.id || currentU.id;
+      if (userId) {
+        localStorage.removeItem(`user_avatar_${userId}`);
+      }
+      localStorage.removeItem('user_avatar');
       delete currentU.avatar;
       localStorage.setItem('user', JSON.stringify(currentU));
       window.dispatchEvent(new Event('user_profile_updated'));
