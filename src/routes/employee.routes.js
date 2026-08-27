@@ -6,12 +6,19 @@ const {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  uploadProfilePicture,
+  removeProfilePicture,
 } = require('../controllers/employee.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
 const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
+const { handleUploadMiddleware } = require('../middlewares/upload.middleware');
 
 router.use(verifyToken, requireTenant);
+
+// Secured Profile Picture Upload & Delete Endpoints (Available to any authenticated user)
+router.post('/profile-picture', handleUploadMiddleware('avatar'), uploadProfilePicture);
+router.delete('/profile-picture', removeProfilePicture);
 
 const canManageEmployees = checkRole('ADMIN', 'HR_MANAGER', 'COMPANY_ADMIN', 'SUPER_ADMIN');
 

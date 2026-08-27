@@ -92,6 +92,37 @@ export const api = {
     });
   },
 
+  uploadProfilePicture: async (formData) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${BASE_URL}/employees/profile-picture`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    const text = await response.text();
+    let data = {};
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        data = { message: text || `Unexpected response (${response.status})` };
+      }
+    }
+    if (!response.ok) {
+      throw new Error(data.message || `Upload failed (${response.status})`);
+    }
+    return data;
+  },
+
+  removeProfilePicture: async (targetUserId) => {
+    return await fetchAPI('/employees/profile-picture', {
+      method: 'DELETE',
+      body: JSON.stringify({ userId: targetUserId }),
+    });
+  },
+
   // --- Password Recovery & OTP Security ---
   checkRecoveryUser: async (email) => {
     return await fetchAPI('/auth/forgot-password/check', {

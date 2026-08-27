@@ -1,5 +1,6 @@
 const prisma = require('../config/prisma');
 const { hashPassword } = require('../utils/password');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 const onboardEmployee = async (req, res) => {
   try {
@@ -536,11 +537,191 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+/**
+ * Upload User Profile Picture to Cloudinary and persist avatarUrl in Database
+ * POST /api/employees/profile-picture
+ */
+const uploadProfilePicture = async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file uploaded. Please select an image file (JPEG, PNG, WEBP, or GIF).',
+      });
+    }
+
+    // Determine target user ID:
+    // If admin or hr passes targetUserId, allow them to upload for that user; otherwise current authenticated user
+    let targetUserId = req.user.userId;
+    const canManage = ['ADMIN', 'HR_MANAGER'].includes(req.user.role);
+    if (canManage && (req.body.userId || req.body.employeeId)) {
+      targetUserId = req.body.userId || req.body.employeeId;
+    }
+
+    // Verify target user exists
+    const user = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.',
+      });
+    }
+
+    // Upload image directly to Cloudinary using file buffer
+    const uploadResult = await uploadToCloudinary(file.buffer, {
+      folder: 'nexahr/avatars',
+      mimetype: file.mimetype,
+      public_id: `avatar_${targetUserId}_${Date.now()}`,
+    });
+
+    const secureUrl = uploadResult.secure_url || uploadResult.url;
+
+    // Persist avatarUrl in EmployeeProfile
+    let updatedProfile;
+    if (user.profile) {
+      updatedProfile = await prisma.employeeProfile.update({
+        where: { userId: targetUserId },
+        data: { avatarUrl: secureUrl },
+        include: {
+          department: true,
+          designation: true,
+        },
+      });
+    } else {
+      updatedProfile = await prisma.employeeProfile.create({
+        data: {
+          userId: targetUserId,
+          avatarUrl: secureUrl,
+        },
+        include: {
+          department: true,
+          designation: true,
+        },
+      });
+    }
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: {
+        id: true,
+        employeeCode: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        profile: {
+          include: {
+            department: true,
+            designation: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile picture uploaded and saved successfully.',
+      data: {
+        avatarUrl: secureUrl,
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    console.error('Error in uploadProfilePicture:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to upload profile picture.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Remove User Profile Picture from Database
+ * DELETE /api/employees/profile-picture
+ */
+const removeProfilePicture = async (req, res) => {
+  try {
+    let targetUserId = req.user.userId;
+    const canManage = ['ADMIN', 'HR_MANAGER'].includes(req.user.role);
+    if (canManage && (req.body.userId || req.query.userId || req.body.employeeId)) {
+      targetUserId = req.body.userId || req.query.userId || req.body.employeeId;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.',
+      });
+    }
+
+    if (user.profile) {
+      await prisma.employeeProfile.update({
+        where: { userId: targetUserId },
+        data: { avatarUrl: null },
+      });
+    }
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: {
+        id: true,
+        employeeCode: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        profile: {
+          include: {
+            department: true,
+            designation: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile picture removed successfully.',
+      data: {
+        avatarUrl: null,
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    console.error('Error in removeProfilePicture:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to remove profile picture.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   onboardEmployee,
   getEmployees,
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  uploadProfilePicture,
+  removeProfilePicture,
 };
 

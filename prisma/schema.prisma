@@ -127,6 +127,7 @@ model Designation {
 model EmployeeProfile {
   id               String    @id @default(uuid())
   userId           String    @unique
+  avatarUrl        String?
   gender           String?
   dateOfBirth      DateTime?
   joiningDate      DateTime  @default(now())

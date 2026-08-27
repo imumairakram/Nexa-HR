@@ -148,49 +148,93 @@ const Profile = () => {
     loadProfile();
   }, []);
 
-  const handleAvatarChange = (e) => {
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Image = reader.result;
-        setAvatar(base64Image);
-        try {
-          const currentU = JSON.parse(localStorage.getItem('user') || '{}');
-          const userId = profile.id || currentU.id;
-          if (userId) {
-            localStorage.setItem(`user_avatar_${userId}`, base64Image);
-          }
-          localStorage.removeItem('user_avatar'); // Remove unscoped global key
-          localStorage.setItem('user', JSON.stringify({ ...currentU, avatar: base64Image }));
-          window.dispatchEvent(new Event('user_profile_updated'));
-          window.dispatchEvent(new Event('storage'));
-        } catch (err) {
-          console.error(err);
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setAvatar(previewUrl);
+    setIsUploadingAvatar(true);
+    showToast('Uploading profile picture to cloud storage...');
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('avatar', file);
+
+      const res = await api.uploadProfilePicture(uploadFormData);
+
+      if (res?.success && res.data?.avatarUrl) {
+        const persistedUrl = res.data.avatarUrl;
+        setAvatar(persistedUrl);
+
+        const currentU = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = profile.id || currentU.id;
+        if (userId) {
+          localStorage.setItem(`user_avatar_${userId}`, persistedUrl);
         }
-        showToast('Profile photo updated and synchronized across the platform!');
-      };
-      reader.readAsDataURL(file);
+        localStorage.removeItem('user_avatar');
+
+        const updatedUser = {
+          ...currentU,
+          avatar: persistedUrl,
+          profile: {
+            ...(currentU.profile || {}),
+            avatarUrl: persistedUrl,
+          },
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+
+        window.dispatchEvent(new Event('user_profile_updated'));
+        window.dispatchEvent(new Event('storage'));
+
+        showToast('Profile photo updated and saved successfully!');
+      } else {
+        throw new Error(res?.message || 'Failed to persist avatar URL.');
+      }
+    } catch (err) {
+      console.error('Avatar upload error:', err);
+      showToast(err.message || 'Failed to upload photo to server.');
+    } finally {
+      setIsUploadingAvatar(false);
+      e.target.value = '';
     }
   };
 
-  const handleRemoveAvatar = () => {
-    setAvatar(null);
+  const handleRemoveAvatar = async () => {
+    setIsUploadingAvatar(true);
     try {
+      await api.removeProfilePicture();
+      setAvatar(null);
+
       const currentU = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = profile.id || currentU.id;
       if (userId) {
         localStorage.removeItem(`user_avatar_${userId}`);
       }
       localStorage.removeItem('user_avatar');
-      delete currentU.avatar;
-      localStorage.setItem('user', JSON.stringify(currentU));
+
+      const updatedUser = {
+        ...currentU,
+        avatar: null,
+        profile: {
+          ...(currentU.profile || {}),
+          avatarUrl: null,
+        },
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
       window.dispatchEvent(new Event('user_profile_updated'));
       window.dispatchEvent(new Event('storage'));
+
+      showToast('Profile photo removed successfully!');
     } catch (e) {
-      console.error(e);
+      console.error('Avatar removal error:', e);
+      showToast(e.message || 'Failed to remove photo.');
+    } finally {
+      setIsUploadingAvatar(false);
     }
-    showToast('Profile photo removed! Set to NO DP.');
   };
 
   const handleSaveProfile = async (e) => {
@@ -295,25 +339,43 @@ const Profile = () => {
 
         <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="relative group shrink-0">
-            {avatar ? (
-              <img
-                src={avatar}
-                alt="Admin Profile"
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-indigo-500/30 shadow-xl bg-slate-800"
-              />
-            ) : (
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xl ring-4 ring-indigo-500/30">
-                <span>{profile.firstName?.[0] || 'A'}{profile.lastName?.[0] || 'D'}</span>
-              </div>
-            )}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden ring-4 ring-indigo-500/30 shadow-xl relative bg-slate-800 flex items-center justify-center">
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt="Admin Profile"
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${
+                    isUploadingAvatar ? 'opacity-50' : 'opacity-100'
+                  }`}
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xl">
+                  <span>{(profile.firstName?.[0] || '') + (profile.lastName?.[0] || '') || 'AD'}</span>
+                </div>
+              )}
+
+              {isUploadingAvatar && (
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center">
+                  <RefreshCw className="w-6 h-6 text-white animate-spin" />
+                </div>
+              )}
+            </div>
             <label
               title="Upload New Profile Picture"
-              className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-indigo-600 text-white shadow-md hover:bg-indigo-700 cursor-pointer transition-all hover:scale-110 border-2 border-white dark:border-slate-900"
+              className={`absolute -bottom-2 -right-2 p-2 rounded-xl bg-indigo-600 text-white shadow-md hover:bg-indigo-700 cursor-pointer transition-all hover:scale-110 border-2 border-white dark:border-slate-900 ${
+                isUploadingAvatar ? 'pointer-events-none opacity-50' : ''
+              }`}
             >
               <Camera className="w-3.5 h-3.5" />
-              <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                onChange={handleAvatarChange}
+                disabled={isUploadingAvatar}
+                className="hidden"
+              />
             </label>
-            {avatar && (
+            {avatar && !isUploadingAvatar && (
               <button
                 type="button"
                 onClick={handleRemoveAvatar}
