@@ -238,7 +238,7 @@ const LeavePolicy = () => {
               30 <span className="text-base font-bold text-slate-400">Days Paid</span>
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-purple-600 dark:text-purple-400 font-bold">Childbirth & Adoption</span>
+              <span className="text-purple-600 dark:text-purple-400 font-bold">Childbirth</span>
               <span className="text-slate-400">Protected</span>
             </div>
           </div>
@@ -293,11 +293,10 @@ const LeavePolicy = () => {
             <div>
               <div className="flex items-start justify-between gap-3 mb-2">
                 <span
-                  className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${
-                    p.type === 'PAID'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
-                  }`}
+                  className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${p.type === 'PAID'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                    }`}
                 >
                   {p.type} LEAVE
                 </span>
@@ -423,11 +422,10 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, type: 'PAID' })}
-                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                        form.type === 'PAID'
-                          ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
-                      }`}
+                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${form.type === 'PAID'
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
+                        }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Fully Paid</span>
@@ -436,11 +434,10 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, type: 'UNPAID' })}
-                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                        form.type === 'UNPAID'
-                          ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
-                      }`}
+                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${form.type === 'UNPAID'
+                        ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
+                        }`}
                     >
                       <AlertCircle className="w-3.5 h-3.5" />
                       <span>Unpaid</span>
@@ -512,11 +509,10 @@ const LeavePolicy = () => {
                     </div>
                   </div>
                 </div>
-                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${
-                  form.type === 'PAID'
-                    ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                    : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                }`}>
+                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${form.type === 'PAID'
+                  ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                  : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                  }`}>
                   {form.type === 'PAID' ? '100% Paid' : 'Unpaid'}
                 </span>
               </div>
