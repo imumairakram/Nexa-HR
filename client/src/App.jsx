@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ScrollToTop from './components/common/ScrollToTop';
 import Login from './pages/website/Login';
 import MainLayout from './layouts/MainLayout';
 import EmployeeLayout from './layouts/EmployeeLayout';
@@ -80,6 +81,7 @@ const AdminRoute = ({ children }) => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Root Route directly renders Secure Internal Login */}
         <Route path="/" element={<Login />} />
