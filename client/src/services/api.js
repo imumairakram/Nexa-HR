@@ -229,6 +229,13 @@ export const api = {
     return await fetchAPI('/leaves/types');
   },
 
+  createLeaveType: async (leaveData) => {
+    return await fetchAPI('/leaves/types', {
+      method: 'POST',
+      body: JSON.stringify(leaveData),
+    });
+  },
+
   createLeaveRequest: async (leaveData) => {
     return await fetchAPI('/leaves/request', {
       method: 'POST',

@@ -42,15 +42,78 @@ const ProjectManagement = () => {
     priority: 'HIGH',
   });
 
+  const DEFAULT_PROJECTS = [
+    {
+      id: 101,
+      name: 'NexaHR Biometric Sync Gateway 2.0',
+      client: 'Internal Core Operations',
+      category: 'IoT & Hardware',
+      progress: 75,
+      lead: 'Sarah Jenkins',
+      deadline: 'Sep 30, 2026',
+      members: 4,
+      priority: 'HIGH',
+      status: 'IN_PROGRESS',
+      budget: '$35,000',
+      spent: '$24,500',
+      tasksTotal: 16,
+      tasksDone: 12,
+    },
+    {
+      id: 102,
+      name: 'Automated Multi-Tier Tax Withholding Engine',
+      client: 'Finance & Compliance',
+      category: 'Fintech & Payroll',
+      progress: 90,
+      lead: 'Muhammad Umair',
+      deadline: 'Oct 15, 2026',
+      members: 3,
+      priority: 'HIGH',
+      status: 'IN_PROGRESS',
+      budget: '$28,000',
+      spent: '$25,200',
+      tasksTotal: 12,
+      tasksDone: 11,
+    },
+    {
+      id: 103,
+      name: 'SOC-2 Compliance Cloud Architecture Audit',
+      client: 'Executive Leadership',
+      category: 'Security & DevOps',
+      progress: 100,
+      lead: 'Alex Mercer',
+      deadline: 'Aug 20, 2026',
+      members: 5,
+      priority: 'MEDIUM',
+      status: 'COMPLETED',
+      budget: '$45,000',
+      spent: '$41,800',
+      tasksTotal: 20,
+      tasksDone: 20,
+    },
+  ];
+
   const loadProjectsData = async () => {
     setLoading(true);
     try {
       let savedProjects = [];
       try {
         const saved = localStorage.getItem('nexahr_projects');
-        if (saved) savedProjects = JSON.parse(saved);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.length > 0) savedProjects = parsed;
+        }
       } catch (e) {
         console.warn(e);
+      }
+
+      if (savedProjects.length === 0) {
+        savedProjects = DEFAULT_PROJECTS;
+        try {
+          localStorage.setItem('nexahr_projects', JSON.stringify(savedProjects));
+        } catch (e) {
+          console.error(e);
+        }
       }
 
       const res = await api.getEmployees();
