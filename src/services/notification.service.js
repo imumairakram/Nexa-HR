@@ -260,7 +260,29 @@ async function sendPayslipEmail({
 }
 
 /**
- * Send Password Recovery OTP via Corporate Email
+ * Send Ephemeral Password Reset Link via Corporate Email
+ */
+async function sendPasswordResetEmail({ email, name, resetUrl, expiresInHours = 1 }) {
+  console.log(`\n========================================================`);
+  console.log(`[NexaHR EMAIL DISPATCH: PASSWORD RESET LINK] -> ${email}`);
+  console.log(`Recipient: ${name}`);
+  console.log(`Subject: [NexaHR Security] Ephemeral Password Reset Request`);
+  console.log(`Reset URL: ${resetUrl}`);
+  console.log(`Valid for: ${expiresInHours} hour(s) (Single Use Only)`);
+  console.log(`Security Notice: Stored as SHA-256 cryptographic digest.`);
+  console.log(`========================================================\n`);
+
+  return {
+    success: true,
+    channel: 'EMAIL',
+    destination: maskEmail(email),
+    dispatchedAt: new Date().toISOString(),
+    message: `Password reset link dispatched to ${maskEmail(email)}.`,
+  };
+}
+
+/**
+ * Send Password Recovery OTP via Corporate Email (Legacy/Direct)
  */
 async function sendOtpEmail({ email, name, otp, role, expiryMinutes = 10 }) {
   console.log(`\n========================================================`);
@@ -312,8 +334,10 @@ module.exports = {
   sendLeaveStatusEmail,
   sendLeaveRequestSubmittedEmail,
   sendPayslipEmail,
+  sendPasswordResetEmail,
   sendOtpEmail,
   sendOtpWhatsApp,
   maskEmail,
   maskPhone,
 };
+

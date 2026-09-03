@@ -3,28 +3,44 @@ const router = express.Router();
 const {
   registerAdmin,
   login,
+  logout,
   getMe,
   checkRecoveryUser,
-  initiateForgotPassword,
-  verifyPasswordResetOtp,
+  forgotPassword,
   resetPassword,
   updateMyProfile,
   changeMyPassword,
 } = require('../controllers/auth.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
+const {
+  authRateLimiter,
+  passwordResetRateLimiter,
+} = require('../middlewares/rateLimiter.middleware');
+const {
+  loginValidationRules,
+  forgotPasswordValidationRules,
+  resetPasswordValidationRules,
+} = require('../middlewares/validator.middleware');
 
-// Standard Auth Routes
+// ====================================================
+// CORE AUTHENTICATION ROUTES
+// ====================================================
 router.post('/register-admin', registerAdmin);
-router.post('/login', login);
+router.post('/login', authRateLimiter, loginValidationRules, login);
+router.post('/logout', verifyToken, logout);
 router.get('/me', verifyToken, getMe);
 router.put('/profile', verifyToken, updateMyProfile);
 router.put('/change-password', verifyToken, changeMyPassword);
 
-// Password Recovery & OTP Security Routes
+// ====================================================
+// EPHEMERAL CRYPTOGRAPHIC PASSWORD RECOVERY ROUTES
+// ====================================================
+router.post('/forgot-password', passwordResetRateLimiter, forgotPasswordValidationRules, forgotPassword);
+router.post('/reset-password', passwordResetRateLimiter, resetPasswordValidationRules, resetPassword);
+
+// Aliases for seamless backward compatibility
 router.post('/forgot-password/check', checkRecoveryUser);
-router.post('/forgot-password/initiate', initiateForgotPassword);
-router.post('/forgot-password/verify-otp', verifyPasswordResetOtp);
-router.post('/forgot-password/reset-password', resetPassword);
+router.post('/forgot-password/initiate', passwordResetRateLimiter, forgotPasswordValidationRules, forgotPassword);
+router.post('/forgot-password/reset-password', passwordResetRateLimiter, resetPasswordValidationRules, resetPassword);
 
 module.exports = router;
-

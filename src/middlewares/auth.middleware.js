@@ -3,44 +3,28 @@ const prisma = require('../config/prisma');
 
 const verifyToken = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    let token = null;
+
+    // 1. Primary Vector: Secure HttpOnly Cookie
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+    // 2. Secondary Vector: Standard Authorization Bearer Header (for mobile/API clients)
+    else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Access denied. No authorization token provided.',
+        message: 'Access denied. No authentication session or token provided.',
       });
     }
 
-    const token = authHeader.split(' ')[1];
-
-    // Seamless fallback support for internal developer/demo session token
-    if (token === 'nexahr_jwt_internal_token_2026') {
-      const demoUser = await prisma.user.findFirst({
-        where: { isActive: true },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          isActive: true,
-        },
-      });
-
-      if (demoUser) {
-        req.user = {
-          userId: demoUser.id,
-          email: demoUser.email,
-          role: demoUser.role,
-          fullName: `${demoUser.firstName} ${demoUser.lastName}`,
-        };
-        return next();
-      }
-    }
-
+    // 3. Cryptographic Verification of JWT
     const decoded = verifyJwtToken(token);
 
-    // Verify user exists and is active in database
+    // 4. Verify user exists and is active in database (revocation check)
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
@@ -56,10 +40,11 @@ const verifyToken = async (req, res, next) => {
     if (!user || !user.isActive) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid token or user account is disabled.',
+        message: 'Invalid session or user account is deactivated.',
       });
     }
 
+    // 5. Attach authenticated user context to request
     req.user = {
       userId: user.id,
       email: user.email,
@@ -67,8 +52,16 @@ const verifyToken = async (req, res, next) => {
       fullName: `${user.firstName} ${user.lastName}`,
     };
 
-    next();
+    return next();
   } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Session has expired. Please log in again.',
+        code: 'TOKEN_EXPIRED',
+      });
+    }
+
     return res.status(401).json({
       success: false,
       message: 'Invalid or expired authorization token.',

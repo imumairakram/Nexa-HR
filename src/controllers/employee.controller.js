@@ -273,9 +273,25 @@ const getEmployees = async (req, res) => {
 const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId, role } = req.user;
+
+    // Strict Anti-IDOR Enforcement:
+    // If role is EMPLOYEE, they can strictly ONLY access their own userId
+    let targetId = id;
+    if (role === 'EMPLOYEE') {
+      if (id !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access Denied: You are not authorized to view details of other employees.',
+        });
+      }
+      targetId = userId;
+    }
+
+    const isPrivileged = role === 'ADMIN' || role === 'HR_MANAGER' || targetId === userId;
 
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: targetId },
       select: {
         id: true,
         employeeCode: true,
@@ -292,7 +308,7 @@ const getEmployeeById = async (req, res) => {
             designation: true,
           },
         },
-        salaryStructure: true,
+        salaryStructure: isPrivileged,
       },
     });
 

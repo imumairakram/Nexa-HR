@@ -64,7 +64,7 @@ model User {
   approvedLeaves  LeaveRequest[]   @relation("ApprovedLeaves")
   salaryStructure SalaryStructure?
   payslips        Payslip[]
-  passwordResetOtps PasswordResetOtp[]
+  passwordResetTokens PasswordResetToken[]
   notifications   Notification[]
 
   @@map("users")
@@ -254,26 +254,25 @@ model Payslip {
 }
 
 // ====================================================
-// SECURITY & PASSWORD RECOVERY OTP MODEL
+// SECURITY & EPHEMERAL PASSWORD RESET TOKEN MODEL
 // ====================================================
 
-model PasswordResetOtp {
-  id        String   @id @default(uuid())
+model PasswordResetToken {
+  id        String    @id @default(uuid())
   userId    String
-  email     String
-  phone     String?
-  otpHash   String
-  channel   String   // "EMAIL" | "WHATSAPP"
-  expiresAt DateTime
-  isUsed    Boolean  @default(false)
-  attempts  Int      @default(0)
-  createdAt DateTime @default(now())
+  tokenHash String    @unique // SHA-256 digest of 20-byte hex token
+  expiresAt DateTime  // Strict 1-hour expiration
+  isUsed    Boolean   @default(false)
+  usedAt    DateTime?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([tokenHash])
   @@index([userId])
-  @@index([email])
-  @@map("password_reset_otps")
+  @@map("password_reset_tokens")
 }
 
 // ====================================================

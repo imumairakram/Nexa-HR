@@ -15,6 +15,7 @@ async function fetchAPI(endpoint, options = {}) {
   };
 
   const config = {
+    credentials: 'include', // Include HttpOnly cookies in API requests
     ...options,
     headers,
   };

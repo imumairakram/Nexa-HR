@@ -20,7 +20,7 @@ router.use(verifyToken, requireTenant);
 router.post('/profile-picture', handleUploadMiddleware('avatar'), uploadProfilePicture);
 router.delete('/profile-picture', removeProfilePicture);
 
-const canManageEmployees = checkRole('ADMIN', 'HR_MANAGER', 'COMPANY_ADMIN', 'SUPER_ADMIN');
+const canManageEmployees = checkRole('ADMIN', 'HR_MANAGER');
 
 router.post('/', canManageEmployees, onboardEmployee);
 router.post('/onboard', canManageEmployees, onboardEmployee);
