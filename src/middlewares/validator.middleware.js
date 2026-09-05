@@ -39,9 +39,28 @@ const loginValidationRules = [
  */
 const forgotPasswordValidationRules = [
   body('email')
-    .isEmail()
-    .withMessage('A valid corporate email address is required.')
-    .normalizeEmail(),
+    .notEmpty()
+    .withMessage('Corporate email address or employee code is required.')
+    .trim(),
+  body('channel')
+    .optional()
+    .isIn(['EMAIL', 'WHATSAPP', 'email', 'whatsapp'])
+    .withMessage("Channel must be either 'EMAIL' or 'WHATSAPP'."),
+  validateRequest,
+];
+
+/**
+ * Validation rules for OTP verification
+ */
+const verifyOtpValidationRules = [
+  body('email')
+    .notEmpty()
+    .withMessage('Corporate email address or employee code is required.')
+    .trim(),
+  body('otp')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('A valid 6-digit OTP code is required.')
+    .trim(),
   validateRequest,
 ];
 
@@ -49,11 +68,6 @@ const forgotPasswordValidationRules = [
  * Validation rules for password reset completion
  */
 const resetPasswordValidationRules = [
-  body('token')
-    .isHexadecimal()
-    .isLength({ min: 40, max: 40 })
-    .withMessage('Invalid reset token format. Expected 40-character hexadecimal token.')
-    .trim(),
   body('newPassword')
     .isLength({ min: 6 })
     .withMessage('New password must be at least 6 characters long.'),
@@ -64,5 +78,7 @@ module.exports = {
   validateRequest,
   loginValidationRules,
   forgotPasswordValidationRules,
+  verifyOtpValidationRules,
   resetPasswordValidationRules,
 };
+

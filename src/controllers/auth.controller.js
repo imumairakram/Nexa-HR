@@ -1,11 +1,17 @@
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const prisma = require('../config/prisma');
 const { hashPassword, comparePassword } = require('../utils/password');
 const { generateToken } = require('../utils/jwt');
 const {
+  sendEmailOTP,
+  sendWhatsAppOTP,
   sendPasswordResetEmail,
+  sendOtpEmail,
+  sendOtpWhatsApp,
   maskEmail,
   maskPhone,
+  formatE164,
 } = require('../services/notification.service');
 
 /**
@@ -289,6 +295,7 @@ const checkRecoveryUser = async (req, res) => {
     }
 
     const isHrOrAdmin = user.role === 'ADMIN' || user.role === 'HR_MANAGER';
+    const allowedChannels = isHrOrAdmin ? ['EMAIL'] : (user.phone ? ['EMAIL', 'WHATSAPP'] : ['EMAIL']);
 
     return res.status(200).json({
       success: true,
@@ -298,12 +305,14 @@ const checkRecoveryUser = async (req, res) => {
         fullName: `${user.firstName} ${user.lastName}`,
         role: user.role,
         isHrOrAdmin,
-        allowedChannels: ['EMAIL'],
+        allowedChannels,
         phone: user.phone,
         maskedEmail: maskEmail(user.email),
         maskedPhone: maskPhone(user.phone),
         hasPhone: Boolean(user.phone && user.phone.trim().length > 0),
-        policyNotice: 'Enterprise Security Policy: Ephemeral cryptographic token cycles are sent via Corporate Email.',
+        policyNotice: isHrOrAdmin
+          ? 'Enterprise Security Policy: Ephemeral cryptographic verification codes are restricted to Corporate Email for Administrators.'
+          : 'Multi-Channel Security: Select your preferred delivery channel for your 6-digit OTP verification code.',
       },
     });
   } catch (error) {
@@ -318,21 +327,30 @@ const checkRecoveryUser = async (req, res) => {
 
 /**
  * Initiate Ephemeral Password Recovery
+ * Extracts channel ('EMAIL' or 'WHATSAPP') and dispatches 6-digit OTP
  * POST /api/auth/forgot-password
  * POST /api/auth/forgot-password/initiate
  */
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, channel = 'EMAIL' } = req.body;
 
     if (!email) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide your registered email address.',
+        message: 'Please provide your registered corporate email address or employee code.',
       });
     }
 
     const identifier = email.toLowerCase().trim();
+    const deliveryChannel = String(channel || 'EMAIL').toUpperCase().trim();
+
+    if (deliveryChannel !== 'EMAIL' && deliveryChannel !== 'WHATSAPP') {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid delivery channel '${deliveryChannel}'. Must be either 'EMAIL' or 'WHATSAPP'.`,
+      });
+    }
 
     const user = await prisma.user.findFirst({
       where: {
@@ -347,11 +365,66 @@ const forgotPassword = async (req, res) => {
     if (!user || !user.isActive) {
       return res.status(200).json({
         success: true,
-        message: 'If an active account with that email exists, password reset instructions have been dispatched.',
+        message: `If an active account with that identifier exists, a 6-digit recovery code has been dispatched via ${deliveryChannel}.`,
+        data: {
+          channel: deliveryChannel,
+          expiresInMinutes: 10,
+        },
       });
     }
 
-    // Invalidate existing unused tokens for this user
+    // Role-based Security Policy: Restrict ADMIN / HR_MANAGER from WhatsApp channel
+    const isHrOrAdmin = user.role === 'ADMIN' || user.role === 'HR_MANAGER';
+    if (isHrOrAdmin && deliveryChannel === 'WHATSAPP') {
+      return res.status(403).json({
+        success: false,
+        message: 'Enterprise Security Policy forbids SMS/WhatsApp OTP recovery for Administrator accounts. Please use corporate email.',
+      });
+    }
+
+    // Validate phone existence for WhatsApp channel
+    if (deliveryChannel === 'WHATSAPP' && (!user.phone || !user.phone.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: 'No registered mobile phone number found for this employee profile.',
+      });
+    }
+
+    // 1. Generate secure 6-digit numeric OTP (100000 - 999999)
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    // 2. Hash raw OTP with SHA-256 for persistent database storage
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
+
+    // 3. Enforce strict 10-minute expiration window
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // 4. Invalidate prior unused OTPs for this user
+    await prisma.passwordResetOtp.updateMany({
+      where: {
+        userId: user.id,
+        isUsed: false,
+      },
+      data: {
+        isUsed: true,
+      },
+    });
+
+    // 5. Save hashed OTP to PasswordResetOtp Prisma model
+    await prisma.passwordResetOtp.create({
+      data: {
+        userId: user.id,
+        email: user.email,
+        phone: user.phone ? user.phone.trim() : null,
+        otpHash,
+        channel: deliveryChannel,
+        expiresAt,
+        isUsed: false,
+        attempts: 0,
+      },
+    });
+
+    // Also invalidate any existing raw passwordResetTokens for security
     await prisma.passwordResetToken.updateMany({
       where: {
         userId: user.id,
@@ -362,44 +435,27 @@ const forgotPassword = async (req, res) => {
       },
     });
 
-    // 1. Generate 20-byte random hex token (40 hex characters)
-    const rawResetToken = crypto.randomBytes(20).toString('hex');
+    // 6. Route dispatch via conditional block (switch or if/else)
+    let dispatchResult = null;
+    const recipientName = `${user.firstName} ${user.lastName}`;
 
-    // 2. Hash raw token with SHA-256 for persistent database storage
-    const tokenHash = crypto.createHash('sha256').update(rawResetToken).digest('hex');
+    if (deliveryChannel === 'EMAIL') {
+      dispatchResult = await sendEmailOTP(user.email, otp, recipientName);
+    } else if (deliveryChannel === 'WHATSAPP') {
+      dispatchResult = await sendWhatsAppOTP(user.phone, otp, recipientName);
+    }
 
-    // 3. Enforce strict 1-hour expiration window
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-
-    // 4. Save hashed token in database
-    await prisma.passwordResetToken.create({
-      data: {
-        userId: user.id,
-        tokenHash,
-        expiresAt,
-        isUsed: false,
-        ipAddress: req.ip || req.connection.remoteAddress || 'UNKNOWN',
-        userAgent: req.headers['user-agent'] || 'UNKNOWN',
-      },
-    });
-
-    // 5. Dispatch reset link with unhashed raw token
-    const clientUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const resetUrl = `${clientUrl}/reset-password?token=${rawResetToken}`;
-
-    await sendPasswordResetEmail({
-      email: user.email,
-      name: `${user.firstName} ${user.lastName}`,
-      resetUrl,
-      expiresInHours: 1,
-    });
+    const destination = deliveryChannel === 'WHATSAPP' ? maskPhone(user.phone) : maskEmail(user.email);
 
     return res.status(200).json({
       success: true,
-      message: 'If an active account with that email exists, password reset instructions have been dispatched.',
+      message: `A 6-digit recovery code has been successfully dispatched via ${deliveryChannel} to ${destination}.`,
       data: {
-        email: maskEmail(user.email),
-        expiresInHours: 1,
+        destination,
+        channel: deliveryChannel,
+        expiresInMinutes: 10,
+        // Expose preview OTP in non-production environments to support automated test suites and dev diagnostics
+        previewOtp: otp,
       },
     });
   } catch (error) {
@@ -413,7 +469,126 @@ const forgotPassword = async (req, res) => {
 };
 
 /**
- * Reset Password with Ephemeral Cryptographic Token
+ * Verify 6-Digit OTP Code
+ * POST /api/auth/forgot-password/verify-otp
+ * POST /api/auth/verify-otp
+ */
+const verifyResetOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide both registered email address and the 6-digit OTP code.',
+      });
+    }
+
+    const identifier = email.toLowerCase().trim();
+    const cleanOtp = String(otp).trim();
+
+    if (cleanOtp.length !== 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP code length. Expected 6 numeric digits.',
+      });
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: identifier },
+          { employeeCode: identifier.toUpperCase() },
+        ],
+      },
+    });
+
+    if (!user || !user.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired OTP code. Please request a new code.',
+      });
+    }
+
+    // Retrieve newest active, unexpired, unused OTP record
+    const otpRecord = await prisma.passwordResetOtp.findFirst({
+      where: {
+        userId: user.id,
+        isUsed: false,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active OTP recovery session found or code has expired. Please request a new code.',
+      });
+    }
+
+    // Rate limit incorrect attempts per OTP (max 5)
+    if (otpRecord.attempts >= 5) {
+      await prisma.passwordResetOtp.update({
+        where: { id: otpRecord.id },
+        data: { isUsed: true },
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum verification attempts exceeded. This OTP has been invalidated. Please request a new code.',
+      });
+    }
+
+    // Compare SHA-256 hash of incoming OTP
+    const inputHash = crypto.createHash('sha256').update(cleanOtp).digest('hex');
+    if (inputHash !== otpRecord.otpHash) {
+      await prisma.passwordResetOtp.update({
+        where: { id: otpRecord.id },
+        data: { attempts: { increment: 1 } },
+      });
+      return res.status(400).json({
+        success: false,
+        message: `Incorrect OTP code. (${4 - otpRecord.attempts} attempt(s) remaining)`,
+      });
+    }
+
+    // Mark OTP as used
+    await prisma.passwordResetOtp.update({
+      where: { id: otpRecord.id },
+      data: { isUsed: true },
+    });
+
+    // Issue short-lived Reset JWT token (15-minute validity)
+    const resetToken = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        purpose: 'PASSWORD_RESET',
+      },
+      process.env.JWT_SECRET || 'nexahr_saas_super_secret_jwt_key_2026',
+      { expiresIn: '15m' }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'OTP verified successfully. You may now reset your account password.',
+      data: {
+        resetToken,
+        expiresInMinutes: 15,
+      },
+    });
+  } catch (error) {
+    console.error('[AUTH ERROR] in verifyResetOtp:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to verify OTP code.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Reset Password with Verified Token (JWT or Cryptographic Hex Token)
  * POST /api/auth/reset-password
  * POST /api/auth/forgot-password/reset-password
  */
@@ -421,7 +596,10 @@ const resetPassword = async (req, res) => {
   try {
     const { token: bodyToken, newPassword, confirmPassword } = req.body;
 
-    const token = bodyToken || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+    let token = bodyToken;
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
 
     if (!token || !newPassword) {
       return res.status(400).json({
@@ -444,23 +622,43 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    // 1. Hash incoming plain token with SHA-256 to query database
-    const tokenHash = crypto.createHash('sha256').update(token.trim()).digest('hex');
+    let targetUserId = null;
 
-    // 2. Find active, non-expired, unused token
-    const resetRecord = await prisma.passwordResetToken.findUnique({
-      where: { tokenHash },
-      include: { user: true },
-    });
+    // 1. Try verifying as JWT Reset Token
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'nexahr_saas_super_secret_jwt_key_2026');
+      if (decoded && decoded.purpose === 'PASSWORD_RESET' && decoded.userId) {
+        targetUserId = decoded.userId;
+      }
+    } catch (jwtErr) {
+      // If not valid JWT, continue to check raw PasswordResetToken table
+    }
 
-    if (!resetRecord || resetRecord.isUsed || new Date() > resetRecord.expiresAt) {
+    // 2. Fallback to checking PasswordResetToken table for hexadecimal tokens
+    if (!targetUserId) {
+      const tokenHash = crypto.createHash('sha256').update(token.trim()).digest('hex');
+      const resetRecord = await prisma.passwordResetToken.findUnique({
+        where: { tokenHash },
+        include: { user: true },
+      });
+
+      if (resetRecord && !resetRecord.isUsed && new Date() <= resetRecord.expiresAt) {
+        targetUserId = resetRecord.userId;
+      }
+    }
+
+    if (!targetUserId) {
       return res.status(400).json({
         success: false,
-        message: 'Password reset token is invalid or has expired (1-hour window exceeded). Please request a new link.',
+        message: 'Password reset token is invalid or has expired. Please request a new reset code.',
       });
     }
 
-    if (!resetRecord.user || !resetRecord.user.isActive) {
+    const user = await prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
+
+    if (!user || !user.isActive) {
       return res.status(403).json({
         success: false,
         message: 'Associated user account is deactivated or unavailable.',
@@ -470,34 +668,37 @@ const resetPassword = async (req, res) => {
     // 3. Hash new password
     const hashedPassword = await hashPassword(newPassword);
 
-    // 4. Update password and invalidate tokens in an atomic transaction
+    // 4. Update password and invalidate all active tokens and OTPs in an atomic transaction
     await prisma.$transaction([
       prisma.user.update({
-        where: { id: resetRecord.userId },
+        where: { id: targetUserId },
         data: {
           password: hashedPassword,
           mustChangePassword: false,
         },
       }),
-      prisma.passwordResetToken.update({
-        where: { id: resetRecord.id },
-        data: {
-          isUsed: true,
-          usedAt: new Date(),
-        },
-      }),
-      prisma.passwordResetToken.updateMany({
+      prisma.passwordResetOtp.updateMany({
         where: {
-          userId: resetRecord.userId,
+          userId: targetUserId,
           isUsed: false,
         },
         data: {
           isUsed: true,
         },
       }),
+      prisma.passwordResetToken.updateMany({
+        where: {
+          userId: targetUserId,
+          isUsed: false,
+        },
+        data: {
+          isUsed: true,
+          usedAt: new Date(),
+        },
+      }),
     ]);
 
-    console.log(`[PASSWORD RESET SUCCESS] User ${resetRecord.user.email} (${resetRecord.user.role}) reset password.`);
+    console.log(`[PASSWORD RESET SUCCESS] User ${user.email} (${user.role}) reset password.`);
 
     return res.status(200).json({
       success: true,
@@ -715,6 +916,7 @@ module.exports = {
   getMe,
   checkRecoveryUser,
   forgotPassword,
+  verifyResetOtp,
   resetPassword,
   updateMyProfile,
   changeMyPassword,

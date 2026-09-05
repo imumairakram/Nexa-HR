@@ -2,11 +2,11 @@ const rateLimit = require('express-rate-limit');
 
 /**
  * Strict Rate Limiter for Authentication Attempts (Login)
- * 5 attempts per 15-minute window per IP
+ * 10 attempts per 15-minute window per IP in production (100 in dev)
  */
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  max: process.env.NODE_ENV === 'production' ? 10 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -18,16 +18,16 @@ const authRateLimiter = rateLimit({
 
 /**
  * Rate Limiter for Password Recovery Invocations
- * 3 requests per 30-minute window per IP
+ * 15 requests per 15-minute window per IP in production (100 in dev)
  */
 const passwordResetRateLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 3,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === 'production' ? 15 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: 'Too many password recovery requests. Please wait 30 minutes before trying again.',
+    message: 'Too many password recovery requests. Please wait before trying again.',
     code: 'RATE_LIMIT_EXCEEDED',
   },
 });

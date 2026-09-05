@@ -65,6 +65,7 @@ model User {
   salaryStructure SalaryStructure?
   payslips        Payslip[]
   passwordResetTokens PasswordResetToken[]
+  passwordResetOtps   PasswordResetOtp[]
   notifications   Notification[]
 
   @@map("users")
@@ -273,6 +274,25 @@ model PasswordResetToken {
   @@index([tokenHash])
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+model PasswordResetOtp {
+  id        String   @id @default(uuid())
+  userId    String
+  email     String
+  phone     String?
+  otpHash   String
+  channel   String
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+  @@map("password_reset_otps")
 }
 
 // ====================================================
