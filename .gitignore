@@ -21,3 +21,8 @@ pnpm-debug.log*
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Build Artifacts
+dist/
+dist-ssr/
+client/dist/
