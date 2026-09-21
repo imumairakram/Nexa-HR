@@ -67,6 +67,8 @@ model User {
   passwordResetTokens PasswordResetToken[]
   passwordResetOtps   PasswordResetOtp[]
   notifications   Notification[]
+  tickets         Ticket[]
+  ticketReplies   TicketReply[]
 
   @@map("users")
 }
@@ -333,5 +335,47 @@ model Announcement {
 
   @@index([createdAt])
   @@map("announcements")
+}
+
+// ====================================================
+// HELPDESK & SUPPORT TICKET MODELS
+// ====================================================
+
+model Ticket {
+  id           String        @id @default(uuid())
+  ticketNumber String        @unique // e.g. "TICK-8021"
+  userId       String
+  subject      String
+  category     String        @default("GENERAL_HR") // IT_HARDWARE | PAYROLL | BENEFITS | WORKPLACE | GENERAL_HR
+  priority     String        @default("MEDIUM") // LOW | MEDIUM | HIGH
+  status       String        @default("IN_PROGRESS") // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  assignedTo   String?       @default("NexaHR Support Team")
+  description  String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies      TicketReply[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+model TicketReply {
+  id        String   @id @default(uuid())
+  ticketId  String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("ticket_replies")
 }
 

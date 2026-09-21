@@ -350,5 +350,41 @@ export const api = {
       method: 'DELETE',
     });
   },
+
+  // --- Helpdesk & Support Tickets ---
+  getMyTickets: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/tickets/my${query ? `?${query}` : ''}`);
+  },
+
+  getAllTickets: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/tickets${query ? `?${query}` : ''}`);
+  },
+
+  getTicketById: async (id) => {
+    return await fetchAPI(`/tickets/${id}`);
+  },
+
+  createTicket: async (ticketData) => {
+    return await fetchAPI('/tickets', {
+      method: 'POST',
+      body: JSON.stringify(ticketData),
+    });
+  },
+
+  addTicketReply: async (ticketId, message) => {
+    return await fetchAPI(`/tickets/${ticketId}/replies`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+  },
+
+  updateTicketStatus: async (ticketId, status) => {
+    return await fetchAPI(`/tickets/${ticketId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+  },
 };
 

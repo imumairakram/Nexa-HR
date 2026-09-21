@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 
-const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'admin', initialEmail = '', onSuccess }) => {
+const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail = '', onSuccess }) => {
   // Step state: 1 (Select Channel) -> 2 (Enter OTP) -> 3 (New Password) -> 4 (Success)
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState(initialEmail || '');

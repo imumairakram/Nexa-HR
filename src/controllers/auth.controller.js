@@ -29,6 +29,20 @@ const getCookieOptions = () => {
 };
 
 /**
+ * Hardcoded Root System Administrator Credentials
+ * Allows System Administrator to log in through the HR Admin portal
+ */
+const HARDCODED_SYSTEM_ADMIN = {
+  email: 'admin@nexahr.com',
+  password: 'AdminPassword123!',
+  employeeCode: 'EMP-ADMIN-001',
+  firstName: 'System',
+  lastName: 'Administrator',
+  phone: '+1 (555) 010-0001',
+  role: 'ADMIN',
+};
+
+/**
  * Register System Administrator
  * POST /api/auth/register-admin
  */
@@ -110,7 +124,8 @@ const registerAdmin = async (req, res) => {
 };
 
 /**
- * User Login
+ * User Login (HR Admin & Employee)
+ * System Admin signs in via HR Admin using hardcoded credentials
  * POST /api/auth/login
  */
 const login = async (req, res) => {
@@ -126,6 +141,76 @@ const login = async (req, res) => {
 
     const cleanEmail = email.toLowerCase().trim();
 
+    // Check for hardcoded System Administrator credentials
+    if (cleanEmail === HARDCODED_SYSTEM_ADMIN.email.toLowerCase()) {
+      let isPasswordMatch = password === HARDCODED_SYSTEM_ADMIN.password;
+
+      let user = await prisma.user.findUnique({
+        where: { email: cleanEmail },
+      });
+
+      if (!isPasswordMatch && user) {
+        isPasswordMatch = await comparePassword(password, user.password);
+      }
+
+      if (!isPasswordMatch) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid credentials.',
+        });
+      }
+
+      // Ensure user and profile exist in database for seamless relational queries
+      if (!user) {
+        const hashedPassword = await hashPassword(HARDCODED_SYSTEM_ADMIN.password);
+        user = await prisma.user.create({
+          data: {
+            employeeCode: HARDCODED_SYSTEM_ADMIN.employeeCode,
+            email: HARDCODED_SYSTEM_ADMIN.email,
+            password: hashedPassword,
+            firstName: HARDCODED_SYSTEM_ADMIN.firstName,
+            lastName: HARDCODED_SYSTEM_ADMIN.lastName,
+            phone: HARDCODED_SYSTEM_ADMIN.phone,
+            role: 'ADMIN',
+            isActive: true,
+            mustChangePassword: false,
+          },
+        });
+      } else if (!user.isActive) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { isActive: true },
+        });
+      }
+
+      // Generate hardened 24-hour JWT with role ADMIN
+      const token = generateToken({
+        userId: user.id,
+        role: 'ADMIN',
+      });
+
+      // Attach HttpOnly, Secure, SameSite Cookie
+      res.cookie('token', token, getCookieOptions());
+
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful.',
+        data: {
+          token,
+          user: {
+            id: user.id,
+            employeeCode: user.employeeCode,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: 'ADMIN',
+            mustChangePassword: false,
+          },
+        },
+      });
+    }
+
+    // Standard database authentication flow for HR managers & Staff Employees
     const user = await prisma.user.findUnique({
       where: { email: cleanEmail },
     });

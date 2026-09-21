@@ -73,8 +73,8 @@ const Login = () => {
   const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Active Login Role: 'admin' | 'hr' | 'employee'
-  const [loginRole, setLoginRole] = useState('admin');
+  // Active Login Role: 'hr' | 'employee'
+  const [loginRole, setLoginRole] = useState('hr');
   const [showPassword, setShowPassword] = useState(false);
 
   // Form State initialized clean
@@ -205,42 +205,27 @@ const Login = () => {
             {/* Header Text */}
             <div className="text-center mb-4 sm:mb-5">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {loginRole === 'admin' && 'Welcome, System Administrator'}
                 {loginRole === 'hr' && 'Welcome, HR Administrator'}
                 {loginRole === 'employee' && 'Welcome, Employee'}
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                {loginRole === 'admin' && 'Sign in with root administrative credentials for system governance & access controls.'}
                 {loginRole === 'hr' && 'Sign in with HR credentials to manage employees, attendance, leaves, and payroll.'}
                 {loginRole === 'employee' && 'Sign in to access your personal dashboard, clock-in records, leaves & payslips.'}
               </p>
             </div>
 
-            {/* Segmented 3-Way Role Switcher */}
+            {/* Segmented 2-Way Role Switcher */}
             <div className="bg-slate-100 dark:bg-slate-800/90 p-1 sm:p-1.5 rounded-2xl flex items-center mb-5 border border-slate-200/60 dark:border-slate-700/60 shadow-inner gap-1">
-              {/* System Admin Tab */}
-              <button
-                type="button"
-                onClick={() => handleRoleTabChange('admin')}
-                className={`flex-1 py-2 text-[11px] sm:text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${loginRole === 'admin'
-                  ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                <span className="truncate">System Admin</span>
-              </button>
-
               {/* HR Admin Tab */}
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('hr')}
-                className={`flex-1 py-2 text-[11px] sm:text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${loginRole === 'hr'
+                className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'hr'
                   ? 'bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
-                <UserCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                <UserCheck className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                 <span className="truncate">HR Admin</span>
               </button>
 
@@ -248,12 +233,12 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('employee')}
-                className={`flex-1 py-2 text-[11px] sm:text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${loginRole === 'employee'
+                className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
                   ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
-                <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">Employee</span>
               </button>
             </div>
@@ -276,9 +261,7 @@ const Login = () => {
               {/* Email Address */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  {loginRole === 'admin' && 'System Admin Email Address'}
-                  {loginRole === 'hr' && 'HR Admin Work Email'}
-                  {loginRole === 'employee' && 'Employee Work Email'}{' '}
+                  {loginRole === 'hr' ? 'HR Admin Work Email' : 'Employee Work Email'}{' '}
                   <span className="text-blue-600 dark:text-blue-400">*</span>
                 </label>
                 <div className="relative">
@@ -355,9 +338,7 @@ const Login = () => {
                 type="submit"
                 disabled={loading}
                 className={`w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] ${
-                  loginRole === 'admin'
-                    ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/25'
-                    : loginRole === 'hr'
+                  loginRole === 'hr'
                     ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 shadow-purple-600/25'
                     : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
                 }`}
@@ -369,9 +350,7 @@ const Login = () => {
                   </>
                 ) : (
                   <span>
-                    {loginRole === 'admin' && 'Sign In as System Admin'}
-                    {loginRole === 'hr' && 'Sign In as HR Admin'}
-                    {loginRole === 'employee' && 'Sign In as Employee'}
+                    {loginRole === 'hr' ? 'Sign In as HR Admin' : 'Sign In as Employee'}
                   </span>
                 )}
               </button>

@@ -13,6 +13,10 @@ import {
   RefreshCw,
   Layers,
   Check,
+  ShieldCheck,
+  Zap,
+  MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { api } from '../../services/api';
@@ -172,15 +176,6 @@ const EmployeeLeaves = () => {
         subtitle="Manage leave balances, submit vacation or sick leave, and track approvals."
         onRefresh={fetchMyLeaves}
         loading={loading}
-        action={
-          <button
-            onClick={() => setIsApplyOpen(true)}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 text-xs font-bold rounded-full flex items-center gap-2 shadow-sm cursor-pointer transition-all hover:scale-105"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Apply for Leave</span>
-          </button>
-        }
       />
 
       {toastMsg && (
@@ -394,59 +389,144 @@ const EmployeeLeaves = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. APPLY MODAL (STITCH LUXURY DESIGN) */}
+      {/* 3. APPLY MODAL (ULTRA PREMIUM THEMED DESIGN) */}
       {/* ========================================================================= */}
       {isApplyOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/60 border border-blue-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-teal-50/50 dark:from-slate-900/80 dark:via-blue-950/20 dark:to-slate-900/80 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/15 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
                   <CalendarDays className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                    Apply for Time-Off
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                      Apply for Time-Off
+                    </h3>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 flex items-center gap-1">
+                      <Zap className="w-3 h-3 fill-blue-500 text-blue-500" />
+                      Auto SLA
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-sm">
                     Submit leave request for supervisory evaluation and entitlement tracking.
                   </p>
                 </div>
               </div>
+
               <button
                 onClick={() => setIsApplyOpen(false)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
+            {/* Form Body */}
             <form onSubmit={handleApplySubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
-              {/* Leave Type */}
-              <div className="space-y-1.5">
-                <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                  Leave Policy Classification <span className="text-rose-500">*</span>
+              {/* Leave Policy Classification Cards */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                  <span>Leave Policy Classification <span className="text-rose-500">*</span></span>
+                  <span className="text-[10px] text-slate-400 font-normal">Select leave category</span>
                 </label>
-                <select
-                  required
-                  value={leaveForm.leaveTypeId}
-                  onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
-                >
-                  {leaveTypes.map((lt) => (
-                    <option key={lt.id} value={lt.id}>
-                      {lt.name} ({lt.daysAllowed} days annual quota)
-                    </option>
-                  ))}
-                </select>
+
+                {leaveTypes && leaveTypes.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {leaveTypes.map((lt) => {
+                      const isSelected = String(leaveForm.leaveTypeId) === String(lt.id);
+                      return (
+                        <button
+                          type="button"
+                          key={lt.id}
+                          onClick={() => setLeaveForm({ ...leaveForm, leaveTypeId: lt.id })}
+                          className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${
+                            isSelected
+                              ? 'bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-950/50 dark:to-slate-800 border-blue-500/80 dark:border-blue-600 text-blue-950 dark:text-white shadow-sm ring-2 ring-blue-500/20'
+                              : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div
+                              className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                                isSelected
+                                  ? 'bg-blue-600 text-white shadow-xs'
+                                  : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
+                              }`}
+                            >
+                              <CalendarDays className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-bold text-xs leading-tight truncate">
+                                {lt.name}
+                              </div>
+                              <div className="text-[10px] text-slate-400 dark:text-slate-400 mt-0.5">
+                                {lt.daysAllowed} days annual quota
+                              </div>
+                            </div>
+                          </div>
+
+                          {isSelected && (
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-blue-300 dark:ring-blue-800 shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <select
+                    required
+                    value={leaveForm.leaveTypeId}
+                    onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all cursor-pointer"
+                  >
+                    <option value="">Select Leave Policy</option>
+                  </select>
+                )}
               </div>
 
-              {/* Start Date & End Date */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Day Mode Selector (Full Day vs Half Day) */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                  <span>Duration Type</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Full absence or partial</span>
+                </label>
+                <div className="grid grid-cols-2 gap-2.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl">
+                  <button
+                    type="button"
+                    onClick={() => setLeaveForm({ ...leaveForm, dayType: 'FULL' })}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      leaveForm.dayType === 'FULL'
+                        ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <span>Full Day</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLeaveForm({ ...leaveForm, dayType: 'HALF' })}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      leaveForm.dayType === 'HALF'
+                        ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <span>Half Day (0.5 Day)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Start Date & End Date Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-blue-500" />
                     Start Date <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -454,12 +534,13 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.startDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, startDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all cursor-pointer shadow-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-blue-500" />
                     End Date <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -467,67 +548,85 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.endDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, endDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all cursor-pointer shadow-xs"
                   />
                 </div>
               </div>
 
-              {/* Reason & Details */}
+              {/* Reason & Purpose Details */}
               <div className="space-y-1.5">
-                <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                  Reason & Purpose Details <span className="text-rose-500">*</span>
+                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5 text-blue-500" />
+                    Reason & Handover Details <span className="text-rose-500">*</span>
+                  </span>
                 </label>
                 <textarea
                   rows={3}
                   required
-                  placeholder="State context and emergency contact arrangements during absence..."
+                  placeholder="State context, urgent coverage contacts, and handover arrangements during absence..."
                   value={leaveForm.reason}
                   onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
-                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
+                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all resize-none leading-relaxed shadow-xs"
                 />
               </div>
 
-              {/* Preview Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-blue-100 dark:border-slate-700 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                    <CalendarDays className="w-5 h-5" />
+              {/* Live Request Preview Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-slate-800/60 dark:via-blue-950/20 dark:to-slate-800/60 border border-blue-100 dark:border-slate-700/70 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-xs border border-blue-100 dark:border-slate-600">
+                    <CalendarDays className="w-4.5 h-4.5 stroke-[2.2]" />
                   </div>
-                  <div>
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
-                      {leaveTypes.find(l => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
+                  <div className="min-w-0">
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate">
+                      {leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
-                      {leaveForm.startDate || 'Start'} to {leaveForm.endDate || 'End'}
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+                      <span>{leaveForm.startDate || 'Start'} to {leaveForm.endDate || 'End'}</span>
+                      <span>•</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                        {calculateDays()} {calculateDays() === 1 ? 'Day' : 'Days'}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                  Pending Approval
-                </span>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-amber-100/80 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Pending Approval
+                  </span>
+                </div>
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={() => setIsApplyOpen(false)}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                >
-                  {submitting ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
-                  )}
-                  <span>Submit Request</span>
-                </button>
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 gap-3">
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Automated Entitlement Routing</span>
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setIsApplyOpen(false)}
+                    className="px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white text-xs font-black shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                    )}
+                    <span>Submit Request</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
