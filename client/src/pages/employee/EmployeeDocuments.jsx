@@ -694,9 +694,9 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {isUploadOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-xl w-full shadow-2xl shadow-teal-950/15 dark:shadow-black/60 border border-teal-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-teal-950/15 dark:shadow-black/60 border border-teal-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-teal-50/80 via-cyan-50/50 to-blue-50/50 dark:from-slate-900/80 dark:via-teal-950/20 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-teal-50/80 via-cyan-50/50 to-blue-50/50 dark:from-slate-900/80 dark:via-teal-950/20 dark:to-slate-900/80 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -706,7 +706,7 @@ const EmployeeDocuments = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                       Upload to Vault
                     </h3>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60 flex items-center gap-1">
@@ -714,7 +714,7 @@ const EmployeeDocuments = () => {
                       AES-256 Vault
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-sm">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
                     Add verified professional certificates, government IDs, and compliance records.
                   </p>
                 </div>
@@ -729,7 +729,7 @@ const EmployeeDocuments = () => {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleUploadSubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+            <form onSubmit={handleUploadSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
               {/* Document Title */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
@@ -759,7 +759,7 @@ const EmployeeDocuments = () => {
                   <span className="text-[10px] text-slate-400 font-normal">Select the file classification</span>
                 </label>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                   {[
                     { id: 'CERTIFICATE', label: 'Professional Certificate', icon: Award, desc: 'AWS, Scrum, PMP, CFA' },
                     { id: 'IDENTIFICATION', label: 'National ID / Passport', icon: ShieldCheck, desc: 'Passport, CNIC, License' },
@@ -774,7 +774,7 @@ const EmployeeDocuments = () => {
                         type="button"
                         key={cat.id}
                         onClick={() => setUploadForm({ ...uploadForm, type: cat.id })}
-                        className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-1.5 relative overflow-hidden ${
+                        className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
                           isSelected
                             ? 'bg-gradient-to-br from-teal-50 to-cyan-50/50 dark:from-teal-950/50 dark:to-slate-800 border-teal-500/80 dark:border-teal-600 text-teal-950 dark:text-white shadow-sm ring-2 ring-teal-500/20'
                             : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
@@ -782,16 +782,16 @@ const EmployeeDocuments = () => {
                       >
                         <div className="flex items-center justify-between w-full">
                           <div
-                            className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                               isSelected
                                 ? 'bg-teal-500 text-white shadow-xs'
                                 : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                             }`}
                           >
-                            <CatIcon className="w-3.5 h-3.5" />
+                            <CatIcon className="w-4 h-4" />
                           </div>
                           {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-800" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-800" />
                           )}
                         </div>
                         <div>
@@ -850,7 +850,7 @@ const EmployeeDocuments = () => {
                   />
 
                   <div
-                    className={`p-4 sm:p-5 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${
+                    className={`p-5 sm:p-6 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${
                       uploadForm.file
                         ? 'border-teal-500/80 bg-teal-50/50 dark:bg-teal-950/30'
                         : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/20'
@@ -957,18 +957,18 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-lg w-full shadow-2xl shadow-teal-950/15 dark:shadow-black/60 border border-teal-100/60 dark:border-slate-800/80 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-teal-950/15 dark:shadow-black/60 border border-teal-100/60 dark:border-slate-800/80 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-teal-50/70 via-cyan-50/40 to-blue-50/40 dark:from-slate-900/80 dark:via-teal-950/20 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-teal-50/70 via-cyan-50/40 to-blue-50/40 dark:from-slate-900/80 dark:via-teal-950/20 dark:to-slate-900/80 relative overflow-hidden">
               <div className="flex items-start gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
-                  <FileText className="w-5 h-5 stroke-[2.2]" />
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
+                  <FileText className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div className="space-y-1 min-w-0">
                   <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-white/80 dark:bg-slate-800 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
                     {selectedDoc.typeLabel || selectedDoc.type}
                   </span>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate">
+                  <h3 className="text-base sm:text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">
                     {selectedDoc.title}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -986,8 +986,8 @@ const EmployeeDocuments = () => {
             </div>
 
             {/* Metadata Body */}
-            <div className="p-5 sm:p-6 space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-50 to-teal-50/30 dark:from-slate-800/50 dark:to-teal-950/20 border border-teal-100/80 dark:border-slate-800 space-y-2.5">
+            <div className="p-6 sm:p-7 md:p-8 space-y-4 text-xs">
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 to-teal-50/30 dark:from-slate-800/50 dark:to-teal-950/20 border border-teal-100/80 dark:border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 font-medium">Vault Record ID</span>
                   <span className="font-mono font-bold text-slate-800 dark:text-slate-200">#{selectedDoc.id}</span>
@@ -1000,7 +1000,7 @@ const EmployeeDocuments = () => {
                   <span className="text-slate-400 font-medium">Encrypted File Size</span>
                   <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{selectedDoc.size}</span>
                 </div>
-                <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                   <span className="text-slate-400 font-medium">Compliance Verification</span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1010,14 +1010,14 @@ const EmployeeDocuments = () => {
               </div>
 
               {selectedDoc.description && (
-                <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/50 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/50 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   {selectedDoc.description}
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="p-5 sm:p-6 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/60 dark:bg-slate-900/50">
+            <div className="p-6 sm:p-7 md:p-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/60 dark:bg-slate-900/50">
               <button
                 onClick={() => setSelectedDoc(null)}
                 className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"

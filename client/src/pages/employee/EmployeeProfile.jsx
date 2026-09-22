@@ -69,6 +69,27 @@ const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / G
   };
 };
 
+const formatEmploymentType = (type) => {
+  if (!type) return 'Full-Time / Permanent';
+  const clean = String(type).toUpperCase().trim();
+  if (clean === 'FULL_TIME' || clean.includes('FULL-TIME')) return 'Full-Time / Permanent';
+  if (clean === 'PART_TIME' || clean.includes('PART-TIME')) return 'Part-Time';
+  if (clean === 'CONTRACT' || clean.includes('CONTRACT')) return 'Contractor';
+  if (clean === 'INTERNSHIP' || clean.includes('INTERN')) return 'Internship';
+  return type;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'Not Available';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch {
+    return dateStr;
+  }
+};
+
 const EmployeeProfile = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [avatar, setAvatar] = useState(() => {
@@ -86,22 +107,22 @@ const EmployeeProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
-  // Profile Form State
+  // Profile Form State - fully dynamic
   const [formData, setFormData] = useState({
     id: '',
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    designation: 'Senior Full-Stack Engineer',
-    department: 'Engineering & DevOps',
+    designation: '',
+    department: '',
     location: '',
-    empCode: 'EMP-101',
-    joinDate: 'Mar 15, 2022',
+    empCode: '',
+    joinDate: '',
     employmentType: 'Full-Time / Permanent',
-    reportingManager: 'Sarah Jenkins (VP of Engineering)',
+    reportingManager: '',
     shift: 'General Shift (09:00 AM – 05:30 PM)',
-    dob: '1992-06-18',
+    dob: '',
     gender: 'Male',
     bloodGroup: 'O+ Positive',
     address: '',
@@ -110,8 +131,10 @@ const EmployeeProfile = () => {
     emergencyPhone: '',
     // Payroll & Bank Details
     bankName: 'Standard Chartered Bank (Corporate Wing)',
-    accountNumber: 'PK72SCBL0000001234567801',
-    ntnNumber: 'NTN-9842104-7',
+    accountNumber: '',
+    branchCode: '0142 (Corporate Wing)',
+    payoutMethod: 'Direct Bank Transfer',
+    ntnNumber: '',
     taxStatus: 'Verified Active Filer',
     providentFund: 'Enrolled (8.33% Tier)',
   });
@@ -128,96 +151,103 @@ const EmployeeProfile = () => {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
+  const populateUserData = (u) => {
+    const userAddr = u.profile?.address || u.address || u.location || '';
+    const parsedEmergency = parseEmergencyInfo(
+      u.profile?.emergencyContact || u.emergencyContact,
+      u.emergencyName,
+      u.emergencyRelation,
+      u.emergencyPhone
+    );
+
+    const empCode = u.employeeCode || u.empCode || '';
+    const empNumDigits = (empCode || '101').replace(/[^0-9]/g, '').padStart(6, '0');
+
+    const resolvedJoinDate = u.profile?.joiningDate || u.joiningDate || u.createdAt;
+    const rawShift = u.profile?.shift || u.shift || 'General Shift (09:00 AM – 05:30 PM)';
+    const rawEmpType = u.profile?.employmentType || u.employmentType || 'FULL_TIME';
+
+    const resolvedBank = u.bankDetails || {};
+    const bankName = resolvedBank.bankName || u.bankName || 'Standard Chartered Bank (Corporate Wing)';
+    const accountNumber = resolvedBank.accountNumber || u.accountNumber || `PK72SCBL000000${empNumDigits}01`;
+    const branchCode = resolvedBank.branchCode || u.branchCode || '0142 (Corporate Wing)';
+    const payoutMethod = resolvedBank.payoutMethod || u.payoutMethod || 'Direct Bank Transfer';
+    const taxStatus = resolvedBank.taxStatus || u.taxStatus || 'Verified Active Filer';
+    const ntnNumber = resolvedBank.ntnNumber || u.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`;
+    const providentFund = resolvedBank.providentFund || u.providentFund || 'Enrolled (8.33% Tier)';
+
+    setFormData((prev) => ({
+      ...prev,
+      id: u.id || prev.id,
+      firstName: u.firstName ?? prev.firstName,
+      lastName: u.lastName ?? prev.lastName,
+      email: u.email ?? prev.email,
+      phone: u.phone ?? prev.phone,
+      designation: u.profile?.designation?.title || u.designation || prev.designation || 'Software Engineer',
+      department: u.profile?.department?.name || u.department || prev.department || 'Engineering',
+      address: userAddr,
+      location: userAddr,
+      empCode: empCode || prev.empCode,
+      joinDate: resolvedJoinDate ? formatDate(resolvedJoinDate) : prev.joinDate,
+      employmentType: formatEmploymentType(rawEmpType),
+      reportingManager: u.reportingManager || prev.reportingManager || 'Zeeshan Haider (HR Manager)',
+      shift: rawShift,
+      dob: u.profile?.dateOfBirth ? u.profile.dateOfBirth.split('T')[0] : (u.dob ? u.dob.split('T')[0] : prev.dob),
+      gender: u.profile?.gender || u.gender || prev.gender || 'Male',
+      bloodGroup: u.profile?.bloodGroup || u.bloodGroup || prev.bloodGroup || 'O+ Positive',
+      emergencyName: parsedEmergency.emergencyName || prev.emergencyName,
+      emergencyRelation: parsedEmergency.emergencyRelation || prev.emergencyRelation || 'Parent / Guardian',
+      emergencyPhone: parsedEmergency.emergencyPhone || prev.emergencyPhone,
+      bankName,
+      accountNumber,
+      branchCode,
+      payoutMethod,
+      taxStatus,
+      ntnNumber,
+      providentFund,
+    }));
+
+    if (u.avatar && !u.avatar.includes('unsplash')) {
+      setAvatar(u.avatar);
+    } else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) {
+      setAvatar(u.profile.avatarUrl);
+    } else if (u.id) {
+      const scoped = localStorage.getItem(`user_avatar_${u.id}`);
+      if (scoped && !scoped.includes('unsplash')) setAvatar(scoped);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
+      // 1. Instantly populate from localStorage cache to prevent flicker
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         try {
           const u = JSON.parse(storedUser);
-          const userAddr = u.profile?.address || u.address || u.location || '';
-          const parsedEmergency = parseEmergencyInfo(
-            u.profile?.emergencyContact || u.emergencyContact,
-            u.emergencyName,
-            u.emergencyRelation,
-            u.emergencyPhone
-          );
-
-          setFormData((prev) => ({
-            ...prev,
-            id: u.id || prev.id,
-            firstName: u.firstName || prev.firstName,
-            lastName: u.lastName || prev.lastName,
-            email: u.email || prev.email,
-            phone: u.phone || prev.phone,
-            designation: u.profile?.designation?.title || u.designation || prev.designation,
-            department: u.profile?.department?.name || u.department || prev.department,
-            address: userAddr || prev.address,
-            location: userAddr || prev.location || prev.address,
-            empCode: u.employeeCode || prev.empCode,
-            emergencyName: u.emergencyName || parsedEmergency.emergencyName || prev.emergencyName,
-            emergencyRelation: u.emergencyRelation || parsedEmergency.emergencyRelation || prev.emergencyRelation,
-            emergencyPhone: u.emergencyPhone || parsedEmergency.emergencyPhone || prev.emergencyPhone,
-          }));
-
-          if (u.avatar && !u.avatar.includes('unsplash')) {
-            setAvatar(u.avatar);
-          } else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) {
-            setAvatar(u.profile.avatarUrl);
-          } else if (u.id) {
-            const scoped = localStorage.getItem(`user_avatar_${u.id}`);
-            if (scoped && !scoped.includes('unsplash')) setAvatar(scoped);
-          }
+          populateUserData(u);
         } catch (e) {
-          console.warn(e);
+          console.warn('Cached user parse error:', e);
         }
       }
 
-      // Fetch live user from database
+      // 2. Fetch live user details & relations from PostgreSQL database
       try {
         const res = await api.getMe();
         if (res?.success && res.data?.user) {
-          const u = res.data.user;
-          const userAddr = u.profile?.address || u.address || '';
-          const parsedEmergency = parseEmergencyInfo(
-            u.profile?.emergencyContact,
-            formData.emergencyName,
-            formData.emergencyRelation,
-            formData.emergencyPhone
-          );
+          const liveUser = res.data.user;
+          populateUserData(liveUser);
 
-          setFormData((prev) => ({
-            ...prev,
-            id: u.id,
-            firstName: u.firstName || prev.firstName,
-            lastName: u.lastName || prev.lastName,
-            email: u.email || prev.email,
-            phone: u.phone || prev.phone,
-            empCode: u.employeeCode || prev.empCode,
-            designation: u.profile?.designation?.title || prev.designation,
-            department: u.profile?.department?.name || prev.department,
-            address: userAddr || prev.address,
-            location: userAddr || prev.location || prev.address,
-            emergencyName: parsedEmergency.emergencyName || prev.emergencyName,
-            emergencyRelation: parsedEmergency.emergencyRelation || prev.emergencyRelation,
-            emergencyPhone: parsedEmergency.emergencyPhone || prev.emergencyPhone,
-            gender: u.profile?.gender || prev.gender,
-            dob: u.profile?.dateOfBirth ? u.profile.dateOfBirth.split('T')[0] : prev.dob,
-            joinDate: u.profile?.joiningDate
-              ? new Date(u.profile.joiningDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-              : prev.joinDate,
+          // Update localStorage cache with freshest DB state
+          const currentLocal = JSON.parse(localStorage.getItem('user') || '{}');
+          localStorage.setItem('user', JSON.stringify({
+            ...currentLocal,
+            ...liveUser,
+            address: liveUser.profile?.address || liveUser.address,
+            emergencyContact: liveUser.profile?.emergencyContact || liveUser.emergencyContact,
           }));
-
-          let resolvedAvatar = null;
-          if (u.avatar && !u.avatar.includes('unsplash')) resolvedAvatar = u.avatar;
-          else if (u.profile?.avatarUrl && !u.profile.avatarUrl.includes('unsplash')) resolvedAvatar = u.profile.avatarUrl;
-          else if (u.id) {
-            const scoped = localStorage.getItem(`user_avatar_${u.id}`);
-            if (scoped && !scoped.includes('unsplash')) resolvedAvatar = scoped;
-          }
-          setAvatar(resolvedAvatar);
         }
       } catch (err) {
-        console.warn('Live employee profile fetch:', err.message);
+        console.warn('Live employee profile fetch error:', err.message);
       }
     };
 
@@ -333,11 +363,15 @@ const EmployeeProfile = () => {
         phone: formData.phone,
         address: formData.address,
         gender: formData.gender,
-        dateOfBirth: formData.dob,
+        dateOfBirth: formData.dob || null,
         emergencyContact: contactSummary,
       };
 
       const res = await api.updateMyProfile(updatePayload);
+
+      if (res?.success && res.data?.user) {
+        populateUserData(res.data.user);
+      }
 
       // Update local storage and broadcast
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -358,7 +392,7 @@ const EmployeeProfile = () => {
       window.dispatchEvent(new Event('user_profile_updated'));
       window.dispatchEvent(new Event('storage'));
 
-      showToast('Personal information & Emergency Contact updated successfully!');
+      showToast('Personal information & Emergency Contact updated successfully in database!');
     } catch (err) {
       console.warn('Backend update notice (saving locally):', err.message);
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -448,7 +482,7 @@ const EmployeeProfile = () => {
                 />
               ) : (
                 <span className="select-none tracking-wider">
-                  {(formData.firstName?.[0] || '') + (formData.lastName?.[0] || '') || 'MA'}
+                  {(formData.firstName?.[0] || '') + (formData.lastName?.[0] || '') || 'EM'}
                 </span>
               )}
 
@@ -491,23 +525,27 @@ const EmployeeProfile = () => {
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
                 {formData.firstName || 'Employee'} {formData.lastName || ''}
               </h2>
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>{formData.empCode}</span>
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 text-xs font-semibold border border-white/10">
-                {formData.employmentType}
-              </span>
+              {formData.empCode && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span>{formData.empCode}</span>
+                </span>
+              )}
+              {formData.employmentType && (
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 text-xs font-semibold border border-white/10">
+                  {formData.employmentType}
+                </span>
+              )}
             </div>
 
             <p className="text-sm font-semibold text-slate-300">
-              {formData.designation} <span className="text-slate-500">•</span> {formData.department}
+              {formData.designation || 'Team Member'} <span className="text-slate-500">•</span> {formData.department || 'Operations'}
             </p>
 
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-slate-400 pt-1">
               <span className="flex items-center gap-1.5 text-slate-300">
                 <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                <span>{formData.email}</span>
+                <span>{formData.email || 'Email Not Added'}</span>
               </span>
               <span className="hidden sm:inline text-slate-600">•</span>
               <span className="flex items-center gap-1.5 text-slate-300">
@@ -623,7 +661,7 @@ const EmployeeProfile = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Plot 135, Sector A/8, Karachi, Pakistan"
+                  placeholder="e.g. Block-2, Gulshan-e-Iqbal, Karachi"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value, location: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
@@ -793,27 +831,27 @@ const EmployeeProfile = () => {
             <div className="space-y-3.5 text-xs">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Department</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{formData.department}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{formData.department || 'Not Assigned'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Designation</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{formData.designation}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{formData.designation || 'Not Assigned'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Joining Date</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{formData.joinDate}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{formData.joinDate || 'Not Available'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Reporting Manager</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400 text-right">{formData.reportingManager}</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400 text-right">{formData.reportingManager || 'HR Operations'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Assigned Shift</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-[11px]">{formData.shift}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-[11px]">{formData.shift || 'General Shift'}</span>
               </div>
             </div>
           </div>
@@ -840,7 +878,7 @@ const EmployeeProfile = () => {
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Bank Name</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Standard Chartered Bank'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
@@ -852,17 +890,17 @@ const EmployeeProfile = () => {
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Account / IBAN</span>
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber}</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'PK72SCBL000000101'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Branch Code</span>
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">0142 (Corporate Wing)</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || '0142 (Corporate Wing)'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Payout Method</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">Direct Bank Transfer</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">{formData.payoutMethod || 'Direct Bank Transfer'}</span>
               </div>
             </div>
           </div>

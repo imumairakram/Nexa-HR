@@ -655,13 +655,13 @@ const EmployeeHelpdesk = () => {
       {/* ========================================================================= */}
       {selectedTicket && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-2xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/60 border border-rose-100/60 dark:border-slate-800/80 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/60 border border-rose-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/70 via-pink-50/40 to-purple-50/40 dark:from-slate-900/80 dark:via-rose-950/20 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/70 via-pink-50/40 to-purple-50/40 dark:from-slate-900/80 dark:via-rose-950/20 dark:to-slate-900/80 relative overflow-hidden">
               <div className="absolute top-0 right-1/4 w-48 h-48 bg-rose-400/10 rounded-full blur-2xl pointer-events-none" />
               <div className="flex items-start gap-3.5 min-w-0 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25 ring-4 ring-rose-100/60 dark:ring-rose-950/50">
-                  <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25 ring-4 ring-rose-100/60 dark:ring-rose-950/50">
+                  <LifeBuoy className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div className="space-y-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -682,7 +682,7 @@ const EmployeeHelpdesk = () => {
                       {selectedTicket.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}
                     </span>
                   </div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate">
+                  <h3 className="text-base sm:text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">
                     {selectedTicket.subject}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -700,7 +700,7 @@ const EmployeeHelpdesk = () => {
             </div>
 
             {/* Conversation Messages Thread */}
-            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 sm:p-7 md:p-8 space-y-4 custom-scrollbar">
               <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-50 to-rose-50/30 dark:from-slate-800/50 dark:to-rose-950/20 border border-rose-100/80 dark:border-slate-800 space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-extrabold text-slate-800 dark:text-slate-200 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
@@ -745,7 +745,7 @@ const EmployeeHelpdesk = () => {
             </div>
 
             {/* Reply Bar & Action Footer */}
-            <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-slate-800 space-y-3.5 bg-slate-50/70 dark:bg-slate-900/60 shrink-0">
+            <div className="px-6 sm:px-7 md:p-8 py-4 border-t border-slate-100 dark:border-slate-800 space-y-3.5 bg-slate-50/70 dark:bg-slate-900/60 shrink-0">
               <div className="flex items-center gap-2.5">
                 <input
                   type="text"
@@ -809,9 +809,9 @@ const EmployeeHelpdesk = () => {
       {/* ========================================================================= */}
       {isNewTicketOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/60 border border-rose-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/60 border border-rose-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/80 via-pink-50/50 to-purple-50/50 dark:from-slate-900/80 dark:via-rose-950/20 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/80 via-pink-50/50 to-purple-50/50 dark:from-slate-900/80 dark:via-rose-950/20 dark:to-slate-900/80 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400/15 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -821,7 +821,7 @@ const EmployeeHelpdesk = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                       Raise Support Ticket
                     </h3>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 flex items-center gap-1">
@@ -829,7 +829,7 @@ const EmployeeHelpdesk = () => {
                       SLA &lt; 4h
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-sm">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
                     Direct routing to HR, IT & Operations specialists for fast resolution.
                   </p>
                 </div>
@@ -844,7 +844,7 @@ const EmployeeHelpdesk = () => {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateTicket} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+            <form onSubmit={handleCreateTicket} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
               {/* Subject */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
@@ -874,7 +874,7 @@ const EmployeeHelpdesk = () => {
                   <span className="text-[10px] text-slate-400 font-normal">Select the best matching area</span>
                 </label>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                   {[
                     { id: 'IT_HARDWARE', label: 'IT & Equipment', icon: Laptop, desc: 'Hardware, software & access' },
                     { id: 'PAYROLL', label: 'Payroll & Tax', icon: CreditCard, desc: 'Salary, tax deductions & slips' },
@@ -889,7 +889,7 @@ const EmployeeHelpdesk = () => {
                         type="button"
                         key={cat.id}
                         onClick={() => setNewTicketForm({ ...newTicketForm, category: cat.id })}
-                        className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-1.5 relative overflow-hidden ${
+                        className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
                           isSelected
                             ? 'bg-gradient-to-br from-rose-50 to-pink-50/50 dark:from-rose-950/50 dark:to-slate-800 border-rose-500/80 dark:border-rose-600 text-rose-950 dark:text-white shadow-sm ring-2 ring-rose-500/20'
                             : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
@@ -897,16 +897,16 @@ const EmployeeHelpdesk = () => {
                       >
                         <div className="flex items-center justify-between w-full">
                           <div
-                            className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                               isSelected
                                 ? 'bg-rose-500 text-white shadow-xs'
                                 : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                             }`}
                           >
-                            <CatIcon className="w-3.5 h-3.5" />
+                            <CatIcon className="w-4 h-4" />
                           </div>
                           {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-300 dark:ring-rose-800" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-300 dark:ring-rose-800" />
                           )}
                         </div>
                         <div>
@@ -930,7 +930,7 @@ const EmployeeHelpdesk = () => {
                   <span className="text-[10px] text-slate-400 font-normal">Determines SLA queue</span>
                 </label>
 
-                <div className="grid grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
                     { id: 'LOW', label: 'Low', badge: 'Standard 24h', color: 'blue' },
                     { id: 'MEDIUM', label: 'Medium', badge: 'Target < 8h', color: 'amber' },
@@ -942,7 +942,7 @@ const EmployeeHelpdesk = () => {
                         type="button"
                         key={p.id}
                         onClick={() => setNewTicketForm({ ...newTicketForm, priority: p.id })}
-                        className={`py-2.5 px-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
+                        className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
                           isSelected
                             ? p.id === 'HIGH'
                               ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs ring-2 ring-rose-500/20'
