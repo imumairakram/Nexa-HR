@@ -201,7 +201,7 @@ const Announcement = () => {
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Post to employee portal</div>
             </div>
             <button
-              onClick={() => setIsCreateOpen(true)}
+              onClick={() => setIsPostModalOpen(true)}
               className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -435,9 +435,9 @@ const Announcement = () => {
       {/* ========================================================================= */}
       {isPostModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
                   <Megaphone className="w-6 h-6 stroke-[2.2]" />
@@ -446,7 +446,7 @@ const Announcement = () => {
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Broadcast Announcement
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl">
                     Publish company circulars, executive updates, and important operational memos to all employees.
                   </p>
                 </div>
@@ -460,7 +460,7 @@ const Announcement = () => {
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handlePostSubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+            <form onSubmit={handlePostSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
               {/* Title */}
               <div className="space-y-1.5">
                 <label className="block text-slate-800 dark:text-slate-200 font-bold">
@@ -479,8 +479,8 @@ const Announcement = () => {
                 </div>
               </div>
 
-              {/* Category & Priority */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Category, Priority & Department */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
                   <label className="block text-slate-800 dark:text-slate-200 font-bold">
                     Category Scope <span className="text-rose-500">*</span>
@@ -512,6 +512,22 @@ const Announcement = () => {
                     <option value="INFO">Informational Bulletin (Blue)</option>
                   </select>
                 </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Target Audience
+                  </label>
+                  <select
+                    value={form.department}
+                    onChange={(e) => setForm({ ...form, department: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="Company-Wide (All Offices)">Company-Wide (All Offices)</option>
+                    <option value="Engineering & Product">Engineering & Product</option>
+                    <option value="People & Operations">People & Operations</option>
+                    <option value="Sales & Marketing">Sales & Marketing</option>
+                  </select>
+                </div>
               </div>
 
               {/* Detailed Notice Body */}
@@ -521,7 +537,7 @@ const Announcement = () => {
                 </label>
                 <div className="relative">
                   <textarea
-                    rows={4}
+                    rows={5}
                     required
                     placeholder="Full announcement text, schedule of events, guidelines, links..."
                     value={form.content}
@@ -532,7 +548,7 @@ const Announcement = () => {
               </div>
 
               {/* Pin Switch Toggle Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
                 <div>
                   <div className="font-bold text-slate-900 dark:text-white text-xs">Pin to Top of Notice Board</div>
                   <div className="text-[10px] text-slate-400 font-medium mt-0.5">
@@ -555,7 +571,7 @@ const Announcement = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsPostModalOpen(false)}
@@ -565,10 +581,20 @@ const Announcement = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                 >
-                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
-                  <span>Publish & Broadcast</span>
+                  {submitting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Publishing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                      <span>Publish & Broadcast</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -578,15 +604,15 @@ const Announcement = () => {
 
       {/* DETAIL MODAL */}
       {selectedNotice && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800/90 space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+                <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
                   {selectedNotice.category} • {selectedNotice.priority}
                 </span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white mt-1">{selectedNotice.title}</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">{selectedNotice.date} • {selectedNotice.author}</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-2">{selectedNotice.title}</h3>
+                <p className="text-xs text-slate-400 mt-1">{selectedNotice.date} • {selectedNotice.author || selectedNotice.department}</p>
               </div>
               <button
                 onClick={() => setSelectedNotice(null)}
@@ -596,14 +622,14 @@ const Announcement = () => {
               </button>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
+            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-line border border-slate-100 dark:border-slate-700/60">
               {selectedNotice.content}
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setSelectedNotice(null)}
-                className="px-5 py-2 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-xs font-bold cursor-pointer"
+                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-2xl text-xs font-bold cursor-pointer transition-colors"
               >
                 Close
               </button>
