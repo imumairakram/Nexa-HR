@@ -752,9 +752,9 @@ const PublicHoliday = () => {
       {/* ========================================================================= */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-2xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/50 via-indigo-50/30 to-emerald-50/30 dark:from-slate-900/60 dark:via-slate-900/40 dark:to-slate-900/60">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/50 via-indigo-50/30 to-emerald-50/30 dark:from-slate-900/60 dark:via-slate-900/40 dark:to-slate-900/60">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20">
                   <CalendarPlus className="w-6 h-6 stroke-[2.2]" />
@@ -763,7 +763,7 @@ const PublicHoliday = () => {
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Add Custom Holiday
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md line-clamp-1 sm:line-clamp-none">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl line-clamp-1 sm:line-clamp-none">
                     Configure attendance rules, payroll wage coverage, and duty station waivers for this corporate event.
                   </p>
                 </div>
@@ -777,7 +777,7 @@ const PublicHoliday = () => {
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handleAddSubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-6 custom-scrollbar text-xs">
+            <form onSubmit={handleAddSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
               {/* Section 1: Basic Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Holiday Name */}
@@ -828,7 +828,7 @@ const PublicHoliday = () => {
                 <label className="block text-slate-800 dark:text-slate-200 font-bold">
                   Classification Category
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {CATEGORY_OPTIONS.map((cat) => {
                     const Icon = cat.icon;
                     const isSelected = form.type === cat.id;
@@ -837,7 +837,7 @@ const PublicHoliday = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setForm({ ...form, type: cat.id })}
-                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 relative ${
+                        className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 relative ${
                           isSelected
                             ? cat.activeClass
                             : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
@@ -903,7 +903,7 @@ const PublicHoliday = () => {
               </div>
 
               {/* Section 4: Smart Policy & Automation Glassmorphic Card */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-slate-800/70 dark:via-slate-800/40 dark:to-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-3.5 relative overflow-hidden">
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-slate-800/70 dark:via-slate-800/40 dark:to-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-3.5 relative overflow-hidden">
                 <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/70 dark:border-slate-700/60">
                   <div className="flex items-center gap-2 font-black text-slate-900 dark:text-white text-xs">
                     <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
@@ -917,74 +917,76 @@ const PublicHoliday = () => {
                   )}
                 </div>
 
-                {/* Toggle 1: Recur annually */}
-                <label className="flex items-center justify-between gap-3 cursor-pointer py-1">
-                  <div>
-                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Annual Recurrence</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                      Automatically synchronize on this date across future calendars.
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Toggle 1: Recur annually */}
+                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Annual Recurrence</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                        Auto-sync across years.
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, recurringYearly: !form.recurringYearly })}
-                    className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                      form.recurringYearly ? 'bg-sky-600' : 'bg-slate-300 dark:bg-slate-700'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
-                        form.recurringYearly ? 'right-1' : 'left-1'
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, recurringYearly: !form.recurringYearly })}
+                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                        form.recurringYearly ? 'bg-sky-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
-                    />
-                  </button>
-                </label>
+                    >
+                      <div
+                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                          form.recurringYearly ? 'right-1' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
 
-                {/* Toggle 2: Paid Wage Coverage */}
-                <label className="flex items-center justify-between gap-3 cursor-pointer py-1">
-                  <div>
-                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">100% Wage Coverage</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                      Process payroll as statutory paid non-working hours without deductions.
+                  {/* Toggle 2: Paid Wage Coverage */}
+                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">100% Wage Coverage</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                        Paid non-working hours.
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, paidCoverage: !form.paidCoverage })}
-                    className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                      form.paidCoverage ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
-                        form.paidCoverage ? 'right-1' : 'left-1'
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, paidCoverage: !form.paidCoverage })}
+                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                        form.paidCoverage ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
-                    />
-                  </button>
-                </label>
+                    >
+                      <div
+                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                          form.paidCoverage ? 'right-1' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
 
-                {/* Toggle 3: Auto-waive penalty */}
-                <label className="flex items-center justify-between gap-3 cursor-pointer py-1">
-                  <div>
-                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Auto-Waive Shift Penalties</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                      Do not flag scheduled roster absences as AWOL on this date.
+                  {/* Toggle 3: Auto-waive penalty */}
+                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Auto-Waive Penalties</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                        No AWOL on this date.
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, autoWaivePenalty: !form.autoWaivePenalty })}
-                    className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                      form.autoWaivePenalty ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
-                        form.autoWaivePenalty ? 'right-1' : 'left-1'
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, autoWaivePenalty: !form.autoWaivePenalty })}
+                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                        form.autoWaivePenalty ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
-                    />
-                  </button>
-                </label>
+                    >
+                      <div
+                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
+                          form.autoWaivePenalty ? 'right-1' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Section 5: Administrative Memo / Notes */}
@@ -1005,7 +1007,7 @@ const PublicHoliday = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}

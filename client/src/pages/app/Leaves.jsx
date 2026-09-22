@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { api } from '../../services/api';
 
 const Leaves = () => {
@@ -227,96 +228,68 @@ const Leaves = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Applications</span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CalendarDays className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {stats.total} <span className="text-base font-bold text-slate-400">Requests</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Lifetime Total</span>
-              <span className="text-slate-400">All Types</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Total Applications"
+          value={stats.total}
+          unit={stats.total === 1 ? 'Request' : 'Requests'}
+          badgeText="Lifetime Total"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="All Leave Types"
+          chartColor="purple"
+          presetWave="wave1"
+          loading={loading}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Pending Review</span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              {stats.pending} <span className="text-base font-bold text-slate-400">Awaiting</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">Action Required</span>
-              <span className="text-slate-400">HR Queue</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Pending Review"
+          value={stats.pending}
+          unit="Awaiting"
+          badgeText={stats.pending > 0 ? `${stats.pending} Needs Review` : 'All Cleared'}
+          badgeType={stats.pending > 0 ? 'warning' : 'positive'}
+          badgeIcon={stats.pending > 0 ? 'dot' : 'up'}
+          subtext="HR Queue"
+          chartColor="amber"
+          presetWave="wave2"
+          loading={loading}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Approved Leaves</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              {stats.approved} <span className="text-base font-bold text-slate-400">Granted</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Synchronized</span>
-              <span className="text-slate-400">Approved</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Approved Leaves"
+          value={stats.approved}
+          unit="Granted"
+          badgeText="Synchronized"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Quota Deducted"
+          chartColor="emerald"
+          presetWave="wave3"
+          loading={loading}
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-rose-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-rose-500/10 blur-2xl pointer-events-none group-hover:bg-rose-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Declined / Rejected</span>
-            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200/60 dark:border-rose-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <XCircle className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
-              {stats.rejected} <span className="text-base font-bold text-slate-400">Declined</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-rose-600 dark:text-rose-400 font-bold">Audit Reason Logged</span>
-              <span className="text-slate-400">Rejected</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Declined / Rejected"
+          value={stats.rejected}
+          unit="Declined"
+          badgeText={stats.rejected > 0 ? `${stats.rejected} Declined` : '0 Declined'}
+          badgeType={stats.rejected > 0 ? 'negative' : 'neutral'}
+          badgeIcon={stats.rejected > 0 ? 'down' : 'dot'}
+          subtext="Audit Reason Logged"
+          chartColor="rose"
+          presetWave="wave4"
+          loading={loading}
+        />
       </div>
 
       {/* Toolbar */}
@@ -452,111 +425,128 @@ const Leaves = () => {
 
       {/* Apply on Behalf Modal */}
       {isApplyOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
-                  <CalendarDays className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/60 border border-blue-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-teal-50/50 dark:from-slate-900/80 dark:via-blue-950/20 dark:to-slate-900/80 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/15 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
+                  <CalendarDays className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">Grant Employee Leave</h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Grant Employee Leave
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Submit authorized absence record on behalf of an employee with direct ledger sync.
+                  </p>
+                </div>
               </div>
+
               <button
                 onClick={() => setIsApplyOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateOnBehalf} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Select Employee *</label>
-                <select
-                  required
-                  value={applyForm.userId}
-                  onChange={(e) => setApplyForm({ ...applyForm, userId: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                >
-                  {employees.length > 0 ? (
-                    employees.map((emp) => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp.firstName} {emp.lastName} ({emp.employeeCode})
+            <form onSubmit={handleCreateOnBehalf} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">Select Employee *</label>
+                  <select
+                    required
+                    value={applyForm.userId}
+                    onChange={(e) => setApplyForm({ ...applyForm, userId: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                  >
+                    {employees.length > 0 ? (
+                      employees.map((emp) => (
+                        <option key={emp.id} value={emp.id}>
+                          {emp.firstName} {emp.lastName} ({emp.employeeCode})
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">No employees onboarded yet</option>
+                    )}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">Leave Policy / Type *</label>
+                  <select
+                    required
+                    value={applyForm.leaveTypeId}
+                    onChange={(e) => setApplyForm({ ...applyForm, leaveTypeId: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                  >
+                    {leaveTypes.map((lt) => (
+                      <option key={lt.id} value={lt.id}>
+                        {lt.name} ({lt.daysAllowed} days allowed)
                       </option>
-                    ))
-                  ) : (
-                    <option value="">No employees onboarded yet</option>
-                  )}
-                </select>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Leave Policy / Type *</label>
-                <select
-                  required
-                  value={applyForm.leaveTypeId}
-                  onChange={(e) => setApplyForm({ ...applyForm, leaveTypeId: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                >
-                  {leaveTypes.map((lt) => (
-                    <option key={lt.id} value={lt.id}>
-                      {lt.name} ({lt.daysAllowed} days allowed)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Start Date *</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">Start Date *</label>
                   <input
                     type="date"
                     required
                     value={applyForm.startDate}
                     onChange={(e) => setApplyForm({ ...applyForm, startDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   />
                 </div>
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">End Date *</label>
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">End Date *</label>
                   <input
                     type="date"
                     required
                     value={applyForm.endDate}
                     onChange={(e) => setApplyForm({ ...applyForm, endDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Reason *</label>
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">Reason & Administrative Remarks *</label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   required
                   placeholder="Provide context or description for the time-off..."
                   value={applyForm.reason}
                   onChange={(e) => setApplyForm({ ...applyForm, reason: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none leading-relaxed"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsApplyOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-                >
-                  {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Submit Leave</span>
-                </button>
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-[11px] text-slate-400">Updates quota balance immediately upon submission</span>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsApplyOpen(false)}
+                    className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold shadow-lg shadow-blue-600/25 cursor-pointer flex items-center gap-2 disabled:opacity-50 transition-all active:scale-95"
+                  >
+                    {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                    <span>Submit Leave</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>

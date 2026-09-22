@@ -332,9 +332,9 @@ const LeavePolicy = () => {
       {/* ========================================================================= */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
                   <CalendarDays className="w-6 h-6 stroke-[2.2]" />
@@ -343,7 +343,7 @@ const LeavePolicy = () => {
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Create Leave Policy
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl">
                     Configure statutory leave quotas, accrual intervals, and payroll wage compensation rules.
                   </p>
                 </div>
@@ -357,7 +357,7 @@ const LeavePolicy = () => {
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handleCreatePolicy} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+            <form onSubmit={handleCreatePolicy} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
               {/* Policy Name & Code */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2 space-y-1.5">
@@ -495,7 +495,7 @@ const LeavePolicy = () => {
               </div>
 
               {/* Preview Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-teal-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-teal-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
                     {form.days || '0'}d
@@ -518,7 +518,7 @@ const LeavePolicy = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
@@ -530,7 +530,7 @@ const LeavePolicy = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
                 >
                   {submitting ? (
                     <>

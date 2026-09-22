@@ -20,6 +20,7 @@ import {
   Zap,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { api } from '../../services/api';
 
 const MONTH_NAMES = [
@@ -183,96 +184,65 @@ const Payroll = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Latest Batch Disbursed</span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              ${(latestBatch?.netPayable || 0).toLocaleString()}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Disbursed Successfully</span>
-              <span className="text-slate-400">Net Pay</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Latest Batch Disbursed"
+          value={`$${(latestBatch?.netPayable || 0).toLocaleString()}`}
+          badgeText="Disbursed"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Net Pay Disbursed"
+          chartColor="purple"
+          presetWave="wave1"
+          loading={loading}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Net All-Time</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              ${totalNetDisbursedAllTime.toLocaleString()}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Cumulative Net</span>
-              <span className="text-slate-400">Audited</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Total Net All-Time"
+          value={`$${totalNetDisbursedAllTime.toLocaleString()}`}
+          badgeText="Cumulative Net"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Audited Payruns"
+          chartColor="emerald"
+          presetWave="wave2"
+          loading={loading}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Tax Withheld YTD</span>
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CreditCard className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
-              ${totalTaxWithheldAllTime.toLocaleString()}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Statutory Filing</span>
-              <span className="text-slate-400">Compliant</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Tax Withheld YTD"
+          value={`$${totalTaxWithheldAllTime.toLocaleString()}`}
+          badgeText="Statutory Filing"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Tax Compliant"
+          chartColor="amber"
+          presetWave="wave3"
+          loading={loading}
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Payslips Stored</span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <FileText className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              {payslips.length} <span className="text-base font-bold text-slate-400">Slips</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">PDF Vouchers</span>
-              <span className="text-slate-400">Encrypted</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Payslips Stored"
+          value={payslips.length}
+          unit={payslips.length === 1 ? 'Slip' : 'Slips'}
+          badgeText="PDF Vouchers"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Encrypted Storage"
+          chartColor="rose"
+          presetWave="wave4"
+          loading={loading}
+        />
       </div>
 
       {/* HISTORICAL PAYRUNS TABLE */}

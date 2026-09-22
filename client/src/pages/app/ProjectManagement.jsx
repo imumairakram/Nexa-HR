@@ -498,27 +498,37 @@ const ProjectManagement = () => {
       {/* 4. MODAL: CREATE NEW PROJECT */}
       {/* ========================================================================= */}
       {isNewProjectOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
-                  <Plus className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-sky-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+                  <FolderKanban className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">Create New Project Initiative</h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Create New Project Initiative
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl">
+                    Configure project timeline, cross-functional leads, financial budget cap, and priority triage.
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsNewProjectOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateProject} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Project Title *
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleCreateProject} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
+              {/* Project Title */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Project Title <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -526,125 +536,159 @@ const ProjectManagement = () => {
                   placeholder="e.g. AI-Powered Resume Screener V1..."
                   value={projectForm.name}
                   onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-slate-400 transition-all"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Client / Department *
+              {/* Department & Category */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Client / Department <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. People Ops / Engineering"
-                    value={projectForm.client}
-                    onChange={(e) => setProjectForm({ ...projectForm, client: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
+                  <div className="relative">
+                    <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. People Ops / Engineering"
+                      value={projectForm.client}
+                      onChange={(e) => setProjectForm({ ...projectForm, client: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-slate-400 transition-all"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Category Tag *
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Category Tag <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Mobile, Backend, IoT"
-                    value={projectForm.category}
-                    onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Project Lead *
-                  </label>
-                  <select
-                    value={projectForm.lead}
-                    onChange={(e) => {
-                      const emp = employees.find((x) => `${x.firstName} ${x.lastName}` === e.target.value);
-                      setProjectForm({
-                        ...projectForm,
-                        lead: e.target.value,
-                        leadId: emp ? emp.id : '',
-                      });
-                    }}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                  >
-                    {employees.map((emp) => (
-                      <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
-                        {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || emp.employeeCode})
-                      </option>
-                    ))}
-                    {employees.length === 0 && (
-                      <option value="Lead Engineer">Engineering Staff</option>
-                    )}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Target Deadline *
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={projectForm.deadline}
-                    onChange={(e) => setProjectForm({ ...projectForm, deadline: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                  />
+                  <div className="relative">
+                    <Layers className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Mobile, Backend, IoT, Infrastructure"
+                      value={projectForm.category}
+                      onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-slate-400 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Priority Tier *
+              {/* Project Lead & Deadline */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Project Lead <span className="text-rose-500">*</span>
                   </label>
-                  <select
-                    value={projectForm.priority}
-                    onChange={(e) => setProjectForm({ ...projectForm, priority: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
-                  >
-                    <option value="HIGH">High Priority</option>
-                    <option value="MEDIUM">Medium Priority</option>
-                    <option value="LOW">Low Priority</option>
-                  </select>
+                  <div className="relative">
+                    <Users className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={projectForm.lead}
+                      onChange={(e) => {
+                        const emp = employees.find((x) => `${x.firstName} ${x.lastName}` === e.target.value);
+                        setProjectForm({
+                          ...projectForm,
+                          lead: e.target.value,
+                          leadId: emp ? emp.id : '',
+                        });
+                      }}
+                      className="w-full pl-10 pr-8 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer appearance-none transition-all"
+                    >
+                      {employees.map((emp) => (
+                        <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
+                          {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || emp.employeeCode})
+                        </option>
+                      ))}
+                      {employees.length === 0 && (
+                        <option value="Lead Engineer">Engineering Staff</option>
+                      )}
+                    </select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Target Deadline <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="date"
+                      required
+                      value={projectForm.deadline}
+                      onChange={(e) => setProjectForm({ ...projectForm, deadline: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Priority Tier & Budget Allocation */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Priority Tier <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['LOW', 'MEDIUM', 'HIGH'].map((p) => {
+                      const isSel = projectForm.priority === p;
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setProjectForm({ ...projectForm, priority: p })}
+                          className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer text-center ${
+                            isSel
+                              ? p === 'HIGH'
+                                ? 'bg-rose-500 text-white border-rose-500 shadow-sm shadow-rose-500/20'
+                                : p === 'MEDIUM'
+                                ? 'bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/20'
+                                : 'bg-slate-700 text-white border-slate-700 dark:bg-slate-600'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 hover:border-slate-300'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
                     Budget Allocation
                   </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. $40,000"
-                    value={projectForm.budget}
-                    onChange={(e) => setProjectForm({ ...projectForm, budget: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
+                  <div className="relative">
+                    <TrendingUp className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="e.g. $40,000"
+                      value={projectForm.budget}
+                      onChange={(e) => setProjectForm({ ...projectForm, budget: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-slate-400 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsNewProjectOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
-                  Launch Project
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>Launch Project</span>
                 </button>
               </div>
             </form>
