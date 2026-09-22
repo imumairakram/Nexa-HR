@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import {
   Building2,
   Plus,
   Search,
-  Filter,
   Users,
   DollarSign,
   CheckCircle2,
   X,
   Edit2,
+  Trash2,
   Shield,
   Layers,
   RefreshCw,
+  AlertTriangle,
+  Briefcase,
 } from 'lucide-react';
 import { api } from '../../../services/api';
 
@@ -22,9 +25,14 @@ const Designation = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDeptFilter, setSelectedDeptFilter] = useState('ALL');
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingDesig, setEditingDesig] = useState(null);
+  const [desigToDelete, setDesigToDelete] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [form, setForm] = useState({
     title: '',
@@ -36,7 +44,7 @@ const Designation = () => {
 
   const showToast = (msg) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3000);
+    setTimeout(() => setToastMsg(''), 3500);
   };
 
   const loadData = async () => {
@@ -70,15 +78,37 @@ const Designation = () => {
       // Map dynamic active staff counts
       const mapped = loadedDesigs.map((d) => {
         const staffCount = loadedEmps.filter(
-          (e) => e.profile?.designationId === d.id || e.profile?.designation?.title === d.title
+          (e) =>
+            e.profile?.designationId === d.id ||
+            (d.title && e.profile?.designation?.title?.toLowerCase() === d.title.toLowerCase())
         ).length;
+
+        let parsedLevel = 'Senior (L5)';
+        let parsedBand = '$120k - $150k';
+
+        if (d.description) {
+          if (d.description.includes('Level:')) {
+            const parts = d.description.split('|');
+            const levelPart = parts.find((p) => p.includes('Level:'));
+            if (levelPart) parsedLevel = levelPart.replace('Level:', '').trim();
+            const bandPart = parts.find((p) => p.includes('Band:'));
+            if (bandPart) parsedBand = bandPart.replace('Band:', '').trim();
+          } else {
+            parsedLevel = d.description;
+          }
+        }
+
         return {
           id: d.id,
           title: d.title,
-          department: d.department?.name || loadedDepts.find((dept) => dept.id === d.departmentId)?.name || 'General Operations',
+          department:
+            d.department?.name ||
+            loadedDepts.find((dept) => dept.id === d.departmentId)?.name ||
+            'General Operations',
           departmentId: d.departmentId,
-          level: d.description?.includes('Level:') ? d.description.split('Level:')[1].trim() : 'Professional',
-          salaryBand: d.salaryBand || '$110k - $145k',
+          level: parsedLevel,
+          salaryBand: d.salaryBand || parsedBand,
+          description: d.description || '',
           activeStaff: staffCount,
         };
       });
@@ -97,7 +127,10 @@ const Designation = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return;
+    if (!form.title.trim()) {
+      showToast('Designation title is required.');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -107,7 +140,7 @@ const Designation = () => {
         description: `Level: ${form.level} | Band: ${form.salaryBand}`,
       });
 
-      showToast(`Designation "${form.title}" created successfully in database!`);
+      showToast(`Designation "${form.title}" created successfully!`);
       setIsAddOpen(false);
       setForm({
         title: '',
@@ -119,23 +152,123 @@ const Designation = () => {
       await loadData();
     } catch (err) {
       console.error('Create designation error:', err);
-      showToast(err.message || 'Could not create designation', 'error');
+      showToast(err.message || 'Could not create designation.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const filtered = designations.filter(
-    (d) =>
+  const openEditModal = (desig) => {
+    setEditingDesig(desig);
+    setForm({
+      title: desig.title || '',
+      departmentId: desig.departmentId || departments[0]?.id || '',
+      description: desig.description || '',
+      level: desig.level || 'Senior (L5)',
+      salaryBand: desig.salaryBand || '$120k - $150k',
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!editingDesig) return;
+    if (!form.title.trim()) {
+      showToast('Designation title is required.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await api.updateDesignation(editingDesig.id, {
+        title: form.title.trim(),
+        departmentId: form.departmentId || null,
+        description: `Level: ${form.level} | Band: ${form.salaryBand}`,
+      });
+
+      showToast(`Designation "${form.title}" updated successfully!`);
+      setIsEditOpen(false);
+      setEditingDesig(null);
+      setForm({
+        title: '',
+        departmentId: departments[0]?.id || '',
+        description: '',
+        level: 'Senior (L5)',
+        salaryBand: '$120k - $150k',
+      });
+      await loadData();
+    } catch (err) {
+      console.error('Update designation error:', err);
+      showToast(err.message || 'Could not update designation.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!desigToDelete) return;
+
+    setDeleting(true);
+    try {
+      await api.deleteDesignation(desigToDelete.id);
+      showToast(`Designation "${desigToDelete.title}" deleted.`);
+      setDesigToDelete(null);
+      await loadData();
+    } catch (err) {
+      console.error('Delete designation error:', err);
+      showToast(err.message || 'Could not delete designation.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const filtered = designations.filter((d) => {
+    const matchesSearch =
       d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.department.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      d.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.level.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesDept =
+      selectedDeptFilter === 'ALL' || d.departmentId === selectedDeptFilter || d.department === selectedDeptFilter;
+
+    return matchesSearch && matchesDept;
+  });
+
+  const totalAssigned = designations.reduce((acc, d) => acc + d.activeStaff, 0);
+
+  const desigSparkData = React.useMemo(() => {
+    const total = designations.length;
+    return [
+      { value: Math.max(0, total - 2), label: 'Mon' },
+      { value: Math.max(0, total - 2), label: 'Tue' },
+      { value: Math.max(0, total - 1), label: 'Wed' },
+      { value: Math.max(0, total - 1), label: 'Thu' },
+      { value: Math.max(0, total), label: 'Fri' },
+      { value: Math.max(0, total), label: 'Sat' },
+      { value: total, label: 'Today' },
+    ];
+  }, [designations.length]);
+
+  const staffSparkData = React.useMemo(() => {
+    const total = totalAssigned;
+    return [
+      { value: Math.max(0, total - 3), label: 'Mon' },
+      { value: Math.max(0, total - 2), label: 'Tue' },
+      { value: Math.max(0, total - 2), label: 'Wed' },
+      { value: Math.max(0, total - 1), label: 'Thu' },
+      { value: Math.max(0, total - 1), label: 'Fri' },
+      { value: Math.max(0, total), label: 'Sat' },
+      { value: total, label: 'Today' },
+    ];
+  }, [totalAssigned]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
         title="Job Designations & Level Hierarchy"
         subtitle="Manage job titles, seniority career tracks, departmental attachments, and compensation salary bands."
+        onRefresh={loadData}
+        loading={loading}
       />
 
       {toastMsg && (
@@ -146,7 +279,7 @@ const Designation = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC DESIGNATIONS HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
+      {/* 1. DYNAMIC DESIGNATIONS HERO BANNER */}
       {/* ========================================================================= */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -170,7 +303,7 @@ const Designation = () => {
               </span>
               <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <Users className="w-3.5 h-3.5" />
-                <span>{designations.reduce((acc, d) => acc + d.activeStaff, 0)} Active Assigned Staff</span>
+                <span>{totalAssigned} Active Assigned Staff</span>
               </span>
             </div>
           </div>
@@ -185,7 +318,16 @@ const Designation = () => {
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Add title & salary band</div>
             </div>
             <button
-              onClick={() => setIsAddOpen(true)}
+              onClick={() => {
+                setForm({
+                  title: '',
+                  departmentId: departments[0]?.id || '',
+                  description: '',
+                  level: 'Senior (L5)',
+                  salaryBand: '$120k - $150k',
+                });
+                setIsAddOpen(true);
+              }}
               className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -196,96 +338,68 @@ const Designation = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Designations</span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Building2 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {designations.length} <span className="text-base font-bold text-slate-400">Roles</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Standardized Titles</span>
-              <span className="text-slate-400">All Depts</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Total Designations"
+          value={designations.length}
+          unit="Roles"
+          badgeText="Standardized"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="All Depts"
+          chartColor="purple"
+          dataPoints={desigSparkData}
+          loading={loading}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Assigned Headcount</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Users className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              {designations.reduce((acc, d) => acc + d.activeStaff, 0)} <span className="text-base font-bold text-slate-400">Staff</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Mapped</span>
-              <span className="text-slate-400">Active</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Assigned Headcount"
+          value={totalAssigned}
+          unit="Staff"
+          badgeText="100% Mapped"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Active Roster"
+          chartColor="emerald"
+          dataPoints={staffSparkData}
+          loading={loading}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Career Levels</span>
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Layers className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
-              L1 - L7 <span className="text-base font-bold text-slate-400">Track</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Promotion Path</span>
-              <span className="text-slate-400">Structured</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Career Levels"
+          value="L1 - L7"
+          unit="Track"
+          badgeText="Promotion Path"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Structured Ladder"
+          chartColor="amber"
+          presetWave="wave3"
+          loading={loading}
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Salary Band Coverage</span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              100% <span className="text-base font-bold text-slate-400">Banded</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">Equal Pay Compliant</span>
-              <span className="text-slate-400">Audited</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Salary Band Coverage"
+          value="100%"
+          unit="Banded"
+          badgeText="Equal Pay"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Audited Bands"
+          chartColor="rose"
+          presetWave="wave4"
+          loading={loading}
+        />
       </div>
 
       {/* Toolbar */}
@@ -294,20 +408,46 @@ const Designation = () => {
           <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search designations by title or department..."
+            placeholder="Search designations by title, department, or level..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           />
         </div>
 
-        <button
-          onClick={() => setIsAddOpen(true)}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Designation</span>
-        </button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {departments.length > 0 && (
+            <select
+              value={selectedDeptFilter}
+              onChange={(e) => setSelectedDeptFilter(e.target.value)}
+              className="px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+            >
+              <option value="ALL">All Departments</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.name}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <button
+            onClick={() => {
+              setForm({
+                title: '',
+                departmentId: departments[0]?.id || '',
+                description: '',
+                level: 'Senior (L5)',
+                salaryBand: '$120k - $150k',
+              });
+              setIsAddOpen(true);
+            }}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Designation</span>
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -320,38 +460,67 @@ const Designation = () => {
                 <th className="py-3.5 px-4">Department</th>
                 <th className="py-3.5 px-4">Seniority Band</th>
                 <th className="py-3.5 px-4">Target Compensation</th>
-                <th className="py-3.5 px-6 text-right">Active Staff</th>
+                <th className="py-3.5 px-4 text-center">Active Staff</th>
+                <th className="py-3.5 px-6 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {filtered.map((d) => (
-                <tr key={d.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="py-4 px-6 font-extrabold text-slate-900 dark:text-white">
-                    {d.title}
-                  </td>
-                  <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">
-                    {d.department}
-                  </td>
-                  <td className="py-4 px-4">
-                    <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold text-[10px]">
-                      {d.level}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 font-medium text-emerald-600 dark:text-emerald-400">
-                    {d.salaryBand}
-                  </td>
-                  <td className="py-4 px-6 text-right font-black text-slate-900 dark:text-white">
-                    {d.activeStaff} Staff
+              {filtered.length > 0 ? (
+                filtered.map((d) => (
+                  <tr key={d.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="py-4 px-6 font-extrabold text-slate-900 dark:text-white">
+                      {d.title}
+                    </td>
+                    <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">
+                      {d.department}
+                    </td>
+                    <td className="py-4 px-4">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold text-[10px] border border-blue-200/50 dark:border-blue-800/50">
+                        {d.level}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-medium text-emerald-600 dark:text-emerald-400">
+                      {d.salaryBand}
+                    </td>
+                    <td className="py-4 px-4 text-center font-black text-slate-900 dark:text-white">
+                      <span className="bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full text-[11px]">
+                        {d.activeStaff} Staff
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => openEditModal(d)}
+                          title="Edit Designation"
+                          className="p-1.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDesigToDelete(d)}
+                          title="Delete Designation"
+                          className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-400 font-medium">
+                    No designations found matching your criteria.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL: ADD DESIGNATION & ROLE PROFILE (STITCH LUXURY DESIGN) */}
+      {/* MODAL: ADD DESIGNATION */}
       {/* ========================================================================= */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
@@ -503,6 +672,186 @@ const Designation = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: EDIT DESIGNATION */}
+      {/* ========================================================================= */}
+      {isEditOpen && editingDesig && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+                  <Edit2 className="w-6 h-6 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Edit Designation & Role
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                    Update role title, attached department, seniority track, or salary parameters.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsEditOpen(false);
+                  setEditingDesig(null);
+                }}
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleUpdate} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+              {/* Designation Title */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Designation Title <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Lead QA Automation Engineer"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Department Selector */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Assigned Department <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <select
+                    value={form.departmentId}
+                    onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
+                    className="w-full pl-10 pr-8 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                  >
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name} ({dept.code})
+                      </option>
+                    ))}
+                    {departments.length === 0 && (
+                      <option value="">General Corporate Operations</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              {/* Seniority Level & Salary Band */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Seniority Level <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Shield className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Senior (L5)"
+                      value={form.level}
+                      onChange={(e) => setForm({ ...form, level: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Salary Band Bracket <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. $120k - $150k"
+                      value={form.salaryBand}
+                      onChange={(e) => setForm({ ...form, salaryBand: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditOpen(false);
+                    setEditingDesig(null);
+                  }}
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  {submitting ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  )}
+                  <span>Update Designation</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: DELETE DESIGNATION CONFIRMATION */}
+      {/* ========================================================================= */}
+      {desigToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] rounded-[28px] max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 stroke-[2.2]" />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">
+                Delete Designation "{desigToDelete.title}"?
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Are you sure you want to remove this role designation? This operation cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                onClick={() => setDesigToDelete(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
+              >
+                {deleting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                <span>Delete Designation</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

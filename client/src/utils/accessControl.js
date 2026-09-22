@@ -70,14 +70,12 @@ export const FEATURE_MODULES = [
   },
   {
     id: 'operations_accounts',
-    name: 'Operations, Accounts & Recognition',
-    description: 'Corporate announcements, double-entry ledger, awards, and projects.',
+    name: 'Operations, Accounts & Broadcasts',
+    description: 'Corporate announcements, double-entry ledger, and recognition.',
     icon: 'Landmark',
     features: [
       { key: 'post_announcements', label: 'Broadcast Official Announcements', description: 'Publish company-wide announcements and pin alerts' },
       { key: 'manage_accounts_ledger', label: 'Record Ledger Vouchers & Accounts', description: 'Post department expenses, invoices, and income' },
-      { key: 'manage_projects', label: 'Manage Projects & Sprint Delivery', description: 'Initiate company projects, milestones, and budgets' },
-      { key: 'generate_executive_reports', label: 'Generate Intelligence & Audit Reports', description: 'Export analytics, headcount forecasts, and liability audits' },
     ],
   },
   {
@@ -149,8 +147,6 @@ export const ROLE_PRESETS = {
       manage_recruitment_taxonomy: true,
       // Operations
       post_announcements: true,
-      manage_projects: true,
-      generate_executive_reports: true,
     },
   },
   PAYROLL_SPECIALIST: {
@@ -167,7 +163,6 @@ export const ROLE_PRESETS = {
       manage_salary_structures: true,
       download_all_payslips: true,
       manage_accounts_ledger: true,
-      generate_executive_reports: true,
     },
   },
   RECRUITER: {
@@ -188,14 +183,13 @@ export const ROLE_PRESETS = {
   TEAM_LEAD: {
     label: 'Department Supervisor / Team Lead',
     badgeColor: 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200',
-    description: 'Team attendance oversight, leave approval authority, and project milestone management.',
+    description: 'Team attendance oversight, leave approval authority, and team coordination.',
     permissions: {
       ...createAllFeaturesMap(false),
       view_directory: true,
       view_attendance_logs: true,
       view_leave_requests: true,
       approve_reject_leaves: true,
-      manage_projects: true,
       schedule_interviews: true,
     },
   },

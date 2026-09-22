@@ -18,8 +18,6 @@ import {
   FileText,
   Megaphone,
   Landmark,
-  BarChart3,
-  FolderKanban,
   Briefcase,
   Calendar,
   KeyRound,
@@ -99,7 +97,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       children: [
         { label: 'New Employee', path: '/app/hr/new-employee' },
         { label: 'Company Directory & Team', path: '/app/employees' },
-        { label: 'Role & Permissions', path: '/app/hr/roles' },
         { label: 'Department', path: '/app/departments' },
         { label: 'Designation', path: '/app/hr/designation' },
       ],
@@ -125,8 +122,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     { type: 'link', label: 'Leave Policy', path: '/app/leave-policy', icon: FileText },
     { type: 'link', label: 'Announcement', path: '/app/announcement', icon: Megaphone },
     { type: 'link', label: 'Accounts', path: '/app/accounts', icon: Landmark },
-    { type: 'link', label: 'Reports', path: '/app/reports', icon: BarChart3 },
-    { type: 'link', label: 'Project', path: '/app/project', icon: FolderKanban },
 
     {
       type: 'accordion',

@@ -18,7 +18,6 @@ import UserAccessControl from './pages/app/UserAccessControl';
 
 // HR Sub-pages
 import NewEmployee from './pages/app/hr/NewEmployee';
-import RolePermissions from './pages/app/hr/RolePermissions';
 import Designation from './pages/app/hr/Designation';
 
 // Attendance & Schedule
@@ -32,13 +31,11 @@ import LeavePolicy from './pages/app/LeavePolicy';
 import CalculatePayroll from './pages/app/payroll/CalculatePayroll';
 import PayslipList from './pages/app/payroll/PayslipList';
 
-// Accounts & Reports
+// Financial Accounts
 import Accounts from './pages/app/Accounts';
-import Reports from './pages/app/Reports';
 
 // Engagement & Operations
 import Announcement from './pages/app/Announcement';
-import ProjectManagement from './pages/app/ProjectManagement';
 
 // Recruitment Module Sub-pages
 import JobCategory from './pages/app/recruitment/JobCategory';
@@ -98,8 +95,13 @@ function App() {
           <Route path="hr/new-employee" element={<NewEmployee />} />
           <Route path="hr/employee-list" element={<Navigate to="/app/employees" replace />} />
           <Route path="hr/directory" element={<Navigate to="/app/employees" replace />} />
-          <Route path="hr/roles" element={<RolePermissions />} />
+          <Route path="hr/roles" element={<Navigate to="/app/employees" replace />} />
+          <Route path="hr/department" element={<Navigate to="/app/departments" replace />} />
+          <Route path="hr/departments" element={<Navigate to="/app/departments" replace />} />
           <Route path="hr/designation" element={<Designation />} />
+          <Route path="hr/designations" element={<Navigate to="/app/hr/designation" replace />} />
+          <Route path="designation" element={<Navigate to="/app/hr/designation" replace />} />
+          <Route path="designations" element={<Navigate to="/app/hr/designation" replace />} />
 
           {/* Attendance & Schedule */}
           <Route path="attendance" element={<Attendance />} />
@@ -118,14 +120,14 @@ function App() {
           <Route path="payroll/calculate" element={<CalculatePayroll />} />
           <Route path="payroll/payslips" element={<PayslipList />} />
 
-          {/* Financial & Analytics */}
+          {/* Financial Accounts */}
           <Route path="accounts" element={<Accounts />} />
-          <Route path="reports" element={<Reports />} />
+          <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
 
           {/* Engagement & Operations */}
           <Route path="announcement" element={<Announcement />} />
           <Route path="award" element={<Navigate to="/app/announcement" replace />} />
-          <Route path="project" element={<ProjectManagement />} />
+          <Route path="project" element={<Navigate to="/app/dashboard" replace />} />
 
           {/* Recruitment Module */}
           <Route path="recruitment/job-category" element={<JobCategory />} />

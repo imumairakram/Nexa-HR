@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import {
   CalendarDays,
   Plus,
@@ -110,6 +111,59 @@ const LeavePolicy = () => {
     }
   };
 
+  const totalPolicies = policies.length;
+  const totalPaidQuotaDays = useMemo(() => {
+    return policies.filter((p) => p.type === 'PAID').reduce((sum, p) => sum + (p.days || 0), 0);
+  }, [policies]);
+  const paidPoliciesCount = useMemo(() => {
+    return policies.filter((p) => p.type === 'PAID').length;
+  }, [policies]);
+  const avgMonthlyAccrual = useMemo(() => {
+    if (!policies.length) return '0.0';
+    const totalDays = policies.reduce((sum, p) => sum + (p.days || 0), 0);
+    return (totalDays / (policies.length * 12)).toFixed(1);
+  }, [policies]);
+
+  const policySparkData = useMemo(() => {
+    const total = policies.length;
+    return [
+      { value: Math.max(0, total - 3), label: 'Q1' },
+      { value: Math.max(0, total - 2), label: 'Q2' },
+      { value: Math.max(0, total - 1), label: 'Q3' },
+      { value: Math.max(0, total - 1), label: 'Q4' },
+      { value: total, label: 'Active' },
+    ];
+  }, [policies.length]);
+
+  const quotaSparkData = useMemo(() => {
+    if (!policies.length) return [{ value: 0, label: 'None' }];
+    return policies.map((p, idx) => ({
+      value: p.days || 0,
+      label: p.code || `P${idx + 1}`,
+      tooltip: `${p.name}: ${p.days} Days`,
+    }));
+  }, [policies]);
+
+  const paidRatioSparkData = useMemo(() => {
+    const ratio = totalPolicies ? Math.round((paidPoliciesCount / totalPolicies) * 100) : 100;
+    return [
+      { value: 80, label: 'Min' },
+      { value: 88, label: 'Standard' },
+      { value: 92, label: 'Q3' },
+      { value: ratio, label: 'Active' },
+    ];
+  }, [paidPoliciesCount, totalPolicies]);
+
+  const accrualSparkData = useMemo(() => {
+    const val = parseFloat(avgMonthlyAccrual) || 1.5;
+    return [
+      { value: +(val * 0.7).toFixed(1), label: 'Q1' },
+      { value: +(val * 0.85).toFixed(1), label: 'Q2' },
+      { value: +(val * 0.95).toFixed(1), label: 'Q3' },
+      { value: val, label: 'Current' },
+    ];
+  }, [avgMonthlyAccrual]);
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
@@ -175,96 +229,67 @@ const LeavePolicy = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. DYNAMIC SPARKLINES TELEMETRY KPI CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Leave Categories</span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CalendarDays className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {policies.length} <span className="text-base font-bold text-slate-400">Policies</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Standard & Special</span>
-              <span className="text-slate-400">Active</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Leave Policy Tiers"
+          value={policies.length}
+          unit={policies.length === 1 ? 'Tier' : 'Tiers'}
+          badgeText="Active Policies"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Standard & Special"
+          chartColor="purple"
+          dataPoints={policySparkData}
+          loading={loading}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Paid Vacation</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              14 <span className="text-base font-bold text-slate-400">Days / Yr</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Salary Paid</span>
-              <span className="text-slate-400">Statutory</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Total Paid Quota"
+          value={totalPaidQuotaDays}
+          unit="Days / Yr"
+          badgeText="100% Salary"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Annual Paid Quota"
+          chartColor="emerald"
+          dataPoints={quotaSparkData}
+          loading={loading}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Parental Leave</span>
-            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Shield className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
-              30 <span className="text-base font-bold text-slate-400">Days Paid</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-purple-600 dark:text-purple-400 font-bold">Childbirth</span>
-              <span className="text-slate-400">Protected</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Paid Leave Coverage"
+          value={totalPolicies ? `${Math.round((paidPoliciesCount / totalPolicies) * 100)}%` : '100%'}
+          badgeText="Statutory Benefit"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Protected Entitlements"
+          chartColor="amber"
+          dataPoints={paidRatioSparkData}
+          loading={loading}
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Medical Allowance</span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              8 <span className="text-base font-bold text-slate-400">Days / Yr</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">Emergency Coverage</span>
-              <span className="text-slate-400">Lump Sum</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Avg Monthly Accrual"
+          value={avgMonthlyAccrual}
+          unit="Days / Mo"
+          badgeText="Automated"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Per Employee Cycle"
+          chartColor="rose"
+          dataPoints={accrualSparkData}
+          loading={loading}
+        />
       </div>
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div>

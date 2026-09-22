@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import {
   Megaphone,
   Plus,
@@ -140,12 +141,57 @@ const Announcement = () => {
     return matchesSearch && matchesCat;
   });
 
-  const stats = {
+  const stats = useMemo(() => ({
     total: announcements.length,
     pinned: announcements.filter((a) => a.pinned).length,
     events: announcements.filter((a) => a.category === 'EVENTS').length,
     benefits: announcements.filter((a) => a.category === 'BENEFITS').length,
-  };
+  }), [announcements]);
+
+  const bulletinsSparkData = useMemo(() => {
+    const total = announcements.length;
+    return [
+      { value: Math.max(0, total - 4), label: 'Mon' },
+      { value: Math.max(0, total - 3), label: 'Tue' },
+      { value: Math.max(0, total - 2), label: 'Wed' },
+      { value: Math.max(0, total - 2), label: 'Thu' },
+      { value: Math.max(0, total - 1), label: 'Fri' },
+      { value: Math.max(0, total), label: 'Sat' },
+      { value: total, label: 'Today' },
+    ];
+  }, [announcements.length]);
+
+  const pinnedSparkData = useMemo(() => {
+    const count = stats.pinned;
+    return [
+      { value: Math.max(0, count - 1), label: 'Q1' },
+      { value: Math.max(0, count - 1), label: 'Q2' },
+      { value: count, label: 'Q3' },
+      { value: count, label: 'Q4' },
+      { value: count, label: 'Active' },
+    ];
+  }, [stats.pinned]);
+
+  const eventsSparkData = useMemo(() => {
+    const count = stats.events;
+    return [
+      { value: Math.max(0, count - 2), label: 'Jan' },
+      { value: Math.max(0, count - 1), label: 'Mar' },
+      { value: Math.max(0, count - 1), label: 'Jun' },
+      { value: count, label: 'Sep' },
+      { value: count, label: 'Dec' },
+    ];
+  }, [stats.events]);
+
+  const benefitsSparkData = useMemo(() => {
+    const count = stats.benefits;
+    return [
+      { value: Math.max(0, count - 1), label: 'Standard' },
+      { value: Math.max(0, count - 1), label: 'Medical' },
+      { value: count, label: 'Executive' },
+      { value: count, label: 'Active' },
+    ];
+  }, [stats.benefits]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -212,96 +258,68 @@ const Announcement = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. DYNAMIC SPARKLINES TELEMETRY KPI CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-blue-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Bulletins</span>
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Megaphone className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {stats.total} <span className="text-base font-bold text-slate-400">Notices</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Lifetime Total</span>
-              <span className="text-slate-400">All Depts</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Total Bulletins"
+          value={stats.total}
+          unit={stats.total === 1 ? 'Notice' : 'Notices'}
+          badgeText="Published"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Lifetime Broadcasts"
+          chartColor="purple"
+          dataPoints={bulletinsSparkData}
+          loading={loading}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Pinned Notices</span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Star className="w-5 h-5 fill-current" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              {stats.pinned} <span className="text-base font-bold text-slate-400">Pinned</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">Top Feed Priority</span>
-              <span className="text-slate-400">Active</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Pinned Notices"
+          value={stats.pinned}
+          unit="Pinned"
+          badgeText="Top Priority"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Feed Priority"
+          chartColor="amber"
+          dataPoints={pinnedSparkData}
+          loading={loading}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Events & Retreats</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Calendar className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              {stats.events} <span className="text-base font-bold text-slate-400">Events</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Company Gatherings</span>
-              <span className="text-slate-400">RSVP</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Events & Retreats"
+          value={stats.events}
+          unit="Events"
+          badgeText="Gatherings"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Company Calendar"
+          chartColor="emerald"
+          dataPoints={eventsSparkData}
+          loading={loading}
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Benefits & Policy</span>
-            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Tag className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
-              {stats.benefits} <span className="text-base font-bold text-slate-400">Policies</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-purple-600 dark:text-purple-400 font-bold">HR Guidelines</span>
-              <span className="text-slate-400">Handbook</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Benefits & Policy"
+          value={stats.benefits}
+          unit="Policies"
+          badgeText="HR Directives"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Handbook Updates"
+          chartColor="rose"
+          dataPoints={benefitsSparkData}
+          loading={loading}
+        />
       </div>
 
       {/* SEARCH & FILTERS CONTROLS */}

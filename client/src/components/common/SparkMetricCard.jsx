@@ -3,19 +3,22 @@ import React, { useState, useId, useMemo, useRef } from 'react';
 /**
  * SparkMetricCard
  * Fully dynamic, active, and interactive KPI Card with real-time vector SVG sparklines,
- * pulsing telemetry indicator, interactive hover crosshairs, active data points, live tooltips, and responsive layout.
+ * pulsing telemetry indicator, interactive hover crosshairs, active data points, live tooltips,
+ * and automatic slope/trend calculation for value increases and decreases.
  */
 const SparkMetricCard = ({
   variant = 'light', // 'dark' | 'light'
   title,
   value,
+  previousValue,
   unit,
   subtext,
-  badgeText = '+5%',
-  badgeType = 'positive', // 'positive' | 'negative' | 'neutral' | 'warning'
-  badgeIcon = 'up', // 'up' | 'down' | 'dot' | 'none'
+  badgeText,
+  badgeType, // 'positive' | 'negative' | 'neutral' | 'warning'
+  badgeIcon, // 'up' | 'down' | 'dot' | 'none'
   chartColor = 'purple', // 'purple' | 'orange' | 'amber' | 'rose' | 'emerald' | 'blue' | 'indigo' | 'teal'
-  presetWave = 'wave1', // 'wave1' | 'wave2' | 'wave3' | 'wave4'
+  presetWave = 'wave1', // 'wave1' | 'wave2' | 'wave3' | 'wave4' | 'up' | 'down'
+  trend = 'auto', // 'auto' | 'up' | 'down' | 'neutral'
   dataPoints = [], // Array of numbers or objects: { value: number, label?: string, tooltip?: string }
   onClick,
   className = '',
@@ -24,6 +27,16 @@ const SparkMetricCard = ({
   const gradientId = useId().replace(/:/g, '_');
   const svgRef = useRef(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+
+  // Extract numeric magnitude from value (handles numbers or strings like "3", "100%", "< 2")
+  const numericVal = useMemo(() => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const match = value.match(/[-+]?[0-9]*\.?[0-9]+/);
+      return match ? parseFloat(match[0]) : 0;
+    }
+    return 0;
+  }, [value]);
 
   // Color schemes for sparklines & interactive tooltips
   const colorSchemes = {
@@ -119,65 +132,71 @@ const SparkMetricCard = ({
 
   const scheme = colorSchemes[chartColor] || colorSchemes.purple;
 
-  // Handcrafted harmonic preset waves
-  const defaultPresets = useMemo(
-    () => ({
-      wave1: [
-        { value: 16, label: 'Mon' },
-        { value: 18, label: 'Tue' },
-        { value: 24, label: 'Wed' },
-        { value: 22, label: 'Thu' },
-        { value: 28, label: 'Fri' },
-        { value: 34, label: 'Sat' },
-        { value: 38, label: 'Today' },
-      ],
-      wave2: [
-        { value: 28, label: 'Mon' },
-        { value: 24, label: 'Tue' },
-        { value: 30, label: 'Wed' },
-        { value: 22, label: 'Thu' },
-        { value: 34, label: 'Fri' },
-        { value: 32, label: 'Sat' },
-        { value: 36, label: 'Today' },
-      ],
-      wave3: [
-        { value: 14, label: 'Mon' },
-        { value: 22, label: 'Tue' },
-        { value: 18, label: 'Wed' },
-        { value: 26, label: 'Thu' },
-        { value: 20, label: 'Fri' },
-        { value: 30, label: 'Sat' },
-        { value: 28, label: 'Today' },
-      ],
-      wave4: [
-        { value: 10, label: 'Mon' },
-        { value: 14, label: 'Tue' },
-        { value: 20, label: 'Wed' },
-        { value: 24, label: 'Thu' },
-        { value: 32, label: 'Fri' },
-        { value: 38, label: 'Sat' },
-        { value: 40, label: 'Today' },
-      ],
-    }),
-    []
-  );
-
-  // Normalize data points into structured coordinate points
+  // Dynamically compute sparkline data points according to numeric value and trend movement
   const normalizedPoints = useMemo(() => {
-    let source = dataPoints && dataPoints.length >= 2 ? dataPoints : defaultPresets[presetWave] || defaultPresets.wave1;
+    if (dataPoints && dataPoints.length >= 2) {
+      return dataPoints.map((item, idx) => {
+        if (typeof item === 'number') {
+          return { value: item, label: `Point ${idx + 1}`, raw: item };
+        }
+        return {
+          value: typeof item?.value === 'number' ? item.value : 0,
+          label: item?.label || `Point ${idx + 1}`,
+          tooltip: item?.tooltip,
+          raw: item,
+        };
+      });
+    }
 
-    return source.map((item, idx) => {
-      if (typeof item === 'number') {
-        return { value: item, label: `Day ${idx + 1}`, raw: item };
-      }
+    // Dynamic wave synthesis based on current numeric value & preset wave
+    const current = Math.max(0, numericVal);
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
+
+    // Determine movement slope
+    const isDownTrend =
+      trend === 'down' ||
+      presetWave === 'down' ||
+      (typeof previousValue === 'number' && previousValue > current);
+
+    let multipliers;
+    if (isDownTrend) {
+      // Downward slope trajectory (decreases over time to current value)
+      multipliers = [1.35, 1.28, 1.15, 1.2, 1.08, 1.04, 1.0];
+    } else if (presetWave === 'wave2') {
+      multipliers = [0.75, 0.85, 0.8, 0.92, 0.88, 0.96, 1.0];
+    } else if (presetWave === 'wave3') {
+      multipliers = [0.7, 0.78, 0.86, 0.82, 0.9, 0.94, 1.0];
+    } else if (presetWave === 'wave4') {
+      multipliers = [0.65, 0.72, 0.8, 0.85, 0.92, 0.97, 1.0];
+    } else {
+      // Standard positive growth trajectory (wave1 / up)
+      multipliers = [0.6, 0.68, 0.75, 0.82, 0.88, 0.95, 1.0];
+    }
+
+    return multipliers.map((mult, i) => {
+      const pointVal = Math.round((current === 0 ? (isDownTrend ? 4 - i * 0.6 : i * 0.6) : current * mult) * 10) / 10;
       return {
-        value: typeof item?.value === 'number' ? item.value : 0,
-        label: item?.label || `Day ${idx + 1}`,
-        tooltip: item?.tooltip,
-        raw: item,
+        value: Math.max(0, pointVal),
+        label: days[i],
+        tooltip: `${days[i]}: ${pointVal} ${unit || ''}`.trim(),
+        raw: pointVal,
       };
     });
-  }, [dataPoints, presetWave, defaultPresets]);
+  }, [dataPoints, numericVal, presetWave, trend, previousValue, unit]);
+
+  // Determine computed movement: upward, downward, or steady
+  const movement = useMemo(() => {
+    if (normalizedPoints.length < 2) return { isUp: true, pct: 0 };
+    const first = normalizedPoints[0].value;
+    const last = normalizedPoints[normalizedPoints.length - 1].value;
+    const diff = last - first;
+    const pct = first > 0 ? Math.round((diff / first) * 100) : (last > 0 ? 100 : 0);
+    return {
+      isUp: diff >= 0,
+      pct: Math.abs(pct),
+      diff,
+    };
+  }, [normalizedPoints]);
 
   // Compute SVG cubic paths & point coordinates
   const chartGeometry = useMemo(() => {
@@ -193,17 +212,16 @@ const SparkMetricCard = ({
     const isFlat = max === min;
 
     // Harmonic wave offsets for flat or constant data so the sparkline remains alive and organic
-    const flatHarmonicOffsets = [0.25, 0.45, 0.35, 0.65, 0.55, 0.8, 0.85];
+    const flatHarmonicOffsets = [0.3, 0.45, 0.4, 0.65, 0.55, 0.78, 0.85];
 
     const points = normalizedPoints.map((p, i) => {
       const x = paddingX + (i / Math.max(1, normalizedPoints.length - 1)) * (width - 2 * paddingX);
-      
+
       let y;
       if (isFlat) {
-        // If all data points are identical, synthesize a natural alive active wave
         const harmonicFactor = flatHarmonicOffsets[i % flatHarmonicOffsets.length] || 0.5;
         const baselineOffset = p.value === 0 ? 0.3 : 0.5;
-        const normalizedH = baselineOffset * 0.5 + harmonicFactor * 0.5;
+        const normalizedH = baselineOffset * 0.4 + harmonicFactor * 0.6;
         y = height - paddingBottom - normalizedH * (height - paddingTop - paddingBottom);
       } else {
         const range = max - min;
@@ -268,6 +286,17 @@ const SparkMetricCard = ({
   const activePoint = hoveredIndex !== null ? chartGeometry.points[hoveredIndex] : null;
   const latestPoint = chartGeometry.lastPoint;
 
+  // Resolve Badge Text, Badge Icon, and Badge Type
+  const resolvedBadgeText = badgeText || (movement.isUp ? `+${movement.pct}%` : `-${movement.pct}%`);
+  const resolvedBadgeIcon =
+    badgeIcon !== undefined
+      ? badgeIcon
+      : movement.isUp
+      ? 'up'
+      : 'down';
+  const resolvedBadgeType =
+    badgeType || (movement.isUp ? 'positive' : 'negative');
+
   return (
     <div
       onClick={onClick}
@@ -300,7 +329,7 @@ const SparkMetricCard = ({
                 isLongValue
                   ? 'text-lg sm:text-xl lg:text-[20px] xl:text-[22px]'
                   : 'text-2xl sm:text-3xl lg:text-[26px] xl:text-[28px]'
-              } font-extrabold tracking-tight font-sans whitespace-nowrap leading-tight ${
+              } font-extrabold tracking-tight font-sans whitespace-nowrap leading-tight transition-all duration-300 ${
                 isDark ? 'text-white' : 'text-slate-900 dark:text-white'
               }`}
             >
@@ -362,7 +391,7 @@ const SparkMetricCard = ({
               <path
                 d={chartGeometry.area}
                 fill={`url(#spark_grad_${gradientId})`}
-                className="transition-all duration-300"
+                className="transition-all duration-500 ease-out"
               />
 
               {/* Glowing Line Stroke */}
@@ -373,7 +402,7 @@ const SparkMetricCard = ({
                 strokeWidth={variant === 'dark' ? 2.4 : 2.2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="transition-all duration-300"
+                className="transition-all duration-500 ease-out"
                 style={{ filter: scheme.filterGlow }}
               />
 
@@ -452,30 +481,30 @@ const SparkMetricCard = ({
         <span
           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-2xs transition-colors shrink-0 ${
             isDark
-              ? badgeType === 'negative'
+              ? resolvedBadgeType === 'negative'
                 ? 'bg-rose-950/70 text-rose-400 border border-rose-800/50'
-                : badgeType === 'warning'
+                : resolvedBadgeType === 'warning'
                 ? 'bg-amber-950/70 text-amber-300 border border-amber-800/50'
-                : badgeType === 'neutral'
+                : resolvedBadgeType === 'neutral'
                 ? 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
                 : 'bg-[#064E3B]/80 text-[#34D399] border border-[#059669]/50'
-              : badgeType === 'negative'
+              : resolvedBadgeType === 'negative'
               ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/70 dark:border-rose-800/40'
-              : badgeType === 'warning'
+              : resolvedBadgeType === 'warning'
               ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/40'
-              : badgeType === 'neutral'
+              : resolvedBadgeType === 'neutral'
               ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
               : 'bg-[#E6F4EA] dark:bg-emerald-950/50 text-[#1E8E3E] dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
           }`}
         >
-          {badgeIcon === 'none' ? null : badgeIcon === 'dot' ? (
+          {resolvedBadgeIcon === 'none' ? null : resolvedBadgeIcon === 'dot' ? (
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-          ) : badgeType === 'negative' || badgeIcon === 'down' ? (
+          ) : resolvedBadgeType === 'negative' || resolvedBadgeIcon === 'down' ? (
             <span className="text-[12px] leading-none">↘</span>
           ) : (
             <span className="text-[12px] leading-none">↗</span>
           )}
-          <span>{badgeText}</span>
+          <span>{resolvedBadgeText}</span>
         </span>
 
         {subtext && (
@@ -493,4 +522,3 @@ const SparkMetricCard = ({
 };
 
 export default SparkMetricCard;
-

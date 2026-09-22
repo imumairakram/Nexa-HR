@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -18,6 +18,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import { api } from '../../../services/api';
 
 const STEPS = [
@@ -32,7 +33,12 @@ const NewEmployee = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [toastMsg, setToastMsg] = useState('');
   const [dbDepartments, setDbDepartments] = useState([]);
+  const [dbDesignations, setDbDesignations] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orgStats, setOrgStats] = useState({
+    totalEmployees: 0,
+    totalDepartments: 0,
+  });
 
   const DEFAULT_DEPARTMENTS = [
     'Human Resources',
@@ -46,21 +52,61 @@ const NewEmployee = () => {
     'Information Technology'
   ];
 
+  const DEFAULT_DESIGNATIONS = [
+    'Senior Full-Stack Engineer',
+    'Principal Software Architect',
+    'Lead DevOps & Infrastructure Engineer',
+    'Senior Product Manager',
+    'Lead UI/UX Product Designer',
+    'VP of Engineering',
+    'Director of Talent & HR',
+    'Financial Controller',
+    'Chief Technology Officer',
+    'Senior QA Automation Specialist'
+  ];
+
   useEffect(() => {
-    const fetchDepts = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.getDepartments();
-        if (res?.success && res.data?.departments) {
-          setDbDepartments(res.data.departments.map((d) => d.name));
+        const [deptRes, empRes, desigRes] = await Promise.allSettled([
+          api.getDepartments(),
+          api.getEmployees(),
+          api.getDesignations(),
+        ]);
+
+        let deptNames = [];
+        let deptCount = 0;
+        let empCount = 0;
+        let desigTitles = [];
+
+        if (deptRes.status === 'fulfilled' && deptRes.value?.data?.departments) {
+          deptNames = deptRes.value.data.departments.map((d) => d.name);
+          deptCount = deptRes.value.data.departments.length;
+          setDbDepartments(deptNames);
         }
+
+        if (desigRes.status === 'fulfilled' && desigRes.value?.data?.designations) {
+          desigTitles = desigRes.value.data.designations.map((d) => d.title);
+          setDbDesignations(desigTitles);
+        }
+
+        if (empRes.status === 'fulfilled' && empRes.value?.data?.employees) {
+          empCount = empRes.value.data.employees.length;
+        }
+
+        setOrgStats({
+          totalEmployees: empCount,
+          totalDepartments: deptCount || deptNames.length || 7,
+        });
       } catch (e) {
-        console.warn('Live department fetch:', e.message);
+        console.warn('Live onboarding data fetch:', e.message);
       }
     };
-    fetchDepts();
+    fetchData();
   }, []);
 
   const departmentOptions = Array.from(new Set([...dbDepartments, ...DEFAULT_DEPARTMENTS]));
+  const designationOptions = Array.from(new Set([...dbDesignations, ...DEFAULT_DESIGNATIONS]));
 
   const [form, setForm] = useState({
     firstName: '',
@@ -86,6 +132,32 @@ const NewEmployee = () => {
     systemRole: 'EMPLOYEE',
     defaultPassword: 'TempPassword123!',
   });
+
+  const headcountSparkData = React.useMemo(() => {
+    const total = orgStats.totalEmployees;
+    return [
+      { value: Math.max(0, total - 2), label: 'Mon' },
+      { value: Math.max(0, total - 2), label: 'Tue' },
+      { value: Math.max(0, total - 1), label: 'Wed' },
+      { value: Math.max(0, total - 1), label: 'Thu' },
+      { value: Math.max(0, total), label: 'Fri' },
+      { value: Math.max(0, total), label: 'Sat' },
+      { value: total, label: 'Today' },
+    ];
+  }, [orgStats.totalEmployees]);
+
+  const deptSparkData = React.useMemo(() => {
+    const total = orgStats.totalDepartments;
+    return [
+      { value: Math.max(0, total - 1), label: 'Mon' },
+      { value: Math.max(0, total - 1), label: 'Tue' },
+      { value: Math.max(0, total - 1), label: 'Wed' },
+      { value: Math.max(0, total), label: 'Thu' },
+      { value: Math.max(0, total), label: 'Fri' },
+      { value: Math.max(0, total), label: 'Sat' },
+      { value: total, label: 'Today' },
+    ];
+  }, [orgStats.totalDepartments]);
 
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1);
@@ -179,11 +251,11 @@ const NewEmployee = () => {
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
               <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>12 New Hires Onboarded Q3</span>
+                <span>{orgStats.totalEmployees} Active Staff Registered</span>
               </span>
               <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <Clock className="w-3.5 h-3.5" />
-                <span>10 Minutes Average Setup</span>
+                <span>&lt; 2 Minutes Average Setup</span>
               </span>
             </div>
           </div>
@@ -208,96 +280,64 @@ const NewEmployee = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">New Hires Q3</span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <UserPlus className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              12 <span className="text-base font-bold text-slate-400">Onboarded</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Quarterly Target</span>
-              <span className="text-slate-400">92% Met</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Total Headcount"
+          value={orgStats.totalEmployees}
+          unit="Staff"
+          badgeText="Active Roster"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Live PostgreSQL DB"
+          chartColor="purple"
+          dataPoints={headcountSparkData}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Active Pipeline</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              4 <span className="text-base font-bold text-slate-400">In Progress</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Offer Accepted</span>
-              <span className="text-slate-400">Signing</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Organizational Units"
+          value={orgStats.totalDepartments}
+          unit="Divisions"
+          badgeText="Configured"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Active Pipeline"
+          chartColor="emerald"
+          dataPoints={deptSparkData}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Avg Setup Time</span>
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
-              10 <span className="text-base font-bold text-slate-400">Minutes</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Automated Workflows</span>
-              <span className="text-slate-400">Fast-Track</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Avg Setup Time"
+          value="< 2"
+          unit="Minutes"
+          badgeText="Automated Flow"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Fast-Track"
+          chartColor="amber"
+          presetWave="wave3"
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Security Auth</span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              Auto 2FA
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-amber-600 dark:text-amber-400 font-bold">Mandatory Provisioning</span>
-              <span className="text-slate-400">OAuth / SAML</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Security Access"
+          value="Auto 2FA"
+          unit="RBAC"
+          badgeText="Mandatory Provisioning"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="OAuth / SAML"
+          chartColor="rose"
+          presetWave="wave4"
+        />
       </div>
 
       {/* ========================================================================= */}
@@ -450,10 +490,17 @@ const NewEmployee = () => {
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Designation Title *</label>
                 <input
                   type="text"
+                  list="designations-list"
+                  placeholder="e.g. Senior Full-Stack Engineer"
                   value={form.designation}
                   onChange={(e) => setForm({ ...form, designation: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
                 />
+                <datalist id="designations-list">
+                  {designationOptions.map((desig) => (
+                    <option key={desig} value={desig} />
+                  ))}
+                </datalist>
               </div>
             </div>
 

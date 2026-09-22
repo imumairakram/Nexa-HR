@@ -1,9 +1,33 @@
 const prisma = require('../config/prisma');
 
+const getDepartmentShortName = (name, code) => {
+  if (code && code.length <= 5) return code;
+  const map = {
+    'Human Resources': 'HR',
+    'Engineering & DevOps': 'Eng & DevOps',
+    'Product & Design': 'Product',
+    'Finance & Accounting': 'Finance',
+    'Finance & Accounts': 'Finance',
+    'Sales & Marketing': 'Sales & Mkt',
+    'Customer Support & Operations': 'Support',
+    'Engineering': 'Engineering',
+  };
+  if (map[name]) return map[name];
+  if (name.length > 14) return name.split('&')[0].trim();
+  return name;
+};
+
 const getAdminDashboard = async (req, res) => {
   try {
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    const sevenDaysAgo = new Date(startOfToday);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+
+    const thirtyDaysAgo = new Date(startOfToday);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
 
     const [
       activeEmployeesCount,
@@ -11,12 +35,15 @@ const getAdminDashboard = async (req, res) => {
       todayAttendances,
       pendingLeavesCount,
       latestPayrollSummary,
-      departments,
+      departmentsWithProfiles,
+      monthAttendances,
     ] = await Promise.all([
       prisma.user.count({ where: { isActive: true } }),
       prisma.department.count(),
       prisma.attendance.findMany({
-        where: { date: today },
+        where: {
+          date: { gte: startOfToday, lte: endOfToday },
+        },
         include: {
           user: {
             select: {
@@ -25,7 +52,8 @@ const getAdminDashboard = async (req, res) => {
               lastName: true,
               profile: {
                 select: {
-                  department: { select: { name: true } },
+                  departmentId: true,
+                  department: { select: { id: true, name: true, code: true } },
                 },
               },
             },
@@ -39,11 +67,40 @@ const getAdminDashboard = async (req, res) => {
         _count: { id: true },
       }),
       prisma.department.findMany({
-        select: { id: true, name: true, code: true },
+        include: {
+          profiles: {
+            where: {
+              user: { isActive: true },
+            },
+            select: {
+              id: true,
+              userId: true,
+            },
+          },
+        },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.attendance.findMany({
+        where: {
+          date: { gte: thirtyDaysAgo, lte: endOfToday },
+        },
+        include: {
+          user: {
+            select: {
+              profile: {
+                select: {
+                  departmentId: true,
+                  department: { select: { id: true, name: true } },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { date: 'asc' },
       }),
     ]);
 
-    // Metrics calculation
+    // Live Metrics Calculation
     let presentTodayCount = 0;
     let onTimeCount = 0;
 
@@ -53,7 +110,7 @@ const getAdminDashboard = async (req, res) => {
         const checkIn = new Date(record.checkInTime);
         const checkInHour = checkIn.getHours();
         const checkInMinute = checkIn.getMinutes();
-        if (checkInHour < 9 || (checkInHour === 9 && checkInMinute <= 30)) {
+        if (record.status === 'PRESENT' || (checkInHour < 9 || (checkInHour === 9 && checkInMinute <= 30))) {
           onTimeCount++;
         }
       }
@@ -69,97 +126,146 @@ const getAdminDashboard = async (req, res) => {
 
     const absentToday = Math.max(0, activeEmployeesCount - presentTodayCount);
 
-    // Weekly Trend (Last 7 Days)
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    // Multi-Timeframe Biometric Attendance Trends (7D, 14D, 30D)
+    const generateTrendSeries = (daysCount) => {
+      const series = [];
+      for (let i = daysCount - 1; i >= 0; i--) {
+        const d = new Date(startOfToday);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
 
-    const weeklyAttendances = await prisma.attendance.findMany({
-      where: {
-        date: { gte: sevenDaysAgo, lte: today },
-      },
-      select: { date: true, status: true, userId: true },
-    });
+        const dayRecords = monthAttendances.filter((att) => {
+          const attDateStr = new Date(att.date).toISOString().split('T')[0];
+          return attDateStr === dateStr;
+        });
 
-    const weeklyTrend = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
+        const dayPresent = dayRecords.filter((r) => ['PRESENT', 'HALF_DAY'].includes(r.status)).length;
+        const dayLate = dayRecords.filter((r) => r.status === 'LATE').length;
+        const totalDay = dayPresent + dayLate;
+        const formattedDate = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 
-      const dayRecords = weeklyAttendances.filter((att) => {
-        const attDateStr = new Date(att.date).toISOString().split('T')[0];
-        return attDateStr === dateStr;
-      });
-
-      const dayCount = dayRecords.filter((r) => ['PRESENT', 'LATE', 'HALF_DAY'].includes(r.status)).length;
-      const formattedDate = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-      
-      weeklyTrend.push({
-        date: formattedDate,
-        attendance: dayCount > 0 ? dayCount : (i === 0 ? presentTodayCount : Math.max(0, activeEmployeesCount - 1)),
-        peak: Math.max(dayCount, activeEmployeesCount),
-      });
-    }
-
-    // Department Attendance Breakdown
-    const deptAttendanceMap = {};
-    departments.forEach((dept) => {
-      deptAttendanceMap[dept.name] = { name: dept.name, onTime: 0, late: 0, total: 0 };
-    });
-
-    // Populate from today's logs if available
-    todayAttendances.forEach((record) => {
-      const deptName = record.user?.profile?.department?.name || 'General';
-      if (!deptAttendanceMap[deptName]) {
-        deptAttendanceMap[deptName] = { name: deptName, onTime: 0, late: 0, total: 0 };
+        series.push({
+          date: formattedDate,
+          attendance: totalDay,
+          onTime: dayPresent,
+          late: dayLate,
+          peak: activeEmployeesCount,
+        });
       }
-      deptAttendanceMap[deptName].total++;
-      if (record.status === 'PRESENT') {
-        deptAttendanceMap[deptName].onTime++;
-      } else if (record.status === 'LATE') {
-        deptAttendanceMap[deptName].late++;
-      }
+      return series;
+    };
+
+    const trend7d = generateTrendSeries(7);
+    const trend14d = generateTrendSeries(14);
+    const trend30d = generateTrendSeries(30);
+
+    // Dynamic Sparkline Time-Series Data Series
+    const headcountSparkline = trend7d.map((d) => ({
+      value: activeEmployeesCount,
+      label: d.date,
+      tooltip: `${d.date}: ${activeEmployeesCount} Active Staff`,
+    }));
+
+    const onTimeSparkline = trend7d.map((d) => {
+      const total = d.onTime + d.late;
+      const rate = total > 0 ? Math.round((d.onTime / total) * 100) : 0;
+      return {
+        value: rate,
+        label: d.date,
+        tooltip: total > 0 ? `${d.date}: ${rate}% On-Time (${d.onTime}/${total})` : `${d.date}: 0 Check-ins`,
+      };
     });
 
-    let departmentAttendance = Object.values(deptAttendanceMap);
+    const absentSparkline = trend7d.map((d) => {
+      const absentCount = Math.max(0, activeEmployeesCount - (d.onTime + d.late));
+      return {
+        value: absentCount,
+        label: d.date,
+        tooltip: `${d.date}: ${absentCount} Absent / Pending`,
+      };
+    });
 
-    // If no check-ins today yet, compute from recent department employee distribution
-    const hasTodayDeptLogs = departmentAttendance.some((d) => d.onTime > 0 || d.late > 0);
-    if (!hasTodayDeptLogs) {
-      const usersWithDept = await prisma.user.findMany({
-        where: { isActive: true },
-        select: {
-          profile: {
-            select: {
-              department: { select: { name: true } },
-            },
-          },
-        },
-      });
+    const leavesSparkline = trend7d.map((d) => ({
+      value: pendingLeavesCount,
+      label: d.date,
+      tooltip: `${d.date}: ${pendingLeavesCount} Pending Leave${pendingLeavesCount !== 1 ? 's' : ''}`,
+    }));
 
-      const deptCounts = {};
-      usersWithDept.forEach((u) => {
-        const dName = u.profile?.department?.name || 'General';
-        deptCounts[dName] = (deptCounts[dName] || 0) + 1;
-      });
+    const weeklyAttendances = monthAttendances.filter((att) => new Date(att.date) >= sevenDaysAgo);
+    const weeklyTrend = trend7d;
 
-      departmentAttendance = departments.map((dept) => {
-        const count = deptCounts[dept.name] || 1;
+    // Dynamic Multi-Timeframe Department Attendance Breakdown
+    const computeDepartmentStats = (logs) => {
+      return departmentsWithProfiles.map((dept) => {
+        const totalStaff = dept.profiles ? dept.profiles.length : 0;
+        const deptLogs = logs.filter((log) => {
+          const userDeptId = log.user?.profile?.departmentId;
+          const userDeptName = log.user?.profile?.department?.name;
+          return userDeptId === dept.id || userDeptName === dept.name;
+        });
+
+        let onTime = 0;
+        let late = 0;
+
+        deptLogs.forEach((log) => {
+          if (log.status === 'PRESENT') {
+            onTime++;
+          } else if (log.status === 'LATE') {
+            late++;
+          } else if (log.status === 'HALF_DAY') {
+            onTime++;
+          }
+        });
+
+        const totalActiveInPeriod = onTime + late;
+        const absent = Math.max(0, totalStaff - totalActiveInPeriod);
+        const punctualityRate = totalActiveInPeriod > 0
+          ? Math.round((onTime / totalActiveInPeriod) * 100)
+          : (totalStaff > 0 ? 100 : 0);
+
         return {
+          id: dept.id,
           name: dept.name,
-          onTime: count,
-          late: 0,
-          total: count,
+          code: dept.code || dept.name.slice(0, 3).toUpperCase(),
+          shortName: getDepartmentShortName(dept.name, dept.code),
+          totalStaff,
+          total: totalActiveInPeriod,
+          onTime,
+          late,
+          absent,
+          punctualityRate,
+          attendanceRate: totalStaff > 0 ? Math.round((totalActiveInPeriod / totalStaff) * 100) : 0,
         };
       });
-    }
+    };
+
+    const deptAttendanceToday = computeDepartmentStats(todayAttendances);
+    const deptAttendanceWeek = computeDepartmentStats(weeklyAttendances);
+    const deptAttendanceMonth = computeDepartmentStats(monthAttendances);
 
     // Organization Operations Health (Normalized 0-100 Radar Dimensions)
-    const punctualityScore = onTimeArrival > 0 ? Math.round(onTimeArrival) : (presentTodayCount === 0 ? 95 : 70);
-    const presenceScore = workforcePresence > 0 ? Math.round(workforcePresence) : (activeEmployeesCount > 0 ? 88 : 0);
-    const leaveHealthScore = Math.max(60, Math.min(100, 100 - (pendingLeavesCount * 8)));
-    const staffingScore = Math.min(100, Math.max(75, Math.round((activeEmployeesCount / Math.max(activeEmployeesCount, 4)) * 100)));
-    const deptCoverageScore = Math.min(100, Math.max(80, Math.round((departmentsCount / Math.max(departmentsCount, 3)) * 100)));
+    const totalMonthLogs = monthAttendances.length;
+    const totalMonthOnTime = monthAttendances.filter((a) => a.status === 'PRESENT').length;
+    const historicalPunctuality = totalMonthLogs > 0
+      ? Math.round((totalMonthOnTime / totalMonthLogs) * 100)
+      : 95;
+
+    const punctualityScore = presentTodayCount > 0
+      ? Math.round(onTimeArrival)
+      : historicalPunctuality;
+
+    const presenceScore = activeEmployeesCount > 0
+      ? Math.round(workforcePresence)
+      : 100;
+
+    const leaveHealthScore = Math.max(0, Math.min(100, 100 - (pendingLeavesCount * 10)));
+    const deptsWithStaff = departmentsWithProfiles.filter((d) => d.profiles && d.profiles.length > 0).length;
+    const deptCoverageScore = departmentsCount > 0
+      ? Math.round((deptsWithStaff / departmentsCount) * 100)
+      : 100;
+    const staffingScore = activeEmployeesCount > 0
+      ? Math.min(100, Math.max(20, Math.round((activeEmployeesCount / Math.max(activeEmployeesCount, 10)) * 100)))
+      : 50;
 
     const departmentPerformance = [
       { subject: 'Punctuality', scoreA: punctualityScore, scoreB: 100, fullMark: 100 },
@@ -234,12 +340,28 @@ const getAdminDashboard = async (req, res) => {
         },
         charts: {
           weeklyTrend,
-          departmentAttendance,
+          attendanceTrends: {
+            '7d': trend7d,
+            '14d': trend14d,
+            '30d': trend30d,
+          },
+          sparklines: {
+            headcount: headcountSparkline,
+            onTime: onTimeSparkline,
+            absent: absentSparkline,
+            leaves: leavesSparkline,
+          },
+          departmentAttendance: deptAttendanceToday,
+          departmentAttendanceTimeframes: {
+            today: deptAttendanceToday,
+            week: deptAttendanceWeek,
+            month: deptAttendanceMonth,
+          },
           departmentPerformance,
         },
         recentLogs,
         todayAttendance: {
-          date: today.toISOString().split('T')[0],
+          date: startOfToday.toISOString().split('T')[0],
           totalRecords: todayAttendances.length,
           stats: {
             present: presentTodayCount,

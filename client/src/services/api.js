@@ -157,8 +157,9 @@ export const api = {
   },
 
   // --- Dashboard ---
-  getDashboard: async () => {
-    return await fetchAPI('/dashboard/admin');
+  getDashboard: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/dashboard/admin${query ? `?${query}` : ''}`);
   },
 
   getEmployeeDashboard: async () => {
@@ -285,6 +286,19 @@ export const api = {
     });
   },
 
+  updateDepartment: async (id, deptData) => {
+    return await fetchAPI(`/departments/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(deptData),
+    });
+  },
+
+  deleteDepartment: async (id) => {
+    return await fetchAPI(`/departments/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   getDesignations: async (departmentId = '') => {
     return await fetchAPI(`/designations${departmentId ? `?departmentId=${departmentId}` : ''}`);
   },
@@ -293,6 +307,19 @@ export const api = {
     return await fetchAPI('/designations', {
       method: 'POST',
       body: JSON.stringify(desigData),
+    });
+  },
+
+  updateDesignation: async (id, desigData) => {
+    return await fetchAPI(`/designations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(desigData),
+    });
+  },
+
+  deleteDesignation: async (id) => {
+    return await fetchAPI(`/designations/${id}`, {
+      method: 'DELETE',
     });
   },
 
