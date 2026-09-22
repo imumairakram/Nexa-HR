@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   CreditCard,
   Download,
@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
@@ -73,6 +74,75 @@ const EmployeePayslips = () => {
   );
   const latestGross = latestSlip?.grossSalary || 9550;
   const latestNet = latestSlip?.netSalary || 8350;
+
+  // Dynamic Sparkline Data for Compensation
+  const netSparkData = useMemo(() => {
+    if (payslips.length >= 2) {
+      return payslips.slice(0, 6).reverse().map((p) => ({
+        value: Number(p.netSalary) || 0,
+        label: MONTH_NAMES[(p.month || 1) - 1]?.slice(0, 3) || 'Mo',
+        tooltip: `${MONTH_NAMES[(p.month || 1) - 1]} ${p.year}: ${formatCurrency(p.netSalary)} (Net)`,
+      }));
+    }
+    const basic = latestSlip?.basicSalary || 8500;
+    const gross = latestGross || 9550;
+    const deduct = totalDeductionsAllTime || 1200;
+    const net = latestNet || 8350;
+    return [
+      { value: basic, label: 'Basic', tooltip: `Basic Salary: ${formatCurrency(basic)}` },
+      { value: gross, label: 'Gross', tooltip: `Gross Salary: ${formatCurrency(gross)}` },
+      { value: deduct, label: 'Deduct', tooltip: `Deductions: ${formatCurrency(deduct)}` },
+      { value: net, label: 'Net', tooltip: `Net Take-Home: ${formatCurrency(net)}` },
+    ];
+  }, [payslips, latestSlip, latestGross, latestNet, totalDeductionsAllTime, formatCurrency]);
+
+  const grossSparkData = useMemo(() => {
+    if (payslips.length >= 2) {
+      return payslips.slice(0, 6).reverse().map((p) => ({
+        value: Number(p.grossSalary) || 0,
+        label: MONTH_NAMES[(p.month || 1) - 1]?.slice(0, 3) || 'Mo',
+        tooltip: `${MONTH_NAMES[(p.month || 1) - 1]} ${p.year}: ${formatCurrency(p.grossSalary)} (Gross)`,
+      }));
+    }
+    const base = latestSlip?.basicSalary || 8500;
+    const house = 600;
+    return [
+      { value: base, label: 'Base', tooltip: `Base Rate: ${formatCurrency(base)}` },
+      { value: base + house, label: 'Housing', tooltip: `Base + Housing: ${formatCurrency(base + house)}` },
+      { value: latestGross, label: 'Gross', tooltip: `Total Gross: ${formatCurrency(latestGross)}` },
+    ];
+  }, [payslips, latestSlip, latestGross, formatCurrency]);
+
+  const disbursedSparkData = useMemo(() => {
+    let cumulative = 0;
+    if (payslips.length > 0) {
+      return payslips.slice(0, 6).reverse().map((p) => {
+        cumulative += Number(p.netSalary) || 0;
+        return {
+          value: cumulative,
+          label: MONTH_NAMES[(p.month || 1) - 1]?.slice(0, 3) || 'Mo',
+          tooltip: `Cumulative Disbursed: ${formatCurrency(cumulative)}`,
+        };
+      });
+    }
+    return [
+      { value: latestNet, label: 'M1', tooltip: `Cycle 1: ${formatCurrency(latestNet)}` },
+      { value: latestNet * 2, label: 'M2', tooltip: `Cycle 2: ${formatCurrency(latestNet * 2)}` },
+      { value: latestNet * 3, label: 'M3', tooltip: `Cycle 3: ${formatCurrency(latestNet * 3)}` },
+    ];
+  }, [payslips, latestNet, formatCurrency]);
+
+  const deductionsSparkData = useMemo(() => {
+    const tax = latestSlip?.taxDeductions || 550;
+    const other = latestSlip?.otherDeductions || 300;
+    const unpaid = latestSlip?.unpaidLeaveDeduction || 0;
+    return [
+      { value: tax, label: 'Tax', tooltip: `Statutory Tax: ${formatCurrency(tax)}` },
+      { value: other, label: 'Benefits', tooltip: `Insurance & Benefits: ${formatCurrency(other)}` },
+      { value: unpaid, label: 'Unpaid', tooltip: `Unpaid Leave: ${formatCurrency(unpaid)}` },
+      { value: tax + other + unpaid, label: 'Total', tooltip: `Total Deductions: ${formatCurrency(tax + other + unpaid)}` },
+    ];
+  }, [latestSlip, formatCurrency]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -142,80 +212,68 @@ const EmployeePayslips = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. COMPENSATION OVERVIEW WIDGETS (DASHBOARD-MATCHED) */}
+      {/* 2. COMPENSATION OVERVIEW SPARKLINE METRIC CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Latest Gross Salary */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Latest Gross Salary</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <CreditCard className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 dark:text-white font-mono">
-              {formatCurrency(latestGross)}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">
-            {latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year}` : 'Active Base Cycle'}
-          </p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Card 1: Dark Navy Card - Latest Net Salary */}
+        <SparkMetricCard
+          variant="dark"
+          title="Net Take-Home Pay"
+          value={formatCurrency(latestNet)}
+          unit=""
+          badgeText={latestSlip?.status === 'PAID' ? 'Disbursed' : 'Active Rate'}
+          badgeType="positive"
+          badgeIcon="up"
+          subtext={latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year} Cycle` : 'Active Salary Structure'}
+          chartColor="purple"
+          presetWave="wave1"
+          dataPoints={netSparkData}
+        />
 
-        {/* Card 2: Latest Net Take-Home */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Net Take-Home Pay</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-              {formatCurrency(latestNet)}
-            </span>
-          </div>
-          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-2">
-            Direct Bank Wire Transfer
-          </p>
-        </div>
+        {/* Card 2: Light Card - Latest Gross Salary */}
+        <SparkMetricCard
+          variant="light"
+          title="Latest Gross Salary"
+          value={formatCurrency(latestGross)}
+          unit=""
+          badgeText={`+${formatCurrency(Math.max(0, latestGross - latestNet))} Allowances`}
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Taxable Base Earnings"
+          chartColor="coral"
+          presetWave="wave2"
+          dataPoints={grossSparkData}
+        />
 
-        {/* Card 3: Total Deductions */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Total Deductions</span>
-            <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-              <ArrowDownRight className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-rose-500 font-mono">
-              {formatCurrency(totalDeductionsAllTime || 850)}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">
-            Tax, Healthcare & Withholdings
-          </p>
-        </div>
+        {/* Card 3: Light Card - Total Net Disbursed */}
+        <SparkMetricCard
+          variant="light"
+          title="Total Net Disbursed"
+          value={formatCurrency(totalNetAllTime || latestNet * (payslips.length || 1))}
+          unit=""
+          badgeText={`${payslips.length > 0 ? payslips.length : 1} Cycles Paid`}
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Direct Corporate Bank Wire"
+          chartColor="amber"
+          presetWave="wave3"
+          dataPoints={disbursedSparkData}
+        />
 
-        {/* Card 4: Total Net Disbursed */}
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">Total Net Disbursed</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-              <Building className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
-              {formatCurrency(totalNetAllTime || latestNet * (payslips.length || 1))}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-2">
-            {payslips.length > 0 ? `${payslips.length} Statements Issued` : 'Current Fiscal Cycle'}
-          </p>
-        </div>
+        {/* Card 4: Light Card - Total Deductions */}
+        <SparkMetricCard
+          variant="light"
+          title="Total Deductions"
+          value={formatCurrency(totalDeductionsAllTime || 850)}
+          unit=""
+          badgeText="Withholdings"
+          badgeType="neutral"
+          badgeIcon="dot"
+          subtext="Statutory Tax & Insurance"
+          chartColor="rose"
+          presetWave="wave4"
+          dataPoints={deductionsSparkData}
+        />
       </div>
 
       {/* ========================================================================= */}

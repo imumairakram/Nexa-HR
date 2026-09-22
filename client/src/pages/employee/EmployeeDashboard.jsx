@@ -25,6 +25,7 @@ import {
   User,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 import { getYearHolidays } from '../../utils/holidayEngine';
@@ -66,6 +67,8 @@ const EmployeeDashboard = () => {
   const [leaveTypes, setLeaveTypes] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+  const [attendanceLogs, setAttendanceLogs] = useState([]);
+  const [payslipHistory, setPayslipHistory] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   // Live digital clock timer update
@@ -76,15 +79,17 @@ const EmployeeDashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch real database attendance & dashboard metrics
+  // Fetch real database attendance, history & dashboard metrics
   const fetchDashboard = async () => {
     setLoading(true);
     try {
-      const [dashRes, leaveRes, reqRes, annRes] = await Promise.allSettled([
+      const [dashRes, leaveRes, reqRes, annRes, logsRes, payRes] = await Promise.allSettled([
         api.getEmployeeDashboard(),
         api.getLeaveTypes(),
         api.getLeaveRequests(),
         api.getAnnouncements(),
+        api.getMyAttendanceLogs ? api.getMyAttendanceLogs({ limit: 14 }) : Promise.resolve(null),
+        api.getMyPayslips ? api.getMyPayslips() : Promise.resolve(null),
       ]);
 
       if (dashRes.status === 'fulfilled' && dashRes.value?.data) {
@@ -98,6 +103,13 @@ const EmployeeDashboard = () => {
       }
       if (annRes.status === 'fulfilled' && annRes.value?.data?.announcements) {
         setAnnouncements(annRes.value.data.announcements);
+      }
+      if (logsRes.status === 'fulfilled' && logsRes.value?.data) {
+        const records = logsRes.value.data.attendances || logsRes.value.data.logs || [];
+        setAttendanceLogs(records);
+      }
+      if (payRes.status === 'fulfilled' && payRes.value?.data?.payslips) {
+        setPayslipHistory(payRes.value.data.payslips);
       }
     } catch (err) {
       console.warn('Failed to load employee dashboard data:', err.message);
@@ -164,9 +176,9 @@ const EmployeeDashboard = () => {
   // Compute dynamic leave quota & balances from real database leave types and requests
   const dynamicLeaveBalances = useMemo(() => {
     const defaultTypes = [
-      { id: 'lt-1', name: 'Annual Vacation', code: 'ANNUAL', daysAllowed: 18 },
-      { id: 'lt-2', name: 'Sick & Medical', code: 'SICK', daysAllowed: 10 },
-      { id: 'lt-3', name: 'Casual Emergency', code: 'CASUAL', daysAllowed: 6 },
+      { id: 'lt-1', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18 },
+      { id: 'lt-2', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 8 },
+      { id: 'lt-3', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12 },
     ];
 
     const typesToUse = leaveTypes && leaveTypes.length > 0 ? leaveTypes : defaultTypes;
@@ -220,11 +232,204 @@ const EmployeeDashboard = () => {
 
   const netSalaryAmount = latestPayslip?.netSalary
     ? formatCurrency(latestPayslip.netSalary)
-    : formatCurrency(currentUser?.salaryStructure?.basicSalary || 9550);
+    : formatCurrency(currentUser?.salaryStructure?.basicSalary || 8500);
 
   const payslipPeriod = latestPayslip?.month
     ? `Paid for Month ${latestPayslip.month}/${latestPayslip.year}`
-    : `Current Period • ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+    : `Period • ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+
+  // Calculations for fully dynamic employee portal metric cards
+  const attendanceOnTimeRate = useMemo(() => {
+    if (!monthlyAttendance?.presentDays || monthlyAttendance.presentDays === 0) return 0;
+    const onTime = monthlyAttendance.presentDays - (monthlyAttendance.lateDays || 0);
+    return Math.max(0, Math.min(100, Math.round((onTime / monthlyAttendance.presentDays) * 100)));
+  }, [monthlyAttendance]);
+
+  const totalRemainingLeaves = useMemo(() => {
+    return dynamicLeaveBalances.reduce((acc, q) => acc + (q.remaining || 0), 0);
+  }, [dynamicLeaveBalances]);
+
+  const totalAllowedLeaves = useMemo(() => {
+    return dynamicLeaveBalances.reduce((acc, q) => acc + (q.totalAllowed || 0), 0) || 34;
+  }, [dynamicLeaveBalances]);
+
+  const avgDailyHours = useMemo(() => {
+    if (!monthlyAttendance?.presentDays || monthlyAttendance.presentDays === 0) {
+      return '0.0';
+    }
+    return (monthlyAttendance.totalWorkHours / monthlyAttendance.presentDays).toFixed(1);
+  }, [monthlyAttendance]);
+
+  // Dynamic Sparkline Time-Series Data Series
+  const attendanceSparkData = useMemo(() => {
+    if (attendanceLogs && attendanceLogs.length >= 2) {
+      return attendanceLogs.slice(0, 10).reverse().map((log) => {
+        const d = new Date(log.date);
+        const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : log.status === 'LATE' ? 7.5 : 0);
+        return {
+          value: hours,
+          label: dayLabel,
+          tooltip: `${dateStr} (${dayLabel}): ${hours} hrs • ${log.status || 'PRESENT'}`,
+        };
+      });
+    }
+    const now = new Date();
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(now.getDate() - (6 - i));
+      const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const present = monthlyAttendance?.presentDays > 0 && !isWeekend;
+      const hours = isWeekend ? 0 : present ? 8.5 : 0;
+      return {
+        value: hours,
+        label: dayLabel,
+        tooltip: `${dateStr} (${dayLabel}): ${hours > 0 ? `${hours} hrs (Present)` : isWeekend ? 'Weekend Off' : 'Pending Entry'}`,
+      };
+    });
+  }, [attendanceLogs, monthlyAttendance]);
+
+  const hoursSparkData = useMemo(() => {
+    if (attendanceLogs && attendanceLogs.length >= 2) {
+      return attendanceLogs.slice(0, 8).reverse().map((log) => {
+        const d = new Date(log.date);
+        const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : 0);
+        return {
+          value: hours,
+          label: dayLabel,
+          tooltip: `${dateStr} (${dayLabel}): ${hours} hrs Logged`,
+        };
+      });
+    }
+    const now = new Date();
+    const avg = Number(avgDailyHours) || (monthlyAttendance?.totalWorkHours > 0 ? 8.5 : 0);
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date();
+      d.setDate(now.getDate() - (5 - i));
+      const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const val = avg > 0 ? (i % 2 === 0 ? avg : Math.max(0, avg - 0.5)) : 0;
+      return {
+        value: Number(val.toFixed(1)),
+        label: dayLabel,
+        tooltip: `${dateStr} (${dayLabel}): ${val.toFixed(1)} hrs Logged`,
+      };
+    });
+  }, [attendanceLogs, avgDailyHours, monthlyAttendance]);
+
+  const leavesSparkData = useMemo(() => {
+    if (dynamicLeaveBalances && dynamicLeaveBalances.length >= 1) {
+      return dynamicLeaveBalances.map((q) => ({
+        value: q.remaining,
+        label: q.code || q.name.slice(0, 3),
+        tooltip: `${q.name}: ${q.remaining}/${q.totalAllowed} days left (${q.approvedDays}d used)`,
+      }));
+    }
+    return [
+      { value: 18, label: 'Annual', tooltip: 'Annual Vacation: 18/18 days left' },
+      { value: 10, label: 'Sick', tooltip: 'Medical & Sick: 10/10 days left' },
+      { value: 6, label: 'Casual', tooltip: 'Casual & Emergency: 6/6 days left' },
+    ];
+  }, [dynamicLeaveBalances]);
+
+  const salarySparkData = useMemo(() => {
+    if (payslipHistory && payslipHistory.length >= 2) {
+      return payslipHistory.slice(0, 6).reverse().map((p) => {
+        const amount = Number(p.netSalary) || 8500;
+        return {
+          value: amount,
+          label: `M${p.month}`,
+          tooltip: `Month ${p.month}/${p.year}: ${formatCurrency(amount)} • ${p.status || 'PAID'}`,
+        };
+      });
+    }
+    const base = currentUser?.salaryStructure?.basicSalary || 8500;
+    const allowances = (currentUser?.salaryStructure?.housingAllowance || 0) + (currentUser?.salaryStructure?.transportAllowance || 0);
+    const deductions = (currentUser?.salaryStructure?.taxDeductions || 0) + (currentUser?.salaryStructure?.otherDeductions || 0);
+    const gross = base + allowances;
+    const net = gross - deductions;
+    return [
+      { value: base, label: 'Basic', tooltip: `Basic Salary: ${formatCurrency(base)}` },
+      { value: gross, label: 'Gross', tooltip: `Gross Pay: ${formatCurrency(gross)} (+${formatCurrency(allowances)} Allowances)` },
+      { value: Math.max(0, deductions), label: 'Deduct', tooltip: `Deductions & Tax: ${formatCurrency(deductions)}` },
+      { value: net, label: 'Net', tooltip: `Net Take-Home: ${formatCurrency(net)}` },
+    ];
+  }, [payslipHistory, currentUser, formatCurrency]);
+
+  // Card 1 Dynamic Tag Logic
+  const card1Badge = useMemo(() => {
+    if (!monthlyAttendance.presentDays || monthlyAttendance.presentDays === 0) {
+      return { text: '0d Logged', type: 'neutral', icon: 'dot', sub: 'Awaiting Punch-In' };
+    }
+    if (monthlyAttendance.lateDays > 0) {
+      return {
+        text: `+${attendanceOnTimeRate}% On-Time`,
+        type: attendanceOnTimeRate >= 80 ? 'positive' : 'warning',
+        icon: attendanceOnTimeRate >= 80 ? 'up' : 'down',
+        sub: `${monthlyAttendance.lateDays} Late Check-in${monthlyAttendance.lateDays > 1 ? 's' : ''}`,
+      };
+    }
+    return { text: '100% Punctual', type: 'positive', icon: 'up', sub: '100% On-Time Record' };
+  }, [monthlyAttendance, attendanceOnTimeRate]);
+
+  // Card 2 Dynamic Tag Logic
+  const card2Badge = useMemo(() => {
+    if (!monthlyAttendance.totalWorkHours || monthlyAttendance.totalWorkHours === 0) {
+      return { text: '0.0h / Day', type: 'neutral', icon: 'dot', sub: 'Shift: 09:00 – 17:30' };
+    }
+    const avg = Number(avgDailyHours);
+    return {
+      text: `+${avgDailyHours}h / Day`,
+      type: avg >= 8 ? 'positive' : 'warning',
+      icon: avg >= 8 ? 'up' : 'down',
+      sub: `${monthlyAttendance.totalWorkHours}h / 176h Monthly Goal`,
+    };
+  }, [monthlyAttendance, avgDailyHours]);
+
+  // Card 3 Dynamic Tag Logic
+  const card3Badge = useMemo(() => {
+    if (leavesSummary.pending > 0) {
+      return {
+        text: `${leavesSummary.pending} Pending Review`,
+        type: 'warning',
+        icon: 'dot',
+        sub: `Awaiting HR Approval`,
+      };
+    }
+    if (leavesSummary.approved > 0) {
+      return {
+        text: `-${leavesSummary.approved}d Consumed`,
+        type: 'neutral',
+        icon: 'down',
+        sub: `${leavesSummary.approved} Days Used This Year`,
+      };
+    }
+    return {
+      text: `${totalRemainingLeaves}d Available`,
+      type: 'positive',
+      icon: 'up',
+      sub: `Quota: ${totalAllowedLeaves} Days Total`,
+    };
+  }, [leavesSummary, totalRemainingLeaves, totalAllowedLeaves]);
+
+  // Card 4 Dynamic Tag Logic
+  const card4Badge = useMemo(() => {
+    if (latestPayslip?.status === 'PAID') {
+      return { text: 'Disbursed', type: 'positive', icon: 'up', sub: payslipPeriod };
+    }
+    if (latestPayslip?.status === 'GENERATED') {
+      return { text: 'Generated', type: 'warning', icon: 'dot', sub: payslipPeriod };
+    }
+    if (latestPayslip?.status === 'DRAFT') {
+      return { text: 'Processing', type: 'neutral', icon: 'dot', sub: payslipPeriod };
+    }
+    return { text: 'Configured', type: 'positive', icon: 'dot', sub: 'Active Salary Structure' };
+  }, [latestPayslip, payslipPeriod]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -325,119 +530,70 @@ const EmployeeDashboard = () => {
         </div>
       </div>
 
-      {/* TOP METRICS CARDS (100% DYNAMIC ENTERPRISE KPI GRID) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Days Present */}
-        <div
+      {/* TOP METRICS CARDS (EXACT HIGH-FIDELITY VECTOR SPARKLINE CARDS FOR EMPLOYEE PORTAL) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Card 1: Dark Navy Card - Present Attendance */}
+        <SparkMetricCard
+          variant="dark"
+          title="Present This Month"
+          value={monthlyAttendance.presentDays || 0}
+          unit={monthlyAttendance.presentDays === 1 ? 'Day' : 'Days'}
+          badgeText={card1Badge.text}
+          badgeType={card1Badge.type}
+          badgeIcon={card1Badge.icon}
+          subtext={card1Badge.sub}
+          chartColor="purple"
+          presetWave="wave1"
+          dataPoints={attendanceSparkData}
           onClick={() => navigate('/employee/attendance')}
-          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 cursor-pointer group"
-        >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+        />
 
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Present This Month
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
+        {/* Card 2: Light Card - Logged Work Hours */}
+        <SparkMetricCard
+          variant="light"
+          title="Logged Hours"
+          value={monthlyAttendance.totalWorkHours || 0}
+          unit="hrs"
+          badgeText={card2Badge.text}
+          badgeType={card2Badge.type}
+          badgeIcon={card2Badge.icon}
+          subtext={card2Badge.sub}
+          chartColor="orange"
+          presetWave="wave2"
+          dataPoints={hoursSparkData}
+          onClick={() => navigate('/employee/attendance')}
+        />
 
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {monthlyAttendance.presentDays} <span className="text-base font-bold text-slate-400">{monthlyAttendance.presentDays === 1 ? 'Day' : 'Days'}</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% On-Time Rate</span>
-              <span className="text-slate-400">{monthlyAttendance.lateDays} Late check-ins</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: Leave Summary */}
-        <div
+        {/* Card 3: Light Card - Available Leaves */}
+        <SparkMetricCard
+          variant="light"
+          title="Available Leaves"
+          value={totalRemainingLeaves}
+          unit="Days"
+          badgeText={card3Badge.text}
+          badgeType={card3Badge.type}
+          badgeIcon={card3Badge.icon}
+          subtext={card3Badge.sub}
+          chartColor="amber"
+          presetWave="wave3"
+          dataPoints={leavesSparkData}
           onClick={() => navigate('/employee/leaves')}
-          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 cursor-pointer group"
-        >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
+        />
 
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Approved Leaves
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CalendarDays className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {leavesSummary.approved} <span className="text-base font-bold text-slate-400">Approved</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">{leavesSummary.pending} Pending review</span>
-              <span className="text-slate-400">Annual Quota</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: Total Work Hours */}
-        <div
-          onClick={() => navigate('/employee/attendance')}
-          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 cursor-pointer group"
-        >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Logged Hours (Month)
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {monthlyAttendance.totalWorkHours} <span className="text-base font-bold text-slate-400">hrs</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Live Synced</span>
-              <span className="text-slate-400">09:00 – 17:30 Shift</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Latest Payslip */}
-        <div
+        {/* Card 4: Light Card - Latest Net Salary */}
+        <SparkMetricCard
+          variant="light"
+          title="Latest Net Salary"
+          value={netSalaryAmount}
+          badgeText={card4Badge.text}
+          badgeType={card4Badge.type}
+          badgeIcon={card4Badge.icon}
+          subtext={card4Badge.sub}
+          chartColor="rose"
+          presetWave="wave4"
+          dataPoints={salarySparkData}
           onClick={() => navigate('/employee/payslips')}
-          className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 cursor-pointer group"
-        >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Latest Net Salary
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CreditCard className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
-              {netSalaryAmount}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-purple-600 dark:text-purple-400 font-bold">{payslipPeriod}</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Disbursed</span>
-            </div>
-          </div>
-        </div>
+        />
       </div>
 
       {/* QUICK SELF-SERVICE ACTIONS HUB */}
@@ -579,72 +735,118 @@ const EmployeeDashboard = () => {
           </div>
 
           {/* Dynamic Leave Quota & Balances */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                  <CalendarDays className="w-4 h-4" />
+          <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[32px] p-6 sm:p-7 shadow-soft border border-slate-100 dark:border-slate-800 transition-all">
+            <div className="pointer-events-none absolute -right-16 -top-16 w-48 h-48 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl" />
+
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800/80 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100 dark:border-blue-800/60 shadow-xs">
+                  <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-slate-900 dark:text-white">
-                    My Leave Quota & Balances
-                  </h3>
-                  <p className="text-xs text-slate-400">Live entitlement and consumed balances for current year</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white tracking-tight">
+                      My Leave Quota & Balances
+                    </h3>
+                    <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
+                      {totalRemainingLeaves}d Available
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">
+                    Live entitlement and consumed balances for current year
+                  </p>
                 </div>
               </div>
 
               <button
                 onClick={() => navigate('/employee/leaves')}
-                className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold transition-all cursor-pointer border border-emerald-200 dark:border-emerald-800/60"
+                className="self-start sm:self-auto px-4 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 text-xs font-bold transition-all cursor-pointer border border-emerald-200/80 dark:border-emerald-800/60 flex items-center gap-1.5 shadow-xs hover:scale-105 active:scale-95"
               >
-                Request Leave
+                <span>Request Leave</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* 3 Quota Tiles */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
               {dynamicLeaveBalances.map((quota) => {
-                const colorTheme =
-                  quota.colorIdx === 0
-                    ? { bar: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' }
-                    : quota.colorIdx === 1
-                    ? { bar: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' }
-                    : { bar: 'bg-purple-500', text: 'text-purple-600 dark:text-purple-400' };
+                const themes = [
+                  {
+                    gradientBar: 'bg-gradient-to-r from-emerald-500 to-teal-400',
+                    badge: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200/60 dark:border-emerald-800/60',
+                    dot: 'bg-emerald-500',
+                    borderHover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/5',
+                    glow: 'group-hover:bg-emerald-500/5',
+                  },
+                  {
+                    gradientBar: 'bg-gradient-to-r from-blue-500 to-indigo-500',
+                    badge: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border-blue-200/60 dark:border-blue-800/60',
+                    dot: 'bg-blue-500',
+                    borderHover: 'hover:border-blue-500/40 hover:shadow-blue-500/5',
+                    glow: 'group-hover:bg-blue-500/5',
+                  },
+                  {
+                    gradientBar: 'bg-gradient-to-r from-purple-500 to-fuchsia-500',
+                    badge: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 border-purple-200/60 dark:border-purple-800/60',
+                    dot: 'bg-purple-500',
+                    borderHover: 'hover:border-purple-500/40 hover:shadow-purple-500/5',
+                    glow: 'group-hover:bg-purple-500/5',
+                  },
+                ];
+
+                const currentTheme = themes[quota.colorIdx % themes.length];
 
                 return (
                   <div
                     key={quota.id}
                     onClick={() => navigate('/employee/leaves')}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/40 space-y-2 cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-all"
+                    className={`group relative overflow-hidden p-5 rounded-[24px] bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 space-y-3 cursor-pointer ${currentTheme.borderHover} hover:shadow-md hover:-translate-y-0.5 transition-all duration-300`}
                   >
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-slate-700 dark:text-slate-200 truncate pr-1">
+                    {/* Subtle hover background highlight */}
+                    <div className={`pointer-events-none absolute inset-0 ${currentTheme.glow} transition-colors duration-300`} />
+
+                    {/* Top Row: Name and Percentage Badge */}
+                    <div className="relative z-10 flex items-center justify-between gap-2">
+                      <span className="font-extrabold text-xs text-slate-800 dark:text-slate-100 truncate pr-1">
                         {quota.name}
                       </span>
-                      <span className={`text-[10px] font-bold ${colorTheme.text} shrink-0`}>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${currentTheme.badge} shrink-0`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${currentTheme.dot} ${quota.percentage > 0 ? 'animate-pulse' : ''}`} />
                         {quota.percentage}% Left
                       </span>
                     </div>
 
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-slate-900 dark:text-white">
+                    {/* Value Display */}
+                    <div className="relative z-10 flex items-baseline gap-1.5 pt-0.5">
+                      <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">
                         {quota.remaining}
                       </span>
-                      <span className="text-xs text-slate-400 font-semibold">
+                      <span className="text-xs font-bold text-slate-400 dark:text-slate-400">
                         / {quota.totalAllowed} Days
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                    {/* High-Tech Progress Track */}
+                    <div className="relative z-10 w-full bg-slate-200/70 dark:bg-slate-700/60 h-2 rounded-full overflow-hidden p-[1px]">
                       <div
-                        className={`${colorTheme.bar} h-full rounded-full transition-all duration-500`}
-                        style={{ width: `${quota.percentage}%` }}
+                        className={`${currentTheme.gradientBar} h-full rounded-full transition-all duration-700 shadow-xs`}
+                        style={{ width: `${Math.max(4, quota.percentage)}%` }}
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold pt-1">
+                    {/* Footer Row */}
+                    <div className="relative z-10 flex items-center justify-between text-[11px] font-semibold text-slate-400 pt-0.5">
                       <span>Used: {quota.approvedDays}d</span>
-                      {quota.pendingDays > 0 && (
-                        <span className="text-amber-500">Pending: {quota.pendingDays}d</span>
+                      {quota.pendingDays > 0 ? (
+                        <span className="text-amber-500 dark:text-amber-400 font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                          Pending: {quota.pendingDays}d
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 dark:text-slate-400 font-medium">
+                          {quota.remaining === quota.totalAllowed ? '100% Available' : `${quota.remaining}d Remaining`}
+                        </span>
                       )}
                     </div>
                   </div>

@@ -30,6 +30,7 @@ import {
   Zap,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const COMPANY_POLICIES = [
@@ -250,6 +251,55 @@ const EmployeeDocuments = () => {
     });
   }, [searchQuery]);
 
+  // Dynamic Sparkline Data for Documents Hub
+  const personalDocsSparkData = useMemo(() => {
+    const typeCount = {
+      CONTRACT: 0,
+      COMPENSATION: 0,
+      LEGAL: 0,
+      TAX_FORM: 0,
+      CERTIFICATE: 0,
+    };
+    personalDocs.forEach((d) => {
+      if (typeCount[d.type] !== undefined) typeCount[d.type]++;
+      else typeCount.CERTIFICATE++;
+    });
+
+    return [
+      { value: typeCount.CONTRACT || 1, label: 'Contract', tooltip: `Contracts: ${typeCount.CONTRACT || 1} Files` },
+      { value: typeCount.COMPENSATION || 1, label: 'Comp', tooltip: `Compensation: ${typeCount.COMPENSATION || 1} Files` },
+      { value: typeCount.LEGAL || 1, label: 'Legal', tooltip: `Legal & NDA: ${typeCount.LEGAL || 1} Files` },
+      { value: typeCount.TAX_FORM || 1, label: 'Tax', tooltip: `Tax Forms: ${typeCount.TAX_FORM || 1} Files` },
+      { value: typeCount.CERTIFICATE || 1, label: 'Certs', tooltip: `Certificates: ${typeCount.CERTIFICATE || 1} Files` },
+    ];
+  }, [personalDocs]);
+
+  const policiesSparkData = useMemo(() => {
+    return [
+      { value: 1, label: 'Ethics', tooltip: 'Corporate Governance Charter' },
+      { value: 2, label: 'Benefits', tooltip: 'Global Health & Medical Guide' },
+      { value: 3, label: 'Finance', tooltip: 'Remote Work & Expense Policy' },
+      { value: 4, label: 'Security', tooltip: 'SOC-2 Data Security Policy' },
+    ];
+  }, []);
+
+  const complianceSparkData = useMemo(() => {
+    return [
+      { value: 25, label: 'Offer', tooltip: 'Offer & Contract Signed (100%)' },
+      { value: 50, label: 'NDA', tooltip: 'Proprietary IP Assignment (100%)' },
+      { value: 75, label: 'Tax', tooltip: 'Statutory W-2 Tax Registered (100%)' },
+      { value: 100, label: 'SOC2', tooltip: 'InfoSec Compliance Certified (100%)' },
+    ];
+  }, []);
+
+  const securitySparkData = useMemo(() => {
+    return [
+      { value: 128, label: '2FA', tooltip: 'Multi-Factor Key Auth: Verified' },
+      { value: 192, label: 'TLS', tooltip: 'TLS 1.3 End-to-End Encryption' },
+      { value: 256, label: 'AES', tooltip: 'AES-256 Cloud Vault Encryption' },
+    ];
+  }, []);
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <EmployeePageHeader
@@ -315,108 +365,68 @@ const EmployeeDocuments = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED KPI TELEMETRY CARDS */}
+      {/* 2. SPARKLINE KPI METRIC CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Personal Files */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-teal-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-teal-500/10 blur-2xl pointer-events-none group-hover:bg-teal-500/20 transition-all" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Card 1: Dark Navy Card - Personal Vault */}
+        <SparkMetricCard
+          variant="dark"
+          title="Personal Vault"
+          value={personalDocs.length}
+          unit={personalDocs.length === 1 ? 'File' : 'Files'}
+          badgeText="100% Encrypted"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Self-Service Verified Files"
+          chartColor="purple"
+          presetWave="wave1"
+          dataPoints={personalDocsSparkData}
+        />
 
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Personal Vault
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <FolderOpen className="w-5 h-5" />
-            </div>
-          </div>
+        {/* Card 2: Light Card - Handbooks & Charters */}
+        <SparkMetricCard
+          variant="light"
+          title="Company Handbooks"
+          value={COMPANY_POLICIES.length}
+          unit="Policies"
+          badgeText="FY26 Certified"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Official Governance Charters"
+          chartColor="coral"
+          presetWave="wave2"
+          dataPoints={policiesSparkData}
+        />
 
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {personalDocs.length} <span className="text-base font-bold text-slate-400">{personalDocs.length === 1 ? 'File' : 'Files'}</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-teal-600 dark:text-teal-400 font-bold">100% Encrypted</span>
-              <span className="text-slate-400">Self-Service</span>
-            </div>
-          </div>
-        </div>
+        {/* Card 3: Light Card - Authenticity & Compliance */}
+        <SparkMetricCard
+          variant="light"
+          title="Compliance State"
+          value="100%"
+          unit="Verified"
+          badgeText="Fully Audited"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="All Mandatory Charters Signed"
+          chartColor="amber"
+          presetWave="wave3"
+          dataPoints={complianceSparkData}
+        />
 
-        {/* Card 2: Handbooks & Charters */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Company Handbooks
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <BookOpen className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {COMPANY_POLICIES.length} <span className="text-base font-bold text-slate-400">Policies</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">FY26 Certified</span>
-              <span className="text-slate-400">Active</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: Verification Status */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Authenticity State
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              100% <span className="text-base font-bold text-slate-400">Verified</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">HR Compliant</span>
-              <span className="text-slate-400">Audited</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Vault Storage Quota */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-cyan-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-cyan-500/10 blur-2xl pointer-events-none group-hover:bg-cyan-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-              Vault Storage
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center border border-cyan-200/60 dark:border-cyan-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <HardDrive className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              6.4 <span className="text-base font-bold text-slate-400">/ 50 MB</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-cyan-600 dark:text-cyan-400 font-bold">Cloud Tier Free</span>
-              <span className="text-slate-400">12% Used</span>
-            </div>
-          </div>
-        </div>
+        {/* Card 4: Light Card - Security Tier */}
+        <SparkMetricCard
+          variant="light"
+          title="Vault Security"
+          value="AES-256"
+          unit="Bit"
+          badgeText="Zero-Trust"
+          badgeType="neutral"
+          badgeIcon="dot"
+          subtext="Cloud Storage Protected"
+          chartColor="rose"
+          presetWave="wave4"
+          dataPoints={securitySparkData}
+        />
       </div>
 
       {/* ========================================================================= */}

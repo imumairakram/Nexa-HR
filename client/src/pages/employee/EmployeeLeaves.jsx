@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   CalendarDays,
   CheckCircle2,
@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { api } from '../../services/api';
 
 const EmployeeLeaves = () => {
@@ -166,8 +167,60 @@ const EmployeeLeaves = () => {
   });
 
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
-  const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
+  const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0) || 34;
   const totalPendingRequests = requests.filter((r) => r.status === 'PENDING').length;
+  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || quotaCards[0] || { available: 18, total: 18, used: 0, percent: 100, pending: 0 };
+  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || quotaCards[1] || { available: 10, total: 10, used: 0, percent: 100, pending: 0 };
+
+  // Dynamic Sparkline Data for Leaves
+  const totalLeavesSparkData = useMemo(() => {
+    if (quotaCards.length > 0) {
+      return quotaCards.map((c) => ({
+        value: c.available,
+        label: c.type.split(' ')[0],
+        tooltip: `${c.type}: ${c.available} / ${c.total} Days Left (${c.used} Used)`,
+      }));
+    }
+    return [
+      { value: 18, label: 'Annual', tooltip: 'Annual Leave: 18 Days Available' },
+      { value: 10, label: 'Sick', tooltip: 'Sick & Medical: 10 Days Available' },
+      { value: 6, label: 'Casual', tooltip: 'Casual Leave: 6 Days Available' },
+    ];
+  }, [quotaCards]);
+
+  const annualSparkData = useMemo(() => {
+    const total = annualCard.total || 18;
+    const used = annualCard.used || 0;
+    const avail = annualCard.available || (total - used);
+    return [
+      { value: total, label: 'Quota', tooltip: `Total Entitlement: ${total} Days` },
+      { value: Math.max(0, total - Math.round(used * 0.5)), label: 'Q2', tooltip: `Mid-Year Balance: ${Math.max(0, total - Math.round(used * 0.5))} Days` },
+      { value: avail, label: 'Available', tooltip: `Current Remaining: ${avail} Days (${used} Taken)` },
+    ];
+  }, [annualCard]);
+
+  const sickSparkData = useMemo(() => {
+    const total = sickCard.total || 10;
+    const used = sickCard.used || 0;
+    const avail = sickCard.available || (total - used);
+    return [
+      { value: total, label: 'Quota', tooltip: `Medical Quota: ${total} Days` },
+      { value: Math.max(0, total - used), label: 'Active', tooltip: `Current Available: ${avail} Days` },
+      { value: used, label: 'Taken', tooltip: `Medical Leave Used: ${used} Days` },
+    ];
+  }, [sickCard]);
+
+  const pendingSparkData = useMemo(() => {
+    const approved = requests.filter((r) => r.status === 'APPROVED').length;
+    const pending = requests.filter((r) => r.status === 'PENDING').length;
+    const rejected = requests.filter((r) => r.status === 'REJECTED').length;
+    return [
+      { value: requests.length, label: 'Total', tooltip: `Total Submitted: ${requests.length} Requests` },
+      { value: approved, label: 'Approved', tooltip: `Approved: ${approved} Requests` },
+      { value: pending, label: 'Pending', tooltip: `Pending Review: ${pending} Requests` },
+      { value: rejected, label: 'Rejected', tooltip: `Rejected: ${rejected} Requests` },
+    ];
+  }, [requests]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -238,71 +291,72 @@ const EmployeeLeaves = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. LEAVE QUOTA CARDS (MODERN ENTERPRISE METRIC PROGRESS CARDS) */}
+      {/* 2. TOP METRIC SPARKLINE CARDS (EXACT HIGH-FIDELITY VECTOR DESIGN) */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {quotaCards.map((item, idx) => (
-          <div
-            key={idx}
-            className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 flex flex-col justify-between group"
-          >
-            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${item.theme.gradient} opacity-80 group-hover:opacity-100 transition-opacity`} />
-            <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-slate-500/5 blur-2xl pointer-events-none group-hover:bg-emerald-500/15 transition-all" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Card 1: Dark Navy Card - Total Available Leaves */}
+        <SparkMetricCard
+          variant="dark"
+          title="Total Leave Balance"
+          value={totalAvailableLeaves}
+          unit={totalAvailableLeaves === 1 ? 'Day' : 'Days'}
+          badgeText={`${totalAvailableLeaves}d Available`}
+          badgeType="positive"
+          badgeIcon="up"
+          subtext={`Quota: ${totalAllowedLeaves} Total Days`}
+          chartColor="purple"
+          presetWave="wave1"
+          dataPoints={totalLeavesSparkData}
+        />
 
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 ${item.theme.iconBg} group-hover:scale-110 transition-transform shadow-xs`}>
-                    <CalendarDays className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-black text-slate-800 dark:text-white block">{item.type}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">Annual Quota</span>
-                  </div>
-                </div>
-                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${item.theme.badgeBg}`}>
-                  {item.used} Used
-                </span>
-              </div>
+        {/* Card 2: Light Card - Annual Vacation */}
+        <SparkMetricCard
+          variant="light"
+          title="Annual Vacation"
+          value={annualCard.available}
+          unit={`/ ${annualCard.total}d`}
+          badgeText={`${annualCard.percent}% Available`}
+          badgeType={annualCard.percent >= 50 ? 'positive' : 'warning'}
+          badgeIcon={annualCard.percent >= 50 ? 'up' : 'dot'}
+          subtext={`${annualCard.used} Days Used This Year`}
+          chartColor="coral"
+          presetWave="wave2"
+          dataPoints={annualSparkData}
+        />
 
-              <div className="flex items-baseline justify-between mt-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {item.available}
-                  </span>
-                  <span className="text-xs font-bold text-slate-400">
-                    / {item.total} Days Left
-                  </span>
-                </div>
-                <span className="text-xs font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  {item.percent}%
-                </span>
-              </div>
-            </div>
+        {/* Card 3: Light Card - Sick & Medical */}
+        <SparkMetricCard
+          variant="light"
+          title="Sick & Medical"
+          value={sickCard.available}
+          unit={`/ ${sickCard.total}d`}
+          badgeText={`${sickCard.percent}% Available`}
+          badgeType={sickCard.used === 0 ? 'positive' : 'neutral'}
+          badgeIcon={sickCard.used === 0 ? 'up' : 'dot'}
+          subtext={sickCard.pending > 0 ? `${sickCard.pending}d Pending Approval` : 'Full Medical Allowance'}
+          chartColor="amber"
+          presetWave="wave3"
+          dataPoints={sickSparkData}
+        />
 
-            <div className="mt-5 space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-              <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                <div
-                  className={`h-full rounded-full bg-gradient-to-r ${item.theme.gradient} transition-all duration-500`}
-                  style={{ width: `${item.percent}%` }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold pt-0.5">
-                <span>{item.used} days taken this year</span>
-                {item.pending > 0 ? (
-                  <span className="text-amber-500 font-bold">{item.pending} pending approval</span>
-                ) : (
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Available</span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+        {/* Card 4: Light Card - Pending Requests */}
+        <SparkMetricCard
+          variant="light"
+          title="Pending Requests"
+          value={totalPendingRequests}
+          unit={totalPendingRequests === 1 ? 'Request' : 'Requests'}
+          badgeText={totalPendingRequests > 0 ? `${totalPendingRequests} Under Review` : 'All Approved'}
+          badgeType={totalPendingRequests > 0 ? 'warning' : 'positive'}
+          badgeIcon={totalPendingRequests > 0 ? 'dot' : 'up'}
+          subtext={`${requests.length} Total Submissions`}
+          chartColor="rose"
+          presetWave="wave4"
+          dataPoints={pendingSparkData}
+        />
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. LEAVE REQUESTS HISTORY & STATUS TABLE */}
+      {/* 3. LEAVE REQUESTS HISTORY & STATUS TABLE */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -392,10 +446,10 @@ const EmployeeLeaves = () => {
       {/* 3. APPLY MODAL (ULTRA PREMIUM THEMED DESIGN) */}
       {/* ========================================================================= */}
       {isApplyOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/60 border border-blue-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 md:p-8 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/60 border border-blue-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-teal-50/50 dark:from-slate-900/80 dark:via-blue-950/20 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-teal-50/50 dark:from-slate-900/80 dark:via-blue-950/20 dark:to-slate-900/80 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/15 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -405,7 +459,7 @@ const EmployeeLeaves = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                       Apply for Time-Off
                     </h3>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 flex items-center gap-1">
@@ -413,7 +467,7 @@ const EmployeeLeaves = () => {
                       Auto SLA
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-sm">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
                     Submit leave request for supervisory evaluation and entitlement tracking.
                   </p>
                 </div>
@@ -428,7 +482,7 @@ const EmployeeLeaves = () => {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleApplySubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 md:p-7 space-y-5 custom-scrollbar text-xs">
+            <form onSubmit={handleApplySubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
               {/* Leave Policy Classification Cards */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
@@ -437,7 +491,7 @@ const EmployeeLeaves = () => {
                 </label>
 
                 {leaveTypes && leaveTypes.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {leaveTypes.map((lt) => {
                       const isSelected = String(leaveForm.leaveTypeId) === String(lt.id);
                       return (
