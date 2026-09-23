@@ -246,6 +246,8 @@ const login = async (req, res) => {
     // Attach HttpOnly, Secure, SameSite Cookie
     res.cookie('token', token, getCookieOptions());
 
+    const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
+
     return res.status(200).json({
       success: true,
       message: 'Login successful.',
@@ -258,7 +260,8 @@ const login = async (req, res) => {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
-          mustChangePassword: user.mustChangePassword ?? false,
+          mustChangePassword: isDemoEmail ? false : (user.mustChangePassword ?? false),
+          isGuest: isDemoEmail,
         },
       },
     });
@@ -1055,6 +1058,14 @@ const changeMyPassword = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'User account not found.',
+      });
+    }
+
+    const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
+    if (isDemoEmail) {
+      return res.status(403).json({
+        success: false,
+        message: 'Password and credential changes are locked for Demo / Guest accounts.',
       });
     }
 

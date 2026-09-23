@@ -18,6 +18,7 @@ import {
   Laptop,
   RefreshCw,
   AlertCircle,
+  ShieldAlert,
   Trash2,
 } from 'lucide-react';
 import { api } from '../../services/api';
@@ -280,8 +281,19 @@ const Profile = () => {
     }
   };
 
+  const isGuest =
+    profile.email?.toLowerCase() === 'hr@nexahr.com' ||
+    profile.email?.toLowerCase() === 'user@nexahr.com' ||
+    profile.email?.toLowerCase() === 'admin@nexahr.com' ||
+    localStorage.getItem('isGuest') === 'true';
+
   const handleSaveSecurity = async (e) => {
     e.preventDefault();
+
+    if (isGuest) {
+      showToast('Password credentials cannot be modified for Guest / Demo accounts.');
+      return;
+    }
 
     if (!security.currentPassword) {
       showToast('Please enter your current password.');
@@ -508,13 +520,25 @@ const Profile = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Primary Email *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold">Primary Email *</label>
+                  {isGuest && (
+                    <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                      Read-only (Guest Mode)
+                    </span>
+                  )}
+                </div>
                 <input
                   type="email"
                   required
+                  readOnly={isGuest}
                   value={profile.email}
-                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  onChange={(e) => !isGuest && setProfile({ ...profile, email: e.target.value })}
+                  className={`w-full px-4 py-3 rounded-2xl border font-medium outline-none ${
+                    isGuest
+                      ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
+                      : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                  }`}
                 />
               </div>
               <div>
@@ -570,16 +594,33 @@ const Profile = () => {
             <p className="text-xs text-slate-400">Manage administrator password authentication and security credentials</p>
           </div>
 
+          {isGuest && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-amber-700 dark:text-amber-300">
+              <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
+              <div>
+                <h4 className="font-bold text-xs">Guest Demo Protection Active</h4>
+                <p className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
+                  Modifying passwords and email credentials is restricted for shared guest and demo accounts to ensure uninterrupted access for all evaluators.
+                </p>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSaveSecurity} className="space-y-4 text-xs">
             <div>
               <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Current Password *</label>
               <input
                 type="password"
                 required
-                placeholder="Enter existing password"
+                disabled={isGuest}
+                placeholder={isGuest ? 'Password changes locked in Guest Mode' : 'Enter existing password'}
                 value={security.currentPassword}
                 onChange={(e) => setSecurity({ ...security, currentPassword: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                className={`w-full px-4 py-3 rounded-2xl border font-medium outline-none ${
+                  isGuest
+                    ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
+                    : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                }`}
               />
             </div>
 
@@ -589,10 +630,15 @@ const Profile = () => {
                 <input
                   type="password"
                   required
-                  placeholder="Min 6 characters"
+                  disabled={isGuest}
+                  placeholder={isGuest ? 'Disabled in Demo Mode' : 'Min 6 characters'}
                   value={security.newPassword}
                   onChange={(e) => setSecurity({ ...security, newPassword: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className={`w-full px-4 py-3 rounded-2xl border font-medium outline-none ${
+                    isGuest
+                      ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
+                      : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                  }`}
                 />
               </div>
               <div>
@@ -600,10 +646,15 @@ const Profile = () => {
                 <input
                   type="password"
                   required
-                  placeholder="Re-type new password"
+                  disabled={isGuest}
+                  placeholder={isGuest ? 'Disabled in Demo Mode' : 'Re-type new password'}
                   value={security.confirmPassword}
                   onChange={(e) => setSecurity({ ...security, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className={`w-full px-4 py-3 rounded-2xl border font-medium outline-none ${
+                    isGuest
+                      ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
+                      : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                  }`}
                 />
               </div>
             </div>
@@ -621,11 +672,15 @@ const Profile = () => {
             <div className="flex justify-end pt-3">
               <button
                 type="submit"
-                disabled={isSavingPassword}
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 disabled:opacity-50"
+                disabled={isSavingPassword || isGuest}
+                className={`px-6 py-2.5 font-bold rounded-2xl flex items-center gap-2 shadow-md transition-all ${
+                  isGuest
+                    ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20 cursor-pointer hover:scale-105 disabled:opacity-50'
+                }`}
               >
                 {isSavingPassword ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                <span>Update Password Credentials</span>
+                <span>{isGuest ? 'Password Locked for Demo' : 'Update Password Credentials'}</span>
               </button>
             </div>
           </form>

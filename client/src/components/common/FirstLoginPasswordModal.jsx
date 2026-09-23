@@ -19,10 +19,12 @@ const FirstLoginPasswordModal = () => {
   const checkUserStatus = () => {
     try {
       const stored = localStorage.getItem('user');
+      const isGuestFlag = localStorage.getItem('isGuest') === 'true';
       if (stored) {
         const u = JSON.parse(stored);
         setUser(u);
-        if (u && u.mustChangePassword === true) {
+        const isDemo = isGuestFlag || u.isGuest || ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(u.email?.toLowerCase());
+        if (!isDemo && u && u.mustChangePassword === true) {
           setShowModal(true);
         } else {
           setShowModal(false);

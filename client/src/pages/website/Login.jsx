@@ -152,6 +152,12 @@ const Login = () => {
         password: formData.password,
       });
       if (res && res.success) {
+        const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(formData.email.trim().toLowerCase());
+        if (isDemoEmail) {
+          localStorage.setItem('isGuest', 'true');
+        } else {
+          localStorage.removeItem('isGuest');
+        }
         const userRole = res.data?.user?.role || 'ADMIN';
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
@@ -173,11 +179,16 @@ const Login = () => {
       ? { email: 'hr@nexahr.com', password: 'HrPassword123!' }
       : { email: 'user@nexahr.com', password: 'UserPassword123!' };
 
-    setFormData(guestCredentials);
+    localStorage.setItem('isGuest', 'true');
 
     try {
       const res = await api.login(guestCredentials);
       if (res && res.success) {
+        // Ensure guest users never have mustChangePassword active in storage
+        if (res.data?.user) {
+          const userWithGuestFlag = { ...res.data.user, mustChangePassword: false, isGuest: true };
+          localStorage.setItem('user', JSON.stringify(userWithGuestFlag));
+        }
         const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'HR_MANAGER' : 'EMPLOYEE');
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
