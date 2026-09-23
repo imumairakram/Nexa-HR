@@ -16,6 +16,9 @@ import {
   User,
   Shield,
   CheckCircle2,
+  Sparkles,
+  Zap,
+  ArrowRight,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
@@ -156,6 +159,32 @@ const Login = () => {
       }
     } catch (err) {
       setError(err.message || 'Unable to connect to server. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async (roleToLogin) => {
+    const targetRole = roleToLogin || loginRole;
+    setLoading(true);
+    setError(null);
+
+    const guestCredentials = targetRole === 'hr'
+      ? { email: 'hr@nexahr.com', password: 'HrPassword123!' }
+      : { email: 'user@nexahr.com', password: 'UserPassword123!' };
+
+    setFormData(guestCredentials);
+
+    try {
+      const res = await api.login(guestCredentials);
+      if (res && res.success) {
+        const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'HR_MANAGER' : 'EMPLOYEE');
+        navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
+      } else {
+        setError(res?.message || 'Guest login failed. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'Unable to connect to server for guest demo.');
     } finally {
       setLoading(false);
     }
@@ -353,6 +382,57 @@ const Login = () => {
                     {loginRole === 'hr' ? 'Sign In as HR Admin' : 'Sign In as Employee'}
                   </span>
                 )}
+              </button>
+
+              {/* Guest / Demo Login Divider */}
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-slate-200 dark:border-slate-700/80"></div>
+                <span className="flex-shrink mx-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Or explore instantly
+                </span>
+                <div className="flex-grow border-t border-slate-200 dark:border-slate-700/80"></div>
+              </div>
+
+              {/* Dedicated 1-Click Guest Experience Button */}
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => handleGuestLogin(loginRole)}
+                className={`w-full py-3 px-4 rounded-2xl border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm ${
+                  loginRole === 'hr'
+                    ? 'bg-purple-50/70 hover:bg-purple-100/90 dark:bg-purple-950/30 dark:hover:bg-purple-900/40 border-purple-200/80 dark:border-purple-800/60 text-purple-900 dark:text-purple-200'
+                    : 'bg-emerald-50/70 hover:bg-emerald-100/90 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/40 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 text-left">
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                      loginRole === 'hr'
+                        ? 'bg-purple-600 text-white shadow-purple-600/30 shadow-md'
+                        : 'bg-emerald-600 text-white shadow-emerald-600/30 shadow-md'
+                    }`}
+                  >
+                    <Zap className="w-4 h-4 fill-current" />
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                      <span>
+                        {loginRole === 'hr'
+                          ? 'Experience as Guest HR'
+                          : 'Experience as Guest Employee'}
+                      </span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 shadow-xs border border-slate-200/60 dark:border-slate-700/60">
+                        1-Click Demo
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                      {loginRole === 'hr'
+                        ? 'Explore full payroll, attendance & staff management'
+                        : 'Explore employee portal, leave requests & payslips'}
+                    </div>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
               </button>
             </form>
           </div>
