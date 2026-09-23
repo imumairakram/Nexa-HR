@@ -606,8 +606,8 @@ NexaHR Workforce Systems`;
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Add employee dossier</div>
             </div>
             <button
-              onClick={() => setIsOnboardOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              disabled
+              className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600/50 dark:bg-indigo-900/40 text-white/60 font-bold text-xs shadow-none flex items-center justify-center gap-2 cursor-not-allowed opacity-60"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -727,14 +727,6 @@ NexaHR Workforce Systems`;
                 <List className="w-4 h-4" />
               </button>
             </div>
-
-            <button
-              onClick={() => setIsOnboardOpen(true)}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Onboard Employee</span>
-            </button>
           </div>
         </div>
 
@@ -761,33 +753,33 @@ NexaHR Workforce Systems`;
       {/* 3. EMPLOYEES GRID / TABLE */}
       {/* ========================================================================= */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
           {filteredEmployees.map((emp, idx) => (
             <div
               key={emp.id || idx}
-              className="relative overflow-hidden rounded-[32px] bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl p-6 sm:p-7 shadow-soft hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 dark:border-slate-800/90 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 flex flex-col justify-between group"
+              className="relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 dark:hover:border-indigo-500/40 flex flex-col justify-between group"
             >
-              {/* Dynamic Glow Line on Hover */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-indigo-500/10 blur-2xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
+              {/* Dynamic Glow Line & Blur Blob on Hover */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
 
               <div>
                 {/* Header: Avatar, Name, Code, Role */}
-                <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="flex items-start justify-between gap-3 mb-3.5">
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div className="relative shrink-0">
                       {getAvatarUrl(emp) ? (
                         <img
                           src={getAvatarUrl(emp)}
                           alt=""
-                          className="w-14 h-14 rounded-2xl object-cover ring-2 ring-indigo-500/30 shadow-md group-hover:scale-105 transition-transform"
+                          className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover ring-2 ring-indigo-500/20 shadow-sm group-hover:scale-105 transition-transform"
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-sm flex items-center justify-center ring-2 ring-indigo-500/30 shadow-md group-hover:scale-105 transition-transform uppercase">
+                        <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-sm flex items-center justify-center ring-2 ring-indigo-500/20 shadow-sm group-hover:scale-105 transition-transform uppercase">
                           <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
                         </div>
                       )}
-                      <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-[#1E293B] rounded-full shadow-xs" title="Active Staff" />
+                      <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-[#1E293B] rounded-full shadow-xs" title="Active Staff" />
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -798,7 +790,7 @@ NexaHR Workforce Systems`;
                         {emp.profile?.designation?.title || 'Staff Member'}
                       </p>
                       <div className="flex items-center gap-1.5 mt-1">
-                        <span className="text-[10px] text-slate-400 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md truncate border border-slate-200/50 dark:border-slate-700/50">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-bold bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md truncate border border-slate-200/60 dark:border-slate-700/60">
                           {emp.employeeCode}
                         </span>
                       </div>
@@ -808,10 +800,10 @@ NexaHR Workforce Systems`;
                   <span
                     className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0 border shadow-xs ${
                       emp.role === 'ADMIN'
-                        ? 'bg-purple-100/80 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                        ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200/80 dark:border-purple-800/60'
                         : emp.role === 'HR_MANAGER'
-                        ? 'bg-amber-100/80 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                        : 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                        ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/60'
+                        : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60'
                     }`}
                   >
                     {emp.role || 'EMPLOYEE'}
@@ -819,22 +811,28 @@ NexaHR Workforce Systems`;
                 </div>
 
                 {/* Glassmorphic Dossier Details Container */}
-                <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 mb-4 p-4 sm:p-4.5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 backdrop-blur-md">
+                <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 my-4 p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 backdrop-blur-md">
                   <div className="flex items-center gap-2.5">
-                    <Building2 className="w-4 h-4 text-indigo-500 shrink-0" />
-                    <span className="font-semibold truncate">{emp.profile?.department?.name || 'General Dept'}</span>
+                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <Building2 className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="font-semibold truncate text-slate-800 dark:text-slate-200">{emp.profile?.department?.name || 'General Dept'}</span>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
-                    <span className="font-semibold truncate">{emp.profile?.address || emp.profile?.location || 'San Francisco HQ'}</span>
+                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <MapPin className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="font-semibold truncate text-slate-600 dark:text-slate-300">{emp.profile?.address || emp.profile?.location || 'San Francisco HQ'}</span>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <Mail className="w-4 h-4 text-indigo-500 shrink-0" />
-                    <span className="font-semibold truncate text-slate-700 dark:text-slate-200">{emp.email}</span>
+                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <Mail className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="font-semibold truncate text-slate-600 dark:text-slate-300">{emp.email}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2.5 mt-1 border-t border-slate-200/60 dark:border-slate-800/60">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Salary Matrix</span>
-                    <span className="font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50">
+                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Salary Matrix</span>
+                    <span className="font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-xl text-xs border border-emerald-200 dark:border-emerald-800/50 shadow-xs">
                       {formatSalary(emp.salaryStructure, emp.profile?.salary)}
                     </span>
                   </div>
@@ -850,7 +848,7 @@ NexaHR Workforce Systems`;
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleOpenEdit(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-indigo-200/50 dark:border-indigo-800/50"
+                    className="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-indigo-200/60 dark:border-indigo-800/50 shadow-xs hover:scale-105"
                     title="Edit Employee Profile"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -859,7 +857,7 @@ NexaHR Workforce Systems`;
 
                   <button
                     onClick={() => setSelectedEmployee(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-slate-200/50 dark:border-slate-700/50"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200/60 dark:border-slate-700/60 shadow-xs hover:scale-105"
                     title="View Full Profile"
                   >
                     <Eye className="w-3.5 h-3.5" />
@@ -868,7 +866,7 @@ NexaHR Workforce Systems`;
 
                   <button
                     onClick={() => setEmployeeToDelete(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-rose-200/50 dark:border-rose-800/50"
+                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-rose-200/60 dark:border-rose-800/50 shadow-xs hover:scale-105"
                     title="Remove Employee"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

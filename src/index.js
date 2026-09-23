@@ -21,6 +21,7 @@ const dashboardRoutes = require('./routes/dashboard.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const announcementRoutes = require('./routes/announcement.routes');
 const ticketRoutes = require('./routes/ticket.routes');
+const accountRoutes = require('./routes/account.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -105,6 +106,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/accounts', accountRoutes);
 
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {

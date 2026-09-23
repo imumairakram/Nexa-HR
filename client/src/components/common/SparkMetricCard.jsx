@@ -282,7 +282,7 @@ const SparkMetricCard = ({
   };
 
   const isDark = variant === 'dark';
-  const isLongValue = typeof value === 'string' && value.length > 8;
+  const isLongValue = typeof value === 'string' && value.length >= 7;
   const activePoint = hoveredIndex !== null ? chartGeometry.points[hoveredIndex] : null;
   const latestPoint = chartGeometry.lastPoint;
 
@@ -300,7 +300,7 @@ const SparkMetricCard = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden rounded-[24px] p-5 sm:p-5.5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
+      className={`relative overflow-hidden rounded-[24px] p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
         isDark
           ? 'bg-[#0B132B] dark:bg-[#0A1024] text-white border border-slate-800/90 shadow-lg shadow-black/20 hover:border-indigo-500/50 hover:shadow-indigo-500/10'
           : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-xl hover:border-slate-200 dark:hover:border-slate-700'
@@ -312,36 +312,37 @@ const SparkMetricCard = ({
       )}
 
       {/* Top Section: Title, Value & Dynamic Interactive Sparkline */}
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-1.5">
         {/* Left Column: Title & Main Number */}
-        <div className="space-y-1.5 min-w-0 flex-1">
+        <div className="space-y-1 min-w-0 flex-1">
           <div
-            className={`text-xs sm:text-[13px] font-medium tracking-tight truncate ${
+            className={`text-xs font-semibold tracking-tight truncate ${
               isDark ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'
             }`}
+            title={title}
           >
             {title}
           </div>
 
-          <div className="flex items-baseline gap-1.5 flex-nowrap overflow-hidden">
+          <div className="flex items-baseline gap-1 flex-wrap sm:flex-nowrap">
             <span
               className={`${
                 isLongValue
-                  ? 'text-lg sm:text-xl lg:text-[20px] xl:text-[22px]'
-                  : 'text-2xl sm:text-3xl lg:text-[26px] xl:text-[28px]'
-              } font-extrabold tracking-tight font-sans whitespace-nowrap leading-tight transition-all duration-300 ${
+                  ? 'text-lg sm:text-xl xl:text-2xl'
+                  : 'text-xl sm:text-2xl xl:text-3xl'
+              } font-black tracking-tight font-sans leading-tight transition-all duration-300 ${
                 isDark ? 'text-white' : 'text-slate-900 dark:text-white'
               }`}
             >
               {loading ? (
-                <span className="inline-block w-16 h-7 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <span className="inline-block w-16 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
               ) : (
                 value
               )}
             </span>
             {unit && !loading && (
               <span
-                className={`text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 ${
+                className={`text-xs font-semibold whitespace-nowrap shrink-0 ${
                   isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
                 }`}
               >
@@ -352,7 +353,7 @@ const SparkMetricCard = ({
         </div>
 
         {/* Right Column: Fully Dynamic Vector Area Sparkline */}
-        <div className="shrink-0 relative flex items-center justify-end pl-1 pt-1">
+        <div className="shrink-0 relative flex items-center justify-end pl-0.5 pt-0.5">
           {/* Floating Hover Tooltip */}
           {activePoint && (
             <div
@@ -367,7 +368,7 @@ const SparkMetricCard = ({
             </div>
           )}
 
-          <div className="w-18 sm:w-22 lg:w-22 xl:w-26 h-9 sm:h-10 lg:h-11 overflow-visible cursor-crosshair relative">
+          <div className="w-14 sm:w-16 md:w-20 xl:w-22 h-8 sm:h-9 lg:h-10 overflow-visible cursor-crosshair relative">
             <svg
               ref={svgRef}
               viewBox="0 0 104 44"

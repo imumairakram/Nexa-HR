@@ -35,184 +35,25 @@ import {
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { api } from '../../services/api';
 
-const DEFAULT_ANNOUNCEMENTS = [
-  {
-    id: 'ann-1',
-    title: 'Annual Company Leadership Summit & Innovation Retreat 2026',
-    category: 'EVENTS',
-    categoryLabel: 'Social & Events',
-    priority: 'HIGH',
-    urgencyLevel: 'CRITICAL',
-    isHero: true,
-    pinned: true,
-    author: 'Sarah Jenkins',
-    authorRole: 'VP of People & Culture',
-    department: 'Executive Office',
-    date: 'Aug 14, 2026',
-    timeAgo: '2 days ago',
-    readTime: '3 min read',
-    summary:
-      'All employees and engineering leads are cordially invited to the NexaHR 2026 Annual Leadership & Innovation Summit at the Serena Hills Resort. Please confirm attendance and dietary preferences before August 25.',
-    content: `We are thrilled to announce the NexaHR Annual Company Leadership & Innovation Retreat 2026!
-
-### Event Overview
-- **Dates**: September 18 – September 21, 2026
-- **Venue**: Serena Mountain Lodge & Conference Center
-- **Theme**: *Scaling Autonomous Workflows & Human-Centric AI*
-
-### Travel & Accommodations
-All travel arrangements, flights, accommodation, and curated meals will be covered by the company. Transportation shuttles will depart from Islamabad HQ and Karachi Regional Hub on Friday morning.
-
-### Key Highlights
-1. Keynote by Executive Leadership on FY27 Roadmap.
-2. Engineering Hackathon with live deployment showcase.
-3. Team-building outdoor excursions and annual gala banquet.
-
-Please review the attached itinerary and submit your RSVP by clicking the attendance toggle below.`,
-    attachments: [
-      { name: 'Retreat_Itinerary_2026.pdf', size: '2.4 MB', type: 'PDF' },
-      { name: 'Rooming_And_Flight_Schedule.xlsx', size: '840 KB', type: 'XLSX' },
-    ],
-    acknowledged: false,
-    acknowledgedCount: 142,
-    totalTargetCount: 160,
-  },
-  {
-    id: 'ann-2',
-    title: 'Policy Update: Biometric Station Synchronization & Grace Minutes',
-    category: 'POLICIES',
-    categoryLabel: 'HR Policies',
-    priority: 'HIGH',
-    urgencyLevel: 'IMPORTANT',
-    isHero: true,
-    pinned: true,
-    author: 'Tariq Mehmood',
-    authorRole: 'Head of People Operations',
-    department: 'Human Resources',
-    date: 'Aug 12, 2026',
-    timeAgo: '4 days ago',
-    readTime: '2 min read',
-    summary:
-      'Effective September 1st, morning biometric attendance check-in window includes a 15-minute grace period (09:00 AM – 09:15 AM PKT). Employees clocking in beyond grace period will trigger automated late arrival flags.',
-    content: `Dear Team,
-
-In accordance with our updated enterprise attendance guidelines, the management has revised the biometric clock-in parameters across all turnstiles and facial recognition gates.
-
-### Summary of Adjustments
-- **Standard Working Shift**: 09:00 AM – 05:30 PM (8.5 Hours)
-- **Morning Grace Window**: 09:00 AM – 09:15 AM
-- **Automated Late Threshold**: Check-ins between 09:16 AM and 10:00 AM will be categorized as Late Presence.
-- **Half-Day Threshold**: Clock-ins after 10:30 AM will automatically count as a Half-Day presence unless backed by an approved time-off request.
-
-Please acknowledge this memo to verify that you have read and understood the shift parameters.`,
-    attachments: [
-      { name: 'Attendance_Shift_Policy_v3.2.pdf', size: '1.1 MB', type: 'PDF' },
-    ],
-    acknowledged: true,
-    acknowledgedCount: 158,
-    totalTargetCount: 160,
-  },
-  {
-    id: 'ann-3',
-    title: 'Annual Corporate Health & Group Life Insurance Renewal (2026–2027)',
-    category: 'BENEFITS',
-    categoryLabel: 'Benefits & Perks',
-    priority: 'MEDIUM',
-    urgencyLevel: 'NORMAL',
-    isHero: false,
-    pinned: false,
-    author: 'Ayesha Siddiqui',
-    authorRole: 'Senior Benefits Specialist',
-    department: 'Compensation & Benefits',
-    date: 'Aug 08, 2026',
-    timeAgo: '1 week ago',
-    readTime: '4 min read',
-    summary:
-      'Open enrollment window for corporate health cards, OPD allowance tier upgrades, and dependent additions is now active. Submit family updates on the self-service portal by August 30.',
-    content: `Dear Colleagues,
-
-Our annual health insurance coverage with Jubilee Life & Allianz Care is up for policy renewal for the 2026-2027 financial term.
-
-### Enhanced Coverage Highlights
-- **In-Patient Hospitalization**: Limit enhanced to PKR 1,500,000 per family member.
-- **Maternity Benefit**: Increased to PKR 350,000.
-- **OPD Annual Ceiling**: Enhanced across all employment grades by 18%.
-- **Dental & Optical Rider**: Available for enrollment during this window.
-
-Please submit any spouse or newborn dependent CNIC/B-Form documents to HR operations before the cut-off date.`,
-    attachments: [
-      { name: 'Insurance_Benefit_Summary_2026.pdf', size: '3.8 MB', type: 'PDF' },
-      { name: 'Hospital_Panel_List_Pakistan.pdf', size: '4.2 MB', type: 'PDF' },
-    ],
-    acknowledged: false,
-    acknowledgedCount: 98,
-    totalTargetCount: 160,
-  },
-  {
-    id: 'ann-4',
-    title: 'Scheduled Cloud ERP & Biometric Turnstile Infrastructure Maintenance',
-    category: 'MAINTENANCE',
-    categoryLabel: 'IT & Infrastructure',
-    priority: 'MEDIUM',
-    urgencyLevel: 'NOTICE',
-    isHero: false,
-    pinned: false,
-    author: 'Zainab Qureshi',
-    authorRole: 'DevOps & SecOps Lead',
-    department: 'Engineering & IT',
-    date: 'Aug 04, 2026',
-    timeAgo: '12 days ago',
-    readTime: '1 min read',
-    summary:
-      'Routine security patch upgrade on primary database clusters and hardware turnstiles will take place on Saturday, Aug 22 from 11:00 PM to 03:00 AM PKT. Offline punch logging will remain active.',
-    content: `IT Infrastructure Notice:
-
-A scheduled maintenance window will be carried out this Saturday night to upgrade our PostgreSQL database clusters, SSL certificates, and biometric hardware gateway endpoints.
-
-### Expected Impact
-- Self-service portal will be in maintenance mode for approximately 40 minutes.
-- Biometric turnstiles will operate in offline caching mode. All physical badge punches will auto-sync once server connections resume.
-
-No action is required from employees.`,
-    attachments: [],
-    acknowledged: true,
-    acknowledgedCount: 155,
-    totalTargetCount: 160,
-  },
-  {
-    id: 'ann-5',
-    title: 'Townhall Notice: Q3 Strategy Roadmap & AI Tooling Rollout',
-    category: 'MEETINGS',
-    categoryLabel: 'Meetings & All-Hands',
-    priority: 'HIGH',
-    urgencyLevel: 'IMPORTANT',
-    isHero: true,
-    pinned: false,
-    author: 'Executive Leadership Team',
-    authorRole: 'C-Suite Broadcast',
-    department: 'Corporate Communications',
-    date: 'Aug 01, 2026',
-    timeAgo: '2 weeks ago',
-    readTime: '2 min read',
-    summary:
-      'Join the global team for our live Q3 Townhall on August 28th at 04:00 PM PKT. Agenda covers product milestone demos, regional expansions, and open floor employee Q&A.',
-    content: `All personnel are invited to the Q3 Global Townhall.
-
-### Agenda
-- **04:00 PM**: Welcome & CEO Strategic Keynote
-- **04:20 PM**: Product Demo: NexaHR v3 AI Autonomous Engine
-- **04:45 PM**: Employee Recognition & Long Service Awards
-- **05:00 PM**: Live Open Mic Q&A with Senior Management
-
-Submit your anonymous questions via the Helpdesk portal prior to Thursday noon.`,
-    attachments: [
-      { name: 'Townhall_Q3_Agenda.pdf', size: '650 KB', type: 'PDF' },
-    ],
-    acknowledged: false,
-    acknowledgedCount: 130,
-    totalTargetCount: 160,
-  },
-];
+const getCategoryLabel = (cat) => {
+  switch (cat) {
+    case 'EVENTS':
+      return 'Social & Events';
+    case 'POLICIES':
+      return 'HR Policies';
+    case 'BENEFITS':
+      return 'Benefits & Perks';
+    case 'MEETINGS':
+      return 'Meetings & Townhalls';
+    case 'MAINTENANCE':
+    case 'OPERATIONS':
+      return 'Operations & IT';
+    case 'CORPORATE':
+      return 'Corporate Circular';
+    default:
+      return cat || 'General Notice';
+  }
+};
 
 const CATEGORY_TABS = [
   { id: 'ALL', label: 'All Circulars' },
@@ -221,24 +62,14 @@ const CATEGORY_TABS = [
   { id: 'POLICIES', label: 'HR Policies' },
   { id: 'BENEFITS', label: 'Benefits & Perks' },
   { id: 'MEETINGS', label: 'Meetings & Townhalls' },
-  { id: 'MAINTENANCE', label: 'IT & Infrastructure' },
+  { id: 'OPERATIONS', label: 'Operations & IT' },
 ];
 
 const EmployeeAnnouncements = () => {
   const [filter, setFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [heroIndex, setHeroIndex] = useState(0);
-  const [announcements, setAnnouncements] = useState(() => {
-    const saved = localStorage.getItem('nexahr_notices_data');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
-    return DEFAULT_ANNOUNCEMENTS;
-  });
+  const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
@@ -248,22 +79,35 @@ const EmployeeAnnouncements = () => {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
-  // Sync live announcements from backend if available
+  // Sync live announcements from backend API
   const loadAnnouncements = async () => {
     setLoading(true);
     try {
+      localStorage.removeItem('nexahr_notices_data');
       const res = await api.getAnnouncements();
-      if (res?.success && Array.isArray(res.data?.announcements) && res.data.announcements.length > 0) {
-        const merged = res.data.announcements.map((backendItem, idx) => ({
-          ...DEFAULT_ANNOUNCEMENTS[idx % DEFAULT_ANNOUNCEMENTS.length],
-          ...backendItem,
-          id: backendItem.id || `ann-server-${idx}`,
+      if (res?.success && Array.isArray(res.data?.announcements)) {
+        const formatted = res.data.announcements.map((item) => ({
+          ...item,
+          categoryLabel: getCategoryLabel(item.category),
+          readTime: `${Math.max(1, Math.ceil((item.content?.length || 100) / 400))} min read`,
+          date: item.createdAt
+            ? new Date(item.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })
+            : 'Recent',
+          summary: item.summary || item.content?.slice(0, 140) + '...',
+          author: item.author || 'People Operations & HR',
+          department: item.department || 'Company-Wide (All Offices)',
         }));
-        setAnnouncements(merged);
-        localStorage.setItem('nexahr_notices_data', JSON.stringify(merged));
+        setAnnouncements(formatted);
+      } else {
+        setAnnouncements([]);
       }
     } catch (err) {
       console.warn('Live notices fetch notice:', err.message);
+      setAnnouncements([]);
     } finally {
       setLoading(false);
     }
@@ -643,22 +487,28 @@ const EmployeeAnnouncements = () => {
           ))
         ) : (
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
-              <Search className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center">
+              <Megaphone className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">No matching circulars found</h4>
+            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              {announcements.length === 0 ? 'No Announcements Published Yet' : 'No matching circulars found'}
+            </h4>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Try adjusting your search terms or switch category filters to view other company announcements.
+              {announcements.length === 0
+                ? 'There are currently no official company notices or circulars posted by HR.'
+                : 'Try adjusting your search terms or switch category filters to view other company announcements.'}
             </p>
-            <button
-              onClick={() => {
-                setFilter('ALL');
-                setSearchQuery('');
-              }}
-              className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white text-xs font-bold cursor-pointer"
-            >
-              Reset All Filters
-            </button>
+            {announcements.length > 0 && (
+              <button
+                onClick={() => {
+                  setFilter('ALL');
+                  setSearchQuery('');
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white text-xs font-bold cursor-pointer"
+              >
+                Reset All Filters
+              </button>
+            )}
           </div>
         )}
       </div>

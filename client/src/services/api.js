@@ -413,5 +413,62 @@ export const api = {
       body: JSON.stringify({ status }),
     });
   },
+
+  // --- Accounts & Financial Ledger Operations ---
+  getAccountTransactions: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/accounts/transactions${query ? `?${query}` : ''}`);
+  },
+
+  getAccountStats: async () => {
+    return await fetchAPI('/accounts/stats');
+  },
+
+  createAccountTransaction: async (txnData) => {
+    return await fetchAPI('/accounts/transactions', {
+      method: 'POST',
+      body: JSON.stringify(txnData),
+    });
+  },
+
+  updateAccountTransaction: async (id, txnData) => {
+    return await fetchAPI(`/accounts/transactions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(txnData),
+    });
+  },
+
+  deleteAccountTransaction: async (id) => {
+    return await fetchAPI(`/accounts/transactions/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  batchDeleteAccountTransactions: async (ids) => {
+    return await fetchAPI('/accounts/batch-delete', {
+      method: 'POST',
+      body: JSON.stringify({ ids }),
+    });
+  },
+
+  batchUpdateAccountTransactionStatus: async (ids, status) => {
+    return await fetchAPI('/accounts/batch-status', {
+      method: 'POST',
+      body: JSON.stringify({ ids, status }),
+    });
+  },
+
+  clearAllAccountTransactions: async () => {
+    return await fetchAPI('/accounts/clear', {
+      method: 'POST',
+    });
+  },
+
+  seedAccountTransactions: async (force = false) => {
+    return await fetchAPI(`/accounts/seed${force ? '?force=true' : ''}`, {
+      method: 'POST',
+    });
+  },
 };
+
 

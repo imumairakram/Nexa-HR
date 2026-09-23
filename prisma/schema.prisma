@@ -69,6 +69,7 @@ model User {
   notifications   Notification[]
   tickets         Ticket[]
   ticketReplies   TicketReply[]
+  accountTransactions AccountTransaction[]
 
   @@map("users")
 }
@@ -377,5 +378,37 @@ model TicketReply {
   @@index([userId])
   @@index([createdAt])
   @@map("ticket_replies")
+}
+
+// ====================================================
+// ACCOUNTS, LEDGER & FINANCIAL TRANSACTIONS
+// ====================================================
+
+model AccountTransaction {
+  id            String   @id @default(uuid())
+  voucherNumber String   @unique // e.g. "TXN-9402"
+  title         String
+  category      String   // INFRASTRUCTURE, PAYROLL, REVENUE, BENEFITS, HARDWARE, FACILITIES, MARKETING, OPERATIONS, TRAVEL, LEGAL, OTHER
+  type          String   @default("EXPENSE") // "EXPENSE" | "INCOME"
+  amount        Float
+  department    String   @default("Company-Wide")
+  date          DateTime @default(now())
+  time          String?
+  status        String   @default("VERIFIED") // "VERIFIED" | "PENDING" | "FLAGGED"
+  paymentMethod String   @default("Corp Visa") // "Corp Visa", "ACH Transfer", "Wire In", "Direct Deposit", "Petty Cash", "Corporate Check"
+  ref           String?  // Reference code e.g. "INV-AWS-2026-08"
+  taxDeductible Boolean  @default(true)
+  notes         String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  createdBy     User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([category])
+  @@index([type])
+  @@index([date])
+  @@index([status])
+  @@map("account_transactions")
 }
 

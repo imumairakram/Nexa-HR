@@ -60,37 +60,6 @@ const EMPLOYEE_SEARCH_SHORTCUTS = [
   { label: 'Settings & Workspace Preferences', icon: Settings, path: '/employee/settings', category: 'Account' },
 ];
 
-
-const INITIAL_EMPLOYEE_NOTIFICATIONS = [
-  {
-    id: 1,
-    title: 'Leave Request Approved',
-    desc: 'Your 3-day summer vacation has been approved by HR.',
-    time: '2 hours ago',
-    type: 'success',
-    read: false,
-    link: '/employee/leaves',
-  },
-  {
-    id: 2,
-    title: 'July 2026 Payslip Ready',
-    desc: 'Your monthly salary slip is now available for download.',
-    time: 'Yesterday',
-    type: 'info',
-    read: false,
-    link: '/employee/payslips',
-  },
-  {
-    id: 3,
-    title: 'New Company Notice',
-    desc: 'Annual Company Retreat 2026 announcement posted.',
-    time: '2 days ago',
-    type: 'info',
-    read: true,
-    link: '/employee/announcements',
-  },
-];
-
 const EmployeePageHeader = ({
   title = 'Employee Portal',
   subtitle = null,

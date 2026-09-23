@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
+import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import {
   FileText,
   Search,
@@ -58,6 +59,39 @@ const PayslipList = () => {
   useEffect(() => {
     loadPayslips();
   }, []);
+
+  // Dynamic Sparkline Telemetry
+  const disbursedSparkData = useMemo(() => {
+    if (!payslips.length) return null;
+    return payslips.slice(0, 7).reverse().map((p) => ({
+      label: p.employee.split(' ')[0] || 'Staff',
+      value: p.net,
+    }));
+  }, [payslips]);
+
+  const taxSparkData = useMemo(() => {
+    if (!payslips.length) return null;
+    return payslips.slice(0, 7).reverse().map((p) => ({
+      label: p.employee.split(' ')[0] || 'Staff',
+      value: p.deductions,
+    }));
+  }, [payslips]);
+
+  const vouchersSparkData = useMemo(() => {
+    if (!payslips.length) return null;
+    return payslips.slice(0, 7).map((_, idx) => ({
+      label: `Voucher ${idx + 1}`,
+      value: idx + 1,
+    }));
+  }, [payslips]);
+
+  const avgSparkData = useMemo(() => {
+    if (!payslips.length) return null;
+    return payslips.slice(0, 7).map((p) => ({
+      label: p.employee.split(' ')[0] || 'Staff',
+      value: Math.round(p.net),
+    }));
+  }, [payslips]);
 
   const filtered = payslips.filter((p) =>
     p.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -133,96 +167,69 @@ const PayslipList = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
+      {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Vouchers</span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <FileText className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {payslips.length} <span className="text-base font-bold text-slate-400">Slips</span>
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Current Cycle</span>
-              <span className="text-slate-400">All Depts</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="dark"
+          title="Total Vouchers"
+          value={payslips.length}
+          unit={payslips.length === 1 ? 'Slip' : 'Slips'}
+          badgeText="Current Cycle"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="All Departments"
+          chartColor="purple"
+          presetWave="wave1"
+          dataPoints={vouchersSparkData}
+          loading={loading}
+        />
 
         {/* Card 2 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Disbursed</span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              ${payslips.reduce((acc, p) => acc + p.net, 0).toLocaleString()}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Net Paid</span>
-              <span className="text-slate-400">Direct Wire</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Total Disbursed"
+          value={`$${payslips.reduce((acc, p) => acc + p.net, 0).toLocaleString()}`}
+          badgeText="100% Net Paid"
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Direct Wire Settled"
+          chartColor="emerald"
+          presetWave="wave2"
+          dataPoints={disbursedSparkData}
+          loading={loading}
+        />
 
         {/* Card 3 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-rose-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-rose-500/10 blur-2xl pointer-events-none group-hover:bg-rose-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Tax Withholdings</span>
-            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200/60 dark:border-rose-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
-              ${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-rose-600 dark:text-rose-400 font-bold">W-2 Deductions</span>
-              <span className="text-slate-400">Statutory</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Tax Withholdings"
+          value={`$${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
+          badgeText="Statutory Filing"
+          badgeType="warning"
+          badgeIcon="dot"
+          subtext="W-2 Deductions"
+          chartColor="rose"
+          presetWave="wave3"
+          dataPoints={taxSparkData}
+          loading={loading}
+        />
 
         {/* Card 4 */}
-        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
-
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Average Net Salary</span>
-            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
-              ${Math.round(payslips.reduce((acc, p) => acc + p.net, 0) / (payslips.length || 1)).toLocaleString()}
-            </div>
-            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
-              <span className="text-purple-600 dark:text-purple-400 font-bold">Per Employee</span>
-              <span className="text-slate-400">Net Avg</span>
-            </div>
-          </div>
-        </div>
+        <SparkMetricCard
+          variant="light"
+          title="Average Net Salary"
+          value={`$${Math.round(payslips.reduce((acc, p) => acc + p.net, 0) / (payslips.length || 1)).toLocaleString()}`}
+          badgeText="Per Employee"
+          badgeType="positive"
+          badgeIcon="dot"
+          subtext="Net Average Payout"
+          chartColor="blue"
+          presetWave="wave4"
+          dataPoints={avgSparkData}
+          loading={loading}
+        />
       </div>
 
       {/* Payslips Table */}

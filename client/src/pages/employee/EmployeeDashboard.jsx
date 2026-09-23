@@ -30,33 +30,6 @@ import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 import { getYearHolidays } from '../../utils/holidayEngine';
 
-const INITIAL_ANNOUNCEMENTS = [
-  {
-    id: 'ann-01',
-    title: 'Annual Performance Appraisal Cycle (FY2026)',
-    desc: 'Self-assessment reviews are now open. Please complete your goals and KPIs before month-end.',
-    category: 'HR & TALENT',
-    date: 'Aug 12, 2026',
-    author: 'People Operations',
-  },
-  {
-    id: 'ann-02',
-    title: 'Comprehensive Health Insurance Policy Renewal',
-    desc: 'Updated outpatient (OPD) and hospitalization coverage tiers have been synced with employee benefits portal.',
-    category: 'BENEFITS',
-    date: 'Aug 08, 2026',
-    author: 'Corporate Benefits',
-  },
-  {
-    id: 'ann-03',
-    title: 'Cloud Infrastructure & Engineering All-Hands',
-    desc: 'Quarterly engineering sync and product roadmap showcase scheduled for this Thursday at 3:00 PM.',
-    category: 'OPERATIONS',
-    date: 'Aug 04, 2026',
-    author: 'Engineering Leadership',
-  },
-];
-
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { formatCurrency, formatDate, formatTime } = useRegionalSettings();
@@ -222,12 +195,12 @@ const EmployeeDashboard = () => {
     });
   }, [leaveTypes, leaveRequests]);
 
-  // Dynamic Announcements list from backend or fallback
+  // Dynamic Announcements list from backend
   const dynamicAnnouncements = useMemo(() => {
     if (announcements && announcements.length > 0) {
       return announcements.slice(0, 3);
     }
-    return INITIAL_ANNOUNCEMENTS;
+    return [];
   }, [announcements]);
 
   const netSalaryAmount = latestPayslip?.netSalary
@@ -700,37 +673,45 @@ const EmployeeDashboard = () => {
             </div>
 
             <div className="space-y-3">
-              {dynamicAnnouncements.map((item, idx) => {
-                const itemDate = item.date || (item.createdAt ? formatDate(item.createdAt) : 'Aug 14, 2026');
-                return (
-                  <div
-                    key={item.id || idx}
-                    onClick={() => setSelectedAnnouncement(item)}
-                    className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/40 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-600 shadow-2xs">
-                        {item.category || 'COMPANY NOTICE'}
-                      </span>
-                      <span className="text-[11px] font-semibold text-slate-400">
-                        {itemDate}
-                      </span>
+              {dynamicAnnouncements.length > 0 ? (
+                dynamicAnnouncements.map((item, idx) => {
+                  const itemDate = item.date || (item.createdAt ? formatDate(item.createdAt) : 'Recent');
+                  return (
+                    <div
+                      key={item.id || idx}
+                      onClick={() => setSelectedAnnouncement(item)}
+                      className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/40 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-600 shadow-2xs">
+                          {item.category || 'COMPANY NOTICE'}
+                        </span>
+                        <span className="text-[11px] font-semibold text-slate-400">
+                          {itemDate}
+                        </span>
+                      </div>
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                        {item.desc || item.summary || item.content}
+                      </p>
+                      <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100/80 dark:border-slate-700/40 text-[11px] font-semibold text-slate-400">
+                        <span>By {item.author || item.createdBy || 'People Operations & HR'}</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
+                          Read Notice →
+                        </span>
+                      </div>
                     </div>
-                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                      {item.desc || item.content}
-                    </p>
-                    <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100/80 dark:border-slate-700/40 text-[11px] font-semibold text-slate-400">
-                      <span>By {item.author || item.createdBy || 'Operations Team'}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
-                        Read Notice →
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="p-8 text-center rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/40 space-y-1.5">
+                  <Megaphone className="w-6 h-6 text-slate-300 dark:text-slate-600 mx-auto" />
+                  <div className="text-xs font-bold text-slate-600 dark:text-slate-300">No Active Announcements</div>
+                  <p className="text-[11px] text-slate-400">All official company circulars posted by HR will appear here.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

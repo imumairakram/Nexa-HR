@@ -94,6 +94,39 @@ const Payroll = () => {
   const totalTaxWithheldAllTime = history.reduce((acc, h) => acc + h.totalDeductions, 0);
   const latestBatch = history[0] || null;
 
+  // Dynamic Sparkline Telemetry
+  const latestBatchSparkData = React.useMemo(() => {
+    if (!history.length) return null;
+    return history.slice(0, 7).reverse().map((h) => ({
+      label: h.month.split(' ')[0],
+      value: h.netPayable,
+    }));
+  }, [history]);
+
+  const totalNetSparkData = React.useMemo(() => {
+    if (!history.length) return null;
+    return history.slice(0, 7).reverse().map((h) => ({
+      label: h.month.split(' ')[0],
+      value: h.totalGross,
+    }));
+  }, [history]);
+
+  const taxSparkData = React.useMemo(() => {
+    if (!history.length) return null;
+    return history.slice(0, 7).reverse().map((h) => ({
+      label: h.month.split(' ')[0],
+      value: h.totalDeductions,
+    }));
+  }, [history]);
+
+  const payslipsSparkData = React.useMemo(() => {
+    if (!history.length) return null;
+    return history.slice(0, 7).reverse().map((h) => ({
+      label: h.month.split(' ')[0],
+      value: h.employeesCount,
+    }));
+  }, [history]);
+
   const handleRunPayroll = async () => {
     try {
       setSubmitting(true);
@@ -198,6 +231,7 @@ const Payroll = () => {
           subtext="Net Pay Disbursed"
           chartColor="purple"
           presetWave="wave1"
+          dataPoints={latestBatchSparkData}
           loading={loading}
         />
 
@@ -212,6 +246,7 @@ const Payroll = () => {
           subtext="Audited Payruns"
           chartColor="emerald"
           presetWave="wave2"
+          dataPoints={totalNetSparkData}
           loading={loading}
         />
 
@@ -226,6 +261,7 @@ const Payroll = () => {
           subtext="Tax Compliant"
           chartColor="amber"
           presetWave="wave3"
+          dataPoints={taxSparkData}
           loading={loading}
         />
 
@@ -241,6 +277,7 @@ const Payroll = () => {
           subtext="Encrypted Storage"
           chartColor="rose"
           presetWave="wave4"
+          dataPoints={payslipsSparkData}
           loading={loading}
         />
       </div>
