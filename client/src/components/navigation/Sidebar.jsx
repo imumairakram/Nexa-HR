@@ -22,6 +22,7 @@ import {
   Calendar,
   KeyRound,
   ShieldCheck,
+  User,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import Logo from '../common/Logo';
@@ -146,6 +147,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     ...(isAdmin
       ? [{ type: 'link', label: 'Access Control', path: '/app/access-control', icon: KeyRound }]
       : []),
+    { type: 'link', label: 'Profile', path: '/app/profile', icon: User },
     { type: 'link', label: 'Settings', path: '/app/settings', icon: Settings },
   ];
 
