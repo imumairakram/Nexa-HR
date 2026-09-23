@@ -353,10 +353,12 @@ const SparkMetricCard = ({
         </div>
 
         {/* Right Column: Fully Dynamic Vector Area Sparkline */}
-        <div className="shrink-0 relative flex items-center justify-end pl-0.5 pt-0.5">
+        <div className="shrink-0 relative flex flex-col items-end pl-0.5 pt-0.5">
           {/* Floating Hover Tooltip */}
           {activePoint && (
             <div
+              id={`tooltip-${gradientId}`}
+              role="tooltip"
               className="absolute -top-7 right-0 z-30 pointer-events-none px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-xl whitespace-nowrap border animate-in fade-in duration-100"
               style={{
                 backgroundColor: isDark ? scheme.tooltipBg : '#0F172A',
@@ -368,14 +370,24 @@ const SparkMetricCard = ({
             </div>
           )}
 
-          <div className="w-14 sm:w-16 md:w-20 xl:w-22 h-8 sm:h-9 lg:h-10 overflow-visible cursor-crosshair relative">
+          <div className="w-16 sm:w-18 md:w-20 xl:w-24 h-8 sm:h-9 lg:h-10 overflow-visible relative">
             <svg
               ref={svgRef}
               viewBox="0 0 104 44"
-              className="w-full h-full overflow-visible group-hover:scale-105 transition-transform duration-300"
+              tabIndex={0}
+              role="img"
+              aria-label={`${title} trend over ${normalizedPoints.length} data points. Starting at ${normalizedPoints[0]?.value ?? 0} ${unit || ''}, current value ${value} ${unit || ''} (${movement.isUp ? 'upward' : 'downward'} trend of ${movement.pct}%).`}
+              aria-describedby={activePoint ? `tooltip-${gradientId}` : undefined}
+              className="w-full h-full overflow-visible cursor-crosshair group-hover:scale-105 focus:outline-none focus:ring-1 focus:ring-indigo-400 rounded transition-transform duration-300"
               preserveAspectRatio="none"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
+              onFocus={() => {
+                if (chartGeometry.points.length) {
+                  setHoveredIndex(chartGeometry.points.length - 1);
+                }
+              }}
+              onBlur={handleMouseLeave}
               onTouchMove={(e) => {
                 if (e.touches?.[0]) handleMouseMove(e.touches[0]);
               }}
@@ -392,7 +404,7 @@ const SparkMetricCard = ({
               <path
                 d={chartGeometry.area}
                 fill={`url(#spark_grad_${gradientId})`}
-                className="transition-all duration-500 ease-out"
+                className="transition-all duration-500 ease-out pointer-events-none"
               />
 
               {/* Glowing Line Stroke */}
@@ -403,13 +415,27 @@ const SparkMetricCard = ({
                 strokeWidth={variant === 'dark' ? 2.4 : 2.2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="transition-all duration-500 ease-out"
+                className="transition-all duration-500 ease-out pointer-events-none"
                 style={{ filter: scheme.filterGlow }}
               />
 
+              {/* Data Point Markers (Visible reference dots along trajectory) */}
+              {chartGeometry.points.map((pt, idx) => (
+                <circle
+                  key={idx}
+                  cx={pt.x}
+                  cy={pt.y}
+                  r={idx === 0 || idx === chartGeometry.points.length - 1 ? 2.2 : 1.4}
+                  fill={scheme.dotColor || '#ffffff'}
+                  stroke={scheme.strokeSecondary || scheme.stroke}
+                  strokeWidth="0.8"
+                  className="opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none"
+                />
+              ))}
+
               {/* Active Pulse Radar Dot on the Latest Point when not hovering */}
               {!activePoint && latestPoint && (
-                <g className="animate-in fade-in">
+                <g className="animate-in fade-in pointer-events-none">
                   {/* Ping Ring */}
                   <circle
                     cx={latestPoint.x}
@@ -441,7 +467,7 @@ const SparkMetricCard = ({
 
               {/* Interactive Crosshair & Active Point when Hovered */}
               {activePoint && (
-                <g className="animate-in fade-in duration-150">
+                <g className="animate-in fade-in duration-150 pointer-events-none">
                   {/* Vertical Guide */}
                   <line
                     x1={activePoint.x}
@@ -474,6 +500,18 @@ const SparkMetricCard = ({
               )}
             </svg>
           </div>
+
+          {/* Start / End Boundary Labels */}
+          {normalizedPoints.length >= 2 && (
+            <div
+              className={`w-full flex justify-between items-center text-[9px] font-medium tracking-tight px-0.5 mt-0.5 select-none ${
+                isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-500'
+              }`}
+            >
+              <span>{normalizedPoints[0]?.label || 'Start'}</span>
+              <span>{normalizedPoints[normalizedPoints.length - 1]?.label || 'Today'}</span>
+            </div>
+          )}
         </div>
       </div>
 
