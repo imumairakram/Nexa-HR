@@ -1,6 +1,7 @@
 // Centralized API Client for NexaHR Backend Integration
 
-const BASE_URL = '/api';
+const rawBase = import.meta.env.VITE_API_URL || '';
+const BASE_URL = rawBase ? (rawBase.endsWith('/api') ? rawBase : `${rawBase.replace(/\/+$/, '')}/api`) : '/api';
 
 /**
  * Helper to execute HTTP fetch requests with auth headers and error handling.
