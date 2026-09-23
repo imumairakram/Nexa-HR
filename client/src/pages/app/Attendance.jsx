@@ -24,21 +24,11 @@ import { api } from '../../services/api';
 
 const Attendance = () => {
   const [logs, setLogs] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
-
-  // Biometric Terminal Hardware Simulator Form
-  const [simForm, setSimForm] = useState({
-    employeeCode: 'EMP-103',
-    type: 'IN',
-    terminal: 'Terminal 01 - Main Turnstile (Face-ID)',
-    timestamp: new Date().toISOString().slice(0, 16),
-  });
 
   // Fetch real database attendance logs
   const fetchAttendance = async () => {
@@ -71,27 +61,8 @@ const Attendance = () => {
     }
   };
 
-  // Fetch employees for simulator dropdown
-  const fetchEmployeesList = async () => {
-    try {
-      const res = await api.getEmployees();
-      if (res && res.success && res.data?.employees) {
-        setEmployees(res.data.employees);
-        if (res.data.employees.length > 0) {
-          setSimForm((prev) => ({
-            ...prev,
-            employeeCode: res.data.employees[0].employeeCode,
-          }));
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to load employees for simulator:', err.message);
-    }
-  };
-
   useEffect(() => {
     fetchAttendance();
-    fetchEmployeesList();
   }, []);
 
   const handleSyncHardware = async () => {
@@ -103,32 +74,6 @@ const Attendance = () => {
       setToastMsg('Biometric database sync completed successfully!');
       setTimeout(() => setToastMsg(''), 3500);
     }, 800);
-  };
-
-  // Hardware Biometric Terminal Trigger Handler
-  const handleHardwarePunch = async (e) => {
-    e.preventDefault();
-    setIsSyncing(true);
-    try {
-      const res = await api.syncBiometricHardware({
-        employeeCode: simForm.employeeCode,
-        type: simForm.type,
-        timestamp: new Date(simForm.timestamp).toISOString(),
-      });
-
-      if (res && res.success) {
-        setToastMsg(`Biometric ${simForm.type} punch recorded into database for ${simForm.employeeCode}!`);
-        setIsSimulatorOpen(false);
-        await fetchAttendance();
-      } else {
-        setToastMsg(`Error: ${res?.message || 'Biometric hardware sync failed.'}`);
-      }
-    } catch (err) {
-      setToastMsg(`Device communication error: ${err.message}`);
-    } finally {
-      setIsSyncing(false);
-      setTimeout(() => setToastMsg(''), 4000);
-    }
   };
 
   const filteredLogs = logs.filter((log) => {
@@ -199,21 +144,14 @@ const Attendance = () => {
               <Cpu className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
-              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Terminal Diagnostics</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Simulate hardware punch log</div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Hardware Terminals</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Biometric sync engine active</div>
             </div>
             <div className="flex flex-col w-full gap-2">
               <button
-                onClick={() => setIsSimulatorOpen(true)}
-                className="w-full px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
-              >
-                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Simulate Hardware Punch</span>
-              </button>
-              <button
                 onClick={handleSyncHardware}
                 disabled={isSyncing}
-                className="w-full px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                className="w-full px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>{isSyncing ? 'Syncing...' : 'Sync Hardware Logs'}</span>
@@ -313,14 +251,6 @@ const Attendance = () => {
               <RefreshCw className={`w-4 h-4 text-emerald-600 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? 'Syncing...' : 'Refresh DB Logs'}</span>
             </button>
-
-            <button
-              onClick={() => setIsSimulatorOpen(true)}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
-            >
-              <Fingerprint className="w-4 h-4" />
-              <span>Biometric Machine Simulator</span>
-            </button>
           </div>
         </div>
 
@@ -412,113 +342,6 @@ const Attendance = () => {
           </table>
         </div>
       </div>
-
-      {/* ========================================================================= */}
-      {/* 4. MODAL: BIOMETRIC HARDWARE MACHINE SIMULATOR */}
-      {/* ========================================================================= */}
-      {isSimulatorOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
-                  <Fingerprint className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">Biometric Terminal Gateway</h3>
-                  <p className="text-[11px] text-slate-400">Trigger hardware scan directly to database</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsSimulatorOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleHardwarePunch} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Select Employee *</label>
-                <select
-                  value={simForm.employeeCode}
-                  onChange={(e) => setSimForm({ ...simForm, employeeCode: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
-                >
-                  {employees.length > 0 ? (
-                    employees.map((emp) => (
-                      <option key={emp.id} value={emp.employeeCode}>
-                        {emp.firstName} {emp.lastName} ({emp.employeeCode})
-                      </option>
-                    ))
-                  ) : (
-                    <option value="EMP-103">Alex Mercer (EMP-103)</option>
-                  )}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Punch Event Type *</label>
-                  <select
-                    value={simForm.type}
-                    onChange={(e) => setSimForm({ ...simForm, type: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
-                  >
-                    <option value="IN">IN (Check In)</option>
-                    <option value="OUT">OUT (Check Out)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Hardware Terminal *</label>
-                  <select
-                    value={simForm.terminal}
-                    onChange={(e) => setSimForm({ ...simForm, terminal: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
-                  >
-                    <option value="Terminal 01 - Main Gate (Face-ID)">Terminal 01 (Face-ID)</option>
-                    <option value="Terminal 02 - Floor 2 (Fingerprint)">Terminal 02 (Fingerprint)</option>
-                    <option value="Terminal 03 - Lab (RFID)">Terminal 03 (RFID)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Scan Timestamp</label>
-                <input
-                  type="datetime-local"
-                  value={simForm.timestamp}
-                  onChange={(e) => setSimForm({ ...simForm, timestamp: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
-                />
-              </div>
-
-              <div className="p-3 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] text-emerald-800 dark:text-emerald-300">
-                This simulates the physical biometric scanner sending a payload via API key to the database.
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsSimulatorOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSyncing}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5"
-                >
-                  <Cpu className="w-4 h-4" />
-                  <span>{isSyncing ? 'Writing to DB...' : 'Execute Biometric Punch'}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
