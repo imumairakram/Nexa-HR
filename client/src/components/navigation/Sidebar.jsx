@@ -187,8 +187,9 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
         {/* Scrollable Navigation Items */}
         <nav
-          className={`flex-1 overflow-y-auto overflow-x-hidden pt-3 space-y-1 w-full ${isCollapsed ? 'no-scrollbar px-0' : 'custom-scrollbar pr-1'
-            }`}
+          className={`flex-1 overflow-y-auto overflow-x-hidden pt-3 space-y-1 w-full no-scrollbar ${
+            isCollapsed ? 'px-0' : 'pr-1'
+          }`}
         >
           {menuStructure.map((item, index) => {
             if (item.type === 'link') {
