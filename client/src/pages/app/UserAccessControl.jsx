@@ -899,7 +899,8 @@ const UserAccessControl = () => {
             </div>
           )}
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 };

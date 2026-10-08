@@ -1154,7 +1154,8 @@ const Accounts = () => {
             </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================================= */}
       {/* 4. SLIDE-OVER DRAWER: RECORD / EDIT VOUCHER */}

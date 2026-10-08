@@ -719,7 +719,6 @@ const EmployeeDashboard = () => {
                   <p className="text-[11px] text-slate-400">All official company circulars posted by HR will appear here.</p>
                 </div>
               )}
-            )}
             </div>
           </div>
         </div>
