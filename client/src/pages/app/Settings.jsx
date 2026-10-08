@@ -18,6 +18,7 @@ import {
   Calendar,
   DollarSign,
 } from 'lucide-react';
+import { SettingsSkeleton } from '../../components/common/Skeleton';
 import { useTheme } from '../../context/ThemeContext';
 import {
   useRegionalSettings,
@@ -41,7 +42,22 @@ const Settings = () => {
     formatCurrency,
   } = useRegionalSettings();
 
+  const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const loadSettings = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 450);
+  };
 
   const [notifications, setNotifications] = useState(() => {
     try {
@@ -140,6 +156,8 @@ const Settings = () => {
       <AppPageHeader
         title="Enterprise System Settings & Preferences"
         subtitle="Configure company parameters, localization, biometric hardware ports, automated alerts, and theme preferences."
+        onRefresh={loadSettings}
+        loading={loading}
       />
 
       {toastMsg && (
@@ -149,10 +167,14 @@ const Settings = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 1. DYNAMIC SYSTEM SETTINGS HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
+      {loading ? (
+        <SettingsSkeleton />
+      ) : (
+        <>
+          {/* ========================================================================= */}
+          {/* 1. DYNAMIC SYSTEM SETTINGS HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
+          {/* ========================================================================= */}
+          <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -454,7 +476,9 @@ const Settings = () => {
           </button>
         </div>
       </form>
-    </div>
+    </>
+  )}
+</div>
   );
 };
 

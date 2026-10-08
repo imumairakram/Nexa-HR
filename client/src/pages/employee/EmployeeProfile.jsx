@@ -29,6 +29,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import { ProfileSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 const DEFAULT_AVATAR = '/blank-profile-picture.png';
@@ -218,40 +219,45 @@ const EmployeeProfile = () => {
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      // 1. Instantly populate from localStorage cache to prevent flicker
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const u = JSON.parse(storedUser);
-          populateUserData(u);
-        } catch (e) {
-          console.warn('Cached user parse error:', e);
-        }
-      }
+  const [loading, setLoading] = useState(true);
 
-      // 2. Fetch live user details & relations from PostgreSQL database
+  const loadData = async () => {
+    setLoading(true);
+    // 1. Instantly populate from localStorage cache to prevent flicker
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
       try {
-        const res = await api.getMe();
-        if (res?.success && res.data?.user) {
-          const liveUser = res.data.user;
-          populateUserData(liveUser);
-
-          // Update localStorage cache with freshest DB state
-          const currentLocal = JSON.parse(localStorage.getItem('user') || '{}');
-          localStorage.setItem('user', JSON.stringify({
-            ...currentLocal,
-            ...liveUser,
-            address: liveUser.profile?.address || liveUser.address,
-            emergencyContact: liveUser.profile?.emergencyContact || liveUser.emergencyContact,
-          }));
-        }
-      } catch (err) {
-        console.warn('Live employee profile fetch error:', err.message);
+        const u = JSON.parse(storedUser);
+        populateUserData(u);
+      } catch (e) {
+        console.warn('Cached user parse error:', e);
       }
-    };
+    }
 
+    // 2. Fetch live user details & relations from PostgreSQL database
+    try {
+      const res = await api.getMe();
+      if (res?.success && res.data?.user) {
+        const liveUser = res.data.user;
+        populateUserData(liveUser);
+
+        // Update localStorage cache with freshest DB state
+        const currentLocal = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({
+          ...currentLocal,
+          ...liveUser,
+          address: liveUser.profile?.address || liveUser.address,
+          emergencyContact: liveUser.profile?.emergencyContact || liveUser.emergencyContact,
+        }));
+      }
+    } catch (err) {
+      console.warn('Live employee profile fetch error:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -465,6 +471,8 @@ const EmployeeProfile = () => {
       <EmployeePageHeader
         title="My Profile"
         subtitle="Manage your personal profile, verified employment details, and security credentials."
+        onRefresh={loadData}
+        loading={loading}
       />
 
       {toastMsg && (
@@ -474,6 +482,10 @@ const EmployeeProfile = () => {
         </div>
       )}
 
+      {loading && !formData.firstName ? (
+        <ProfileSkeleton />
+      ) : (
+        <>
       {/* ========================================================================= */}
       {/* 1. HERO PROFILE CARD (ROYAL VIOLET / PURPLE GRADIENT AESTHETIC) */}
       {/* ========================================================================= */}
@@ -947,6 +959,8 @@ const EmployeeProfile = () => {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

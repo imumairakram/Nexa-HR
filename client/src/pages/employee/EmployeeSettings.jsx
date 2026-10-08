@@ -21,6 +21,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import { SettingsSkeleton } from '../../components/common/Skeleton';
 import { useTheme } from '../../context/ThemeContext';
 import {
   useRegionalSettings,
@@ -42,8 +43,23 @@ const EmployeeSettings = () => {
     formatCurrency,
   } = useRegionalSettings();
 
+  const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const loadSettings = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 450);
+  };
 
   const [formState, setFormState] = useState({
     timezone,
@@ -108,6 +124,8 @@ const EmployeeSettings = () => {
       <EmployeePageHeader
         title="Settings"
         subtitle="Configure appearance themes, notification channels, and regional formats."
+        onRefresh={loadSettings}
+        loading={loading}
       />
 
       {toastMsg && (
@@ -117,10 +135,10 @@ const EmployeeSettings = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* FULL-WIDTH SETTINGS FORM CATEGORIES STACK */}
-      {/* ========================================================================= */}
-      <div className="w-full space-y-6">
+      {loading ? (
+        <SettingsSkeleton />
+      ) : (
+        <div className="w-full space-y-6">
         {/* ========================================================================= */}
         {/* 1. CATEGORY 1: DISPLAY & APPEARANCE (CLICKABLE THEME PREVIEW CARDS) */}
         {/* ========================================================================= */}
@@ -394,6 +412,7 @@ const EmployeeSettings = () => {
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 };

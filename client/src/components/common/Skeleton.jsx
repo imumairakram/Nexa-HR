@@ -442,4 +442,108 @@ export const SecurityRosterSkeleton = () => {
   );
 };
 
+/**
+ * Skeleton for Document Cards & Policy Cards Grid
+ */
+export const DocumentCardSkeleton = ({ count = 6 }) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: count }).map((_, idx) => (
+        <div
+          key={idx}
+          className="rounded-3xl p-5 border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#1E293B] shadow-soft space-y-3"
+        >
+          <div className="flex items-center justify-between">
+            <Skeleton className="w-10 h-10 rounded-2xl" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+          <div className="space-y-1.5">
+            <Skeleton className="h-4 w-3/4 rounded-md" />
+            <Skeleton className="h-3 w-1/2 rounded-md" />
+          </div>
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+            <Skeleton className="h-3 w-16 rounded-md" />
+            <Skeleton className="h-6 w-20 rounded-xl" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * Skeleton for System & Employee Settings Page
+ */
+export const SettingsSkeleton = () => {
+  return (
+    <div className="w-full space-y-6">
+      {/* Category 1: Theme Selector Skeleton */}
+      <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
+        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <Skeleton className="w-10 h-10 rounded-2xl" />
+          <div className="space-y-1.5 flex-1">
+            <Skeleton className="h-5 w-48 rounded-md" />
+            <Skeleton className="h-3.5 w-64 rounded-md" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-1">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <div key={idx} className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 space-y-4">
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <div className="flex items-center justify-between pt-1">
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-24 rounded-md" />
+                  <Skeleton className="h-3 w-32 rounded-md" />
+                </div>
+                <Skeleton className="w-4 h-4 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Category 2: Regional Preferences Skeleton */}
+      <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
+        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <Skeleton className="w-10 h-10 rounded-2xl" />
+          <div className="space-y-1.5 flex-1">
+            <Skeleton className="h-5 w-44 rounded-md" />
+            <Skeleton className="h-3.5 w-72 rounded-md" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="space-y-2">
+              <Skeleton className="h-3.5 w-28 rounded-md" />
+              <Skeleton className="h-11 w-full rounded-2xl" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Category 3: Notification Toggles Skeleton */}
+      <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
+        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <Skeleton className="w-10 h-10 rounded-2xl" />
+          <div className="space-y-1.5 flex-1">
+            <Skeleton className="h-5 w-52 rounded-md" />
+            <Skeleton className="h-3.5 w-60 rounded-md" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-40 rounded-md" />
+                <Skeleton className="h-3 w-56 rounded-md" />
+              </div>
+              <Skeleton className="w-11 h-6 rounded-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default Skeleton;

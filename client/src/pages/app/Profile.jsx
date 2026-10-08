@@ -29,6 +29,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import { ProfileSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 // Helper to reliably parse Emergency Contact string into individual fields
@@ -239,40 +240,45 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      // 1. Instantly populate from localStorage cache to prevent flicker
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const u = JSON.parse(storedUser);
-          populateUserData(u);
-        } catch (e) {
-          console.warn('Cached user parse error:', e);
-        }
-      }
+  const [loading, setLoading] = useState(true);
 
-      // 2. Fetch live user details & relations from backend database
+  const loadData = async () => {
+    setLoading(true);
+    // 1. Instantly populate from localStorage cache to prevent flicker
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
       try {
-        const res = await api.getMe();
-        if (res?.success && res.data?.user) {
-          const liveUser = res.data.user;
-          populateUserData(liveUser);
-
-          // Update localStorage cache with freshest DB state
-          const currentLocal = JSON.parse(localStorage.getItem('user') || '{}');
-          localStorage.setItem('user', JSON.stringify({
-            ...currentLocal,
-            ...liveUser,
-            address: liveUser.profile?.address || liveUser.address,
-            emergencyContact: liveUser.profile?.emergencyContact || liveUser.emergencyContact,
-          }));
-        }
-      } catch (err) {
-        console.warn('Live profile fetch error:', err.message);
+        const u = JSON.parse(storedUser);
+        populateUserData(u);
+      } catch (e) {
+        console.warn('Cached user parse error:', e);
       }
-    };
+    }
 
+    // 2. Fetch live user details & relations from backend database
+    try {
+      const res = await api.getMe();
+      if (res?.success && res.data?.user) {
+        const liveUser = res.data.user;
+        populateUserData(liveUser);
+
+        // Update localStorage cache with freshest DB state
+        const currentLocal = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({
+          ...currentLocal,
+          ...liveUser,
+          address: liveUser.profile?.address || liveUser.address,
+          emergencyContact: liveUser.profile?.emergencyContact || liveUser.emergencyContact,
+        }));
+      }
+    } catch (err) {
+      console.warn('Live profile fetch error:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -484,6 +490,8 @@ const Profile = () => {
       <AppPageHeader
         title="My Profile"
         subtitle="Manage your personal profile, verified employment details, and security credentials."
+        onRefresh={loadData}
+        loading={loading}
       />
 
       {toastMsg && (
@@ -493,10 +501,14 @@ const Profile = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 1. HERO PROFILE CARD (ROYAL VIOLET / PURPLE GRADIENT AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-indigo-800/40">
+      {loading && !formData.firstName ? (
+        <ProfileSkeleton />
+      ) : (
+        <>
+          {/* ========================================================================= */}
+          {/* 1. HERO PROFILE CARD (ROYAL VIOLET / PURPLE GRADIENT AESTHETIC) */}
+          {/* ========================================================================= */}
+          <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-indigo-800/40">
         <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -966,7 +978,9 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
+  )}
+</div>
   );
 };
 

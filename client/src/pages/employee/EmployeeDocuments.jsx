@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { TableSkeleton, DocumentCardSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const COMPANY_POLICIES = [
@@ -159,6 +160,18 @@ const EmployeeDocuments = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const fetchDocuments = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 400);
+  };
+
+  React.useEffect(() => {
+    fetchDocuments();
+  }, []);
 
   // Upload Form State
   const [uploadForm, setUploadForm] = useState({
@@ -305,6 +318,8 @@ const EmployeeDocuments = () => {
       <EmployeePageHeader
         title="Documents & Policies Hub"
         subtitle="Access your personal employment vault, contracts, tax certificates, and verified company compliance handbooks."
+        onRefresh={fetchDocuments}
+        loading={loading}
       />
 
       {toastMsg && (
@@ -381,6 +396,7 @@ const EmployeeDocuments = () => {
           chartColor="purple"
           presetWave="wave1"
           dataPoints={personalDocsSparkData}
+          loading={loading}
         />
 
         {/* Card 2: Light Card - Handbooks & Charters */}
@@ -396,6 +412,7 @@ const EmployeeDocuments = () => {
           chartColor="coral"
           presetWave="wave2"
           dataPoints={policiesSparkData}
+          loading={loading}
         />
 
         {/* Card 3: Light Card - Authenticity & Compliance */}
@@ -411,6 +428,7 @@ const EmployeeDocuments = () => {
           chartColor="amber"
           presetWave="wave3"
           dataPoints={complianceSparkData}
+          loading={loading}
         />
 
         {/* Card 4: Light Card - Security Tier */}
@@ -426,6 +444,7 @@ const EmployeeDocuments = () => {
           chartColor="rose"
           presetWave="wave4"
           dataPoints={securitySparkData}
+          loading={loading}
         />
       </div>
 
@@ -527,7 +546,15 @@ const EmployeeDocuments = () => {
             </span>
           </div>
 
-          {viewMode === 'list' ? (
+          {loading ? (
+            viewMode === 'list' ? (
+              <TableSkeleton rows={5} cols={6} />
+            ) : (
+              <div className="p-6">
+                <DocumentCardSkeleton count={6} />
+              </div>
+            )
+          ) : viewMode === 'list' ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
@@ -643,7 +670,10 @@ const EmployeeDocuments = () => {
 
       {/* Policies Tab Content */}
       {activeTab === 'policies' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        loading ? (
+          <DocumentCardSkeleton count={4} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredPolicies.map((pol) => (
             <div
               key={pol.id}
@@ -687,6 +717,7 @@ const EmployeeDocuments = () => {
             </div>
           ))}
         </div>
+        )
       )}
 
       {/* ========================================================================= */}
