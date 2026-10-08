@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { TableSkeleton } from '../../components/common/Skeleton';
 import {
   DollarSign,
   TrendingUp,
@@ -748,7 +749,10 @@ const Accounts = () => {
       {/* ========================================================================= */}
       {/* 3. SIMPLE, MODERN CORPORATE LEDGER DATA TABLE */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800/80 overflow-hidden">
+      {loading ? (
+        <TableSkeleton rows={6} cols={9} />
+      ) : (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800/80 overflow-hidden">
         {/* Simple & Clean Toolbar */}
         <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 space-y-3">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
@@ -1150,7 +1154,7 @@ const Accounts = () => {
             </button>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 4. SLIDE-OVER DRAWER: RECORD / EDIT VOUCHER */}

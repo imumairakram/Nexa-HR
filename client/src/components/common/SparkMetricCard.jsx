@@ -297,6 +297,30 @@ const SparkMetricCard = ({
   const resolvedBadgeType =
     badgeType || (movement.isUp ? 'positive' : 'negative');
 
+  if (loading) {
+    return (
+      <div
+        className={`relative overflow-hidden rounded-[24px] p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
+          isDark
+            ? 'bg-[#0B132B] dark:bg-[#0A1024] border border-slate-800/90'
+            : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
+        } ${className}`}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-2 flex-1">
+            <div className="skeleton-shimmer animate-pulse h-3.5 w-24 rounded-md" />
+            <div className="skeleton-shimmer animate-pulse h-7 w-20 rounded-lg" />
+          </div>
+          <div className="w-24 h-11 skeleton-shimmer animate-pulse rounded-lg" />
+        </div>
+        <div className="pt-3 flex items-center justify-between border-t border-slate-100/50 dark:border-slate-800/40">
+          <div className="skeleton-shimmer animate-pulse h-4 w-16 rounded-full" />
+          <div className="skeleton-shimmer animate-pulse h-3 w-16 rounded-md" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       onClick={onClick}

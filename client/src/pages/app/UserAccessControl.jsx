@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { SecurityRosterSkeleton } from '../../components/common/Skeleton';
 import {
   Shield,
   ShieldCheck,
@@ -522,7 +523,10 @@ const UserAccessControl = () => {
       {/* ========================================================================= */}
       {/* 3. SPLIT-SCREEN MASTER-DETAIL WORKFORCE ACCESS INSPECTOR */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {loading ? (
+        <SecurityRosterSkeleton />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: User Roster & Filter List (5 cols) */}
         <div className="lg:col-span-5 bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
@@ -895,7 +899,7 @@ const UserAccessControl = () => {
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

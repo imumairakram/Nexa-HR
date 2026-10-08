@@ -31,7 +31,7 @@ import {
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATAR = null;
+const DEFAULT_AVATAR = '/blank-profile-picture.png';
 
 // Helper to reliably parse Emergency Contact string into individual fields
 const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / Guardian', fallbackPhone = '') => {
@@ -484,20 +484,17 @@ const EmployeeProfile = () => {
         <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-center gap-6">
           {/* Avatar with Camera upload button */}
           <div className="relative group shrink-0">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-white/20 bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-2xl flex items-center justify-center text-white font-black text-2xl sm:text-3xl relative">
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt="User Avatar"
-                  className={`w-full h-full object-cover transition-opacity duration-300 ${
-                    isUploadingAvatar ? 'opacity-50' : 'opacity-100'
-                  }`}
-                />
-              ) : (
-                <span className="select-none tracking-wider">
-                  {(formData.firstName?.[0] || '') + (formData.lastName?.[0] || '') || 'EM'}
-                </span>
-              )}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-white/20 bg-slate-800 shadow-2xl flex items-center justify-center text-white font-black text-2xl sm:text-3xl relative">
+              <img
+                src={avatar || DEFAULT_AVATAR}
+                alt="User Avatar"
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  isUploadingAvatar ? 'opacity-50' : 'opacity-100'
+                }`}
+                onError={(e) => {
+                  e.target.src = DEFAULT_AVATAR;
+                }}
+              />
 
               {isUploadingAvatar && (
                 <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { LeaveCardSkeleton } from '../../components/common/Skeleton';
 import {
   CalendarDays,
   Plus,
@@ -309,48 +310,52 @@ const LeavePolicy = () => {
       {/* ========================================================================= */}
       {/* 3. POLICY CARDS GRID */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {policies.map((p) => (
-          <div
-            key={p.id}
-            className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <span
-                  className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${p.type === 'PAID'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
-                    }`}
-                >
-                  {p.type} LEAVE
-                </span>
-                <span className="text-[10px] font-mono font-bold text-slate-400">{p.code}</span>
-              </div>
-
-              <h4 className="text-base font-extrabold text-slate-900 dark:text-white">{p.name}</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                {p.description}
-              </p>
-
-              <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-2 text-xs">
-                <div className="flex justify-between font-bold">
-                  <span className="text-slate-400">Allowed Quota:</span>
-                  <span className="text-blue-600 dark:text-blue-400 font-black text-sm">{p.days} Days</span>
+      {loading ? (
+        <LeaveCardSkeleton count={6} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {policies.map((p) => (
+            <div
+              key={p.id}
+              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4"
+            >
+              <div>
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <span
+                    className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${p.type === 'PAID'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                      }`}
+                  >
+                    {p.type} LEAVE
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-slate-400">{p.code}</span>
                 </div>
-                <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
-                  <span className="text-slate-400">Accrual Cycle:</span>
-                  <span>{p.accrual}</span>
-                </div>
-                <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
-                  <span className="text-slate-400">Carryover Limit:</span>
-                  <span>{p.carryover}</span>
+
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white">{p.name}</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                  {p.description}
+                </p>
+
+                <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-2 text-xs">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-slate-400">Allowed Quota:</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-black text-sm">{p.days} Days</span>
+                  </div>
+                  <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
+                    <span className="text-slate-400">Accrual Cycle:</span>
+                    <span>{p.accrual}</span>
+                  </div>
+                  <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
+                    <span className="text-slate-400">Carryover Limit:</span>
+                    <span>{p.carryover}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 4. MODAL: ADD LEAVE POLICY (STITCH LUXURY DESIGN) */}

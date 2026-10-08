@@ -7,13 +7,57 @@ import {
   CheckCircle2,
   X,
   Edit2,
+  Edit3,
   Trash2,
   RefreshCw,
   AlertTriangle,
+  MapPin,
+  Eye,
+  ShieldCheck,
+  Mail,
+  Calendar,
+  Phone,
+  Briefcase,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { DepartmentCardSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'Active';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = d.getDate();
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    const year = d.getFullYear();
+    return `${day} ${month} ${year}`;
+  } catch (e) {
+    return dateStr;
+  }
+};
+
+const DEFAULT_BLANK_AVATAR = '/blank-profile-picture.png';
+
+const getAvatarUrl = (emp) => {
+  if (!emp) return DEFAULT_BLANK_AVATAR;
+  if (emp.avatar && typeof emp.avatar === 'string' && emp.avatar.trim() !== '' && !emp.avatar.includes('unsplash')) {
+    return emp.avatar;
+  }
+  if (emp.profile?.avatarUrl && typeof emp.profile.avatarUrl === 'string' && emp.profile.avatarUrl.trim() !== '' && !emp.profile.avatarUrl.includes('unsplash')) {
+    return emp.profile.avatarUrl;
+  }
+  if (emp.id) {
+    try {
+      const scoped = localStorage.getItem(`user_avatar_${emp.id}`);
+      if (scoped && typeof scoped === 'string' && scoped.trim() !== '' && !scoped.includes('unsplash')) {
+        return scoped;
+      }
+    } catch {}
+  }
+  return DEFAULT_BLANK_AVATAR;
+};
 
 const Departments = () => {
   const [departments, setDepartments] = useState([]);
@@ -23,6 +67,7 @@ const Departments = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingDept, setEditingDept] = useState(null);
+  const [selectedDept, setSelectedDept] = useState(null);
   const [deptToDelete, setDeptToDelete] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -352,136 +397,159 @@ const Departments = () => {
       </div>
 
       {/* Grid of Departments */}
-      {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
-          {filtered.map((dept) => {
+      {loading ? (
+        <DepartmentCardSkeleton count={6} />
+      ) : filtered.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
+          {filtered.map((dept, idx) => {
             const staffCount = getStaffCountForDept(dept);
             const deptText = `${dept.code || ''} ${dept.name || ''}`.toUpperCase();
             
             let colorTheme = {
-              gradient: 'from-blue-600 via-indigo-600 to-blue-700',
-              accentText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
-              iconBg: 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400',
-              badge: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200/60 dark:border-blue-800/60',
+              gradient: 'from-blue-600 via-indigo-600 to-sky-500',
+              accentText: 'hover:text-blue-600 dark:hover:text-blue-400',
             };
 
             if (deptText.includes('FIN') || deptText.includes('ACC') || deptText.includes('PAY')) {
               colorTheme = {
-                gradient: 'from-emerald-600 via-teal-600 to-emerald-700',
-                accentText: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
-                iconBg: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400',
-                badge: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/60',
+                gradient: 'from-emerald-600 via-teal-600 to-emerald-500',
+                accentText: 'hover:text-emerald-600 dark:hover:text-emerald-400',
               };
             } else if (deptText.includes('HR') || deptText.includes('PEOPLE') || deptText.includes('TALENT')) {
               colorTheme = {
-                gradient: 'from-purple-600 via-indigo-600 to-purple-700',
-                accentText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
-                iconBg: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400',
-                badge: 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200/60 dark:border-purple-800/60',
+                gradient: 'from-purple-600 via-indigo-600 to-violet-500',
+                accentText: 'hover:text-purple-600 dark:hover:text-purple-400',
               };
             } else if (deptText.includes('MKT') || deptText.includes('SALES') || deptText.includes('GROWTH')) {
               colorTheme = {
-                gradient: 'from-rose-600 via-pink-600 to-rose-700',
-                accentText: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
-                iconBg: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400',
-                badge: 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/60',
+                gradient: 'from-rose-600 via-pink-600 to-rose-500',
+                accentText: 'hover:text-rose-600 dark:hover:text-rose-400',
               };
             } else if (deptText.includes('OPS') || deptText.includes('SUPPORT') || deptText.includes('CUST')) {
               colorTheme = {
-                gradient: 'from-amber-500 via-orange-600 to-amber-600',
-                accentText: 'group-hover:text-amber-600 dark:group-hover:text-amber-400',
-                iconBg: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400',
-                badge: 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/60',
+                gradient: 'from-amber-500 via-orange-600 to-amber-500',
+                accentText: 'hover:text-amber-600 dark:hover:text-amber-400',
               };
             } else if (deptText.includes('PROD') || deptText.includes('DESIGN') || deptText.includes('UX')) {
               colorTheme = {
-                gradient: 'from-indigo-600 via-purple-600 to-indigo-700',
-                accentText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
-                iconBg: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400',
-                badge: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/60',
+                gradient: 'from-indigo-600 via-purple-600 to-indigo-500',
+                accentText: 'hover:text-indigo-600 dark:hover:text-indigo-400',
               };
             }
 
             return (
               <div
-                key={dept.id}
-                className="relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 dark:hover:border-blue-500/40 flex flex-col justify-between group"
+                key={dept.id || idx}
+                className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between"
               >
-                {/* Dynamic Glow Line & Blur Blob on Hover */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-blue-500/10 blur-2xl group-hover:bg-blue-500/20 transition-all pointer-events-none" />
-
-                <div>
-                  {/* Header: Dynamic Gradient Avatar, Code, Actions */}
-                  <div className="flex items-start justify-between gap-3 mb-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${colorTheme.gradient} text-white font-black text-xs flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform uppercase tracking-wider`}>
-                        {dept.code ? (dept.code.length > 4 ? dept.code.slice(0, 4) : dept.code) : 'DEP'}
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-700/60">
-                          {dept.code || 'UNIT'}
-                        </span>
+                <div className="p-6 pb-2">
+                  {/* 1. Header: Avatar & Top-Right Edit Button */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="relative inline-block">
+                      <div className={`relative w-18 h-18 sm:w-20 sm:h-20 rounded-full ring-4 ring-slate-100 dark:ring-slate-800 shadow-sm overflow-hidden bg-gradient-to-tr ${colorTheme.gradient} text-white flex items-center justify-center font-black text-base sm:text-lg tracking-wider uppercase`}>
+                        <span>{dept.code ? (dept.code.length > 4 ? dept.code.slice(0, 4) : dept.code) : 'DEP'}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => openEditModal(dept)}
-                        title="Edit Department"
-                        className="p-1.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all cursor-pointer border border-transparent hover:border-blue-200/60 dark:hover:border-blue-800/60"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => setDeptToDelete(dept)}
-                        title="Delete Department"
-                        className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition-all cursor-pointer border border-transparent hover:border-rose-200/60 dark:hover:border-rose-800/60"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    {/* Edit Button at Top Right */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditModal(dept);
+                      }}
+                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                      title="Edit Department"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 stroke-[2.2]" />
+                    </button>
                   </div>
 
-                  <h4 className={`text-base font-black text-slate-900 dark:text-white ${colorTheme.accentText} transition-colors tracking-tight`}>
-                    {dept.name}
-                  </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed font-medium">
-                    {dept.description || 'Core organizational business unit and division.'}
-                  </p>
+                  {/* 2. Main Dossier Info */}
+                  <div>
+                    <h3
+                      onClick={() => setSelectedDept(dept)}
+                      className={`text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug ${colorTheme.accentText} cursor-pointer transition-colors`}
+                    >
+                      {dept.name}
+                    </h3>
 
-                  {/* Inner Dossier / Metrics Container */}
-                  <div className="space-y-2.5 text-xs my-4 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 backdrop-blur-md">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-semibold">
-                        <div className={`w-6 h-6 rounded-lg ${colorTheme.iconBg} flex items-center justify-center shrink-0`}>
-                          <Users className="w-3.5 h-3.5" />
-                        </div>
-                        <span>Assigned Staff</span>
-                      </div>
-                      <span className={`font-extrabold text-xs px-2.5 py-0.5 rounded-lg ${colorTheme.badge} shadow-xs`}>
-                        {staffCount} {staffCount === 1 ? 'Member' : 'Members'}
+                    <p className="text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-slate-200 mt-1 truncate">
+                      <span>{dept.code ? `${dept.code} Unit` : 'Corporate Division'}</span>
+                      <span className="text-slate-400 mx-1.5 font-normal">|</span>
+                      <span>{staffCount} {staffCount === 1 ? 'Assigned Member' : 'Assigned Members'}</span>
+                    </p>
+
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-normal">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">
+                        Cost Center: {dept.code ? `CC-${dept.code}` : 'CC-CORP'} • San Francisco HQ
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
-                      <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Operational Status</span>
-                      <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        Live Unit
-                      </span>
+                    <p className="text-xs sm:text-[12.5px] text-slate-600 dark:text-slate-300 leading-relaxed mt-3.5 font-normal line-clamp-4">
+                      {dept.description || `${dept.name} is an active corporate operational division driving organizational goals, cross-functional collaboration, and departmental workflows.`}
+                    </p>
+
+                    <div className="space-y-2 mt-4 text-xs font-normal text-slate-700 dark:text-slate-300">
+                      <div
+                        onClick={() => setSelectedDept(dept)}
+                        className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 transition-all cursor-pointer group/row"
+                        title="Click to view enrolled employees"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Users className="w-3.5 h-3.5 text-slate-400 group-hover/row:text-blue-600 dark:group-hover/row:text-blue-400 transition-colors shrink-0" />
+                          <span className="font-semibold text-slate-800 dark:text-slate-200 group-hover/row:text-blue-600 dark:group-hover/row:text-blue-400 transition-colors">
+                            Assigned Staff
+                          </span>
+                        </div>
+                        <span className="font-bold text-[11px] px-2 py-0.5 rounded-lg bg-blue-100/70 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+                          {staffCount} {staffCount === 1 ? 'Member' : 'Members'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2.5 px-2">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>Corporate Business Division</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 px-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                          Operational & Active
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-extrabold text-slate-400 flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Cost Center</span>
+                {/* 4. Footer: Established Date & View Staff Button + Delete Action Icon */}
+                <div className="px-6 pb-6 pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                  <span className="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    Established {formatDate(dept.createdAt)}
                   </span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-[11px] bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/50">
-                    Active Division
-                  </span>
+
+                  <div className="flex items-center gap-2">
+                    {/* View Enrolled Employees Button */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDept(dept)}
+                      className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-blue-200/60 dark:border-blue-800/60 shadow-2xs hover:scale-105"
+                      title="View Enrolled Staff"
+                    >
+                      <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
+                      <span>View Staff ({staffCount})</span>
+                    </button>
+
+                    {/* Remove Department */}
+                    <button
+                      type="button"
+                      onClick={() => setDeptToDelete(dept)}
+                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                      title="Remove Department"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 stroke-[2.2]" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -784,8 +852,164 @@ const Departments = () => {
           </div>
         </div>
       )}
+      {/* ========================================================================= */}
+      {/* MODAL: VIEW DEPARTMENT DOSSIER */}
+      {/* ========================================================================= */}
+      {selectedDept && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-2xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-blue-500/25 uppercase">
+                  {selectedDept.code ? (selectedDept.code.length > 4 ? selectedDept.code.slice(0, 4) : selectedDept.code) : 'DEP'}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                      {selectedDept.name}
+                    </h3>
+                    <span className="text-[10px] font-mono font-bold bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800">
+                      {selectedDept.code || 'UNIT'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                    Cost Center: {selectedDept.code ? `CC-${selectedDept.code}` : 'CC-CORP'} • Established {formatDate(selectedDept.createdAt)}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedDept(null)}
+                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="overflow-y-auto flex-1 p-6 md:p-7 space-y-6 custom-scrollbar text-xs">
+              {/* Mission Statement */}
+              <div>
+                <h4 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">
+                  Operational Scope & Objectives
+                </h4>
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed font-normal bg-slate-50 dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80">
+                  {selectedDept.description || `${selectedDept.name} operates as a primary organizational business unit responsible for strategic objectives, high-velocity delivery, and cross-functional outcomes.`}
+                </p>
+              </div>
+
+              {/* Divisional Stats Matrix */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40">
+                  <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Active Staff</div>
+                  <div className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                    {getStaffCountForDept(selectedDept)} Members
+                  </div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
+                  <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Status</div>
+                  <div className="text-lg font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                    Live Unit
+                  </div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40">
+                  <div className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Allocation</div>
+                  <div className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                    HQ (San Francisco)
+                  </div>
+                </div>
+              </div>
+
+              {/* Assigned Staff Members List */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                    Assigned Employees ({getStaffCountForDept(selectedDept)})
+                  </h4>
+                </div>
+
+                {(() => {
+                  const members = employees.filter(
+                    (e) =>
+                      e.profile?.departmentId === selectedDept.id ||
+                      (selectedDept.name && e.profile?.department?.name?.toLowerCase() === selectedDept.name.toLowerCase())
+                  );
+
+                  if (members.length === 0) {
+                    return (
+                      <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 text-center text-slate-400">
+                        <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-xs font-semibold">No employees currently allocated to this department.</p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                      {members.map((emp, idx) => (
+                        <div
+                          key={emp.id || idx}
+                          className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-blue-500/30 transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden ring-2 ring-slate-100 dark:ring-slate-800 shrink-0">
+                              <img
+                                src={getAvatarUrl(emp)}
+                                alt=""
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.src = DEFAULT_BLANK_AVATAR;
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <div className="font-bold text-slate-900 dark:text-white text-xs">
+                                {emp.firstName} {emp.lastName}
+                              </div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                                {emp.profile?.designation?.title || 'Staff Member'}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono font-bold bg-white dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+                            {emp.email}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-5 md:p-6 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-end gap-3 shrink-0 bg-slate-50/50 dark:bg-slate-900/30">
+              <button
+                type="button"
+                onClick={() => setSelectedDept(null)}
+                className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = selectedDept;
+                  setSelectedDept(null);
+                  openEditModal(d);
+                }}
+                className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-1.5 cursor-pointer transition-all"
+              >
+                <Edit3 className="w-3.5 h-3.5 stroke-[2.2]" />
+                <span>Edit Department</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Departments;
+

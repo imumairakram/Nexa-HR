@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { AnnouncementSkeleton } from '../../components/common/Skeleton';
 import {
   Megaphone,
   Plus,
@@ -363,8 +364,11 @@ const Announcement = () => {
       </div>
 
       {/* ANNOUNCEMENTS LIST */}
-      <div className="space-y-4">
-        {filtered.length > 0 ? (
+      {loading ? (
+        <AnnouncementSkeleton count={3} />
+      ) : (
+        <div className="space-y-4">
+          {filtered.length > 0 ? (
           filtered.map((item) => (
             <div
               key={item.id}
@@ -447,6 +451,7 @@ const Announcement = () => {
           </div>
         )}
       </div>
+      )}
 
       {/* ========================================================================= */}
       {/* MODAL: POST CIRCULAR (STITCH LUXURY DESIGN) */}

@@ -31,7 +31,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATAR = null;
+const DEFAULT_AVATAR = '/blank-profile-picture.png';
 
 function formatRelativeTime(dateString) {
   if (!dateString) return 'Just now';
@@ -144,12 +144,12 @@ const EmployeePageHeader = ({
     }
 
     if (!activeUser) {
-      setUserAvatar(null);
+      setUserAvatar(DEFAULT_AVATAR);
       setClockedIn(localStorage.getItem('nexahr_clocked_in') === 'true');
       return;
     }
 
-    let activeAvatar = null;
+    let activeAvatar = DEFAULT_AVATAR;
     if (activeUser.avatar && typeof activeUser.avatar === 'string' && !activeUser.avatar.includes('unsplash') && activeUser.avatar.trim() !== '') {
       activeAvatar = activeUser.avatar;
     } else if (activeUser.profile?.avatarUrl && typeof activeUser.profile.avatarUrl === 'string' && !activeUser.profile.avatarUrl.includes('unsplash')) {
@@ -161,7 +161,7 @@ const EmployeePageHeader = ({
       }
     }
 
-    setUserAvatar(activeAvatar);
+    setUserAvatar(activeAvatar || DEFAULT_AVATAR);
     setClockedIn(localStorage.getItem('nexahr_clocked_in') === 'true');
   };
 
@@ -559,12 +559,15 @@ const EmployeePageHeader = ({
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center gap-2 pl-2 pr-3 py-1 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full shadow-sm border border-slate-200/80 dark:border-slate-800 cursor-pointer transition-all active:scale-95"
             >
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-emerald-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-emerald-500/20 shrink-0">
-                {userAvatar ? (
-                  <img src={userAvatar} alt="User Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <span>{userInitials}</span>
-                )}
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-white text-xs font-bold ring-2 ring-emerald-500/20 shrink-0">
+                <img
+                  src={userAvatar || DEFAULT_AVATAR}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = DEFAULT_AVATAR;
+                  }}
+                />
               </div>
               <div className="hidden sm:block text-left">
                 <div className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">

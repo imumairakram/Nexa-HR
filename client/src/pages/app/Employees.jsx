@@ -35,11 +35,97 @@ import {
 } from 'lucide-react';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
+import { EmployeeCardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
+const DEFAULT_BLANK_AVATAR = '/blank-profile-picture.png';
+
 const getAvatarUrl = (emp) => {
-  if (emp && emp.avatar && typeof emp.avatar === 'string' && !emp.avatar.includes('unsplash') && emp.avatar.trim() !== '') return emp.avatar;
-  return null;
+  if (!emp) return DEFAULT_BLANK_AVATAR;
+  // 1. Direct avatar on user object
+  if (emp.avatar && typeof emp.avatar === 'string' && emp.avatar.trim() !== '' && !emp.avatar.includes('unsplash')) {
+    return emp.avatar;
+  }
+  // 2. Avatar on profile object
+  if (emp.profile?.avatarUrl && typeof emp.profile.avatarUrl === 'string' && emp.profile.avatarUrl.trim() !== '' && !emp.profile.avatarUrl.includes('unsplash')) {
+    return emp.profile.avatarUrl;
+  }
+  // 3. Check scoped localStorage for this employee ID
+  if (emp.id) {
+    try {
+      const scoped = localStorage.getItem(`user_avatar_${emp.id}`);
+      if (scoped && typeof scoped === 'string' && scoped.trim() !== '' && !scoped.includes('unsplash')) {
+        return scoped;
+      }
+    } catch {}
+  }
+  // 4. Check active session user if matches this employee
+  try {
+    const current = JSON.parse(localStorage.getItem('user') || '{}');
+    if (current && (current.id === emp.id || (current.email && emp.email && current.email.toLowerCase() === emp.email.toLowerCase()))) {
+      if (current.avatar && typeof current.avatar === 'string' && current.avatar.trim() !== '' && !current.avatar.includes('unsplash')) {
+        return current.avatar;
+      }
+      if (current.profile?.avatarUrl && typeof current.profile.avatarUrl === 'string' && current.profile.avatarUrl.trim() !== '' && !current.profile.avatarUrl.includes('unsplash')) {
+        return current.profile.avatarUrl;
+      }
+      const scopedCurrent = localStorage.getItem(`user_avatar_${current.id}`);
+      if (scopedCurrent && typeof scopedCurrent === 'string' && scopedCurrent.trim() !== '' && !scopedCurrent.includes('unsplash')) {
+        return scopedCurrent;
+      }
+    }
+  } catch {}
+
+  return DEFAULT_BLANK_AVATAR;
+};
+
+const formatDob = (dobStr) => {
+  if (!dobStr) return 'Not Specified';
+  try {
+    const d = new Date(dobStr);
+    if (isNaN(d.getTime())) return dobStr;
+    const day = d.getDate();
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    const year = d.getFullYear();
+    return `${day} ${month} ${year}`;
+  } catch (e) {
+    return dobStr;
+  }
+};
+
+const formatJoiningDate = (joinStr) => {
+  if (!joinStr) return 'Active';
+  try {
+    const d = new Date(joinStr);
+    if (isNaN(d.getTime())) return joinStr;
+    const day = d.getDate();
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    const year = d.getFullYear();
+    return `${day} ${month} ${year}`;
+  } catch (e) {
+    return joinStr;
+  }
+};
+
+const getEmployeeBio = (emp) => {
+  if (emp?.profile?.bio && typeof emp.profile.bio === 'string' && emp.profile.bio.trim() !== '') {
+    return emp.profile.bio;
+  }
+  if (emp?.bio && typeof emp.bio === 'string' && emp.bio.trim() !== '') {
+    return emp.bio;
+  }
+
+  const name = emp?.firstName ? `${emp.firstName}` : 'This team member';
+  const desig = emp?.profile?.designation?.title || emp?.designationTitle || '';
+  const dept = emp?.profile?.department?.name || emp?.departmentName || '';
+
+  if (desig && dept) {
+    return `${name} is an active ${desig} in the ${dept} department at NexaHR, focused on driving cross-functional outcomes, scalable workflows, and team excellence.`;
+  }
+  if (desig) {
+    return `${name} is a dedicated ${desig} at NexaHR, committed to delivering high-impact solutions, quality execution, and collaborative results.`;
+  }
+  return `${name} is a valued team member at NexaHR, contributing to core organizational goals, professional standards, and strategic execution.`;
 };
 
 const formatSalary = (salaryStructure, rawSalary) => {
@@ -183,9 +269,20 @@ const Employees = () => {
 
   useEffect(() => {
     fetchEmployeesData();
-    window.addEventListener('user_profile_updated', fetchEmployeesData);
+    const handleProfileUpdate = () => {
+      fetchEmployeesData();
+    };
+
+    window.addEventListener('user_profile_updated', handleProfileUpdate);
+    window.addEventListener('avatar_updated', handleProfileUpdate);
+    window.addEventListener('user_avatar_updated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+
     return () => {
-      window.removeEventListener('user_profile_updated', fetchEmployeesData);
+      window.removeEventListener('user_profile_updated', handleProfileUpdate);
+      window.removeEventListener('avatar_updated', handleProfileUpdate);
+      window.removeEventListener('user_avatar_updated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
     };
   }, []);
 
@@ -752,125 +849,149 @@ NexaHR Workforce Systems`;
       {/* ========================================================================= */}
       {/* 3. EMPLOYEES GRID / TABLE */}
       {/* ========================================================================= */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+      {loading ? (
+        viewMode === 'grid' ? (
+          <EmployeeCardSkeleton count={6} />
+        ) : (
+          <TableSkeleton rows={6} cols={6} />
+        )
+      ) : viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
           {filteredEmployees.map((emp, idx) => (
             <div
               key={emp.id || idx}
-              className="relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-indigo-500/40 dark:hover:border-indigo-500/40 flex flex-col justify-between group"
+              className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between"
             >
-              {/* Dynamic Glow Line & Blur Blob on Hover */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
-
-              <div>
-                {/* Header: Avatar, Name, Code, Role */}
-                <div className="flex items-start justify-between gap-3 mb-3.5">
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="relative shrink-0">
-                      {getAvatarUrl(emp) ? (
-                        <img
-                          src={getAvatarUrl(emp)}
-                          alt=""
-                          className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover ring-2 ring-indigo-500/20 shadow-sm group-hover:scale-105 transition-transform"
-                        />
-                      ) : (
-                        <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white font-black text-sm flex items-center justify-center ring-2 ring-indigo-500/20 shadow-sm group-hover:scale-105 transition-transform uppercase">
-                          <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
-                        </div>
-                      )}
-                      <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-[#1E293B] rounded-full shadow-xs" title="Active Staff" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-base font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate tracking-tight">
-                        {emp.firstName} {emp.lastName}
-                      </h4>
-                      <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5 truncate">
-                        {emp.profile?.designation?.title || 'Staff Member'}
-                      </p>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-bold bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md truncate border border-slate-200/60 dark:border-slate-700/60">
-                          {emp.employeeCode}
-                        </span>
-                      </div>
+              <div className="p-6 pb-2">
+                {/* 1. Header: Avatar & Top-Right Edit Button */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="relative inline-block">
+                    <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full ring-4 ring-slate-100 dark:ring-slate-800 shadow-sm overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                      <img
+                        src={getAvatarUrl(emp)}
+                        alt={`${emp.firstName} ${emp.lastName}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = DEFAULT_BLANK_AVATAR;
+                        }}
+                      />
                     </div>
                   </div>
 
-                  <span
-                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0 border shadow-xs ${
-                      emp.role === 'ADMIN'
-                        ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200/80 dark:border-purple-800/60'
-                        : emp.role === 'HR_MANAGER'
-                        ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/60'
-                        : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60'
-                    }`}
+                  {/* Edit Button at Top Right */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenEdit(emp);
+                    }}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Edit Employee Profile"
                   >
-                    {emp.role || 'EMPLOYEE'}
-                  </span>
+                    <Edit3 className="w-3.5 h-3.5 stroke-[2.5]" />
+                  </button>
                 </div>
 
-                {/* Glassmorphic Dossier Details Container */}
-                <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 my-4 p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 backdrop-blur-md">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                      <Building2 className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold truncate text-slate-800 dark:text-slate-200">{emp.profile?.department?.name || 'General Dept'}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                      <MapPin className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold truncate text-slate-600 dark:text-slate-300">{emp.profile?.address || emp.profile?.location || 'San Francisco HQ'}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                      <Mail className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold truncate text-slate-600 dark:text-slate-300">{emp.email}</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2.5 mt-1 border-t border-slate-200/60 dark:border-slate-800/60">
-                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Salary Matrix</span>
-                    <span className="font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-xl text-xs border border-emerald-200 dark:border-emerald-800/50 shadow-xs">
-                      {formatSalary(emp.salaryStructure, emp.profile?.salary)}
+                {/* 2. Main Dossier Info */}
+                <div>
+                  <h3
+                    onClick={() => setSelectedEmployee(emp)}
+                    className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                  >
+                    {emp.firstName || ''} {emp.lastName || ''}
+                  </h3>
+
+                  <p className="text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-slate-200 mt-1 truncate">
+                    <span>{emp.profile?.designation?.title || emp.designationTitle || emp.role || 'Staff Member'}</span>
+                    {(emp.profile?.department?.name || emp.departmentName) && (
+                      <>
+                        <span className="text-slate-400 mx-1.5 font-normal">|</span>
+                        <span>{emp.profile?.department?.name || emp.departmentName}</span>
+                      </>
+                    )}
+                  </p>
+
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-normal">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">
+                      {emp.profile?.address || emp.profile?.location || emp.location || emp.address || 'Remote / HQ'}
                     </span>
+                  </div>
+
+                  <p className="text-xs sm:text-[12.5px] text-slate-600 dark:text-slate-300 leading-relaxed mt-3.5 font-normal line-clamp-4">
+                    {getEmployeeBio(emp)}
+                  </p>
+
+                  <div className="space-y-2 mt-4 text-xs font-normal text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-2.5">
+                      <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {emp.email ? (
+                        <a
+                          href={`mailto:${emp.email}`}
+                          className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
+                        >
+                          {emp.email}
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic">No email provided</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{formatDob(emp.profile?.dateOfBirth || emp.dateOfBirth || emp.dob)}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {emp.phone || emp.profile?.phone ? (
+                        <a
+                          href={`tel:${emp.phone || emp.profile?.phone}`}
+                          className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        >
+                          {emp.phone || emp.profile?.phone}
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic">Not Provided</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Card Footer: Joined Date & Modern Action Pills */}
-              <div className="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-slate-400">
-                  Joined {emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : '2023'}
+              {/* 4. Footer: Joined Date & Rounded Action Icons */}
+              <div className="px-6 pb-6 pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  Joined on {formatJoiningDate(emp.profile?.joiningDate || emp.joiningDate || emp.createdAt)}
                 </span>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
+                  {/* Full Profile View */}
                   <button
-                    onClick={() => handleOpenEdit(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-indigo-200/60 dark:border-indigo-800/50 shadow-xs hover:scale-105"
-                    title="Edit Employee Profile"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit</span>
-                  </button>
-
-                  <button
+                    type="button"
                     onClick={() => setSelectedEmployee(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200/60 dark:border-slate-700/60 shadow-xs hover:scale-105"
-                    title="View Full Profile"
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Full Profile View"
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>View</span>
+                    <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
                   </button>
 
+                  {/* Edit Profile */}
                   <button
+                    type="button"
+                    onClick={() => handleOpenEdit(emp)}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Edit Profile"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 stroke-[2.2]" />
+                  </button>
+
+                  {/* Remove Employee */}
+                  <button
+                    type="button"
                     onClick={() => setEmployeeToDelete(emp)}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-rose-200/60 dark:border-rose-800/50 shadow-xs hover:scale-105"
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
                     title="Remove Employee"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Remove</span>
+                    <Trash2 className="w-3.5 h-3.5 stroke-[2.2]" />
                   </button>
                 </div>
               </div>
@@ -896,17 +1017,14 @@ NexaHR Workforce Systems`;
                   <tr key={emp.id || idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        {getAvatarUrl(emp) ? (
-                          <img
-                            src={getAvatarUrl(emp)}
-                            alt=""
-                            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0"
-                          />
-                        ) : (
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-700 text-white font-black text-xs flex items-center justify-center shrink-0 uppercase">
-                            <span>{emp.firstName?.[0] || 'E'}{emp.lastName?.[0] || 'M'}</span>
-                          </div>
-                        )}
+                        <img
+                          src={getAvatarUrl(emp)}
+                          alt=""
+                          className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0"
+                          onError={(e) => {
+                            e.target.src = DEFAULT_BLANK_AVATAR;
+                          }}
+                        />
                         <div>
                           <div className="font-extrabold text-slate-900 dark:text-white">
                             {emp.firstName} {emp.lastName}
@@ -1756,17 +1874,14 @@ NexaHR Workforce Systems`;
             {/* Profile Header */}
             <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-6">
               <div className="flex items-center gap-5">
-                {getAvatarUrl(selectedEmployee) ? (
-                  <img
-                    src={getAvatarUrl(selectedEmployee)}
-                    alt=""
-                    className="w-20 h-20 rounded-[24px] object-cover ring-4 ring-indigo-500/20 shadow-lg shrink-0"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-[24px] bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white font-black text-2xl flex items-center justify-center ring-4 ring-indigo-500/20 shadow-lg shrink-0 uppercase">
-                    <span>{selectedEmployee.firstName?.[0] || 'E'}{selectedEmployee.lastName?.[0] || 'M'}</span>
-                  </div>
-                )}
+                <img
+                  src={getAvatarUrl(selectedEmployee)}
+                  alt=""
+                  className="w-20 h-20 rounded-[24px] object-cover ring-4 ring-indigo-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
+                  onError={(e) => {
+                    e.target.src = DEFAULT_BLANK_AVATAR;
+                  }}
+                />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60">

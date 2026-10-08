@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { HelpdeskTicketSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 
@@ -398,6 +399,7 @@ const EmployeeHelpdesk = () => {
           chartColor="purple"
           presetWave="wave1"
           dataPoints={totalTicketsSparkData}
+          loading={loading}
         />
 
         {/* Card 2: Light Card - Under Review */}
@@ -413,6 +415,7 @@ const EmployeeHelpdesk = () => {
           chartColor="coral"
           presetWave="wave2"
           dataPoints={inProgressSparkData}
+          loading={loading}
         />
 
         {/* Card 3: Light Card - Resolved Issues */}
@@ -428,6 +431,7 @@ const EmployeeHelpdesk = () => {
           chartColor="amber"
           presetWave="wave3"
           dataPoints={resolvedSparkData}
+          loading={loading}
         />
 
         {/* Card 4: Light Card - Avg Response SLA */}
@@ -443,6 +447,7 @@ const EmployeeHelpdesk = () => {
           chartColor="rose"
           presetWave="wave4"
           dataPoints={slaSparkData}
+          loading={loading}
         />
       </div>
 
@@ -547,12 +552,7 @@ const EmployeeHelpdesk = () => {
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-slate-400 space-y-3">
-            <Loader2 className="w-8 h-8 text-indigo-500 animate-spin mx-auto" />
-            <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Synchronizing helpdesk tickets from server...
-            </p>
-          </div>
+          <HelpdeskTicketSkeleton count={5} />
         ) : filteredTickets.length > 0 ? (
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {filteredTickets.map((t) => (

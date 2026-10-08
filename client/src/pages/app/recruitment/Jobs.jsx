@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
+import { JobCardSkeleton } from '../../../components/common/Skeleton';
 import {
   Briefcase,
   Plus,
@@ -283,55 +284,59 @@ const Jobs = () => {
       </div>
 
       {/* Job Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {filtered.map((job) => (
-          <div
-            key={job.id}
-            className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4 group"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold uppercase">
-                  {job.dept}
-                </span>
+      {loading ? (
+        <JobCardSkeleton count={6} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {filtered.map((job) => (
+            <div
+              key={job.id}
+              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4 group"
+            >
+              <div>
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold uppercase">
+                    {job.dept}
+                  </span>
 
-                <span
-                  className={`text-[10px] font-extrabold px-2.5 py-1 rounded-xl uppercase ${
-                    job.status === 'ACTIVE'
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                      : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                  }`}
-                >
-                  {job.status}
-                </span>
+                  <span
+                    className={`text-[10px] font-extrabold px-2.5 py-1 rounded-xl uppercase ${
+                      job.status === 'ACTIVE'
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                    }`}
+                  >
+                    {job.status}
+                  </span>
+                </div>
+
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                  {job.title}
+                </h4>
+
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mt-2 font-medium">
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>{job.location}</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
+                    <DollarSign className="w-3.5 h-3.5" />
+                    <span>{job.salary}</span>
+                  </span>
+                </div>
               </div>
 
-              <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
-                {job.title}
-              </h4>
-
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mt-2 font-medium">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span>{job.location}</span>
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5" />
+                  <span>{job.applicants} Candidates Applied</span>
                 </span>
-                <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>{job.salary}</span>
-                </span>
+                <span className="text-slate-400">Posted {job.posted}</span>
               </div>
             </div>
-
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-              <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                <Users className="w-3.5 h-3.5" />
-                <span>{job.applicants} Candidates Applied</span>
-              </span>
-              <span className="text-slate-400">Posted {job.posted}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* MODAL: PUBLISH JOB OPENING (STITCH LUXURY DESIGN) */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
+import { TableSkeleton } from '../../../components/common/Skeleton';
 import {
   DollarSign,
   Calculator,
@@ -255,58 +256,62 @@ const CalculatePayroll = () => {
       </div>
 
       {/* Calculator Table */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden space-y-4 p-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-              Pre-Disbursement Compensation Breakdown
-            </h3>
-            <p className="text-xs text-slate-400">Attendance punch logs factored into standard monthly working days</p>
+      {loading ? (
+        <TableSkeleton rows={6} cols={7} />
+      ) : (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden space-y-4 p-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                Pre-Disbursement Compensation Breakdown
+              </h3>
+              <p className="text-xs text-slate-400">Attendance punch logs factored into standard monthly working days</p>
+            </div>
+
+            <button
+              onClick={handleDisburse}
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-2xl flex items-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>Confirm & Disburse Batch</span>
+            </button>
           </div>
 
-          <button
-            onClick={handleDisburse}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-2xl flex items-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer transition-all hover:scale-105 shrink-0"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            <span>Confirm & Disburse Batch</span>
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-              <tr>
-                <th className="py-3.5 px-4">Employee</th>
-                <th className="py-3.5 px-4">Department</th>
-                <th className="py-3.5 px-4">Working Days Ratio</th>
-                <th className="py-3.5 px-4">Base Monthly</th>
-                <th className="py-3.5 px-4">Overtime Pay</th>
-                <th className="py-3.5 px-4">Tax Withholding</th>
-                <th className="py-3.5 px-4 text-right">Net Payable</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {data.map((row) => (
-                <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="py-4 px-4 font-extrabold text-slate-900 dark:text-white">
-                    <div>{row.name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">{row.id}</div>
-                  </td>
-                  <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">{row.dept}</td>
-                  <td className="py-4 px-4 font-bold text-blue-600 dark:text-blue-400">{row.daysWorked}</td>
-                  <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">${row.base.toLocaleString()}</td>
-                  <td className="py-4 px-4 font-semibold text-emerald-600">+${row.overtime.toLocaleString()}</td>
-                  <td className="py-4 px-4 font-semibold text-rose-500">-${row.tax.toLocaleString()}</td>
-                  <td className="py-4 px-4 text-right font-black text-slate-900 dark:text-white text-sm">
-                    ${row.net.toLocaleString()}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                <tr>
+                  <th className="py-3.5 px-4">Employee</th>
+                  <th className="py-3.5 px-4">Department</th>
+                  <th className="py-3.5 px-4">Working Days Ratio</th>
+                  <th className="py-3.5 px-4">Base Monthly</th>
+                  <th className="py-3.5 px-4">Overtime Pay</th>
+                  <th className="py-3.5 px-4">Tax Withholding</th>
+                  <th className="py-3.5 px-4 text-right">Net Payable</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {data.map((row) => (
+                  <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="py-4 px-4 font-extrabold text-slate-900 dark:text-white">
+                      <div>{row.name}</div>
+                      <div className="text-[10px] text-slate-400 font-mono">{row.id}</div>
+                    </td>
+                    <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">{row.dept}</td>
+                    <td className="py-4 px-4 font-bold text-blue-600 dark:text-blue-400">{row.daysWorked}</td>
+                    <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">${row.base.toLocaleString()}</td>
+                    <td className="py-4 px-4 font-semibold text-emerald-600">+${row.overtime.toLocaleString()}</td>
+                    <td className="py-4 px-4 font-semibold text-rose-500">-${row.tax.toLocaleString()}</td>
+                    <td className="py-4 px-4 text-right font-black text-slate-900 dark:text-white text-sm">
+                      ${row.net.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

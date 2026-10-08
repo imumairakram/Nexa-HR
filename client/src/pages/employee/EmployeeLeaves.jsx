@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 const EmployeeLeaves = () => {
@@ -307,6 +308,7 @@ const EmployeeLeaves = () => {
           chartColor="purple"
           presetWave="wave1"
           dataPoints={totalLeavesSparkData}
+          loading={loading}
         />
 
         {/* Card 2: Light Card - Annual Vacation */}
@@ -322,6 +324,7 @@ const EmployeeLeaves = () => {
           chartColor="coral"
           presetWave="wave2"
           dataPoints={annualSparkData}
+          loading={loading}
         />
 
         {/* Card 3: Light Card - Sick & Medical */}
@@ -337,6 +340,7 @@ const EmployeeLeaves = () => {
           chartColor="amber"
           presetWave="wave3"
           dataPoints={sickSparkData}
+          loading={loading}
         />
 
         {/* Card 4: Light Card - Pending Requests */}
@@ -352,95 +356,100 @@ const EmployeeLeaves = () => {
           chartColor="rose"
           presetWave="wave4"
           dataPoints={pendingSparkData}
+          loading={loading}
         />
       </div>
 
       {/* ========================================================================= */}
       {/* 3. LEAVE REQUESTS HISTORY & STATUS TABLE */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Leave History & Review Status</h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Review log of all time-off submissions and supervisor approval states
-            </p>
+      {loading ? (
+        <TableSkeleton rows={6} cols={5} />
+      ) : (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Leave History & Review Status</h3>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Review log of all time-off submissions and supervisor approval states
+              </p>
+            </div>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+              {requests.length} Total Requests
+            </span>
           </div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-            {requests.length} Total Requests
-          </span>
-        </div>
 
-        {requests.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-6">Leave Category</th>
-                  <th className="py-3.5 px-4">Duration & Schedule</th>
-                  <th className="py-3.5 px-4">Submission Reason</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-6 text-right">Approval Remarks</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {requests.map((req) => (
-                  <tr key={req.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                    <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
-                          <Layers className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-100">
-                            {req.leaveType?.name || 'General Leave'}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-slate-800 dark:text-slate-200">
-                        {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
-                      </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate">
-                      {req.reason}
-                    </td>
-                    <td className="py-4 px-4">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
-                          req.status === 'APPROVED'
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
-                            : req.status === 'REJECTED'
-                            ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
-                        }`}
-                      >
-                        {req.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right text-slate-500 dark:text-slate-400 text-[11px]">
-                      {req.rejectionReason || (req.status === 'APPROVED' ? 'Approved by HR Lead' : 'Pending Supervisor Review')}
-                    </td>
+          {requests.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                  <tr>
+                    <th className="py-3.5 px-6">Leave Category</th>
+                    <th className="py-3.5 px-4">Duration & Schedule</th>
+                    <th className="py-3.5 px-4">Submission Reason</th>
+                    <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-6 text-right">Approval Remarks</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-12 text-center flex flex-col items-center justify-center">
-            <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-            <h4 className="text-base font-black text-slate-900 dark:text-white">No Leave Applications Found</h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              You haven't submitted any time-off requests yet. Use the "Apply for Leave" button above to get started.
-            </p>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {requests.map((req) => (
+                    <tr key={req.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                      <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                            <Layers className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="font-extrabold text-slate-800 dark:text-slate-100">
+                              {req.leaveType?.name || 'General Leave'}
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="font-bold text-slate-800 dark:text-slate-200">
+                          {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate">
+                        {req.reason}
+                      </td>
+                      <td className="py-4 px-4">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
+                            req.status === 'APPROVED'
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
+                              : req.status === 'REJECTED'
+                              ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
+                          }`}
+                        >
+                          {req.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right text-slate-500 dark:text-slate-400 text-[11px]">
+                        {req.rejectionReason || (req.status === 'APPROVED' ? 'Approved by HR Lead' : 'Pending Supervisor Review')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="p-12 text-center flex flex-col items-center justify-center">
+              <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+              <h4 className="text-base font-black text-slate-900 dark:text-white">No Leave Applications Found</h4>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm">
+                You haven't submitted any time-off requests yet. Use the "Apply for Leave" button above to get started.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 3. APPLY MODAL (ULTRA PREMIUM THEMED DESIGN) */}

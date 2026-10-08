@@ -28,7 +28,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 
-const DEFAULT_AVATAR = null;
+const DEFAULT_AVATAR = '/blank-profile-picture.png';
 
 function formatRelativeTime(dateString) {
   if (!dateString) return 'Just now';
@@ -173,12 +173,12 @@ const AppPageHeader = ({
     }
 
     if (!activeUser) {
-      setUserAvatar(null);
+      setUserAvatar(DEFAULT_AVATAR);
       return;
     }
 
     // Compute avatar strictly for this active user
-    let activeAvatar = null;
+    let activeAvatar = DEFAULT_AVATAR;
     if (activeUser.avatar && typeof activeUser.avatar === 'string' && !activeUser.avatar.includes('unsplash') && activeUser.avatar.trim() !== '') {
       activeAvatar = activeUser.avatar;
     } else if (activeUser.profile?.avatarUrl && typeof activeUser.profile.avatarUrl === 'string' && !activeUser.profile.avatarUrl.includes('unsplash')) {
@@ -190,7 +190,7 @@ const AppPageHeader = ({
       }
     }
 
-    setUserAvatar(activeAvatar);
+    setUserAvatar(activeAvatar || DEFAULT_AVATAR);
   };
 
   useEffect(() => {
@@ -614,33 +614,27 @@ const AppPageHeader = ({
               title={userFullName}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 p-0.5 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all cursor-pointer shrink-0 flex items-center justify-center overflow-hidden active:scale-95"
             >
-              {userAvatar ? (
-                <img
-                  src={userAvatar}
-                  alt="User Avatar"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full rounded-full bg-[#0F172A] dark:bg-slate-100 text-white dark:text-slate-900 font-bold flex items-center justify-center text-xs shadow-sm">
-                  {userInitials}
-                </div>
-              )}
+              <img
+                src={userAvatar || DEFAULT_AVATAR}
+                alt="User Avatar"
+                className="w-full h-full rounded-full object-cover"
+                onError={(e) => {
+                  e.target.src = DEFAULT_AVATAR;
+                }}
+              />
             </button>
 
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                  {userAvatar ? (
-                    <img
-                      src={userAvatar}
-                      alt="Avatar"
-                      className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-[#0F172A] text-white font-bold flex items-center justify-center text-xs shrink-0">
-                      {userInitials}
-                    </div>
-                  )}
+                  <img
+                    src={userAvatar || DEFAULT_AVATAR}
+                    alt="Avatar"
+                    className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                    onError={(e) => {
+                      e.target.src = DEFAULT_AVATAR;
+                    }}
+                  />
                   <div className="overflow-hidden">
                     <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{userFullName}</p>
                     <p className="text-[10px] font-semibold text-slate-400 truncate">

@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { AnnouncementSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 import { getYearHolidays } from '../../utils/holidayEngine';
@@ -34,7 +35,7 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { formatCurrency, formatDate, formatTime } = useRegionalSettings();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dashboardData, setDashboardData] = useState(null);
   const [leaveTypes, setLeaveTypes] = useState([]);
@@ -519,6 +520,7 @@ const EmployeeDashboard = () => {
           presetWave="wave1"
           dataPoints={attendanceSparkData}
           onClick={() => navigate('/employee/attendance')}
+          loading={loading}
         />
 
         {/* Card 2: Light Card - Logged Work Hours */}
@@ -535,6 +537,7 @@ const EmployeeDashboard = () => {
           presetWave="wave2"
           dataPoints={hoursSparkData}
           onClick={() => navigate('/employee/attendance')}
+          loading={loading}
         />
 
         {/* Card 3: Light Card - Available Leaves */}
@@ -551,6 +554,7 @@ const EmployeeDashboard = () => {
           presetWave="wave3"
           dataPoints={leavesSparkData}
           onClick={() => navigate('/employee/leaves')}
+          loading={loading}
         />
 
         {/* Card 4: Light Card - Latest Net Salary */}
@@ -566,6 +570,7 @@ const EmployeeDashboard = () => {
           presetWave="wave4"
           dataPoints={salarySparkData}
           onClick={() => navigate('/employee/payslips')}
+          loading={loading}
         />
       </div>
 
@@ -673,7 +678,9 @@ const EmployeeDashboard = () => {
             </div>
 
             <div className="space-y-3">
-              {dynamicAnnouncements.length > 0 ? (
+              {loading ? (
+                <AnnouncementSkeleton count={2} />
+              ) : dynamicAnnouncements.length > 0 ? (
                 dynamicAnnouncements.map((item, idx) => {
                   const itemDate = item.date || (item.createdAt ? formatDate(item.createdAt) : 'Recent');
                   return (
@@ -712,6 +719,7 @@ const EmployeeDashboard = () => {
                   <p className="text-[11px] text-slate-400">All official company circulars posted by HR will appear here.</p>
                 </div>
               )}
+            )}
             </div>
           </div>
         </div>

@@ -33,6 +33,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
+import { AnnouncementSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 const getCategoryLabel = (cat) => {
@@ -70,7 +71,7 @@ const EmployeeAnnouncements = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [heroIndex, setHeroIndex] = useState(0);
   const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -373,7 +374,9 @@ const EmployeeAnnouncements = () => {
       {/* 3. CLEAN FULL-WIDTH NOTICES LIST */}
       {/* ========================================================================= */}
       <div className="w-full space-y-4">
-        {filteredNotices.length > 0 ? (
+        {loading ? (
+          <AnnouncementSkeleton count={4} />
+        ) : filteredNotices.length > 0 ? (
           filteredNotices.map((item) => (
             <div
               key={item.id}
@@ -511,6 +514,7 @@ const EmployeeAnnouncements = () => {
             )}
           </div>
         )}
+      )}
       </div>
 
       {/* ========================================================================= */}

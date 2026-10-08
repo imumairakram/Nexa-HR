@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
@@ -228,6 +229,7 @@ const EmployeePayslips = () => {
           chartColor="purple"
           presetWave="wave1"
           dataPoints={netSparkData}
+          loading={loading}
         />
 
         {/* Card 2: Light Card - Latest Gross Salary */}
@@ -243,6 +245,7 @@ const EmployeePayslips = () => {
           chartColor="coral"
           presetWave="wave2"
           dataPoints={grossSparkData}
+          loading={loading}
         />
 
         {/* Card 3: Light Card - Total Net Disbursed */}
@@ -258,6 +261,7 @@ const EmployeePayslips = () => {
           chartColor="amber"
           presetWave="wave3"
           dataPoints={disbursedSparkData}
+          loading={loading}
         />
 
         {/* Card 4: Light Card - Total Deductions */}
@@ -273,13 +277,17 @@ const EmployeePayslips = () => {
           chartColor="rose"
           presetWave="wave4"
           dataPoints={deductionsSparkData}
+          loading={loading}
         />
       </div>
 
       {/* ========================================================================= */}
       {/* 2. SALARY DISBURSAL HISTORY LIST */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+      {loading ? (
+        <TableSkeleton rows={6} cols={7} />
+      ) : (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
@@ -381,6 +389,7 @@ const EmployeePayslips = () => {
           </div>
         )}
       </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 3. PAYSLIP MODAL DETAIL VIEWER */}

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 const Attendance = () => {
@@ -276,7 +277,10 @@ const Attendance = () => {
       {/* ========================================================================= */}
       {/* 3. ATTENDANCE LOGS TABLE */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+      {loading ? (
+        <TableSkeleton rows={6} cols={7} />
+      ) : (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
@@ -342,6 +346,7 @@ const Attendance = () => {
           </table>
         </div>
       </div>
+      )}
     </div>
   );
 };

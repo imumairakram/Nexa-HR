@@ -21,13 +21,14 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const EmployeeAttendance = () => {
   const { formatTime, formatDate, timezone } = useRegionalSettings();
   const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [todayLog, setTodayLog] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -344,7 +345,6 @@ const EmployeeAttendance = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* ========================================================================= */}
       {/* 2. STATS ROW (EXACT HIGH-FIDELITY VECTOR SPARKLINE CARDS FOR ATTENDANCE) */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -361,6 +361,7 @@ const EmployeeAttendance = () => {
           chartColor="purple"
           presetWave="wave1"
           dataPoints={presenceSparkData}
+          loading={loading}
         />
 
         {/* Card 2: Light Card - Late Arrivals */}
@@ -376,6 +377,7 @@ const EmployeeAttendance = () => {
           chartColor="orange"
           presetWave="wave2"
           dataPoints={lateSparkData}
+          loading={loading}
         />
 
         {/* Card 3: Light Card - Logged Work Hours */}
@@ -391,6 +393,7 @@ const EmployeeAttendance = () => {
           chartColor="amber"
           presetWave="wave3"
           dataPoints={hoursSparkData}
+          loading={loading}
         />
 
         {/* Card 4: Light Card - Terminal Sync Logs */}
@@ -406,13 +409,17 @@ const EmployeeAttendance = () => {
           chartColor="rose"
           presetWave="wave4"
           dataPoints={punchesSparkData}
+          loading={loading}
         />
       </div>
 
       {/* ========================================================================= */}
       {/* 3. MODERN ATTENDANCE LOG DATA GRID */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+      {loading ? (
+        <TableSkeleton rows={6} cols={6} />
+      ) : (
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
         {/* Header & Filter Controls */}
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -527,6 +534,7 @@ const EmployeeAttendance = () => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };
