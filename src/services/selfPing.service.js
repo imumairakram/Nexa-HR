@@ -55,11 +55,11 @@ function sendPing(url) {
  * @returns {NodeJS.Timeout|null} Interval timer instance or null if not started
  */
 function startSelfPing() {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
   const rawBackendUrl = process.env.BACKEND_URL;
 
   if (!isProduction) {
-    console.log('[SELF-PING] Inactive: NODE_ENV is not set to "production".');
+    console.log('[SELF-PING] Inactive: NODE_ENV is not set to "production" (or running locally).');
     return null;
   }
 
