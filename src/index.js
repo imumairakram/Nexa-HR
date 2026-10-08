@@ -23,6 +23,9 @@ const announcementRoutes = require('./routes/announcement.routes');
 const ticketRoutes = require('./routes/ticket.routes');
 const accountRoutes = require('./routes/account.routes');
 
+// Background Services
+const { startSelfPing, stopSelfPing } = require('./services/selfPing.service');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -168,16 +171,27 @@ const server = app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`[ENTERPRISE SECURITY ACTIVE] NexaHR Backend on http://localhost:${PORT}`);
   console.log(`====================================================`);
+
+  // Start background self-ping service (for Render free tier spindown prevention)
+  startSelfPing();
 });
 
 // Graceful Shutdown
-process.on('SIGINT', async () => {
-  console.log('Shutting down server gracefully...');
-  await prisma.$disconnect();
+const handleShutdown = async (signal) => {
+  console.log(`[${signal}] Shutting down server gracefully...`);
+  stopSelfPing();
+  try {
+    await prisma.$disconnect();
+  } catch (err) {
+    console.error('Error disconnecting Prisma client:', err.message);
+  }
   server.close(() => {
     console.log('Server closed.');
     process.exit(0);
   });
-});
+};
+
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 
 module.exports = app;
