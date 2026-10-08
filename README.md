@@ -17,7 +17,7 @@
 <br/>
 
 <p align="center">
-  <b>NexaHR</b> is a state-of-the-art, full-stack Human Resource Management System (HRMS) and Employee Self-Service (ESS) platform. Designed with glassmorphic UI aesthetics, enterprise-grade Role-Based Access Control (RBAC), real-time biometric synchronization, automated payroll tax engines, full-lifecycle recruitment ATS, multi-channel OTP recovery, Cloudinary media pipeline, and in-app notifications.
+  <b>NexaHR</b> is an enterprise-grade, full-stack Human Resource Management System (HRMS) and Employee Self-Service (ESS) platform. Designed with world-class glassmorphic UI aesthetics, zero-layout-shift shimmer skeleton loading, fine-grained Role-Based Access Control (RBAC), real-time biometric synchronization, automated payroll tax engines, full-lifecycle recruitment ATS, multi-channel OTP recovery, Cloudinary media pipeline, and multi-currency regional settings.
 </p>
 
 <p align="center">
@@ -28,6 +28,7 @@
   <a href="#-system-architecture">Architecture</a> •
   <a href="#-repository-structure">Directory Map</a> •
   <a href="#-quick-start-guide">Quick Start</a> •
+  <a href="#-deployment-guide">Deployment Guide</a> •
   <a href="#-api-reference-overview">API Reference</a> •
   <a href="#-security--compliance">Security</a>
 </p>
@@ -51,8 +52,9 @@
   │     • Full Recruitment ATS & Interview Desk       • Team Roster & Live Presence         │
   │     • Company Accounts, Ledgers & Audits          • Helpdesk & IT Service Desk          │
   │     • User Access Control (Granular RBAC)         • Encrypted Document Vault & Policies │
-  │     • Corporate Announcements & Bulletins         • Awards, Badges & Peer Kudos Feed    │
-  │     • In-App Notifications Hub                    • Holiday Countdown & Weekend Planner │
+  │     • Corporate Announcements & Bulletins         • Holiday Countdown & Weekend Planner │
+  │     • In-App Notifications Hub                    • Vector Sparkline Analytics & Cards  │
+  │     • Zero-Layout-Shift Shimmer Skeleton Loading  • Multi-Currency Regional Preferences │
   └─────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -63,7 +65,7 @@
 NexaHR delivers two distinct, role-tailored application environments sharing unified backend services and real-time data persistence:
 
 ### 1. 🏢 HR Executive & Admin Command Center (`/app/*`)
-* **Workforce Intelligence & BI Dashboard**: Headcount analytics, gender distribution, department distribution charts, live presence donut, quick action shortcuts, and recruitment pipeline status.
+* **Workforce Intelligence & BI Dashboard**: Headcount analytics, gender distribution, department distribution charts, live presence gauge, quick action shortcuts, and recruitment pipeline status.
 * **Personnel Information Management (PIM)**: Complete employee directory with 6-tab dossiers (Personal, Professional, Financial, Documents, Assets, Emergency Contact), search, department filtering, and status management.
 * **Multi-Step Onboarding Engine**: Guided employee onboarding wizard with profile picture upload, salary structure configuration, and automated account credential generation.
 * **Biometric & Geo Attendance Control**: Live biometric hardware gateway integration, daily punch logs, overtime records, and shift tracking (Present, Late, Half-Day, Absent, On Leave).
@@ -80,13 +82,24 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Attendance & Regularization**: Monthly punch logs, check-in/out stamps, punch methods (Biometric, Web, Mobile), and regularization request filing.
 * **Smart Leave Manager**: Visual quota progress meters (Annual, Casual, Sick, Parental), instant date duration calculations, reason attachments, and approval tracking.
 * **Interactive Payslip Vault**: Detailed earnings vs. deductions breakdown, year-to-date (YTD) salary trends, and pixel-perfect PDF-styled printable payslip view.
-* **Project & Kanban Board**: Sprint deliverables, draggable task workflow status cards, and direct work hour logging.
 * **Company Team Directory & Roster**: Searchable colleague directory filtered by department and live presence (In Office, Remote, On Leave), with direct email actions.
 * **Helpdesk & HR Service Desk**: Multi-category support ticket creation (HR, IT Hardware, Payroll, Benefits), priority levels, and live conversation threads.
 * **Encrypted Documents & Policy Center**: Personal contracts, signed NDAs, tax forms, certificate upload modal, and company policy handbook repository.
-* **Awards & Peer Kudos Wall**: Personal honors showcase, company-wide peer recognition feed, and "Send Kudos" modal with badge endorsements.
 * **Holiday Schedule & Long Weekend Planner**: Next holiday countdown hero banner, full official calendar, and long weekend optimization badges.
 * **Multi-Tab Profile & Settings**: Comprehensive personal dossier view, theme engine customization (Dark/Light/System), and security settings.
+
+---
+
+## 💎 Design System & Component Engineering
+
+* **Zero-Layout-Shift Shimmer Skeleton Loading**:
+  - Implemented via a comprehensive [`Skeleton.jsx`](client/src/components/common/Skeleton.jsx) module.
+  - Tailored skeleton primitives for Employee Cards, Department Cards, Data Tables (custom rows/cols), KPI Metric Grids, Announcement Bulletins, Support Tickets, Leave Policies, and RBAC Split-Screen Rosters.
+  - Seamless CSS linear gradient animations synchronized across Light and Dark themes.
+* **Interactive Vector Sparkline Metrics**:
+  - Vector SVG-based high-fidelity sparkline cards with micro-tooltips and smooth cubic Bézier curves ([`SparkMetricCard.jsx`](client/src/components/common/SparkMetricCard.jsx)).
+* **Regional & Currency Settings Engine**:
+  - Global context ([`RegionalSettingsContext.jsx`](client/src/context/RegionalSettingsContext.jsx)) providing real-time currency formatting (USD, EUR, GBP, PKR, INR, AED, CAD), regional date styles, and time displays.
 
 ---
 
@@ -98,8 +111,6 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Cloudinary Media Pipeline**:
   - Direct memory stream profile picture uploads to Cloudinary CDN via Multer (zero disk footprint for ephemeral platforms like Render/Vercel).
   - Built-in webcam capture and local base64 preview fallback.
-* **Mandatory First-Login Password Change**:
-  - Enforced credential update modal upon initial account activation (`mustChangePassword` flag).
 * **Tiered Rate Limiting & HTTP Protection**:
   - Strict rate limiters for authentication endpoints, password reset flows, and general API routes.
   - Helmet CSP headers, CORS with credential handling, and express-validator input sanitization.
@@ -152,7 +163,7 @@ flowchart TB
         B[Admin & HR Module /app/*]
         C[Employee ESS Module /employee/*]
         D[In-App Notification Center]
-        E[Glassmorphic Theme Engine]
+        E[Glassmorphic Theme & Skeleton Engine]
     end
 
     subgraph Server["Backend REST API (Node.js + Express 4.21)"]
@@ -190,71 +201,66 @@ flowchart TB
 
 ```
 NexaHR/
-├── client/                                 # Frontend Client (React 19 + Vite 8)
+├── client/                                 # Frontend Client (React 19 + Vite 8 + Tailwind v4)
+│   ├── public/                             # Public static assets & SVG icons
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── common/                     # Logo, Badge, ScrollToTop, Modal dialogs
-│   │   │   ├── navigation/                 # Admin & Employee Sidebar, Header, NotificationDropdown
-│   │   │   └── ui/                         # Reusable buttons, cards, inputs, tabs
-│   │   ├── context/                        # ThemeContext (Dark/Light/System)
-│   │   ├── layouts/
-│   │   │   ├── MainLayout.jsx              # Admin & HR command layout wrapper
-│   │   │   └── EmployeeLayout.jsx          # Employee Self-Service layout wrapper
+│   │   │   ├── auth/                       # ForgotPasswordModal
+│   │   │   ├── common/                     # Skeleton, SparkMetricCard, Logo, ErrorBoundary
+│   │   │   └── navigation/                 # Admin & Employee Sidebar, Header, PageHeaders
+│   │   ├── context/                        # ThemeContext & RegionalSettingsContext
+│   │   ├── layouts/                        # MainLayout (Admin) & EmployeeLayout (ESS)
 │   │   ├── pages/
-│   │   │   ├── website/                    # Login, Multi-Channel Forgot Password, Setup
-│   │   │   ├── app/                        # HR Executive & Admin Command Pages
+│   │   │   ├── app/                        # HR Executive & Admin Command Center Pages
 │   │   │   │   ├── Dashboard.jsx           # 360° Workforce BI & Analytics
-│   │   │   │   ├── Employees.jsx           # Employee Directory & 6-Tab Dossier Modal
+│   │   │   │   ├── Employees.jsx           # Directory, Table, and 6-Tab Dossier Modal
 │   │   │   │   ├── Attendance.jsx          # Biometric Hardware Sync & Punch Logs
 │   │   │   │   ├── Leaves.jsx              # Company-wide Leave Approvals
-│   │   │   │   ├── LeavePolicy.jsx         # Leave Quota & Policy Configuration
-│   │   │   │   ├── Payroll.jsx             # Payroll Matrix & Structure Management
-│   │   │   │   ├── Departments.jsx         # Department Hierarchy
-│   │   │   │   ├── EmploymentStatus.jsx    # Classification & Status Types
-│   │   │   │   ├── UserAccessControl.jsx   # Role-Based Access Control (RBAC) & Audit
-│   │   │   │   ├── Accounts.jsx            # Company Accounts, Ledgers & Expenses
-│   │   │   │   ├── Reports.jsx             # Headcount, Attendance & Financial Reports
-│   │   │   │   ├── Announcement.jsx        # Admin Broadcasts & Circulars
-│   │   │   │   ├── ProjectManagement.jsx   # Agile Project & Task Sprint Board
-│   │   │   │   ├── Settings.jsx            # System Configuration & Localization
-│   │   │   │   ├── holiday/                # Public & Company Holiday Planner
-│   │   │   │   ├── hr/                     # Onboarding Wizard, Designations, Roles
-│   │   │   │   ├── payroll/                # Calculate Payroll & Payslip Lists
-│   │   │   │   └── recruitment/            # ATS Desk, Board, Jobs, Interviews, Tags
+│   │   │   │   ├── LeavePolicy.jsx         # Quota Rules & Policy Configuration
+│   │   │   │   ├── Payroll.jsx             # Payroll Ledger & Structure Management
+│   │   │   │   ├── Departments.jsx         # Organizational Units
+│   │   │   │   ├── EmploymentStatus.jsx    # Employment Types & Status Classifications
+│   │   │   │   ├── UserAccessControl.jsx   # Split-Screen RBAC Governance & Preset Matrix
+│   │   │   │   ├── Accounts.jsx            # Company Accounts & Ledger Management
+│   │   │   │   ├── Announcement.jsx        # Admin Circulars & Bulletins
+│   │   │   │   ├── holiday/                # Public Holidays Planner
+│   │   │   │   ├── hr/                     # Designation Hierarchy & New Employee Wizard
+│   │   │   │   ├── payroll/                # Calculate Payroll & Payslip List
+│   │   │   │   └── recruitment/            # Recruitment ATS Desk, Board & Jobs Catalog
 │   │   │   └── employee/                   # Employee Self-Service Pages
-│   │   │       ├── EmployeeDashboard.jsx   # Personal Shift Pulse & Quick Actions
-│   │   │       ├── EmployeeAttendance.jsx  # Live Punch Terminal & Regularizations
-│   │   │       ├── EmployeeLeaves.jsx      # Balance Meters & Leave Application
-│   │   │       ├── EmployeePayslips.jsx    # Digital Salary Slips & Printable PDF
-│   │   │       ├── EmployeeDirectory.jsx   # Team Roster & Presence Status
-│   │   │       ├── EmployeeHelpdesk.jsx    # HR & IT Support Ticket Desk
+│   │   │       ├── EmployeeDashboard.jsx   # Shift Pulse & Action Hub
+│   │   │       ├── EmployeeAttendance.jsx  # Clock-In/Out & Monthly Logs
+│   │   │       ├── EmployeeLeaves.jsx      # Quota Meters & Application Form
+│   │   │       ├── EmployeePayslips.jsx    # Payslip Vault & Printable PDF Slip
+│   │   │       ├── EmployeeHelpdesk.jsx    # HR & IT Support Inquiries Thread
 │   │   │       ├── EmployeeDocuments.jsx   # Encrypted Document Vault & Policies
-│   │   │       ├── EmployeeAnnouncements.jsx # Corporate Bulletins
-│   │   │       ├── EmployeeAwards.jsx      # Badges & Peer Recognition Wall
-│   │   │       ├── EmployeeHolidays.jsx    # Holiday Countdown & Weekend Planner
-│   │   │       ├── EmployeeProfile.jsx     # Multi-Tab Personal Profile View
-│   │   │       └── EmployeeSettings.jsx    # Notification & Display Preferences
-│   │   ├── services/                       # Centralized Axios/Fetch API Client & Mock Fallbacks
+│   │   │       ├── EmployeeAnnouncements.jsx # Corporate Notices
+│   │   │       ├── EmployeeHolidays.jsx    # Official Holiday Observances
+│   │   │       ├── EmployeeProfile.jsx     # Personal Dossier & Identity
+│   │   │       └── EmployeeSettings.jsx    # User Preferences & Security
+│   │   ├── services/                       # Centralized Axios/Fetch API Client & Fallbacks
+│   │   ├── utils/                          # Access Control & Holiday Engine
 │   │   ├── App.jsx                         # Master Routing Hub & Protected Routes
 │   │   └── main.jsx                        # React 19 Entrypoint
 │   ├── package.json
+│   ├── vercel.json                         # Vercel Deployment SPA Configuration
 │   └── vite.config.js
 │
 ├── prisma/
-│   └── schema.prisma                       # PostgreSQL Data Models & Relations
+│   ├── schema.prisma                       # PostgreSQL Schema & Relational Models
+│   ├── seed.js                             # Canonical Database Seeder
+│   └── migrations/                         # Prisma Migration History SQL files
 │
 ├── src/                                    # Backend Express.js REST API
 │   ├── config/                             # Prisma Client & Cloudinary Configuration
-│   ├── controllers/                        # 10 Dedicated Controllers (Auth, Employee, Leaves, etc.)
+│   ├── controllers/                        # Dedicated Controllers (Auth, Employee, Leaves, etc.)
 │   ├── middlewares/                        # JWT Auth, RBAC, Rate Limiters, Upload, Validators
 │   ├── routes/                             # Express REST API Endpoints
-│   ├── services/                           # Notification Dispatch, Mailer & Tax Engines
+│   ├── services/                           # Notification Dispatch & Tax Services
 │   ├── utils/                              # Password Hashing & JWT Helpers
 │   └── index.js                            # Express Server Entrypoint (Port 5000)
 │
 ├── run.bat / run.sh                        # 1-Click Unified Development Launchers
-├── run-backend.bat / run-frontend.bat      # Granular Process Launchers
-├── test-*.js                               # Comprehensive Unit & Integration Test Suites
 ├── .env.example                            # Environment Variables Template
 ├── package.json                            # Root Backend Package & Scripts
 └── README.md                               # Project Master Documentation
@@ -267,14 +273,14 @@ NexaHR/
 ### Prerequisites
 * [Node.js](https://nodejs.org/) `>= 18.0.0`
 * [npm](https://www.npmjs.com/) `>= 9.0.0`
-* [PostgreSQL](https://www.postgresql.org/) `>= 14.0` *(Optional for live DB; frontend includes graceful mock fallback)*
+* [PostgreSQL](https://www.postgresql.org/) `>= 14.0` *(Optional; frontend features graceful offline fallback)*
 
 ---
 
 ### Option 1: 1-Click Launch (Recommended)
 
 #### On Windows:
-Double-click [`run.bat`](file:///d:/NexaHR/run.bat) or execute in PowerShell/CMD:
+Double-click [`run.bat`](run.bat) or execute in PowerShell/CMD:
 ```bat
 .\run.bat
 ```
@@ -285,7 +291,7 @@ chmod +x run.sh
 ./run.sh
 ```
 
-*This automatically verifies dependencies, generates `.env` if missing, and launches both Backend and Frontend concurrently.*
+*This automatically checks dependencies, creates `.env` from template if missing, generates Prisma clients, and launches both Backend and Frontend concurrently.*
 
 ---
 
@@ -331,6 +337,7 @@ Generate Prisma client & run database migrations:
 ```bash
 npm run prisma:generate
 npm run prisma:migrate
+npm run prisma:seed
 ```
 
 Start the Backend Server:
@@ -353,6 +360,46 @@ Alternatively, run both servers together from the project root:
 ```bash
 npm run dev
 ```
+
+---
+
+## 🌐 Deployment Guide
+
+### Deploy Frontend (Vercel)
+The client includes pre-configured single-page application routing rules in [`client/vercel.json`](client/vercel.json).
+
+1. Import the repository on [Vercel](https://vercel.com).
+2. Set **Root Directory** to `client`.
+3. Build Settings:
+   - **Framework Preset**: `Vite`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Add Environment Variable:
+   - `VITE_API_BASE_URL` = `https://your-backend-api.onrender.com`
+5. Click **Deploy**.
+
+---
+
+### Deploy Backend (Render / Railway / Docker / VPS)
+
+#### Using Render / Railway:
+1. Create a new **Web Service** connected to the repository.
+2. Root Directory: `.` (Project root).
+3. **Build Command**:
+   ```bash
+   npm install && npx prisma generate
+   ```
+4. **Start Command**:
+   ```bash
+   node src/index.js
+   ```
+5. Add Environment Variables:
+   - `NODE_ENV` = `production`
+   - `PORT` = `5000`
+   - `DATABASE_URL` = `postgresql://...` (from Neon, Supabase, AWS RDS, or Render PostgreSQL)
+   - `JWT_SECRET` = `<your-secure-secret>`
+   - `FRONTEND_URL` = `https://your-nexahr-app.vercel.app`
+   - *(Optional)* Cloudinary and SMTP credentials.
 
 ---
 
@@ -445,32 +492,6 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 
 ---
 
-## 🧪 Verification & Test Suites
-
-The repository includes standalone validation and integration test suites:
-
-```bash
-# Test Database Connection & Models
-node test-db.js
-
-# Test Enterprise Security, Helmet, CORS & Rate Limiting
-node test-security-suite.js
-
-# Test Multi-Channel Password Recovery & OTP Pipeline
-node test-recovery.js
-
-# Test Cloudinary Zero-Disk Profile Picture Upload
-node test-profile-picture-pipeline.js
-
-# Test In-App Notification Hub & Email Dispatch
-node test-notification-flow.js
-
-# Test Employee Onboarding & PIM Flow
-node test-employee-flow.js
-```
-
----
-
 ## 🎨 Design Philosophy & UI Excellence
 
 NexaHR is crafted adhering to world-class modern UI/UX principles:
@@ -478,15 +499,6 @@ NexaHR is crafted adhering to world-class modern UI/UX principles:
 * **Fluid Glassmorphism**: Translucent backdrop-blur cards with subtle 1px border lighting.
 * **Micro-Animations**: Smooth Framer Motion hover elevations, pulsating punch indicators, animated modal transitions, and interactive charts.
 * **Responsive Layouts**: Seamless adaptations from multi-column ultra-wide monitors down to mobile bottom-nav drawer views.
-
----
-
-## 🗺️ Roadmap & Upcoming Milestones
-
-- [ ] **AI-Powered Resume Matcher**: Automated CV parsing and candidate scoring for the Recruitment module.
-- [ ] **Real-Time WebSockets**: Instant push notifications for leave approvals, kudos alerts, and live punches.
-- [ ] **Slack & MS Teams Webhooks**: Daily attendance reminders and holiday broadcast bots.
-- [ ] **Native Mobile Application (Capacitor/React Native)**: Native biometric fingerprint login on iOS & Android.
 
 ---
 
