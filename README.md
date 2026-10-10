@@ -64,7 +64,7 @@
 
 NexaHR delivers two distinct, role-tailored application environments sharing unified backend services and real-time data persistence:
 
-### 1. 🏢 HR Executive & Admin Command Center (`/app/*`)
+### 🏢 HR Executive & Admin Command Center (`/app/*`)
 * **Workforce Intelligence & BI Dashboard**: Headcount analytics, gender distribution, department distribution charts, live presence gauge, quick action shortcuts, and recruitment pipeline status.
 * **Personnel Information Management (PIM)**: Complete employee directory with 6-tab dossiers (Personal, Professional, Financial, Documents, Assets, Emergency Contact), search, department filtering, and status management.
 * **Multi-Step Onboarding Engine**: Guided employee onboarding wizard with profile picture upload, salary structure configuration, and automated account credential generation.
@@ -77,7 +77,7 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Accounts, Ledgers & Financial Audits**: Departmental cost tracking, payroll disbursement logs, expense accounts, and exportable financial summaries.
 * **Corporate Announcements**: Rich-text company broadcasts, department targeting, priority tags, and pinning capabilities.
 
-### 2. 👤 Employee Self-Service (ESS) Portal (`/employee/*`)
+### 👤 Employee Self-Service (ESS) Portal (`/employee/*`)
 * **Live Punch Terminal**: Real-time web clock-in/out terminal with active session timers, break counter, and cross-tab event synchronization.
 * **Attendance & Regularization**: Monthly punch logs, check-in/out stamps, punch methods (Biometric, Web, Mobile), and regularization request filing.
 * **Smart Leave Manager**: Visual quota progress meters (Annual, Casual, Sick, Parental), instant date duration calculations, reason attachments, and approval tracking.
