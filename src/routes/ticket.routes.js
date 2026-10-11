@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middlewares/auth.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
+const cacheService = require('../services/cache.service');
 const {
   getMyTickets,
   getAllTickets,
@@ -14,13 +15,13 @@ const {
 router.use(verifyToken);
 
 // Employee Self-Service routes
-router.get('/my', getMyTickets);
+router.get('/my', cacheService.middleware({ ttlSeconds: 60, tags: ['tickets'] }), getMyTickets);
 
 // General ticket list (role-scoped)
-router.get('/', getAllTickets);
+router.get('/', cacheService.middleware({ ttlSeconds: 60, tags: ['tickets'] }), getAllTickets);
 
 // Single ticket details
-router.get('/:id', getTicketById);
+router.get('/:id', cacheService.middleware({ ttlSeconds: 60, tags: ['tickets'] }), getTicketById);
 
 // Create new support ticket
 router.post('/', createTicket);

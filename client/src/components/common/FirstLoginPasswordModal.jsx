@@ -97,11 +97,11 @@ const FirstLoginPasswordModal = () => {
 
   return (
     <div className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 animate-in zoom-in-95">
+      <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 animate-in zoom-in-95">
         
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-600 to-red-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/25 shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 via-orange-600 to-red-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/25 shrink-0">
             <KeyRound className="w-6 h-6 stroke-[2.2]" />
           </div>
           <div>
@@ -118,7 +118,7 @@ const FirstLoginPasswordModal = () => {
         </div>
 
         {toastMsg && (
-          <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 shrink-0" />
             <span>{toastMsg}</span>
           </div>
@@ -137,7 +137,7 @@ const FirstLoginPasswordModal = () => {
                 placeholder="Enter temporary password provided by HR..."
                 value={form.currentPassword}
                 onChange={(e) => setForm({ ...form, currentPassword: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none pr-10"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none pr-10"
               />
               <button
                 type="button"
@@ -160,7 +160,7 @@ const FirstLoginPasswordModal = () => {
                 placeholder="Choose a strong private password..."
                 value={form.newPassword}
                 onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none pr-10"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none pr-10"
               />
               <button
                 type="button"
@@ -182,7 +182,7 @@ const FirstLoginPasswordModal = () => {
               placeholder="Re-enter new password to verify..."
               value={form.confirmPassword}
               onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-              className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
             />
           </div>
 
@@ -190,7 +190,7 @@ const FirstLoginPasswordModal = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-600 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-black text-xs shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-600 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-black text-xs shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
             >
               {submitting ? (
                 <>

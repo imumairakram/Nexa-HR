@@ -60,9 +60,9 @@ const getAvatarUrl = (emp) => {
 };
 
 const Departments = () => {
-  const [departments, setDepartments] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState(() => api.getCached('/departments')?.data?.departments || []);
+  const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/departments'));
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -86,7 +86,9 @@ const Departments = () => {
   };
 
   const fetchAllData = async () => {
-    setLoading(true);
+    if (!api.hasCached('/departments')) {
+      setLoading(true);
+    }
     try {
       const [deptRes, empRes] = await Promise.allSettled([
         api.getDepartments(),

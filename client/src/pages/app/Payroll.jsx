@@ -31,8 +31,8 @@ const MONTH_NAMES = [
 
 const Payroll = () => {
   const navigate = useNavigate();
-  const [payslips, setPayslips] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [payslips, setPayslips] = useState(() => api.getCached('/payroll/payslips')?.data?.payslips || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/payroll/payslips'));
   const [isRunModalOpen, setIsRunModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -47,7 +47,9 @@ const Payroll = () => {
   };
 
   const fetchPayroll = async () => {
-    setLoading(true);
+    if (!api.hasCached('/payroll/payslips')) {
+      setLoading(true);
+    }
     try {
       const res = await api.getPayslips();
       if (res && res.success && res.data?.payslips) {

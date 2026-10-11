@@ -35,14 +35,14 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { formatCurrency, formatDate, formatTime } = useRegionalSettings();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !api.hasCached('/dashboard/employee'));
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [dashboardData, setDashboardData] = useState(null);
-  const [leaveTypes, setLeaveTypes] = useState([]);
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [announcements, setAnnouncements] = useState([]);
-  const [attendanceLogs, setAttendanceLogs] = useState([]);
-  const [payslipHistory, setPayslipHistory] = useState([]);
+  const [dashboardData, setDashboardData] = useState(() => api.getCached('/dashboard/employee')?.data || null);
+  const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
+  const [leaveRequests, setLeaveRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
+  const [announcements, setAnnouncements] = useState(() => api.getCached('/announcements')?.data?.announcements || []);
+  const [attendanceLogs, setAttendanceLogs] = useState(() => api.getCached('/attendance/my-logs?limit=14')?.data?.attendances || []);
+  const [payslipHistory, setPayslipHistory] = useState(() => api.getCached('/payroll/my-payslips')?.data?.payslips || []);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   // Live digital clock timer update
@@ -55,7 +55,9 @@ const EmployeeDashboard = () => {
 
   // Fetch real database attendance, history & dashboard metrics
   const fetchDashboard = async () => {
-    setLoading(true);
+    if (!api.hasCached('/dashboard/employee')) {
+      setLoading(true);
+    }
     try {
       const [dashRes, leaveRes, reqRes, annRes, logsRes, payRes] = await Promise.allSettled([
         api.getEmployeeDashboard(),

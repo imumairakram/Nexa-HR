@@ -26,8 +26,8 @@ import { api } from '../../services/api';
 
 const Announcement = () => {
   const { formatDate } = useRegionalSettings();
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [announcements, setAnnouncements] = useState(() => api.getCached('/announcements')?.data?.announcements || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/announcements'));
   const [submitting, setSubmitting] = useState(false);
 
   const [categoryFilter, setCategoryFilter] = useState('ALL');
@@ -48,7 +48,9 @@ const Announcement = () => {
   });
 
   const loadAnnouncements = async () => {
-    setLoading(true);
+    if (!api.hasCached('/announcements')) {
+      setLoading(true);
+    }
     try {
       const res = await api.getAnnouncements();
       if (res?.success && res.data?.announcements) {

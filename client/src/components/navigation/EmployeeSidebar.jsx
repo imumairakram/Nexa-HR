@@ -88,7 +88,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
   return (
     <aside
-      className={`hidden lg:flex flex-col justify-between py-5 bg-white dark:bg-[#1E293B] rounded-[32px] fixed left-3 top-3 bottom-3 shadow-soft border border-slate-100/80 dark:border-slate-800 shrink-0 z-40 transition-all duration-300 ${
+      className={`hidden lg:flex flex-col justify-between py-5 bg-white dark:bg-[#1E293B] rounded-2xl fixed left-3 top-3 bottom-3 shadow-soft border border-slate-100/80 dark:border-slate-800 shrink-0 z-40 transition-all duration-300 ${
         isCollapsed ? 'w-20 px-2 items-center' : 'w-64 px-3'
       }`}
     >
@@ -121,7 +121,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
               toggleSidebar();
             }}
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shrink-0"
           >
             {isCollapsed ? (
               <ChevronRight className="w-4 h-4 stroke-[2.5]" />
@@ -148,8 +148,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
                 className={({ isActive }) =>
                   `flex items-center transition-all duration-200 ${
                     isCollapsed
-                      ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
-                      : 'gap-3 px-3 py-2.5 rounded-2xl text-xs font-semibold'
+                      ? 'w-11 h-11 rounded-xl justify-center mx-auto my-1'
+                      : 'gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold'
                   } ${
                     isActive
                       ? 'bg-gradient-to-r from-emerald-50 to-teal-50/80 dark:from-emerald-950/70 dark:to-teal-950/40 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-emerald-200/50 dark:border-emerald-800/40'
@@ -183,8 +183,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
           title={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
           className={`flex items-center transition-all cursor-pointer ${
             isCollapsed
-              ? 'w-11 h-11 rounded-2xl justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              : 'w-full gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              ? 'w-11 h-11 rounded-xl justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              : 'w-full gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           {resolvedTheme === 'dark' ? (
@@ -201,8 +201,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
           title="Sign Out"
           className={`flex items-center transition-all cursor-pointer ${
             isCollapsed
-              ? 'w-11 h-11 rounded-2xl justify-center mx-auto text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-              : 'w-full gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400'
+              ? 'w-11 h-11 rounded-xl justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              : 'w-full gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <LogOut className="w-4 h-4 stroke-[2] shrink-0" />

@@ -29,8 +29,8 @@ const MONTH_NAMES = [
 
 const EmployeePayslips = () => {
   const { formatCurrency, formatDate } = useRegionalSettings();
-  const [payslips, setPayslips] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [payslips, setPayslips] = useState(() => api.getCached('/payroll/my-payslips')?.data?.payslips || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/payroll/my-payslips'));
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -40,7 +40,9 @@ const EmployeePayslips = () => {
   };
 
   const fetchMyPayslips = async () => {
-    setLoading(true);
+    if (!api.hasCached('/payroll/my-payslips')) {
+      setLoading(true);
+    }
     try {
       const res = await api.getMyPayslips();
       if (res && res.success && res.data?.payslips) {

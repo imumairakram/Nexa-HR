@@ -7,14 +7,15 @@ const {
 } = require('../controllers/attendance.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
+const cacheService = require('../services/cache.service');
 
 // Public Biometric Hardware Sync Endpoint (Secured by x-hardware-key)
 router.post('/hardware-sync', hardwareSync);
 
 // Employee Self-Service Logs
-router.get('/my-logs', verifyToken, getMyLogs);
+router.get('/my-logs', verifyToken, cacheService.middleware({ ttlSeconds: 60, tags: ['attendance'] }), getMyLogs);
 
 // Admin/HR Attendance Overview
-router.get('/', verifyToken, checkRole('ADMIN', 'HR_MANAGER'), getCompanyAttendance);
+router.get('/', verifyToken, checkRole('ADMIN', 'HR_MANAGER'), cacheService.middleware({ ttlSeconds: 60, tags: ['attendance'] }), getCompanyAttendance);
 
 module.exports = router;

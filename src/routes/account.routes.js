@@ -14,14 +14,15 @@ const {
 const { verifyToken } = require('../middlewares/auth.middleware');
 const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
+const cacheService = require('../services/cache.service');
 
 router.use(verifyToken, requireTenant);
 
 const canManageAccounts = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
 
 // Account Transactions & Financial Statistics
-router.get('/stats', canManageAccounts, getTransactionStats);
-router.get('/transactions', canManageAccounts, getTransactions);
+router.get('/stats', canManageAccounts, cacheService.middleware({ ttlSeconds: 60, tags: ['accounts'] }), getTransactionStats);
+router.get('/transactions', canManageAccounts, cacheService.middleware({ ttlSeconds: 60, tags: ['accounts'] }), getTransactions);
 router.post('/transactions', canManageAccounts, createTransaction);
 router.put('/transactions/:id', canManageAccounts, updateTransaction);
 router.patch('/transactions/:id', canManageAccounts, updateTransaction);

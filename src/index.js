@@ -25,6 +25,7 @@ const accountRoutes = require('./routes/account.routes');
 
 // Background Services
 const { startSelfPing, stopSelfPing } = require('./services/selfPing.service');
+const cacheService = require('./services/cache.service');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -94,6 +95,9 @@ if (process.env.NODE_ENV === 'development') {
 
 // General API Rate Limiting across all /api endpoints
 app.use('/api', generalApiLimiter);
+
+// Smart cache mutation invalidator: instantly clears related cache on POST/PUT/PATCH/DELETE
+app.use('/api', cacheService.mutationInvalidator());
 
 // =========================================================================
 // 4. CORE API ROUTES

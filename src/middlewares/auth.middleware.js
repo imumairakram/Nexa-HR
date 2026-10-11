@@ -1,5 +1,6 @@
 const { verifyJwtToken } = require('../utils/jwt');
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 
 const verifyToken = async (req, res, next) => {
   try {
@@ -24,18 +25,24 @@ const verifyToken = async (req, res, next) => {
     // 3. Cryptographic Verification of JWT
     const decoded = verifyJwtToken(token);
 
-    // 4. Verify user exists and is active in database (revocation check)
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isActive: true,
-      },
-    });
+    // 4. Verify user exists and is active (Fast in-memory cache lookup)
+    let user = cacheService.getCachedUser(decoded.userId);
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isActive: true,
+        },
+      });
+      if (user && user.isActive) {
+        cacheService.setCachedUser(decoded.userId, user);
+      }
+    }
 
     if (!user || !user.isActive) {
       return res.status(401).json({

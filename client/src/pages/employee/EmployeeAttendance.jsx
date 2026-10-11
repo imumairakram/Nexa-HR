@@ -27,8 +27,11 @@ import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const EmployeeAttendance = () => {
   const { formatTime, formatDate, timezone } = useRegionalSettings();
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [logs, setLogs] = useState(() => {
+    const cached = api.getCached('/attendance/my-logs')?.data?.attendances;
+    return cached || [];
+  });
+  const [loading, setLoading] = useState(() => !api.hasCached('/attendance/my-logs'));
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [todayLog, setTodayLog] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -41,7 +44,9 @@ const EmployeeAttendance = () => {
 
   // Fetch real database attendance logs
   const fetchMyAttendance = async () => {
-    setLoading(true);
+    if (!api.hasCached('/attendance/my-logs')) {
+      setLoading(true);
+    }
     try {
       const res = await api.getMyAttendanceLogs();
       if (res && res.success && res.data?.attendances) {

@@ -24,8 +24,28 @@ import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 const Attendance = () => {
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [logs, setLogs] = useState(() => {
+    const cached = api.getCached('/attendance')?.data?.attendances;
+    if (cached) {
+      return cached.map((item) => ({
+        id: item.id,
+        date: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],
+        checkInTime: item.checkInTime,
+        checkOutTime: item.checkOutTime,
+        status: item.status,
+        totalHours: item.totalHours || (item.checkInTime && item.checkOutTime ? 8.5 : 0),
+        notes: item.notes || 'Biometric Face-ID Terminal',
+        user: {
+          employeeCode: item.user?.employeeCode || 'EMP-100',
+          firstName: item.user?.firstName || 'Staff',
+          lastName: item.user?.lastName || 'Member',
+          department: item.user?.profile?.department?.name || 'Engineering',
+        },
+      }));
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => !api.hasCached('/attendance'));
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
@@ -33,7 +53,9 @@ const Attendance = () => {
 
   // Fetch real database attendance logs
   const fetchAttendance = async () => {
-    setLoading(true);
+    if (!api.hasCached('/attendance')) {
+      setLoading(true);
+    }
     try {
       const res = await api.getAttendanceLogs();
       if (res && res.success && res.data?.attendances) {

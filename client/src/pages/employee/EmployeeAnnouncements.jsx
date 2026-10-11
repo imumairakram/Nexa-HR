@@ -70,8 +70,28 @@ const EmployeeAnnouncements = () => {
   const [filter, setFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [heroIndex, setHeroIndex] = useState(0);
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [announcements, setAnnouncements] = useState(() => {
+    const cached = api.getCached('/announcements')?.data?.announcements;
+    if (Array.isArray(cached)) {
+      return cached.map((item) => ({
+        ...item,
+        categoryLabel: getCategoryLabel(item.category),
+        readTime: `${Math.max(1, Math.ceil((item.content?.length || 100) / 400))} min read`,
+        date: item.createdAt
+          ? new Date(item.createdAt).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })
+          : 'Recent',
+        summary: item.summary || item.content?.slice(0, 140) + '...',
+        author: item.author || 'People Operations & HR',
+        department: item.department || 'Company-Wide (All Offices)',
+      }));
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => !api.hasCached('/announcements'));
   const [selectedItem, setSelectedItem] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -82,7 +102,9 @@ const EmployeeAnnouncements = () => {
 
   // Sync live announcements from backend API
   const loadAnnouncements = async () => {
-    setLoading(true);
+    if (!api.hasCached('/announcements')) {
+      setLoading(true);
+    }
     try {
       localStorage.removeItem('nexahr_notices_data');
       const res = await api.getAnnouncements();

@@ -20,10 +20,10 @@ import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 
 const Leaves = () => {
-  const [requests, setRequests] = useState([]);
-  const [leaveTypes, setLeaveTypes] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [requests, setRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
+  const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
+  const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/leaves/requests'));
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedReq, setSelectedReq] = useState(null);
@@ -47,7 +47,9 @@ const Leaves = () => {
   };
 
   const fetchLeaveData = async () => {
-    setLoading(true);
+    if (!api.hasCached('/leaves/requests')) {
+      setLoading(true);
+    }
     try {
       const [reqRes, typesRes, empRes] = await Promise.allSettled([
         api.getLeaveRequests(),

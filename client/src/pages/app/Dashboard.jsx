@@ -39,14 +39,14 @@ import { api } from '../../services/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [metricsData, setMetricsData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [metricsData, setMetricsData] = useState(() => api.getCached('/dashboard/admin')?.data || null);
+  const [loading, setLoading] = useState(() => !api.hasCached('/dashboard/admin'));
   const [deptTimeframe, setDeptTimeframe] = useState('today');
   const [trendTimeframe, setTrendTimeframe] = useState('7d');
 
   // Quick Biometric Punch Modal State
   const [isPunchModalOpen, setIsPunchModalOpen] = useState(false);
-  const [employeesList, setEmployeesList] = useState([]);
+  const [employeesList, setEmployeesList] = useState(() => api.getCached('/employees')?.data?.employees || []);
   const [punchForm, setPunchForm] = useState({
     employeeCode: '',
     type: 'IN',
@@ -56,7 +56,9 @@ const Dashboard = () => {
   const [punchToast, setPunchToast] = useState('');
 
   const loadDashboardMetrics = async () => {
-    setLoading(true);
+    if (!api.hasCached('/dashboard/admin')) {
+      setLoading(true);
+    }
     try {
       const res = await api.getDashboard();
       if (res && res.success && res.data) {
@@ -89,6 +91,12 @@ const Dashboard = () => {
   useEffect(() => {
     loadDashboardMetrics();
     loadEmployeesForPunch();
+    // Warm client cache in idle background for smooth instant navigation across all pages
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        api.prefetch(['/employees', '/departments', '/designations', '/attendance', '/leaves/requests', '/payroll/payslips']);
+      }, 300);
+    }
   }, []);
 
   const handleQuickPunch = async (e) => {

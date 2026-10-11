@@ -34,10 +34,10 @@ import {
 import { api } from '../../services/api';
 
 const Accounts = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [transactions, setTransactions] = useState(() => api.getCached('/accounts/transactions')?.data?.transactions || []);
+  const [departments, setDepartments] = useState(() => api.getCached('/departments')?.data?.departments?.map((d) => d.name) || []);
+  const [stats, setStats] = useState(() => api.getCached('/accounts/stats')?.data || null);
+  const [loading, setLoading] = useState(() => !api.hasCached('/accounts/transactions'));
   const [actionLoading, setActionLoading] = useState(false);
 
   // Filters & Search
@@ -93,7 +93,9 @@ const Accounts = () => {
 
   // Load all accounts data dynamically from backend database
   const loadAccountsData = async () => {
-    setLoading(true);
+    if (!api.hasCached('/accounts/transactions')) {
+      setLoading(true);
+    }
     try {
       await loadDepartments();
 

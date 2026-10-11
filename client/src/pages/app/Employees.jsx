@@ -142,10 +142,10 @@ const formatSalary = (salaryStructure, rawSalary) => {
 };
 
 const Employees = () => {
-  const [employees, setEmployees] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [designations, setDesignations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
+  const [departments, setDepartments] = useState(() => api.getCached('/departments')?.data?.departments || []);
+  const [designations, setDesignations] = useState(() => api.getCached('/designations')?.data?.designations || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/employees'));
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [viewMode, setViewMode] = useState('grid');
@@ -243,7 +243,9 @@ const Employees = () => {
   // Fetch live data from backend
   const fetchEmployeesData = async () => {
     try {
-      setLoading(true);
+      if (!api.hasCached('/employees')) {
+        setLoading(true);
+      }
       const [empRes, deptRes, desigRes] = await Promise.allSettled([
         api.getEmployees(),
         api.getDepartments(),

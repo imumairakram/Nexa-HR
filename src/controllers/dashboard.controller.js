@@ -84,17 +84,12 @@ const getAdminDashboard = async (req, res) => {
         where: {
           date: { gte: thirtyDaysAgo, lte: endOfToday },
         },
-        include: {
-          user: {
-            select: {
-              profile: {
-                select: {
-                  departmentId: true,
-                  department: { select: { id: true, name: true } },
-                },
-              },
-            },
-          },
+        select: {
+          id: true,
+          date: true,
+          status: true,
+          checkInTime: true,
+          userId: true,
         },
         orderBy: { date: 'asc' },
       }),
@@ -195,10 +190,20 @@ const getAdminDashboard = async (req, res) => {
     const weeklyTrend = trend7d;
 
     // Dynamic Multi-Timeframe Department Attendance Breakdown
+    const userToDeptId = {};
+    departmentsWithProfiles.forEach((dept) => {
+      dept.profiles?.forEach((p) => {
+        if (p.userId) userToDeptId[p.userId] = dept.id;
+      });
+    });
+
     const computeDepartmentStats = (logs) => {
       return departmentsWithProfiles.map((dept) => {
         const totalStaff = dept.profiles ? dept.profiles.length : 0;
         const deptLogs = logs.filter((log) => {
+          if (log.userId && userToDeptId[log.userId]) {
+            return userToDeptId[log.userId] === dept.id;
+          }
           const userDeptId = log.user?.profile?.departmentId;
           const userDeptName = log.user?.profile?.department?.name;
           return userDeptId === dept.id || userDeptName === dept.name;

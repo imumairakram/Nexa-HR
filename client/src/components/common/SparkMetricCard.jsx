@@ -300,7 +300,7 @@ const SparkMetricCard = ({
   if (loading) {
     return (
       <div
-        className={`relative overflow-hidden rounded-[24px] p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
+        className={`relative overflow-hidden rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
           isDark
             ? 'bg-[#0B132B] dark:bg-[#0A1024] border border-slate-800/90'
             : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
@@ -308,14 +308,14 @@ const SparkMetricCard = ({
       >
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-2 flex-1">
-            <div className="skeleton-shimmer animate-pulse h-3.5 w-24 rounded-md" />
+            <div className="skeleton-shimmer animate-pulse h-3.5 w-24 rounded-lg" />
             <div className="skeleton-shimmer animate-pulse h-7 w-20 rounded-lg" />
           </div>
           <div className="w-24 h-11 skeleton-shimmer animate-pulse rounded-lg" />
         </div>
         <div className="pt-3 flex items-center justify-between border-t border-slate-100/50 dark:border-slate-800/40">
           <div className="skeleton-shimmer animate-pulse h-4 w-16 rounded-full" />
-          <div className="skeleton-shimmer animate-pulse h-3 w-16 rounded-md" />
+          <div className="skeleton-shimmer animate-pulse h-3 w-16 rounded-lg" />
         </div>
       </div>
     );
@@ -324,7 +324,7 @@ const SparkMetricCard = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden rounded-[24px] p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
+      className={`relative overflow-hidden rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
         isDark
           ? 'bg-[#0B132B] dark:bg-[#0A1024] text-white border border-slate-800/90 shadow-lg shadow-black/20 hover:border-indigo-500/50 hover:shadow-indigo-500/10'
           : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-xl hover:border-slate-200 dark:hover:border-slate-700'
@@ -341,7 +341,7 @@ const SparkMetricCard = ({
         <div className="space-y-1 min-w-0 flex-1">
           <div
             className={`text-xs font-semibold tracking-tight truncate ${
-              isDark ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'
+              isDark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'
             }`}
             title={title}
           >
@@ -359,7 +359,7 @@ const SparkMetricCard = ({
               }`}
             >
               {loading ? (
-                <span className="inline-block w-16 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <span className="inline-block w-16 h-6 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
               ) : (
                 value
               )}
@@ -383,7 +383,7 @@ const SparkMetricCard = ({
             <div
               id={`tooltip-${gradientId}`}
               role="tooltip"
-              className="absolute -top-7 right-0 z-30 pointer-events-none px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-xl whitespace-nowrap border animate-in fade-in duration-100"
+              className="absolute -top-7 right-0 z-30 pointer-events-none px-2.5 py-1 rounded-lg text-xs font-bold shadow-xl whitespace-nowrap border animate-in fade-in duration-100"
               style={{
                 backgroundColor: isDark ? scheme.tooltipBg : '#0F172A',
                 color: isDark ? scheme.tooltipText : '#F8FAFC',
@@ -402,7 +402,7 @@ const SparkMetricCard = ({
               role="img"
               aria-label={`${title} trend over ${normalizedPoints.length} data points. Starting at ${normalizedPoints[0]?.value ?? 0} ${unit || ''}, current value ${value} ${unit || ''} (${movement.isUp ? 'upward' : 'downward'} trend of ${movement.pct}%).`}
               aria-describedby={activePoint ? `tooltip-${gradientId}` : undefined}
-              className="w-full h-full overflow-visible cursor-crosshair group-hover:scale-105 focus:outline-none focus:ring-1 focus:ring-indigo-400 rounded transition-transform duration-300"
+              className="w-full h-full overflow-visible cursor-crosshair group-hover:scale-105 focus:outline-none focus:ring-1 focus:ring-indigo-400 rounded-lg transition-transform duration-300"
               preserveAspectRatio="none"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -528,8 +528,8 @@ const SparkMetricCard = ({
           {/* Start / End Boundary Labels */}
           {normalizedPoints.length >= 2 && (
             <div
-              className={`w-full flex justify-between items-center text-[9px] font-medium tracking-tight px-0.5 mt-0.5 select-none ${
-                isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-500'
+              className={`w-full flex justify-between items-center text-xs font-medium tracking-tight px-0.5 mt-0.5 select-none ${
+                isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
               }`}
             >
               <span>{normalizedPoints[0]?.label || 'Start'}</span>
@@ -542,37 +542,37 @@ const SparkMetricCard = ({
       {/* Bottom Section: Trend Pill Badge & Subtext */}
       <div className="mt-auto pt-3 flex items-center justify-between gap-1.5 border-t border-transparent">
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-2xs transition-colors shrink-0 ${
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-tight shadow-2xs transition-colors shrink-0 ${
             isDark
               ? resolvedBadgeType === 'negative'
                 ? 'bg-rose-950/70 text-rose-400 border border-rose-800/50'
                 : resolvedBadgeType === 'warning'
-                ? 'bg-amber-950/70 text-amber-300 border border-amber-800/50'
+                ? 'bg-amber-950/70 text-amber-400 border border-amber-800/50'
                 : resolvedBadgeType === 'neutral'
                 ? 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
-                : 'bg-[#064E3B]/80 text-[#34D399] border border-[#059669]/50'
+                : 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50'
               : resolvedBadgeType === 'negative'
               ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/70 dark:border-rose-800/40'
               : resolvedBadgeType === 'warning'
-              ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/40'
+              ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-800/40'
               : resolvedBadgeType === 'neutral'
-              ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-              : 'bg-[#E6F4EA] dark:bg-emerald-950/50 text-[#1E8E3E] dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
+              : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
           }`}
         >
           {resolvedBadgeIcon === 'none' ? null : resolvedBadgeIcon === 'dot' ? (
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
           ) : resolvedBadgeType === 'negative' || resolvedBadgeIcon === 'down' ? (
-            <span className="text-[12px] leading-none">↘</span>
+            <span className="text-xs leading-none">↘</span>
           ) : (
-            <span className="text-[12px] leading-none">↗</span>
+            <span className="text-xs leading-none">↗</span>
           )}
           <span>{resolvedBadgeText}</span>
         </span>
 
         {subtext && (
           <span
-            className={`text-[11px] font-semibold truncate text-right pl-1 ${
+            className={`text-xs font-semibold truncate text-right pl-1 ${
               isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
             }`}
           >

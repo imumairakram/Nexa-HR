@@ -1,14 +1,67 @@
-// Centralized API Client for NexaHR Backend Integration
+// Centralized High-Performance API Client for NexaHR Frontend Integration
+// Features: In-memory SWR caching, in-flight deduplication, and instant mutation invalidation.
 
 const rawBase = import.meta.env.VITE_API_URL || '';
 const BASE_URL = rawBase ? (rawBase.endsWith('/api') ? rawBase : `${rawBase.replace(/\/+$/, '')}/api`) : '/api';
 
+// In-Memory Client Cache Store
+const clientCache = new Map();
+// In-Flight Promise Registry for Request Deduplication
+const inFlightRequests = new Map();
+
+const DEFAULT_CACHE_TTL = 45 * 1000; // 45 seconds fresh
+const MAX_STALE_TTL = 120 * 1000; // 2 minutes max stale for SWR
+
 /**
- * Helper to execute HTTP fetch requests with auth headers and error handling.
+ * Invalidate client cache entries
+ */
+function invalidateClientCache(pattern) {
+  if (!pattern) {
+    clientCache.clear();
+    return;
+  }
+  const clean = pattern.toLowerCase();
+  for (const key of clientCache.keys()) {
+    if (key.toLowerCase().includes(clean)) {
+      clientCache.delete(key);
+    }
+  }
+}
+
+/**
+ * Helper to execute HTTP fetch requests with auth headers, client caching, and deduplication.
  */
 async function fetchAPI(endpoint, options = {}) {
-  const token = localStorage.getItem('token');
+  const method = (options.method || 'GET').toUpperCase();
+  const isGet = method === 'GET';
+  const bypassCache = options.bypassCache === true;
 
+  // 1. SWR / In-Memory Cache Lookup for GET requests
+  if (isGet && !bypassCache) {
+    const cached = clientCache.get(endpoint);
+    if (cached) {
+      const age = Date.now() - cached.timestamp;
+      // Fresh: Return immediately
+      if (age < DEFAULT_CACHE_TTL) {
+        return cached.data;
+      }
+      // Stale-While-Revalidate: Return cached data immediately, revalidate in background
+      if (age < MAX_STALE_TTL) {
+        // Trigger silent background revalidation without blocking caller
+        fetchAPI(endpoint, { ...options, bypassCache: true }).catch(() => {});
+        return cached.data;
+      }
+      // Expired beyond stale window: clean up
+      clientCache.delete(endpoint);
+    }
+
+    // 2. In-flight Request Deduplication: avoid duplicate simultaneous network calls
+    if (inFlightRequests.has(endpoint)) {
+      return inFlightRequests.get(endpoint);
+    }
+  }
+
+  const token = localStorage.getItem('token');
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -21,31 +74,85 @@ async function fetchAPI(endpoint, options = {}) {
     headers,
   };
 
-  try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, config);
-    const text = await response.text();
-    let data = {};
-    if (text) {
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        data = { message: text || `Unexpected response format (${response.status})` };
+  const executeRequest = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}${endpoint}`, config);
+      const text = await response.text();
+      let data = {};
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = { message: text || `Unexpected response format (${response.status})` };
+        }
+      }
+
+      if (!response.ok) {
+        if (response.status === 401 && endpoint !== '/auth/login') {
+          console.warn('Authentication expired or unauthorized on endpoint:', endpoint);
+        }
+        throw new Error(data.message || `Server error (${response.status})`);
+      }
+
+      // Cache successful GET responses
+      if (isGet && response.ok) {
+        clientCache.set(endpoint, {
+          data,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Invalidate cache on mutations (POST, PUT, PATCH, DELETE)
+      if (!isGet && response.ok) {
+        if (endpoint.includes('/employees') || endpoint.includes('/profile')) {
+          invalidateClientCache('/employees');
+          invalidateClientCache('/dashboard');
+          invalidateClientCache('/departments');
+        } else if (endpoint.includes('/attendance')) {
+          invalidateClientCache('/attendance');
+          invalidateClientCache('/dashboard');
+        } else if (endpoint.includes('/leaves')) {
+          invalidateClientCache('/leaves');
+          invalidateClientCache('/dashboard');
+        } else if (endpoint.includes('/payroll')) {
+          invalidateClientCache('/payroll');
+          invalidateClientCache('/dashboard');
+        } else if (endpoint.includes('/departments') || endpoint.includes('/designations')) {
+          invalidateClientCache('/departments');
+          invalidateClientCache('/designations');
+          invalidateClientCache('/employees');
+          invalidateClientCache('/dashboard');
+        } else if (endpoint.includes('/announcements')) {
+          invalidateClientCache('/announcements');
+          invalidateClientCache('/dashboard');
+        } else if (endpoint.includes('/tickets')) {
+          invalidateClientCache('/tickets');
+        } else if (endpoint.includes('/accounts')) {
+          invalidateClientCache('/accounts');
+          invalidateClientCache('/dashboard');
+        } else {
+          clientCache.clear();
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.warn(`API Error [${endpoint}]:`, error.message);
+      throw error;
+    } finally {
+      if (isGet) {
+        inFlightRequests.delete(endpoint);
       }
     }
+  };
 
-    if (!response.ok) {
-      if (response.status === 401 && endpoint !== '/auth/login') {
-        // Only clear if token is genuinely invalid and not during normal navigation
-        console.warn('Authentication expired or unauthorized on endpoint:', endpoint);
-      }
-      throw new Error(data.message || `Server error (${response.status})`);
-    }
-
-    return data;
-  } catch (error) {
-    console.warn(`API Error [${endpoint}]:`, error.message);
-    throw error;
+  if (isGet && !bypassCache) {
+    const promise = executeRequest();
+    inFlightRequests.set(endpoint, promise);
+    return promise;
   }
+
+  return executeRequest();
 }
 
 export const api = {
@@ -469,6 +576,30 @@ export const api = {
     return await fetchAPI(`/accounts/seed${force ? '?force=true' : ''}`, {
       method: 'POST',
     });
+  },
+
+  // --- Client Cache Utilities ---
+  getCached: (endpoint) => {
+    const entry = clientCache.get(endpoint);
+    return entry ? entry.data : null;
+  },
+
+  hasCached: (endpoint) => {
+    return clientCache.has(endpoint);
+  },
+
+  clearCache: (pattern) => {
+    invalidateClientCache(pattern);
+  },
+
+  prefetch: async (endpoints = []) => {
+    return Promise.allSettled(
+      endpoints.map((ep) =>
+        fetchAPI(ep).catch((e) => {
+          console.warn('Prefetch skipped for:', ep, e.message);
+        })
+      )
+    );
   },
 };
 
