@@ -17,7 +17,6 @@ import {
   UserCheck,
   FileText,
   Megaphone,
-  Landmark,
   Briefcase,
   Calendar,
   KeyRound,
@@ -122,7 +121,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     { type: 'link', label: 'Holiday', path: '/app/holiday/public', icon: Calendar },
     { type: 'link', label: 'Leave Policy', path: '/app/leave-policy', icon: FileText },
     { type: 'link', label: 'Announcement', path: '/app/announcement', icon: Megaphone },
-    { type: 'link', label: 'Accounts', path: '/app/accounts', icon: Landmark },
 
     {
       type: 'accordion',

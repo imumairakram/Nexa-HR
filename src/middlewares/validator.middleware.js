@@ -31,6 +31,18 @@ const loginValidationRules = [
     .notEmpty()
     .withMessage('Password must be provided.')
     .trim(),
+  body('portalRole')
+    .optional()
+    .isString()
+    .trim(),
+  body('role')
+    .optional()
+    .isString()
+    .trim(),
+  body('loginRole')
+    .optional()
+    .isString()
+    .trim(),
   validateRequest,
 ];
 

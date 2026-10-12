@@ -31,8 +31,6 @@ import LeavePolicy from './pages/app/LeavePolicy';
 import CalculatePayroll from './pages/app/payroll/CalculatePayroll';
 import PayslipList from './pages/app/payroll/PayslipList';
 
-// Financial Accounts
-import Accounts from './pages/app/Accounts';
 
 // Engagement & Operations
 import Announcement from './pages/app/Announcement';
@@ -120,8 +118,7 @@ function App() {
           <Route path="payroll/calculate" element={<CalculatePayroll />} />
           <Route path="payroll/payslips" element={<PayslipList />} />
 
-          {/* Financial Accounts */}
-          <Route path="accounts" element={<Accounts />} />
+          <Route path="accounts" element={<Navigate to="/app/dashboard" replace />} />
           <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
 
           {/* Engagement & Operations */}

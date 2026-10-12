@@ -130,7 +130,7 @@ const registerAdmin = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, portalRole, role, loginRole } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -140,6 +140,7 @@ const login = async (req, res) => {
     }
 
     const cleanEmail = email.toLowerCase().trim();
+    const requestedRole = (portalRole || role || loginRole || '').toString().toLowerCase().trim();
 
     // Check for hardcoded System Administrator credentials
     if (cleanEmail === HARDCODED_SYSTEM_ADMIN.email.toLowerCase()) {
@@ -157,6 +158,14 @@ const login = async (req, res) => {
         return res.status(401).json({
           success: false,
           message: 'Invalid credentials.',
+        });
+      }
+
+      // Enforce portal role restriction for Administrator accounts
+      if (requestedRole && ['employee', 'staff', 'user'].includes(requestedRole)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied: Administrator accounts cannot sign in through the Employee portal. Please switch to the HR Admin tab.',
         });
       }
 
@@ -235,6 +244,25 @@ const login = async (req, res) => {
         success: false,
         message: 'Invalid credentials.',
       });
+    }
+
+    // Role-based portal restriction enforcement
+    if (requestedRole) {
+      if (['hr', 'admin', 'hr_admin', 'hr_manager'].includes(requestedRole)) {
+        if (user.role === 'EMPLOYEE') {
+          return res.status(403).json({
+            success: false,
+            message: 'Access denied: Employee accounts cannot sign in through the HR Admin portal. Please switch to the Employee tab.',
+          });
+        }
+      } else if (['employee', 'staff', 'user'].includes(requestedRole)) {
+        if (user.role === 'ADMIN' || user.role === 'HR_MANAGER') {
+          return res.status(403).json({
+            success: false,
+            message: 'Access denied: Administrator accounts cannot sign in through the Employee portal. Please switch to the HR Admin tab.',
+          });
+        }
+      }
     }
 
     // Generate hardened 24-hour JWT

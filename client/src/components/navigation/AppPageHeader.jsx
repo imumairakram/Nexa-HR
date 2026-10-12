@@ -86,7 +86,6 @@ const SEARCH_SHORTCUTS = [
   { label: 'Calculate Payroll', icon: DollarSign, path: '/app/payroll/calculate', category: 'Payroll' },
   { label: 'Payslip List', icon: FileText, path: '/app/payroll/payslips', category: 'Payroll' },
   { label: 'Payroll Management', icon: DollarSign, path: '/app/payroll', category: 'Payroll' },
-  { label: 'Accounts & Ledger', icon: DollarSign, path: '/app/accounts', category: 'Finance' },
   { label: 'Announcements', icon: Megaphone, path: '/app/announcement', category: 'Operations' },
   { label: 'Recruitment - Job Desk', icon: Briefcase, path: '/app/recruitment/desk', category: 'Recruitment' },
   { label: 'Recruitment - Active Jobs', icon: Users, path: '/app/recruitment/jobs', category: 'Recruitment' },

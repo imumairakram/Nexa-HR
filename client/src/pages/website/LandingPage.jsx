@@ -4,7 +4,7 @@ import { Users, ArrowRight, Clock, CreditCard, ShieldCheck } from 'lucide-react'
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-[#F4F4EC] text-slate-800 flex flex-col justify-between font-sans">
+    <div className="flex-1 min-h-[calc(100vh/0.9)] min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 flex flex-col justify-between font-sans">
       {/* Public Navigation Header */}
       <header className="max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">

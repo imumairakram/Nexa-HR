@@ -12,7 +12,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-gradient-to-t from-[#F4F4EC] via-[#F4F4EC]/90 to-transparent">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-gradient-to-t from-[#F4F4F7] via-[#F4F4F7]/90 dark:from-[#0B0F19] dark:via-[#0B0F19]/90 to-transparent">
       <nav className="bg-slate-900/95 backdrop-blur-md rounded-3xl p-2.5 shadow-2xl flex items-center justify-around border border-slate-800">
         {mobileNavItems.map((item) => {
           const Icon = item.icon;

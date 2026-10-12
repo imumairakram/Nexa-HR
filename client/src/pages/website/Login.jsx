@@ -150,15 +150,31 @@ const Login = () => {
       const res = await api.login({
         email: formData.email,
         password: formData.password,
+        portalRole: loginRole,
       });
       if (res && res.success) {
+        const userRole = res.data?.user?.role || 'ADMIN';
+
+        // Strict role validation guard against cross-portal login
+        if (loginRole === 'hr' && userRole === 'EMPLOYEE') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setError('Access denied: Employee accounts cannot sign in through the HR Admin portal. Please switch to the Employee tab.');
+          return;
+        }
+        if (loginRole === 'employee' && (userRole === 'ADMIN' || userRole === 'HR_MANAGER')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setError('Access denied: Administrator accounts cannot sign in through the Employee portal. Please switch to the HR Admin tab.');
+          return;
+        }
+
         const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(formData.email.trim().toLowerCase());
         if (isDemoEmail) {
           localStorage.setItem('isGuest', 'true');
         } else {
           localStorage.removeItem('isGuest');
         }
-        const userRole = res.data?.user?.role || 'ADMIN';
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
         setError(res?.message || 'Invalid email or password. Please try again.');
@@ -176,8 +192,8 @@ const Login = () => {
     setError(null);
 
     const guestCredentials = targetRole === 'hr'
-      ? { email: 'hr@nexahr.com', password: 'HrPassword123!' }
-      : { email: 'user@nexahr.com', password: 'UserPassword123!' };
+      ? { email: 'hr@nexahr.com', password: 'HrPassword123!', portalRole: 'hr' }
+      : { email: 'user@nexahr.com', password: 'UserPassword123!', portalRole: 'employee' };
 
     localStorage.setItem('isGuest', 'true');
 
@@ -203,7 +219,7 @@ const Login = () => {
 
 
   return (
-    <div className="min-h-screen bg-[#F4F4EC] dark:bg-[#0B0F19] flex items-center justify-center p-3 sm:p-6 lg:p-8 font-sans antialiased transition-colors duration-300 relative overflow-hidden select-none">
+    <div className="flex-1 min-h-[calc(100vh/0.9)] min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex items-center justify-center p-3 sm:p-6 lg:p-8 font-sans antialiased transition-colors duration-300 relative overflow-hidden select-none">
       {/* Ambient background glows for rich aesthetic depth */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -293,8 +309,26 @@ const Login = () => {
               )}
 
               {error && (
-                <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold text-center border border-rose-200 dark:border-rose-800/50">
-                  {error}
+                <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold text-center border border-rose-200 dark:border-rose-800/50 flex flex-col items-center justify-center gap-1.5">
+                  <span>{error}</span>
+                  {error.includes('switch to the Employee tab') && (
+                    <button
+                      type="button"
+                      onClick={() => handleRoleTabChange('employee')}
+                      className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+                    >
+                      Click here to switch to Employee tab &rarr;
+                    </button>
+                  )}
+                  {error.includes('switch to the HR Admin tab') && (
+                    <button
+                      type="button"
+                      onClick={() => handleRoleTabChange('hr')}
+                      className="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+                    >
+                      Click here to switch to HR Admin tab &rarr;
+                    </button>
+                  )}
                 </div>
               )}
 

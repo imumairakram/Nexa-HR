@@ -33,7 +33,7 @@ const MainLayout = () => {
 
   return (
     <div
-      className={`min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex text-slate-800 dark:text-slate-100 antialiased font-sans p-3 md:p-6 transition-all duration-300 ${
+      className={`flex-1 min-h-[calc(100vh/0.9)] min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex text-slate-800 dark:text-slate-100 antialiased font-sans p-3 md:p-6 transition-all duration-300 ${
         isCollapsed ? 'lg:pl-[112px]' : 'lg:pl-[288px]'
       }`}
     >

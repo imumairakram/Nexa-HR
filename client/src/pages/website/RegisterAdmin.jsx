@@ -23,7 +23,7 @@ const RegisterAdmin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F4EC] flex items-center justify-center p-4 font-sans py-12">
+    <div className="flex-1 min-h-[calc(100vh/0.9)] min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex items-center justify-center p-4 font-sans py-12">
       <div className="w-full max-w-lg bg-white rounded-3xl p-8 shadow-soft border border-slate-100">
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-md mb-3">
