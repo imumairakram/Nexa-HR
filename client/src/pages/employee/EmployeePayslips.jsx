@@ -397,95 +397,103 @@ const EmployeePayslips = () => {
       {/* 3. PAYSLIP MODAL DETAIL VIEWER */}
       {/* ========================================================================= */}
       {selectedPayslip && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl w-full shadow-2xl shadow-blue-950/20 dark:shadow-black/60 border border-blue-200/70 dark:border-blue-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                  <CreditCard className="w-5 h-5" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-blue-200/50 dark:border-blue-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-blue-950/40 dark:via-indigo-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
+                  <CreditCard className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                <div className="min-w-0">
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white truncate">
                     Salary Statement • {MONTH_NAMES[(selectedPayslip.month || 1) - 1]} {selectedPayslip.year}
                   </h3>
-                  <p className="text-xs text-slate-400">NexaHR Corporate Payroll Voucher • ID: {selectedPayslip.id}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap mt-0.5">
+                    NexaHR Corporate Payroll Voucher • ID: #{selectedPayslip.id}
+                  </p>
                 </div>
               </div>
+
               <button
                 onClick={() => setSelectedPayslip(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Breakdown Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Earnings */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-2.5">
-                <div className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Earnings</div>
-                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                  <span>Basic Base Salary</span>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+            {/* Breakdown Body */}
+            <div className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Earnings */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2.5">
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Earnings</div>
+                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
+                    <span>Basic Base Salary</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
+                    <span>Allowances & Housing</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(0)}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-bold text-slate-900 dark:text-white">
+                    <span>Gross Total</span>
+                    <span className="font-mono">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                  <span>Allowances & Housing</span>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(0)}</span>
-                </div>
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-bold text-slate-900 dark:text-white">
-                  <span>Gross Total</span>
-                  <span className="font-mono">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+
+                {/* Deductions */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2.5">
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Deductions</div>
+                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
+                    <span>Income Tax Withholding</span>
+                    <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.taxDeductions || 0)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
+                    <span>Unpaid Leaves</span>
+                    <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.unpaidLeaveDeduction || 0)}</span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-bold text-slate-900 dark:text-white">
+                    <span>Total Deductions</span>
+                    <span className="font-mono text-rose-500">
+                      -{formatCurrency(
+                        (Number(selectedPayslip.taxDeductions) || 0) +
+                        (Number(selectedPayslip.otherDeductions) || 0) +
+                        (Number(selectedPayslip.unpaidLeaveDeduction) || 0)
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Deductions */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-2.5">
-                <div className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Deductions</div>
-                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                  <span>Income Tax Withholding</span>
-                  <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.taxDeductions || 0)}</span>
+              {/* Net Salary Highlight */}
+              <div className="p-4 sm:p-4.5 rounded-xl bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-200/60 dark:border-emerald-800/40 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Net Amount Deposited</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Wire Transferred to Registered Bank Account</div>
                 </div>
-                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                  <span>Unpaid Leaves</span>
-                  <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.unpaidLeaveDeduction || 0)}</span>
+                <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                  {formatCurrency(selectedPayslip.netSalary || 0)}
                 </div>
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-bold text-slate-900 dark:text-white">
-                  <span>Total Deductions</span>
-                  <span className="font-mono text-rose-500">
-                    -{formatCurrency(
-                      (Number(selectedPayslip.taxDeductions) || 0) +
-                      (Number(selectedPayslip.otherDeductions) || 0) +
-                      (Number(selectedPayslip.unpaidLeaveDeduction) || 0)
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Net Salary Highlight */}
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-200/60 dark:border-emerald-800/40 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Net Amount Deposited</div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Wire Transferred to Registered Bank Account</div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-                {formatCurrency(selectedPayslip.netSalary || 0)}
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-blue-100/60 dark:border-blue-900/40 flex items-center justify-end gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
               <button
                 onClick={handlePrint}
-                className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 transition-colors flex items-center gap-2 cursor-pointer text-xs"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 transition-colors flex items-center gap-2 cursor-pointer text-xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Slip</span>
               </button>
               <button
                 onClick={() => handleDownload(selectedPayslip)}
-                className="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md text-xs"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md shadow-blue-600/20 text-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>Download PDF</span>

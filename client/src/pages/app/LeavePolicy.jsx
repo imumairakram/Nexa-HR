@@ -362,32 +362,35 @@ const LeavePolicy = () => {
       {/* ========================================================================= */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl border border-blue-200/60 dark:border-blue-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
-                  <CalendarDays className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-blue-100/80 dark:border-blue-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-blue-950/60 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25 ring-4 ring-blue-500/15">
+                  <CalendarDays className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
                     Create Leave Policy
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Configure statutory leave quotas, accrual intervals, and payroll wage compensation rules.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handleCreatePolicy} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
+            <form onSubmit={handleCreatePolicy} className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-4 custom-scrollbar text-xs relative z-10">
               {/* Policy Name & Code */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2 space-y-1.5">
@@ -402,7 +405,7 @@ const LeavePolicy = () => {
                       placeholder="e.g. Study & Development Leave"
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
                     />
                   </div>
                 </div>
@@ -418,7 +421,7 @@ const LeavePolicy = () => {
                       placeholder="e.g. STUDY"
                       value={form.code}
                       onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                      className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-black focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400 text-center"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-black focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400 text-center"
                     />
                   </div>
                 </div>
@@ -439,7 +442,7 @@ const LeavePolicy = () => {
                       required
                       value={form.days}
                       onChange={(e) => setForm({ ...form, days: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -452,7 +455,7 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, type: 'PAID' })}
-                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${form.type === 'PAID'
+                      className={`py-2.5 px-3 rounded-xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${form.type === 'PAID'
                         ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
                         : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
                         }`}
@@ -464,7 +467,7 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, type: 'UNPAID' })}
-                      className={`py-2.5 px-3 rounded-2xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${form.type === 'UNPAID'
+                      className={`py-2.5 px-3 rounded-xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${form.type === 'UNPAID'
                         ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
                         : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
                         }`}
@@ -485,7 +488,7 @@ const LeavePolicy = () => {
                   <select
                     value={form.accrual}
                     onChange={(e) => setForm({ ...form, accrual: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="Monthly Accrual">Monthly Pro-Rata Accrual</option>
                     <option value="Frontloaded Annual">Frontloaded on Jan 1st</option>
@@ -500,7 +503,7 @@ const LeavePolicy = () => {
                   <select
                     value={form.carryover}
                     onChange={(e) => setForm({ ...form, carryover: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="Max 3 Days">Max 3 Days Rollover</option>
                     <option value="Max 5 Days">Max 5 Days Rollover</option>
@@ -520,12 +523,12 @@ const LeavePolicy = () => {
                   placeholder="Provide details on required notice period, approvals, and supporting documentation..."
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
+                  className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
                 />
               </div>
 
               {/* Preview Card */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-teal-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-teal-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-teal-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
                     {form.days || '0'}d
@@ -534,7 +537,7 @@ const LeavePolicy = () => {
                     <div className="font-extrabold text-slate-900 dark:text-white text-xs">
                       {form.name.trim() || 'Leave Policy Preview'}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                       {form.accrual} • {form.carryover}
                     </div>
                   </div>
@@ -548,19 +551,19 @@ const LeavePolicy = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
                   disabled={submitting}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
                 >
                   {submitting ? (
                     <>

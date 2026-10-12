@@ -293,31 +293,33 @@ const PayslipList = () => {
 
       {/* Modal: Printable Payslip PDF Preview */}
       {selectedSlip && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-6 animate-in zoom-in-95">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 space-y-4 animate-in zoom-in-95 duration-200 relative">
+            <div className="flex items-start justify-between border-b border-indigo-100/80 dark:border-indigo-800/60 pb-4">
               <div>
                 <span className="text-[10px] font-mono font-bold text-slate-400">{selectedSlip.id}</span>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
                   Official Salary Statement
                 </h3>
-                <p className="text-xs text-slate-400">NexaHR Enterprise Systems Inc.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                  NexaHR Enterprise Systems Inc.
+                </p>
               </div>
               <button
                 onClick={() => setSelectedSlip(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Employee</span>
                 <span className="font-bold text-slate-900 dark:text-white">{selectedSlip.employee}</span>
                 <span className="text-[10px] text-slate-400 block font-mono">{selectedSlip.code}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Disbursement Period</span>
                 <span className="font-bold text-slate-900 dark:text-white">{selectedSlip.month}</span>
                 <span className="text-[10px] text-slate-400 block">{selectedSlip.date}</span>
@@ -326,32 +328,32 @@ const PayslipList = () => {
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">Gross Base Salary & Allowances:</span>
+                <span className="text-slate-500 dark:text-slate-400">Gross Base Salary & Allowances:</span>
                 <span className="font-bold text-slate-900 dark:text-white">${selectedSlip.gross.toLocaleString()}.00</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">Federal/State Tax & Benefits Deductions:</span>
+                <span className="text-slate-500 dark:text-slate-400">Federal/State Tax & Benefits Deductions:</span>
                 <span className="font-bold text-rose-500">-${selectedSlip.deductions.toLocaleString()}.00</span>
               </div>
-              <div className="flex justify-between py-3 text-sm font-black bg-blue-50 dark:bg-blue-950/40 p-4 rounded-2xl">
-                <span className="text-blue-900 dark:text-blue-200">Net Take-Home Pay (ACH Direct):</span>
+              <div className="flex justify-between py-3 text-sm font-black bg-indigo-50/80 dark:bg-indigo-950/40 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+                <span className="text-indigo-900 dark:text-indigo-200">Net Take-Home Pay (ACH Direct):</span>
                 <span className="text-emerald-600 dark:text-emerald-400">${selectedSlip.net.toLocaleString()}.00</span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => {
                   window.print();
                 }}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-2 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print PDF</span>
               </button>
               <button
                 onClick={() => setSelectedSlip(null)}
-                className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 cursor-pointer"
+                className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 cursor-pointer shadow-md shadow-indigo-600/25 transition-all"
               >
                 Close
               </button>

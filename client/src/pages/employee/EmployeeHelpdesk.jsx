@@ -22,7 +22,6 @@ import {
   Check,
   Zap,
   ArrowRight,
-  ShieldCheck,
   Headphones,
   UserCheck,
   RotateCcw,
@@ -654,16 +653,18 @@ const EmployeeHelpdesk = () => {
       {/* 5. TICKET LIVE CONVERSATION THREAD MODAL */}
       {/* ========================================================================= */}
       {selectedTicket && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/60 border border-rose-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-rose-950/20 dark:shadow-black/60 border border-rose-200/70 dark:border-rose-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/70 via-pink-50/40 to-purple-50/40 dark:from-slate-900/80 dark:via-rose-950/20 dark:to-slate-900/80 relative overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-48 h-48 bg-rose-400/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="flex items-start gap-3.5 min-w-0 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25 ring-4 ring-rose-100/60 dark:ring-rose-950/50">
-                  <LifeBuoy className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-rose-200/50 dark:border-rose-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-rose-50/90 via-pink-50/70 to-purple-50/60 dark:from-rose-950/40 dark:via-purple-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 min-w-0 relative z-10">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/30 ring-4 ring-rose-100/70 dark:ring-rose-950/60">
+                  <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div className="space-y-1 min-w-0">
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200/60 dark:border-slate-700/60">
                       #{selectedTicket.id}
@@ -682,26 +683,26 @@ const EmployeeHelpdesk = () => {
                       {selectedTicket.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}
                     </span>
                   </div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate mt-0.5">
                     {selectedTicket.subject}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Assigned: <strong className="text-slate-800 dark:text-slate-200 font-bold">{selectedTicket.assignedTo}</strong>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+                    Assigned: <strong className="text-slate-800 dark:text-slate-100 font-bold">{selectedTicket.assignedTo}</strong>
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Conversation Messages Thread */}
-            <div className="flex-1 overflow-y-auto p-6 sm:p-7 md:p-8 space-y-4 custom-scrollbar">
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-50 to-rose-50/30 dark:from-slate-800/50 dark:to-rose-950/20 border border-rose-100/80 dark:border-slate-800 space-y-1.5 text-xs">
+            <div className="flex-1 overflow-y-auto px-6 sm:px-7 py-5 space-y-4 custom-scrollbar text-xs">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-rose-50/30 dark:from-slate-800/50 dark:to-rose-950/20 border border-rose-100/80 dark:border-slate-800 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="font-extrabold text-slate-800 dark:text-slate-200 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5 text-rose-500" />
@@ -716,7 +717,7 @@ const EmployeeHelpdesk = () => {
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2">
+              <div className="space-y-3 pt-1">
                 {selectedTicket.replies?.map((rep, idx) => {
                   const isMe = rep.sender?.includes('(You)') || rep.sender === 'You';
                   return (
@@ -730,7 +731,7 @@ const EmployeeHelpdesk = () => {
                         <span>{formatTimeDisplay(rep.time)}</span>
                       </div>
                       <div
-                        className={`px-4 py-3 rounded-2xl max-w-lg text-xs leading-relaxed font-normal shadow-xs ${
+                        className={`px-4 py-2.5 rounded-2xl max-w-lg text-xs leading-relaxed font-normal shadow-xs ${
                           isMe
                             ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-br-xs shadow-rose-600/20'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-xs border border-slate-200/60 dark:border-slate-700/50'
@@ -745,7 +746,7 @@ const EmployeeHelpdesk = () => {
             </div>
 
             {/* Reply Bar & Action Footer */}
-            <div className="px-6 sm:px-7 md:p-8 py-4 border-t border-slate-100 dark:border-slate-800 space-y-3.5 bg-slate-50/70 dark:bg-slate-900/60 shrink-0">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-rose-100/60 dark:border-rose-900/40 space-y-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
               <div className="flex items-center gap-2.5">
                 <input
                   type="text"
@@ -756,23 +757,23 @@ const EmployeeHelpdesk = () => {
                     if (e.key === 'Enter') handleSendReply(selectedTicket.id);
                   }}
                   disabled={isReplying}
-                  className="flex-1 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-rose-500 disabled:opacity-60 transition-all shadow-xs"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-rose-500 disabled:opacity-60 transition-all shadow-xs"
                 />
                 <button
                   onClick={() => handleSendReply(selectedTicket.id)}
                   disabled={!replyText.trim() || isReplying}
-                  className="px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold flex items-center gap-2 cursor-pointer disabled:opacity-40 transition-all shadow-md shadow-rose-600/20"
+                  className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold flex items-center gap-2 cursor-pointer disabled:opacity-40 transition-all shadow-md shadow-rose-600/20"
                 >
                   {isReplying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                   <span>{isReplying ? 'Sending...' : 'Reply'}</span>
                 </button>
               </div>
 
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center justify-end pt-1">
                 <button
                   onClick={() => handleToggleResolved(selectedTicket.id)}
                   disabled={isUpdatingStatus}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 border shadow-xs ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 border shadow-xs ${
                     selectedTicket.status === 'RESOLVED'
                       ? 'bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60'
                       : 'bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60'
@@ -793,11 +794,6 @@ const EmployeeHelpdesk = () => {
                       : 'Mark as Resolved'}
                   </span>
                 </button>
-
-                <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />
-                  Standard Resolution SLA Active
-                </span>
               </div>
             </div>
           </div>
@@ -808,28 +804,22 @@ const EmployeeHelpdesk = () => {
       {/* 6. CREATE NEW SUPPORT TICKET MODAL (ULTRA PREMIUM THEMED DESIGN) */}
       {/* ========================================================================= */}
       {isNewTicketOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/60 border border-rose-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/70 border border-rose-200/70 dark:border-rose-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-rose-50/80 via-pink-50/50 to-purple-50/50 dark:from-slate-900/80 dark:via-rose-950/20 dark:to-slate-900/80 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400/15 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-rose-200/70 dark:border-rose-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-rose-50/90 via-pink-50/70 to-purple-50/60 dark:from-rose-950/40 dark:via-pink-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/30 ring-4 ring-rose-100/70 dark:ring-rose-950/60">
-                  <LifeBuoy className="w-6 h-6 stroke-[2.2]" />
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/30 ring-3 ring-rose-100/80 dark:ring-rose-950/60">
+                  <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                      Raise Support Ticket
-                    </h3>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 flex items-center gap-1">
-                      <Zap className="w-3 h-3 fill-rose-500 text-rose-500" />
-                      SLA &lt; 4h
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Raise Support Ticket
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Direct routing to HR, IT & Operations specialists for fast resolution.
                   </p>
                 </div>
@@ -837,14 +827,14 @@ const EmployeeHelpdesk = () => {
 
               <button
                 onClick={() => setIsNewTicketOpen(false)}
-                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-rose-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-rose-200/60 dark:hover:border-slate-700 relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateTicket} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
+            <form onSubmit={handleCreateTicket} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-rose-50/15 to-purple-50/15 dark:from-transparent dark:via-rose-950/10 dark:to-purple-950/10">
               {/* Subject */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
@@ -863,18 +853,18 @@ const EmployeeHelpdesk = () => {
                   placeholder="e.g. MacBook Pro external monitor flickering or Tax Form W-2 Inquiry"
                   value={newTicketForm.subject}
                   onChange={(e) => setNewTicketForm({ ...newTicketForm, subject: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-rose-500/25 focus:border-rose-500 outline-none transition-all shadow-xs"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-rose-500/25 focus:border-rose-500 outline-none transition-all shadow-xs text-xs"
                 />
               </div>
 
               {/* Category Visual Selector */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                   <span>Category & Department <span className="text-rose-500">*</span></span>
                   <span className="text-[10px] text-slate-400 font-normal">Select the best matching area</span>
                 </label>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                   {[
                     { id: 'IT_HARDWARE', label: 'IT & Equipment', icon: Laptop, desc: 'Hardware, software & access' },
                     { id: 'PAYROLL', label: 'Payroll & Tax', icon: CreditCard, desc: 'Salary, tax deductions & slips' },
@@ -889,24 +879,24 @@ const EmployeeHelpdesk = () => {
                         type="button"
                         key={cat.id}
                         onClick={() => setNewTicketForm({ ...newTicketForm, category: cat.id })}
-                        className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
+                        className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
                           isSelected
-                            ? 'bg-gradient-to-br from-rose-50 to-pink-50/50 dark:from-rose-950/50 dark:to-slate-800 border-rose-500/80 dark:border-rose-600 text-rose-950 dark:text-white shadow-sm ring-2 ring-rose-500/20'
-                            : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
+                            ? 'bg-rose-50/90 dark:bg-rose-950/50 border-rose-500 text-rose-950 dark:text-white shadow-xs ring-1 ring-rose-500/30'
+                            : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-rose-50/40 dark:hover:bg-slate-800 hover:border-rose-300/80'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <div
-                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
                               isSelected
                                 ? 'bg-rose-500 text-white shadow-xs'
                                 : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                             }`}
                           >
-                            <CatIcon className="w-4 h-4" />
+                            <CatIcon className="w-3.5 h-3.5" />
                           </div>
                           {isSelected && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-300 dark:ring-rose-800" />
+                            <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-300 dark:ring-rose-800" />
                           )}
                         </div>
                         <div>
@@ -924,13 +914,13 @@ const EmployeeHelpdesk = () => {
               </div>
 
               {/* Priority Selector (Interactive Chips) */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                   <span>Urgency & Priority <span className="text-rose-500">*</span></span>
                   <span className="text-[10px] text-slate-400 font-normal">Determines SLA queue</span>
                 </label>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {[
                     { id: 'LOW', label: 'Low', badge: 'Standard 24h', color: 'blue' },
                     { id: 'MEDIUM', label: 'Medium', badge: 'Target < 8h', color: 'amber' },
@@ -942,14 +932,14 @@ const EmployeeHelpdesk = () => {
                         type="button"
                         key={p.id}
                         onClick={() => setNewTicketForm({ ...newTicketForm, priority: p.id })}
-                        className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                        className={`py-2 px-3.5 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
                           isSelected
                             ? p.id === 'HIGH'
-                              ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs ring-2 ring-rose-500/20'
+                              ? 'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs ring-1 ring-rose-500/30'
                               : p.id === 'MEDIUM'
-                              ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-700 dark:text-amber-300 font-bold shadow-xs ring-2 ring-amber-500/20'
-                              : 'bg-blue-50 dark:bg-blue-950/60 border-blue-500 text-blue-700 dark:text-blue-300 font-bold shadow-xs ring-2 ring-blue-500/20'
-                            : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                              ? 'bg-amber-50/90 dark:bg-amber-950/60 border-amber-500 text-amber-700 dark:text-amber-300 font-bold shadow-xs ring-1 ring-amber-500/30'
+                              : 'bg-blue-50/90 dark:bg-blue-950/60 border-blue-500 text-blue-700 dark:text-blue-300 font-bold shadow-xs ring-1 ring-blue-500/30'
+                            : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <div className="flex items-center gap-1.5 text-xs font-bold">
@@ -982,23 +972,23 @@ const EmployeeHelpdesk = () => {
                   </span>
                 </label>
                 <textarea
-                  rows={4}
+                  rows={2}
                   required
                   placeholder="Please provide full details, error messages, asset tags, or required equipment specifications to help our team resolve this swiftly..."
                   value={newTicketForm.description}
                   onChange={(e) => setNewTicketForm({ ...newTicketForm, description: e.target.value })}
-                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-rose-500/25 focus:border-rose-500 outline-none transition-all resize-none leading-relaxed shadow-xs"
+                  className="w-full p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-rose-500/25 focus:border-rose-500 outline-none transition-all resize-none leading-relaxed shadow-xs text-xs"
                 />
               </div>
 
               {/* Live Ticket Routing Preview */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-rose-50/30 to-purple-50/20 dark:from-slate-800/60 dark:via-rose-950/20 dark:to-slate-800/60 border border-rose-100 dark:border-slate-700/70 flex items-center justify-between gap-3">
+              <div className="px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-rose-200/70 dark:border-rose-800/60 flex items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 shadow-xs border border-rose-100 dark:border-slate-600">
-                    <LifeBuoy className="w-4.5 h-4.5 stroke-[2.2]" />
+                  <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 shadow-xs border border-rose-200/60 dark:border-rose-800/60">
+                    <LifeBuoy className="w-4 h-4 stroke-[2.2]" />
                   </div>
                   <div className="min-w-0">
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate">
+                    <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
                       {newTicketForm.subject.trim() || 'Untitled Support Request'}
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
@@ -1011,7 +1001,7 @@ const EmployeeHelpdesk = () => {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <span
-                    className={`text-[10px] font-extrabold px-2.5 py-1 rounded-lg border ${
+                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
                       newTicketForm.priority === 'HIGH'
                         ? 'bg-rose-100/80 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-800'
                         : newTicketForm.priority === 'MEDIUM'
@@ -1025,34 +1015,27 @@ const EmployeeHelpdesk = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 gap-3">
-                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Encrypted Enterprise Routing</span>
-                </div>
-
-                <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => setIsNewTicketOpen(false)}
-                    disabled={isSubmitting}
-                    className="px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 hover:from-rose-500 hover:to-pink-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-rose-600/30 hover:shadow-rose-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                    )}
-                    <span>{isSubmitting ? 'Submitting...' : 'Dispatch Ticket'}</span>
-                  </button>
-                </div>
+              <div className="flex items-center justify-end pt-3 border-t border-rose-100/80 dark:border-slate-800 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsNewTicketOpen(false)}
+                  disabled={isSubmitting}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-rose-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 hover:from-rose-500 hover:to-pink-600 active:scale-[0.98] text-white text-xs font-bold shadow-md shadow-rose-600/25 hover:shadow-rose-600/40 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-[1.02]"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                  )}
+                  <span>{isSubmitting ? 'Submitting...' : 'Dispatch Ticket'}</span>
+                </button>
               </div>
             </form>
           </div>

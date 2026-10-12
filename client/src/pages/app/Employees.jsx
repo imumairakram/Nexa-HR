@@ -1088,33 +1088,31 @@ NexaHR Workforce Systems`;
       {/* 4. MODAL: ONBOARD EMPLOYEE (STITCH EXECUTIVE DESIGN) */}
       {/* ========================================================================= */}
       {isOnboardOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/60 via-blue-50/40 to-purple-50/40 dark:from-slate-900/80 dark:via-slate-900/60 dark:to-slate-900/80 relative z-10">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/25 ring-2 ring-white/20">
-                  <UserPlus className="w-7 h-7 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-blue-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative z-10 overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-64 h-64 bg-purple-400/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-100/70 dark:ring-indigo-950/60">
+                  <UserPlus className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60">
-                      Elite Talent Provisioning
-                    </span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
+                <div className="min-w-0">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Onboard New Team Member
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Provision employee workspace credentials, assign departmental roles & configure baseline payroll.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOnboardOpen(false)}
-                className="p-2.5 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -1535,33 +1533,31 @@ NexaHR Workforce Systems`;
       {/* 5. MODAL: EDIT EMPLOYEE PROFILE */}
       {/* ========================================================================= */}
       {isEditOpen && editingEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-amber-950/20 dark:shadow-black/60 border border-amber-200/70 dark:border-amber-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-amber-50/60 via-orange-50/40 to-yellow-50/40 dark:from-slate-900/80 dark:via-slate-900/60 dark:to-slate-900/80 relative z-10">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/25 ring-2 ring-white/20">
-                  <Edit3 className="w-7 h-7 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-amber-200/50 dark:border-amber-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-yellow-50/60 dark:from-slate-900/80 dark:via-amber-950/30 dark:to-slate-900/80 relative z-10 overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-64 h-64 bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-orange-300/20 dark:bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/30 ring-4 ring-amber-100/70 dark:ring-amber-950/60">
+                  <Edit3 className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60">
-                      Directory Records Management
-                    </span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                    Edit Employee Profile: {editForm.firstName} {editForm.lastName}
+                <div className="min-w-0">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Edit Profile: {editForm.firstName} {editForm.lastName}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Update role ACL authorizations, workplace position, compensation matrix, and personal directory information.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsEditOpen(false)}
-                className="p-2.5 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -1871,41 +1867,38 @@ NexaHR Workforce Systems`;
       {/* 6. MODAL: EMPLOYEE PROFILE VIEW (DOSSIER VIEW) */}
       {/* ========================================================================= */}
       {selectedEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-3xl sm:max-w-4xl w-full p-6 sm:p-8 md:p-9 shadow-2xl border border-slate-100 dark:border-slate-800/90 space-y-6 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full p-6 sm:p-7 shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 space-y-5 animate-in zoom-in-95 duration-200 relative overflow-hidden">
             {/* Profile Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-6">
-              <div className="flex items-center gap-5">
+            <div className="flex items-start justify-between border-b border-indigo-200/50 dark:border-indigo-800/40 pb-5">
+              <div className="flex items-center gap-4">
                 <img
                   src={getAvatarUrl(selectedEmployee)}
                   alt=""
-                  className="w-20 h-20 rounded-[24px] object-cover ring-4 ring-indigo-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
+                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-indigo-500/20 shadow-md shrink-0 bg-slate-100 dark:bg-slate-800"
                   onError={(e) => {
                     e.target.src = DEFAULT_BLANK_AVATAR;
                   }}
                 />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60">
-                      Active Dossier
-                    </span>
-                    <span className="text-xs font-mono font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
-                      {selectedEmployee.employeeCode}
+                    <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2.5 py-0.5 rounded-lg border border-indigo-200/60 dark:border-indigo-800/60">
+                      #{selectedEmployee.employeeCode}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     {selectedEmployee.firstName} {selectedEmployee.lastName}
                   </h3>
-                  <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
                     {selectedEmployee.profile?.designation?.title || 'Staff Member'} • {selectedEmployee.profile?.department?.name || 'Engineering'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedEmployee(null)}
-                className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -1989,19 +1982,19 @@ NexaHR Workforce Systems`;
       {/* 4. MODAL: ONBOARDED EMPLOYEE CREDENTIALS CARD */}
       {/* ========================================================================= */}
       {createdCreds && (
-        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-fadeIn">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800/90 space-y-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl shadow-amber-950/20 dark:shadow-black/60 border border-amber-200/70 dark:border-amber-800/50 space-y-4 animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
+            <div className="flex items-start justify-between border-b border-amber-200/50 dark:border-amber-800/40 pb-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center border border-amber-200/80 dark:border-amber-800/60 shrink-0 shadow-xs">
-                  <KeyRound className="w-6 h-6 stroke-[2.2]" />
+                <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center border border-amber-200/80 dark:border-amber-800/60 shrink-0 shadow-xs">
+                  <KeyRound className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                     Employee Credentials Generated
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
                     Share these temporary access details with {createdCreds.name}.
                   </p>
                 </div>
@@ -2009,7 +2002,7 @@ NexaHR Workforce Systems`;
               <button
                 type="button"
                 onClick={() => setCreatedCreds(null)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -2088,9 +2081,9 @@ NexaHR Workforce Systems`;
       {/* 5. MODAL: REMOVE EMPLOYEE CONFIRMATION */}
       {/* ========================================================================= */}
       {employeeToDelete && (
-        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-rose-100 dark:border-rose-900/40 space-y-5 animate-in zoom-in-95 duration-200">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
+        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 shadow-2xl shadow-rose-950/20 dark:shadow-black/60 border border-rose-200/70 dark:border-rose-900/50 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-rose-200/50 dark:border-rose-900/40 pb-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 via-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/25">
                   <UserX className="w-6 h-6 stroke-[2.2]" />
@@ -2106,7 +2099,7 @@ NexaHR Workforce Systems`;
               </div>
               <button
                 onClick={() => setEmployeeToDelete(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

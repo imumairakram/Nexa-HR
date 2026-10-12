@@ -724,28 +724,22 @@ const EmployeeDocuments = () => {
       {/* 5. UPLOAD DOCUMENT MODAL (ULTRA PREMIUM THEMED DESIGN) */}
       {/* ========================================================================= */}
       {isUploadOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-teal-950/15 dark:shadow-black/60 border border-teal-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-teal-50/80 via-cyan-50/50 to-blue-50/50 dark:from-slate-900/80 dark:via-teal-950/20 dark:to-slate-900/80 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
-                  <Upload className="w-6 h-6 stroke-[2.2]" />
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                  <Upload className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                      Upload to Vault
-                    </h3>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60 flex items-center gap-1">
-                      <Zap className="w-3 h-3 fill-teal-500 text-teal-500" />
-                      AES-256 Vault
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Upload to Vault
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Add verified professional certificates, government IDs, and compliance records.
                   </p>
                 </div>
@@ -753,34 +747,53 @@ const EmployeeDocuments = () => {
 
               <button
                 onClick={() => setIsUploadOpen(false)}
-                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleUploadSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
-              {/* Document Title */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-teal-500" />
-                    Document Title <span className="text-rose-500">*</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">
-                    {uploadForm.title.length}/100 chars
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  maxLength={100}
-                  placeholder="e.g. Certified Scrum Master (CSM) Certificate or National Passport Scan"
-                  value={uploadForm.title}
-                  onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all shadow-xs"
-                />
+            <form onSubmit={handleUploadSubmit} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs">
+              {/* Document Title & Issuing Authority Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-teal-500" />
+                      Document Title <span className="text-rose-500">*</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">
+                      {uploadForm.title.length}/100 chars
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={100}
+                    placeholder="e.g. Certified Scrum Master (CSM) Certificate or Passport Scan"
+                    value={uploadForm.title}
+                    onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all shadow-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-teal-500" />
+                      Issuing Authority or Institute
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">e.g. Scrum Alliance, AWS, NADRA</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Scrum Alliance / Amazon Web Services / NADRA"
+                    value={uploadForm.issuer}
+                    onChange={(e) => setUploadForm({ ...uploadForm, issuer: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all shadow-xs"
+                  />
+                </div>
               </div>
 
               {/* Category Visual Selector */}
@@ -790,7 +803,7 @@ const EmployeeDocuments = () => {
                   <span className="text-[10px] text-slate-400 font-normal">Select the file classification</span>
                 </label>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3">
                   {[
                     { id: 'CERTIFICATE', label: 'Professional Certificate', icon: Award, desc: 'AWS, Scrum, PMP, CFA' },
                     { id: 'IDENTIFICATION', label: 'National ID / Passport', icon: ShieldCheck, desc: 'Passport, CNIC, License' },
@@ -805,7 +818,7 @@ const EmployeeDocuments = () => {
                         type="button"
                         key={cat.id}
                         onClick={() => setUploadForm({ ...uploadForm, type: cat.id })}
-                        className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
+                        className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
                           isSelected
                             ? 'bg-gradient-to-br from-teal-50 to-cyan-50/50 dark:from-teal-950/50 dark:to-slate-800 border-teal-500/80 dark:border-teal-600 text-teal-950 dark:text-white shadow-sm ring-2 ring-teal-500/20'
                             : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
@@ -813,20 +826,20 @@ const EmployeeDocuments = () => {
                       >
                         <div className="flex items-center justify-between w-full">
                           <div
-                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
                               isSelected
                                 ? 'bg-teal-500 text-white shadow-xs'
                                 : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                             }`}
                           >
-                            <CatIcon className="w-4 h-4" />
+                            <CatIcon className="w-3.5 h-3.5" />
                           </div>
                           {isSelected && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-800" />
+                            <span className="w-2 h-2 rounded-full bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-800" />
                           )}
                         </div>
                         <div>
-                          <div className="font-bold text-xs leading-tight">
+                          <div className="font-bold text-[11px] leading-tight">
                             {cat.label}
                           </div>
                           <div className="text-[10px] text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1">
@@ -839,144 +852,132 @@ const EmployeeDocuments = () => {
                 </div>
               </div>
 
-              {/* Issuing Authority */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <Building className="w-3.5 h-3.5 text-teal-500" />
-                    Issuing Authority or Institute
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">e.g. Scrum Alliance, AWS, NADRA</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Scrum Alliance / Amazon Web Services / NADRA"
-                  value={uploadForm.issuer}
-                  onChange={(e) => setUploadForm({ ...uploadForm, issuer: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all shadow-xs"
-                />
-              </div>
+              {/* Styled File Upload Dropzone & Live Vault Preview Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Styled File Upload Dropzone */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Upload className="w-3.5 h-3.5 text-teal-500" />
+                      File Attachment (PDF, DOCX, PNG) <span className="text-rose-500">*</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">Max size: 15 MB</span>
+                  </label>
 
-              {/* Styled File Upload Dropzone */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5 text-teal-500" />
-                    File Attachment (PDF, DOCX, PNG) <span className="text-rose-500">*</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">Max size: 15 MB</span>
-                </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      required={!uploadForm.file}
+                      accept=".pdf,.docx,.doc,.png,.jpg,.jpeg"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setUploadForm({ ...uploadForm, file: e.target.files[0] });
+                        }
+                      }}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                    />
 
-                <div className="relative">
-                  <input
-                    type="file"
-                    required={!uploadForm.file}
-                    accept=".pdf,.docx,.doc,.png,.jpg,.jpeg"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        setUploadForm({ ...uploadForm, file: e.target.files[0] });
-                      }
-                    }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                  />
-
-                  <div
-                    className={`p-5 sm:p-6 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${
-                      uploadForm.file
-                        ? 'border-teal-500/80 bg-teal-50/50 dark:bg-teal-950/30'
-                        : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/20'
-                    }`}
-                  >
-                    {uploadForm.file ? (
-                      <div className="flex items-center justify-between w-full gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-teal-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <FileCheck className="w-5 h-5" />
-                          </div>
-                          <div className="text-left min-w-0">
-                            <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
-                              {uploadForm.file.name}
+                    <div
+                      className={`p-3.5 sm:p-4 rounded-xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${
+                        uploadForm.file
+                          ? 'border-teal-500/80 bg-teal-50/50 dark:bg-teal-950/30'
+                          : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/20'
+                      }`}
+                    >
+                      {uploadForm.file ? (
+                        <div className="flex items-center justify-between w-full gap-3">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-teal-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                              <FileCheck className="w-4 h-4" />
                             </div>
-                            <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
-                              {(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB • Ready to Encrypt
+                            <div className="text-left min-w-0">
+                              <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
+                                {uploadForm.file.name}
+                              </div>
+                              <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
+                                {(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB • Ready to Encrypt
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <span className="px-3 py-1 rounded-xl bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 text-[11px] font-bold border border-teal-200 dark:border-teal-800/60 shrink-0 shadow-xs">
-                          Replace File
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center space-y-2">
-                        <div className="w-10 h-10 rounded-2xl bg-teal-100 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center shadow-xs">
-                          <Upload className="w-5 h-5 stroke-[2.2]" />
+                          <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 text-[10px] font-bold border border-teal-200 dark:border-teal-800/60 shrink-0 shadow-xs">
+                            Replace
+                          </span>
                         </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                            Click to browse or drag & drop document
-                          </p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">
-                            PDF, Word (DOCX), PNG, JPG up to 15 MB
-                          </p>
+                      ) : (
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-teal-100 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center shadow-xs shrink-0">
+                            <Upload className="w-4 h-4 stroke-[2.2]" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                              Click to browse or drag & drop document
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              PDF, Word (DOCX), PNG, JPG up to 15 MB
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Live Vault Preview Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-teal-50/30 to-cyan-50/20 dark:from-slate-800/60 dark:via-teal-950/20 dark:to-slate-800/60 border border-teal-100 dark:border-slate-700/70 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-700 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 shadow-xs border border-teal-100 dark:border-slate-600">
-                    <FileText className="w-4.5 h-4.5 stroke-[2.2]" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate">
-                      {uploadForm.title.trim() || 'Untitled Vault Document'}
+                {/* Live Vault Preview Card */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-teal-500" />
+                      Live Preview & Record Card
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">Real-time summary</span>
+                  </label>
+
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 via-teal-50/30 to-cyan-50/20 dark:from-slate-800/60 dark:via-teal-950/20 dark:to-slate-800/60 border border-teal-100 dark:border-slate-700/70 flex items-center justify-between gap-3 h-[62px]">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 shadow-xs border border-teal-100 dark:border-slate-600">
+                        <FileText className="w-4 h-4 stroke-[2.2]" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate">
+                          {uploadForm.title.trim() || 'Untitled Vault Document'}
+                        </div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+                          <span>{uploadForm.type}</span>
+                          <span>•</span>
+                          <span className="text-teal-600 dark:text-teal-400 font-semibold truncate">
+                            {uploadForm.issuer.trim() || 'Self-Submission'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
-                      <span>{uploadForm.type}</span>
-                      <span>•</span>
-                      <span className="text-teal-600 dark:text-teal-400 font-semibold truncate">
-                        {uploadForm.issuer.trim() || 'Self-Submission'}
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-teal-100/80 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800 flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5 text-teal-500" />
+                        AES-256
                       </span>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-teal-100/80 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800 flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-teal-500" />
-                    AES-256
-                  </span>
-                </div>
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 gap-3">
-                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Encrypted Personal Vault</span>
-                </div>
-
-                <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => setIsUploadOpen(false)}
-                    className="px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all"
-                  >
-                    <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                    <span>Save & Encrypt</span>
-                  </button>
-                </div>
+              <div className="flex items-center justify-end pt-3 border-t border-teal-100/60 dark:border-teal-900/40 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsUploadOpen(false)}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all"
+                >
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                  <span>Save & Encrypt</span>
+                </button>
               </div>
             </form>
           </div>
@@ -987,38 +988,43 @@ const EmployeeDocuments = () => {
       {/* 6. DOCUMENT PREVIEW MODAL (LUXURY THEMED) */}
       {/* ========================================================================= */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-teal-950/15 dark:shadow-black/60 border border-teal-100/60 dark:border-slate-800/80 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-teal-50/70 via-cyan-50/40 to-blue-50/40 dark:from-slate-900/80 dark:via-teal-950/20 dark:to-slate-900/80 relative overflow-hidden">
-              <div className="flex items-start gap-3.5 min-w-0">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
-                  <FileText className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
+                  <FileText className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div className="space-y-1 min-w-0">
-                  <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-white/80 dark:bg-slate-800 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
-                    {selectedDoc.typeLabel || selectedDoc.type}
-                  </span>
-                  <h3 className="text-base sm:text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">
-                    {selectedDoc.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Issuer: <strong className="text-slate-800 dark:text-slate-200 font-bold">{selectedDoc.issuer}</strong>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-teal-100/80 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
+                      {selectedDoc.typeLabel || selectedDoc.type}
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate">
+                      {selectedDoc.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                    Issuer: <strong className="text-slate-800 dark:text-slate-100 font-bold">{selectedDoc.issuer}</strong>
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Metadata Body */}
-            <div className="p-6 sm:p-7 md:p-8 space-y-4 text-xs">
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 to-teal-50/30 dark:from-slate-800/50 dark:to-teal-950/20 border border-teal-100/80 dark:border-slate-800 space-y-3">
+            <div className="px-6 sm:px-7 py-5 space-y-4 text-xs">
+              <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-slate-50 to-teal-50/30 dark:from-slate-800/50 dark:to-teal-950/20 border border-teal-100/80 dark:border-slate-800 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 font-medium">Vault Record ID</span>
                   <span className="font-mono font-bold text-slate-800 dark:text-slate-200">#{selectedDoc.id}</span>
@@ -1041,17 +1047,17 @@ const EmployeeDocuments = () => {
               </div>
 
               {selectedDoc.description && (
-                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/50 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/50 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   {selectedDoc.description}
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="p-6 sm:p-7 md:p-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/60 dark:bg-slate-900/50">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-teal-100/60 dark:border-teal-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40">
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
               >
                 Close
               </button>
@@ -1060,7 +1066,7 @@ const EmployeeDocuments = () => {
                   handleDownload(selectedDoc);
                   setSelectedDoc(null);
                 }}
-                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-teal-600/20 active:scale-95 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-teal-600/20 active:scale-95 transition-all"
               >
                 <Download className="w-3.5 h-3.5 stroke-[2.2]" />
                 <span>Download Secure Copy</span>

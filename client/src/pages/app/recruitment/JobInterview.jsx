@@ -369,67 +369,75 @@ const JobInterview = () => {
       {/* MODAL: SCHEDULE INTERVIEW */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95">
-            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center">
-                  <Video className="w-5 h-5" />
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-400/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Modal Header */}
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-100/80 dark:border-indigo-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
+                  <Video className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">Schedule Candidate Assessment</h3>
-                  <p className="text-xs text-slate-500">Book video interview with panel evaluators.</p>
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
+                    Schedule Candidate Assessment
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                    Book video interview session with panel evaluators.
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSchedule} className="p-6 space-y-4 text-xs">
+            <form onSubmit={handleSchedule} className="p-6 sm:p-7 space-y-4 text-xs relative z-10">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Candidate Name *</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Candidate Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Maya Lin"
                   value={form.candidate}
                   onChange={(e) => setForm({ ...form, candidate: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Interview Date *</label>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Interview Date *</label>
                   <input
                     type="date"
                     required
                     value={form.date}
                     onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Start Time *</label>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Start Time *</label>
                   <input
                     type="time"
                     required
                     value={form.time}
                     onChange={(e) => setForm({ ...form, time: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Panel Evaluator</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Panel Evaluator</label>
                 <select
                   value={form.interviewer}
                   onChange={(e) => setForm({ ...form, interviewer: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer"
                 >
                   {employees.length > 0 ? (
                     employees.map((emp) => (
@@ -448,11 +456,11 @@ const JobInterview = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1">Assessment Round</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Assessment Round</label>
                 <select
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer"
                 >
                   <option value="Technical Screening">Technical Screening</option>
                   <option value="System Architecture Round">System Architecture Round</option>
@@ -461,17 +469,17 @@ const JobInterview = () => {
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-md shadow-indigo-600/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   Confirm Schedule
                 </button>

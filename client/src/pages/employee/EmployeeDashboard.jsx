@@ -823,40 +823,49 @@ const EmployeeDashboard = () => {
 
       {/* Announcement Quick Preview Modal */}
       {selectedAnnouncement && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full shadow-2xl shadow-slate-950/20 dark:shadow-black/60 border border-slate-200/70 dark:border-slate-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-slate-50 via-slate-100/60 to-slate-50 dark:from-slate-900/80 dark:via-slate-800/60 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-6 left-10 w-36 h-36 bg-blue-400/10 rounded-full blur-2xl pointer-events-none" />
+
+              <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 relative z-10">
                 {selectedAnnouncement.category || 'NOTICE'}
               </span>
+
               <button
                 onClick={() => setSelectedAnnouncement(null)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug">
-                {selectedAnnouncement.title}
-              </h3>
-              <p className="text-xs text-slate-400 font-semibold mt-1">
-                Published {selectedAnnouncement.date || (selectedAnnouncement.createdAt ? formatDate(selectedAnnouncement.createdAt) : 'Aug 14, 2026')} • By {selectedAnnouncement.author || selectedAnnouncement.createdBy || 'Executive Operations'}
-              </p>
+            {/* Content Body */}
+            <div className="px-6 py-5 space-y-3.5 text-xs">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug">
+                  {selectedAnnouncement.title}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
+                  Published {selectedAnnouncement.date || (selectedAnnouncement.createdAt ? formatDate(selectedAnnouncement.createdAt) : 'Aug 14, 2026')} • By {selectedAnnouncement.author || selectedAnnouncement.createdBy || 'Executive Operations'}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/50 text-xs text-slate-700 dark:text-slate-300 leading-relaxed max-h-56 overflow-y-auto custom-scrollbar font-medium">
+                {selectedAnnouncement.desc || selectedAnnouncement.content}
+              </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 text-xs text-slate-700 dark:text-slate-300 leading-relaxed max-h-60 overflow-y-auto">
-              {selectedAnnouncement.desc || selectedAnnouncement.content}
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            {/* Modal Footer */}
+            <div className="px-6 py-3.5 border-t border-slate-200/50 dark:border-slate-800/40 flex items-center justify-end gap-2.5 bg-white/40 dark:bg-slate-900/40 shrink-0">
               <button
                 onClick={() => {
                   setSelectedAnnouncement(null);
                   navigate('/employee/announcements');
                 }}
-                className="px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-md shadow-emerald-600/20"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold cursor-pointer transition-all shadow-md shadow-emerald-600/20"
               >
                 Go to Announcements Feed
               </button>

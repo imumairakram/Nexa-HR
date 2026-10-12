@@ -1433,29 +1433,39 @@ const Accounts = () => {
       {viewingTxn && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity"
             onClick={() => setViewingTxn(null)}
           />
 
           <div className="fixed inset-0 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#131B2E] rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 animate-in zoom-in-95">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
-                    {viewingTxn.id || viewingTxn.voucherNumber}
-                  </h3>
-                  <p className="text-xs text-slate-400">Reference: {viewingTxn.ref || 'N/A'}</p>
+            <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-md w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 overflow-hidden animate-in zoom-in-95 duration-200 relative">
+              {/* Ambient blur orbs */}
+              <div className="absolute top-0 right-10 w-48 h-48 bg-indigo-400/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-10 left-10 w-48 h-48 bg-blue-400/20 dark:bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Header */}
+              <div className="px-6 py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-between gap-4 bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
+                    <Receipt className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
+                      {viewingTxn.id || viewingTxn.voucherNumber}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Reference: {viewingTxn.ref || 'N/A'}</p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setViewingTxn(null)}
-                  className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs">
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+              <div className="p-6 space-y-3.5 text-xs relative z-10">
+                <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Description</div>
                   <div className="font-extrabold text-sm text-slate-900 dark:text-white mt-0.5">
                     {viewingTxn.title}
@@ -1468,7 +1478,7 @@ const Accounts = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Amount</div>
                     <div
                       className={`text-sm font-black ${
@@ -1484,7 +1494,7 @@ const Accounts = () => {
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Department</div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                       {viewingTxn.department || 'Company-Wide'}
@@ -1493,7 +1503,7 @@ const Accounts = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Category</div>
                     <div className="mt-1">
                       <span
@@ -1506,15 +1516,15 @@ const Accounts = () => {
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Status</div>
                     <div className="mt-1">
                       <button
                         onClick={() => toggleTxnStatus(viewingTxn.id)}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold cursor-pointer ${
                           viewingTxn.status === 'VERIFIED'
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                         }`}
                       >
                         {viewingTxn.status === 'VERIFIED' ? (
@@ -1529,44 +1539,44 @@ const Accounts = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Payment</div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                       {viewingTxn.paymentMethod || 'ACH Transfer'}
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Date Logged</div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                       {viewingTxn.date}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  onClick={() => setDeleteConfirmId(viewingTxn.id)}
-                  className="px-3 py-1.5 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-xs font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Delete</span>
-                </button>
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <button
+                    onClick={() => setDeleteConfirmId(viewingTxn.id)}
+                    className="px-3.5 py-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </button>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => startEditTxn(viewingTxn)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => setViewingTxn(null)}
-                    className="px-4 py-1.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 cursor-pointer"
-                  >
-                    Done
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEditTxn(viewingTxn)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setViewingTxn(null)}
+                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold cursor-pointer transition-all shadow-md shadow-indigo-600/25"
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1580,32 +1590,33 @@ const Accounts = () => {
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md"
             onClick={() => setDeleteConfirmId(null)}
           />
           <div className="fixed inset-0 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#131B2E] rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 animate-in zoom-in-95">
-              <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/70 text-rose-600 flex items-center justify-center mx-auto">
-                <AlertTriangle className="w-5 h-5" />
+            <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-rose-200/60 dark:border-rose-900/60 space-y-4 animate-in zoom-in-95 duration-200 relative overflow-hidden">
+              <div className="absolute top-0 right-5 w-32 h-32 bg-rose-400/20 dark:bg-rose-600/15 rounded-full blur-2xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-red-600 text-white flex items-center justify-center mx-auto shadow-md shadow-rose-500/25 ring-4 ring-rose-500/15">
+                <AlertTriangle className="w-6 h-6 stroke-[2.2]" />
               </div>
-              <div className="text-center space-y-1">
+              <div className="text-center space-y-1 relative z-10">
                 <h3 className="text-base font-black text-slate-900 dark:text-white">
                   Delete Voucher?
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   This transaction will be permanently removed from the corporate ledger.
                 </p>
               </div>
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-2.5 pt-2 relative z-10">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="flex-1 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDeleteTxn(deleteConfirmId)}
-                  className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-600/20 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold shadow-md shadow-rose-600/25 cursor-pointer transition-all text-xs"
                 >
                   Delete
                 </button>

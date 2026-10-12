@@ -436,9 +436,11 @@ const EmployeePageHeader = ({
 
           {/* Refresh Button */}
           <button
+            type="button"
             onClick={handleRefreshClick}
             title="Refresh Data"
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95"
+            aria-label="Refresh attendance data"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <RefreshCw
               className={`w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[2] transition-transform duration-300 ${
@@ -449,9 +451,11 @@ const EmployeePageHeader = ({
 
           {/* Theme Switcher Toggle */}
           <button
+            type="button"
             onClick={toggleTheme}
             title={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95"
+            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             {resolvedTheme === 'dark' ? (
               <Sun className="w-4 h-4 text-amber-400 stroke-[2] transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
@@ -463,9 +467,12 @@ const EmployeePageHeader = ({
           {/* Notification Icon & Dropdown */}
           <div className="relative" ref={notifyRef}>
             <button
+              type="button"
               onClick={() => setIsNotifyOpen(!isNotifyOpen)}
               title="Notifications"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer active:scale-95"
+              aria-label="View notifications"
+              aria-expanded={isNotifyOpen}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <Bell className="w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[1.75]" />
               {unreadCount > 0 && (
@@ -556,8 +563,11 @@ const EmployeePageHeader = ({
           {/* User Profile Pill & Dropdown */}
           <div className="relative" ref={profileRef}>
             <button
+              type="button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 pl-2 pr-3 py-1 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full shadow-xs border border-slate-200/80 dark:border-slate-800 cursor-pointer transition-all active:scale-95"
+              aria-label="User profile menu"
+              aria-expanded={isProfileOpen}
+              className="flex items-center gap-2 pl-2 pr-3 py-1 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl shadow-xs border border-slate-200/80 dark:border-slate-800 cursor-pointer transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-white text-xs font-bold ring-2 ring-emerald-500/20 shrink-0">
                 <img

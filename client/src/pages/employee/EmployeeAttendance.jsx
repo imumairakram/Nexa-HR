@@ -341,9 +341,9 @@ const EmployeeAttendance = () => {
               </div>
             </div>
 
-            <div className="w-full pt-2 flex items-center justify-between text-[11px] text-slate-300 font-medium">
+            <div className="w-full pt-2 flex items-center justify-between text-xs sm:text-sm text-slate-200 font-medium leading-normal">
               <span>Shift: 09:00 AM – 05:30 PM</span>
-              <span className="text-emerald-400 font-bold">8.5h Standard</span>
+              <span className="text-emerald-400 font-semibold">8.5h Standard</span>
             </div>
           </div>
         </div>
@@ -437,7 +437,11 @@ const EmployeeAttendance = () => {
           </div>
 
           {/* Segmented Filter Pills */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl self-start sm:self-auto">
+          <div
+            role="tablist"
+            aria-label="Attendance status filters"
+            className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl self-start sm:self-auto gap-1"
+          >
             {[
               { id: 'ALL', label: 'All Logs' },
               { id: 'PRESENT', label: 'Present' },
@@ -445,11 +449,14 @@ const EmployeeAttendance = () => {
             ].map((st) => (
               <button
                 key={st.id}
+                type="button"
+                role="tab"
+                aria-selected={statusFilter === st.id}
                 onClick={() => setStatusFilter(st.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                   statusFilter === st.id
                     ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
                 }`}
               >
                 {st.label}

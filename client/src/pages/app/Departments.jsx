@@ -580,28 +580,28 @@ const Departments = () => {
       {/* MODAL: ADD DEPARTMENT */}
       {/* ========================================================================= */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
-                  <Building2 className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-blue-50/70 to-purple-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative overflow-hidden">
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
+                  <Building2 className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Create New Department
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
-                    Establish business units, operational divisions, and reporting hierarchies across your organization.
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                    Establish business units, operational divisions, and reporting hierarchies.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -708,19 +708,19 @@ const Departments = () => {
       {/* MODAL: EDIT DEPARTMENT */}
       {/* ========================================================================= */}
       {isEditOpen && editingDept && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
-                  <Edit2 className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-blue-50/70 to-purple-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative overflow-hidden">
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
+                  <Edit2 className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Edit Department
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Update business unit details, unit code, and divisional objectives.
                   </p>
                 </div>
@@ -730,9 +730,9 @@ const Departments = () => {
                   setIsEditOpen(false);
                   setEditingDept(null);
                 }}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -823,7 +823,7 @@ const Departments = () => {
       {/* ========================================================================= */}
       {deptToDelete && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[28px] max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-md w-full p-6 shadow-2xl shadow-rose-950/20 dark:shadow-black/60 border border-rose-200/70 dark:border-rose-900/50 space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
               <AlertTriangle className="w-6 h-6 stroke-[2.2]" />
             </div>
@@ -858,33 +858,33 @@ const Departments = () => {
       {/* MODAL: VIEW DEPARTMENT DOSSIER */}
       {/* ========================================================================= */}
       {selectedDept && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-xl rounded-[32px] max-w-2xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-2xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-6 md:p-7 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-blue-500/25 uppercase">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-blue-50/70 to-purple-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative overflow-hidden">
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/25 uppercase shrink-0 ring-4 ring-indigo-100/70 dark:ring-indigo-950/60">
                   {selectedDept.code ? (selectedDept.code.length > 4 ? selectedDept.code.slice(0, 4) : selectedDept.code) : 'DEP'}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight truncate">
                       {selectedDept.name}
                     </h3>
-                    <span className="text-[10px] font-mono font-bold bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800">
+                    <span className="text-[10px] font-mono font-bold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800">
                       {selectedDept.code || 'UNIT'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Cost Center: {selectedDept.code ? `CC-${selectedDept.code}` : 'CC-CORP'} • Established {formatDate(selectedDept.createdAt)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedDept(null)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 

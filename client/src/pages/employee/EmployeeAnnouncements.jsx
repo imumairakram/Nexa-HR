@@ -542,76 +542,89 @@ const EmployeeAnnouncements = () => {
       {/* 4. FULL NOTICE READ MODAL (ENTERPRISE LETTERHEAD LAYOUT) */}
       {/* ========================================================================= */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full p-6 sm:p-7 md:p-8 shadow-2xl border border-slate-100 dark:border-slate-800/90 space-y-6 max-h-[92vh] overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-5">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] font-extrabold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
-                    {selectedItem.categoryLabel || selectedItem.category}
-                  </span>
-                  <span className="text-xs text-slate-400 font-semibold">{selectedItem.date}</span>
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-slate-50/60 dark:from-[#1b1536]/80 dark:via-[#16122d]/70 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-64 h-64 bg-purple-400/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-3.5 min-w-0 relative z-10">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/30 ring-4 ring-indigo-100/70 dark:ring-indigo-950/60">
+                  <Megaphone className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                  {selectedItem.title}
-                </h3>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  Issued by <strong>{selectedItem.author}</strong> • {selectedItem.authorRole} ({selectedItem.department})
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100/80 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60">
+                      {selectedItem.categoryLabel || selectedItem.category}
+                    </span>
+                    <span className="text-xs text-slate-400 font-semibold">{selectedItem.date}</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate mt-0.5">
+                    {selectedItem.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+                    Issued by <strong className="text-slate-800 dark:text-slate-100 font-bold">{selectedItem.author}</strong> • {selectedItem.authorRole} ({selectedItem.department})
+                  </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedItem(null)}
-                className="p-2.5 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line space-y-3.5 font-medium p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60">
-              {selectedItem.content || selectedItem.summary}
+            <div className="flex-1 overflow-y-auto px-6 sm:px-7 py-5 space-y-4 custom-scrollbar text-xs">
+              <div className="p-4 sm:p-5 rounded-xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line font-medium">
+                {selectedItem.content || selectedItem.summary}
+              </div>
+
+              {/* Attachments Section */}
+              {selectedItem.attachments && selectedItem.attachments.length > 0 && (
+                <div className="p-4 sm:p-5 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 space-y-2.5">
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                    <Paperclip className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Attached Documents & Forms:</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {selectedItem.attachments.map((att, aIdx) => (
+                      <div
+                        key={aIdx}
+                        className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 text-xs shadow-xs"
+                      >
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-2">{att.name}</span>
+                        <button
+                          onClick={() => handleDownloadAttachment(att)}
+                          className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Attachments Section */}
-            {selectedItem.attachments && selectedItem.attachments.length > 0 && (
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700 space-y-3">
-                <div className="text-xs font-bold text-slate-700 dark:text-slate-200">Attached Documents & Forms:</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {selectedItem.attachments.map((att, aIdx) => (
-                    <div
-                      key={aIdx}
-                      className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-xs"
-                    >
-                      <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-2">{att.name}</span>
-                      <button
-                        onClick={() => handleDownloadAttachment(att)}
-                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download</span>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
-              <span className="text-xs text-slate-400 font-medium">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-indigo-100/60 dark:border-indigo-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
+              <span className="text-xs text-slate-400 font-medium hidden sm:inline">
                 Official NexaHR Enterprise Broadcast
               </span>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-end gap-3 w-full sm:w-auto">
                 <button
                   onClick={() => {
                     toggleAcknowledge(selectedItem.id);
                     setSelectedItem((prev) => ({ ...prev, acknowledged: !prev.acknowledged }));
                   }}
-                  className={`px-5 py-2.5 rounded-2xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
                     selectedItem.acknowledged
-                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                      ? 'bg-emerald-600 text-white shadow-emerald-600/20'
                       : 'bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white'
                   }`}
                 >
@@ -620,7 +633,7 @@ const EmployeeAnnouncements = () => {
                 </button>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                 >
                   Close
                 </button>

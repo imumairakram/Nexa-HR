@@ -581,33 +581,36 @@ const EmploymentStatus = () => {
       {/* 5. MODAL: UPDATE STATUS & SHIFTS */}
       {/* ========================================================================= */}
       {selectedEmp && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-6 animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full shadow-2xl border border-amber-200/60 dark:border-amber-800/60 overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-orange-300/20 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-600 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25 shrink-0">
-                  <Briefcase className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-amber-100/80 dark:border-amber-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-amber-50/90 via-orange-50/80 to-yellow-50/60 dark:from-amber-950/60 dark:via-orange-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-500/25 ring-4 ring-amber-500/15 shrink-0">
+                  <Briefcase className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white truncate">
                     Update {selectedEmp.name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     {selectedEmp.employeeCode} • Configure classification, shift timing, and work station.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedEmp(null)}
-                className="p-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Form Fields */}
-            <form onSubmit={handleUpdateStatus} className="space-y-4 text-xs">
+            <form onSubmit={handleUpdateStatus} className="p-6 sm:p-7 space-y-4 text-xs relative z-10">
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
                   Employment Classification *
@@ -615,7 +618,7 @@ const EmploymentStatus = () => {
                 <select
                   value={selectedEmp.employmentType}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, employmentType: e.target.value })}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
                 >
                   <option value="FULL_TIME">Full-Time Permanent</option>
                   <option value="REMOTE">Full-Time Remote</option>
@@ -631,7 +634,7 @@ const EmploymentStatus = () => {
                 <select
                   value={selectedEmp.shift}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, shift: e.target.value })}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
                 >
                   <option value="General Morning (09:00 - 17:30)">General Shift (09:00 AM - 05:30 PM)</option>
                   <option value="Flexible Remote">Flexible Remote (Asynchronous)</option>
@@ -649,12 +652,12 @@ const EmploymentStatus = () => {
                   required
                   value={selectedEmp.location}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
                 />
               </div>
 
               {/* Live Preview Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50/70 via-orange-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-amber-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50/70 via-orange-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-amber-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-extrabold text-xs shadow-sm">
                     {selectedEmp.employmentType === 'FULL_TIME'
@@ -669,7 +672,7 @@ const EmploymentStatus = () => {
                     <div className="font-extrabold text-slate-900 dark:text-white text-xs">
                       {selectedEmp.name}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                       {selectedEmp.shift} • {selectedEmp.location}
                     </div>
                   </div>
@@ -695,14 +698,14 @@ const EmploymentStatus = () => {
                   type="button"
                   onClick={() => setSelectedEmp(null)}
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs shadow-md shadow-amber-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs shadow-md shadow-amber-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
                 >
                   {saving ? (
                     <>
@@ -727,73 +730,70 @@ const EmploymentStatus = () => {
       {/* ========================================================================= */}
       {selectedEmployee && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-3xl sm:max-w-4xl w-full p-6 sm:p-8 md:p-9 shadow-2xl border border-slate-100 dark:border-slate-800/90 space-y-6 animate-in zoom-in-95 duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full p-6 sm:p-7 shadow-2xl border border-amber-200/60 dark:border-amber-800/60 space-y-4 animate-in zoom-in-95 duration-200 relative">
             {/* Profile Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-6">
-              <div className="flex items-center gap-5">
+            <div className="flex items-start justify-between border-b border-amber-100/80 dark:border-amber-800/60 pb-5">
+              <div className="flex items-center gap-4">
                 <img
                   src={getAvatarUrl(selectedEmployee)}
                   alt=""
-                  className="w-20 h-20 rounded-[24px] object-cover ring-4 ring-indigo-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
+                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-amber-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
                   onError={(e) => {
                     e.target.src = DEFAULT_BLANK_AVATAR;
                   }}
                 />
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60">
-                      Active Dossier
-                    </span>
-                    <span className="text-xs font-mono font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
                       {selectedEmployee.employeeCode}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     {selectedEmployee.firstName} {selectedEmployee.lastName}
                   </h3>
-                  <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                  <p className="text-xs font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">
                     {selectedEmployee.profile?.designation?.title || 'Staff Member'} • {selectedEmployee.profile?.department?.name || 'Engineering'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedEmployee(null)}
-                className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Dossier Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Department</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Department</span>
                 <span className="font-extrabold text-slate-900 dark:text-white text-sm">
                   {selectedEmployee.profile?.department?.name || 'Engineering'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Role Authorization</span>
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Role Authorization</span>
                 <span className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">{selectedEmployee.role || 'EMPLOYEE'}</span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Base Compensation</span>
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Base Compensation</span>
                 <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
                   {formatSalary(selectedEmployee.salaryStructure, selectedEmployee.profile?.salary)}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Contact Email</span>
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Contact Email</span>
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{selectedEmployee.email}</span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Location / Workplace</span>
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Location / Workplace</span>
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">
                   {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'San Francisco HQ'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Onboarding Date</span>
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Onboarding Date</span>
                 <span className="font-extrabold text-slate-900 dark:text-white">
                   {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : '2023-01-01'}
                 </span>
@@ -801,7 +801,7 @@ const EmploymentStatus = () => {
             </div>
 
             {/* Dossier Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80">
               <div className="flex items-center gap-2.5">
                 <button
                   onClick={() => {
@@ -809,7 +809,7 @@ const EmploymentStatus = () => {
                     setSelectedEmployee(null);
                     handleOpenEdit(toEdit);
                   }}
-                  className="px-5 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
+                  className="px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-extrabold hover:bg-amber-600 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit Profile</span>
@@ -821,7 +821,7 @@ const EmploymentStatus = () => {
                     setSelectedEmployee(null);
                     setEmployeeToDelete(toDelete);
                   }}
-                  className="px-4 py-2.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-extrabold hover:bg-rose-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
+                  className="px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-extrabold hover:bg-rose-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
                   title="Remove Employee from Directory"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -831,7 +831,7 @@ const EmploymentStatus = () => {
 
               <button
                 onClick={() => setSelectedEmployee(null)}
-                className="px-6 py-2.5 rounded-2xl bg-[#0F172A] dark:bg-white text-white dark:text-slate-900 text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-md"
+                className="px-6 py-2.5 rounded-xl bg-[#0F172A] dark:bg-white text-white dark:text-slate-900 text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-md"
               >
                 Close Dossier
               </button>
@@ -845,24 +845,24 @@ const EmploymentStatus = () => {
       {/* ========================================================================= */}
       {employeeToDelete && (
         <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-rose-100 dark:border-rose-900/40 space-y-5 animate-in zoom-in-95 duration-200">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-rose-200/60 dark:border-rose-900/40 space-y-4 animate-in zoom-in-95 duration-200 relative">
+            <div className="flex items-start justify-between border-b border-rose-100/80 dark:border-rose-900/40 pb-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 via-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/25">
-                  <UserX className="w-6 h-6 stroke-[2.2]" />
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-500 via-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25 ring-4 ring-rose-500/15">
+                  <UserX className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                     Remove Employee
                   </h3>
-                  <p className="text-xs text-rose-600 dark:text-rose-400 font-bold mt-0.5">
+                  <p className="text-xs text-rose-600 dark:text-rose-400 font-bold mt-0.5 whitespace-nowrap">
                     Confirm Deletion Action
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setEmployeeToDelete(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -872,7 +872,7 @@ const EmploymentStatus = () => {
               Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500">{employeeToDelete.employeeCode}</span>) from company directory?
             </p>
 
-            <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80 space-y-2 text-xs">
+            <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80 space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 font-bold text-[11px]">Department:</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200">
@@ -889,7 +889,7 @@ const EmploymentStatus = () => {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-700 dark:text-rose-300 font-medium flex items-center gap-2.5">
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-700 dark:text-rose-300 font-medium flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
               <span>This record will be permanently deleted from the database.</span>
             </div>
@@ -899,7 +899,7 @@ const EmploymentStatus = () => {
                 type="button"
                 onClick={() => setEmployeeToDelete(null)}
                 disabled={deleting}
-                className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -907,7 +907,7 @@ const EmploymentStatus = () => {
                 type="button"
                 onClick={handleDeleteEmployee}
                 disabled={deleting}
-                className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-black text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-black text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
               >
                 {deleting ? (
                   <>

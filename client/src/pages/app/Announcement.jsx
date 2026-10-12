@@ -460,32 +460,35 @@ const Announcement = () => {
       {/* ========================================================================= */}
       {isPostModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl border border-slate-100 dark:border-slate-800/90 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-400/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-teal-50/40 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/70">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
-                  <Megaphone className="w-6 h-6 stroke-[2.2]" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-100/80 dark:border-indigo-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/90 via-purple-50/80 to-pink-50/60 dark:from-indigo-950/60 dark:via-purple-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
+                  <Megaphone className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
                     Broadcast Announcement
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-xl">
-                    Publish company circulars, executive updates, and important operational memos to all employees.
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                    Publish company circulars, executive updates, and operational memos to all employees.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsPostModalOpen(false)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handlePostSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
+            <form onSubmit={handlePostSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-4 custom-scrollbar text-xs relative z-10">
               {/* Title */}
               <div className="space-y-1.5">
                 <label className="block text-slate-800 dark:text-slate-200 font-bold">
@@ -499,7 +502,7 @@ const Announcement = () => {
                     placeholder="e.g. Annual Company Retreat 2026 Announcement & Itinerary"
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -513,7 +516,7 @@ const Announcement = () => {
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="EVENTS">Events & Retreats</option>
                     <option value="BENEFITS">Benefits & Health</option>
@@ -530,7 +533,7 @@ const Announcement = () => {
                   <select
                     value={form.priority}
                     onChange={(e) => setForm({ ...form, priority: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="HIGH">High Priority (Urgent Red Alert)</option>
                     <option value="MEDIUM">Medium Priority (Standard Amber)</option>
@@ -545,7 +548,7 @@ const Announcement = () => {
                   <select
                     value={form.department}
                     onChange={(e) => setForm({ ...form, department: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="Company-Wide (All Offices)">Company-Wide (All Offices)</option>
                     <option value="Engineering & Product">Engineering & Product</option>
@@ -562,21 +565,21 @@ const Announcement = () => {
                 </label>
                 <div className="relative">
                   <textarea
-                    rows={5}
+                    rows={4}
                     required
                     placeholder="Full announcement text, schedule of events, guidelines, links..."
                     value={form.content}
                     onChange={(e) => setForm({ ...form, content: e.target.value })}
-                    className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
+                    className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none placeholder:text-slate-400"
                   />
                 </div>
               </div>
 
               {/* Pin Switch Toggle Card */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-purple-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
                 <div>
                   <div className="font-bold text-slate-900 dark:text-white text-xs">Pin to Top of Notice Board</div>
-                  <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                     Ensures all employees see this notice immediately upon portal login.
                   </div>
                 </div>
@@ -584,7 +587,7 @@ const Announcement = () => {
                   type="button"
                   onClick={() => setForm({ ...form, pinned: !form.pinned })}
                   className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                    form.pinned ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
+                    form.pinned ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
                   }`}
                 >
                   <div
@@ -596,18 +599,18 @@ const Announcement = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsPostModalOpen(false)}
-                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                 >
                   {submitting ? (
                     <>
@@ -630,31 +633,31 @@ const Announcement = () => {
       {/* DETAIL MODAL */}
       {selectedNotice && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800/90 space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl w-full p-6 sm:p-7 shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar relative">
+            <div className="flex items-start justify-between border-b border-indigo-100/80 dark:border-indigo-800/60 pb-4">
               <div>
-                <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
+                <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
                   {selectedNotice.category} • {selectedNotice.priority}
                 </span>
-                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-2">{selectedNotice.title}</h3>
-                <p className="text-xs text-slate-400 mt-1">{selectedNotice.date} • {selectedNotice.author || selectedNotice.department}</p>
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-2">{selectedNotice.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{selectedNotice.date} • {selectedNotice.author || selectedNotice.department}</p>
               </div>
               <button
                 onClick={() => setSelectedNotice(null)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-line border border-slate-100 dark:border-slate-700/60">
+            <div className="p-5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-line border border-slate-200/70 dark:border-slate-700/60">
               {selectedNotice.content}
             </div>
 
             <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setSelectedNotice(null)}
-                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-2xl text-xs font-bold cursor-pointer transition-colors"
+                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
               >
                 Close
               </button>

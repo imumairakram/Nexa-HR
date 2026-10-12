@@ -432,22 +432,22 @@ const Leaves = () => {
 
       {/* Apply on Behalf Modal */}
       {isApplyOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-[32px] max-w-5xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/60 border border-blue-100/60 dark:border-slate-800/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-emerald-950/20 dark:shadow-black/60 border border-emerald-200/70 dark:border-emerald-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 md:p-8 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-teal-50/50 dark:from-slate-900/80 dark:via-blue-950/20 dark:to-slate-900/80 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/15 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
 
-              <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
-                  <CalendarDays className="w-6 h-6 stroke-[2.2]" />
+              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-100/70 dark:ring-emerald-950/60">
+                  <CalendarDays className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                <div className="min-w-0">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Grant Employee Leave
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5 max-w-md">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap mt-0.5">
                     Submit authorized absence record on behalf of an employee with direct ledger sync.
                   </p>
                 </div>
@@ -455,13 +455,13 @@ const Leaves = () => {
 
               <button
                 onClick={() => setIsApplyOpen(false)}
-                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateOnBehalf} className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs">
+            <form onSubmit={handleCreateOnBehalf} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="block text-slate-800 dark:text-slate-200 font-bold">Select Employee *</label>
@@ -469,7 +469,7 @@ const Leaves = () => {
                     required
                     value={applyForm.userId}
                     onChange={(e) => setApplyForm({ ...applyForm, userId: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   >
                     {employees.length > 0 ? (
                       employees.map((emp) => (
@@ -489,7 +489,7 @@ const Leaves = () => {
                     required
                     value={applyForm.leaveTypeId}
                     onChange={(e) => setApplyForm({ ...applyForm, leaveTypeId: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   >
                     {leaveTypes.map((lt) => (
                       <option key={lt.id} value={lt.id}>
@@ -508,7 +508,7 @@ const Leaves = () => {
                     required
                     value={applyForm.startDate}
                     onChange={(e) => setApplyForm({ ...applyForm, startDate: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -518,7 +518,7 @@ const Leaves = () => {
                     required
                     value={applyForm.endDate}
                     onChange={(e) => setApplyForm({ ...applyForm, endDate: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   />
                 </div>
               </div>
@@ -526,34 +526,31 @@ const Leaves = () => {
               <div className="space-y-1.5">
                 <label className="block text-slate-800 dark:text-slate-200 font-bold">Reason & Administrative Remarks *</label>
                 <textarea
-                  rows={4}
+                  rows={2.5}
                   required
                   placeholder="Provide context or description for the time-off..."
                   value={applyForm.reason}
                   onChange={(e) => setApplyForm({ ...applyForm, reason: e.target.value })}
-                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none leading-relaxed"
+                  className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none resize-none leading-relaxed"
                 />
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-[11px] text-slate-400">Updates quota balance immediately upon submission</span>
-                <div className="flex items-center gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setIsApplyOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold shadow-lg shadow-blue-600/25 cursor-pointer flex items-center gap-2 disabled:opacity-50 transition-all active:scale-95"
-                  >
-                    {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                    <span>Submit Leave</span>
-                  </button>
-                </div>
+              <div className="flex items-center justify-end pt-3 border-t border-emerald-100/60 dark:border-emerald-900/40 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsApplyOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold shadow-lg shadow-emerald-600/25 cursor-pointer flex items-center gap-2 disabled:opacity-50 transition-all active:scale-95 text-xs"
+                >
+                  {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                  <span>Submit Leave</span>
+                </button>
               </div>
             </form>
           </div>
