@@ -705,8 +705,13 @@ NexaHR Workforce Systems`;
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Add employee dossier</div>
             </div>
             <button
-              disabled
-              className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600/50 dark:bg-indigo-900/40 text-white/60 font-bold text-xs shadow-none flex items-center justify-center gap-2 cursor-not-allowed opacity-60"
+              type="button"
+              onClick={() => {
+                setOnboardForm(initialOnboardState);
+                setOnboardTab('basic');
+                setIsOnboardOpen(true);
+              }}
+              className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Onboard Employee</span>
