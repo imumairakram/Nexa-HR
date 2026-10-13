@@ -88,6 +88,25 @@ const Attendance = () => {
     fetchAttendance();
   }, []);
 
+  const handlePunchAllToday = async () => {
+    setIsSyncing(true);
+    setToastMsg('Recording today punch-in for all active employees...');
+    try {
+      const res = await api.punchAllUsersToday();
+      if (res && res.success) {
+        setToastMsg(`Successfully punched in ${res.data?.totalPunched || 'all'} employees for today!`);
+        await fetchAttendance();
+      } else {
+        setToastMsg(res?.message || 'Failed to punch in all employees');
+      }
+    } catch (err) {
+      setToastMsg(`Error: ${err.message}`);
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => setToastMsg(''), 4000);
+    }
+  };
+
   const handleSyncHardware = async () => {
     setIsSyncing(true);
     setToastMsg('Syncing live attendance records with PostgreSQL database...');
@@ -162,7 +181,7 @@ const Attendance = () => {
           </div>
 
           {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[260px] shrink-0 space-y-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <Cpu className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -172,17 +191,26 @@ const Attendance = () => {
             </div>
             <div className="flex flex-col w-full gap-2">
               <button
-                onClick={handleSyncHardware}
+                onClick={handlePunchAllToday}
                 disabled={isSyncing}
                 className="w-full px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
               >
+                <Fingerprint className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Processing...' : 'Punch-In All (Today)'}</span>
+              </button>
+              <button
+                onClick={handleSyncHardware}
+                disabled={isSyncing}
+                className="w-full px-3 py-2 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+              >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? 'Syncing...' : 'Sync Hardware Logs'}</span>
+                <span>Refresh Logs</span>
               </button>
             </div>
           </div>
         </div>
       </div>
+
 
       {/* ========================================================================= */}
       {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}

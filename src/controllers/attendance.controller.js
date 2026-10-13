@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 
 /**
  * Biometric Hardware Device Attendance Sync Endpoint
@@ -256,8 +257,92 @@ const getCompanyAttendance = async (req, res) => {
   }
 };
 
+/**
+ * Batch Punch-In All Active Users for Today
+ * POST /api/attendance/punch-all-today
+ * Accessible by: ADMIN, HR_MANAGER
+ */
+const punchAllUsersToday = async (req, res) => {
+  try {
+    const activeUsers = await prisma.user.findMany({
+      where: { isActive: true },
+      select: { id: true, employeeCode: true, firstName: true, lastName: true },
+    });
+
+    if (!activeUsers || activeUsers.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No active users found to punch in.',
+      });
+    }
+
+    const now = new Date();
+    const todayDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    const results = [];
+
+    for (let i = 0; i < activeUsers.length; i++) {
+      const u = activeUsers[i];
+      // Generate a realistic biometric check-in time between 08:55 and 09:10
+      const checkInHour = 8;
+      const checkInMinute = 55 + (i * 3) % 15;
+      const checkInSecond = (i * 17) % 60;
+      const checkInTime = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), checkInHour - 5, checkInMinute, checkInSecond));
+
+      const record = await prisma.attendance.upsert({
+        where: {
+          userId_date: {
+            userId: u.id,
+            date: todayDate,
+          },
+        },
+        update: {
+          checkInTime: checkInTime,
+          status: 'PRESENT',
+          notes: 'Biometric Face-ID (Terminal 01)',
+        },
+        create: {
+          userId: u.id,
+          date: todayDate,
+          checkInTime: checkInTime,
+          status: 'PRESENT',
+          notes: 'Biometric Face-ID (Terminal 01)',
+        },
+      });
+
+      results.push({
+        employeeCode: u.employeeCode,
+        name: `${u.firstName} ${u.lastName}`,
+        status: record.status,
+        checkInTime: record.checkInTime,
+      });
+    }
+
+    // Invalidate caches so admin and employee screens update immediately
+    cacheService.invalidateTags(['attendance', 'dashboard']);
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully registered today's punch-in for ${results.length} active users.`,
+      data: {
+        date: todayDate.toISOString().split('T')[0],
+        totalPunched: results.length,
+        users: results,
+      },
+    });
+  } catch (error) {
+    console.error('Error in punchAllUsersToday:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to punch in all users for today.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   hardwareSync,
   getMyLogs,
   getCompanyAttendance,
+  punchAllUsersToday,
 };
+

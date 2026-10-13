@@ -329,6 +329,13 @@ export const api = {
     });
   },
 
+  punchAllUsersToday: async () => {
+    return await fetchAPI('/attendance/punch-all-today', {
+      method: 'POST',
+    });
+  },
+
+
   // --- Leaves ---
   getLeaveRequests: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
