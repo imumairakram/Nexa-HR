@@ -1090,25 +1090,26 @@ NexaHR Workforce Systems`;
       )}
 
       {/* ========================================================================= */}
-      {/* 4. MODAL: ONBOARD EMPLOYEE (STITCH EXECUTIVE DESIGN) */}
+      {/* 4. MODAL: ONBOARD EMPLOYEE */}
       {/* ========================================================================= */}
       {isOnboardOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
-            {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-blue-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative z-10 overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-64 h-64 bg-purple-400/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
+            {/* Ambient background blur orbs */}
+            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-400/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
 
+            {/* Modal Header */}
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-100/70 dark:ring-indigo-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
                   <UserPlus className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                     Onboard New Team Member
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
                     Provision employee workspace credentials, assign departmental roles & configure baseline payroll.
                   </p>
                 </div>
@@ -1122,9 +1123,9 @@ NexaHR Workforce Systems`;
             </div>
 
             {/* Scrollable Container with Tabs */}
-            <div className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs relative z-10">
+            <div className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-5 custom-scrollbar text-xs relative z-10 bg-gradient-to-b from-white/40 via-indigo-50/15 to-purple-50/20 dark:from-transparent dark:via-indigo-950/10 dark:to-purple-950/10">
               {/* Modal Form Segmented Stepper Tabs */}
-              <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-2xl text-xs font-extrabold no-scrollbar overflow-x-auto border border-slate-200/80 dark:border-slate-800/80 shrink-0 shadow-inner-light">
+              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl text-xs font-bold no-scrollbar overflow-x-auto border border-slate-200/70 dark:border-slate-800/70 shrink-0">
                 {[
                   { id: 'basic', step: '01', label: 'Identity & Access' },
                   { id: 'position', step: '02', label: 'Position & Org' },
@@ -1135,13 +1136,13 @@ NexaHR Workforce Systems`;
                     key={tab.id}
                     type="button"
                     onClick={() => setOnboardTab(tab.id)}
-                    className={`flex-1 py-2.5 px-3 rounded-xl transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
+                    className={`flex-1 py-2 px-3 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
                       onboardTab === tab.id
-                        ? 'bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white shadow-md shadow-indigo-600/30 font-black'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-bold'
+                        ? 'bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white shadow-md shadow-indigo-600/25 font-bold'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium hover:bg-white/50 dark:hover:bg-slate-800/50'
                     }`}
                   >
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${onboardTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${onboardTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-800 text-slate-500'}`}>
                       {tab.step}
                     </span>
                     <span>{tab.label}</span>
@@ -1149,13 +1150,13 @@ NexaHR Workforce Systems`;
                 ))}
               </div>
 
-              <form onSubmit={handleOnboardSubmit} className="space-y-5 text-xs">
+              <form onSubmit={handleOnboardSubmit} className="space-y-4 text-xs">
                 {/* TAB 1: IDENTITY & ACCESS */}
                 {onboardTab === 'basic' && (
-                  <div className="space-y-4 animate-in fade-in">
+                  <div className="space-y-4 animate-in fade-in duration-150">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           First Name <span className="text-rose-500">*</span>
                         </label>
                         <input
@@ -1164,11 +1165,11 @@ NexaHR Workforce Systems`;
                           placeholder="e.g. Jordan"
                           value={onboardForm.firstName}
                           onChange={(e) => setOnboardForm({ ...onboardForm, firstName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Last Name <span className="text-rose-500">*</span>
                         </label>
                         <input
@@ -1177,14 +1178,14 @@ NexaHR Workforce Systems`;
                           placeholder="e.g. Hayes"
                           value={onboardForm.lastName}
                           onChange={(e) => setOnboardForm({ ...onboardForm, lastName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Work Email <span className="text-rose-500">*</span>
                         </label>
                         <input
@@ -1193,11 +1194,11 @@ NexaHR Workforce Systems`;
                           placeholder="jordan.h@company.com"
                           value={onboardForm.email}
                           onChange={(e) => setOnboardForm({ ...onboardForm, email: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Employee Code / ID
                         </label>
                         <input
@@ -1205,14 +1206,14 @@ NexaHR Workforce Systems`;
                           placeholder="EMP-108"
                           value={onboardForm.employeeCode}
                           onChange={(e) => setOnboardForm({ ...onboardForm, employeeCode: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-mono font-black focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Phone Number
                         </label>
                         <input
@@ -1220,17 +1221,17 @@ NexaHR Workforce Systems`;
                           placeholder="+1 (555) 019-2831"
                           value={onboardForm.phone}
                           onChange={(e) => setOnboardForm({ ...onboardForm, phone: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Role Authorization ACL
                         </label>
                         <select
                           value={onboardForm.role}
                           onChange={(e) => setOnboardForm({ ...onboardForm, role: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-extrabold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
                           <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
@@ -1240,10 +1241,10 @@ NexaHR Workforce Systems`;
                     </div>
 
                     {/* Tech Security Password Key Card */}
-                    <div className="p-4.5 rounded-3xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-purple-500/10 border border-amber-400/40 dark:border-amber-500/30 backdrop-blur-md space-y-3 relative overflow-hidden">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 space-y-2.5 relative overflow-hidden">
                       <div className="flex items-center justify-between">
-                        <label className="block text-slate-900 dark:text-white font-black text-xs flex items-center gap-2">
-                          <KeyRound className="w-4 h-4 text-amber-500" />
+                        <label className="block text-slate-900 dark:text-white font-bold text-xs flex items-center gap-2">
+                          <KeyRound className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                           <span>Enterprise Access Key / Default Password</span>
                         </label>
                         <button
@@ -1252,10 +1253,10 @@ NexaHR Workforce Systems`;
                             const rand = `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
                             setOnboardForm({ ...onboardForm, password: rand });
                           }}
-                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-[11px] shadow-sm hover:shadow-md hover:shadow-amber-500/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                          className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
-                          <span>Generate Secure Key</span>
+                          <span>Generate Key</span>
                         </button>
                       </div>
                       <input
@@ -1264,10 +1265,10 @@ NexaHR Workforce Systems`;
                         placeholder="e.g. Nexa#8421"
                         value={onboardForm.password}
                         onChange={(e) => setOnboardForm({ ...onboardForm, password: e.target.value })}
-                        className="w-full px-4 py-3 rounded-2xl bg-white dark:bg-slate-950 border border-amber-300 dark:border-amber-700/80 text-slate-900 dark:text-amber-400 font-mono font-black focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-xs tracking-wider"
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-indigo-200 dark:border-indigo-800 text-slate-900 dark:text-indigo-300 font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-xs tracking-wider"
                       />
-                      <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1.5">
-                        <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                        <ShieldAlert className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                         <span>Employee will be prompted to replace this default access key upon their initial sign-in.</span>
                       </p>
                     </div>
@@ -1276,16 +1277,16 @@ NexaHR Workforce Systems`;
 
                 {/* TAB 2: POSITION & ORGANIZATION */}
                 {onboardTab === 'position' && (
-                  <div className="space-y-4 animate-in fade-in">
+                  <div className="space-y-4 animate-in fade-in duration-150">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Department <span className="text-rose-500">*</span>
                         </label>
                         <select
                           value={onboardForm.departmentName}
                           onChange={(e) => setOnboardForm({ ...onboardForm, departmentName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-extrabold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           {deptOptions.map((d) => (
                             <option key={d} value={d}>
@@ -1295,7 +1296,7 @@ NexaHR Workforce Systems`;
                         </select>
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Designation / Position Title <span className="text-rose-500">*</span>
                         </label>
                         <input
@@ -1304,14 +1305,14 @@ NexaHR Workforce Systems`;
                           placeholder="e.g. Senior Full-Stack Engineer"
                           value={onboardForm.designationTitle}
                           onChange={(e) => setOnboardForm({ ...onboardForm, designationTitle: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Workplace Location
                         </label>
                         <input
@@ -1319,18 +1320,18 @@ NexaHR Workforce Systems`;
                           placeholder="San Francisco HQ (Floor 4) or Remote"
                           value={onboardForm.location}
                           onChange={(e) => setOnboardForm({ ...onboardForm, location: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Joining Date
                         </label>
                         <input
                           type="date"
                           value={onboardForm.joiningDate}
                           onChange={(e) => setOnboardForm({ ...onboardForm, joiningDate: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-xs cursor-pointer"
                         />
                       </div>
                     </div>
@@ -1339,16 +1340,18 @@ NexaHR Workforce Systems`;
 
                 {/* TAB 3: COMPENSATION & SALARY STRUCTURE */}
                 {onboardTab === 'salary' && (
-                  <div className="space-y-4 animate-in fade-in">
-                    <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/30 flex items-center justify-between">
+                  <div className="space-y-4 animate-in fade-in duration-150">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-purple-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <DollarSign className="w-6 h-6 text-emerald-500" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                          <DollarSign className="w-5 h-5" />
+                        </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white text-xs">PostgreSQL Payroll Matrix</div>
+                          <div className="font-extrabold text-slate-900 dark:text-white text-xs">Payroll Compensation Matrix</div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Automatic payroll sync & payslip generation</div>
                         </div>
                       </div>
-                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-300 dark:border-emerald-800">
+                      <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
                         Net: ${(
                           parseFloat(onboardForm.basicSalary || 0) +
                           parseFloat(onboardForm.housingAllowance || 0) +
@@ -1360,7 +1363,7 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Basic Base Salary ($/mo) <span className="text-rose-500">*</span>
                         </label>
                         <input
@@ -1368,11 +1371,11 @@ NexaHR Workforce Systems`;
                           placeholder="8500"
                           value={onboardForm.basicSalary}
                           onChange={(e) => setOnboardForm({ ...onboardForm, basicSalary: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-black focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Housing Allowance ($/mo)
                         </label>
                         <input
@@ -1380,14 +1383,14 @@ NexaHR Workforce Systems`;
                           placeholder="1200"
                           value={onboardForm.housingAllowance}
                           onChange={(e) => setOnboardForm({ ...onboardForm, housingAllowance: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Transport Allowance ($/mo)
                         </label>
                         <input
@@ -1395,11 +1398,11 @@ NexaHR Workforce Systems`;
                           placeholder="500"
                           value={onboardForm.transportAllowance}
                           onChange={(e) => setOnboardForm({ ...onboardForm, transportAllowance: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Estimated Tax Deductions ($/mo)
                         </label>
                         <input
@@ -1407,7 +1410,7 @@ NexaHR Workforce Systems`;
                           placeholder="950"
                           value={onboardForm.taxDeductions}
                           onChange={(e) => setOnboardForm({ ...onboardForm, taxDeductions: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
@@ -1416,16 +1419,16 @@ NexaHR Workforce Systems`;
 
                 {/* TAB 4: PERSONAL & EMERGENCY */}
                 {onboardTab === 'personal' && (
-                  <div className="space-y-4 animate-in fade-in">
+                  <div className="space-y-4 animate-in fade-in duration-150">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Gender
                         </label>
                         <select
                           value={onboardForm.gender}
                           onChange={(e) => setOnboardForm({ ...onboardForm, gender: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -1434,21 +1437,21 @@ NexaHR Workforce Systems`;
                         </select>
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Date of Birth
                         </label>
                         <input
                           type="date"
                           value={onboardForm.dateOfBirth}
                           onChange={(e) => setOnboardForm({ ...onboardForm, dateOfBirth: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-xs cursor-pointer"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Residential Address
                         </label>
                         <input
@@ -1456,11 +1459,11 @@ NexaHR Workforce Systems`;
                           placeholder="100 Market St, San Francisco, CA"
                           value={onboardForm.address}
                           onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
                           Emergency Contact Info
                         </label>
                         <input
@@ -1468,7 +1471,7 @@ NexaHR Workforce Systems`;
                           placeholder="Jane Doe (+1 555-0192)"
                           value={onboardForm.emergencyContact}
                           onChange={(e) => setOnboardForm({ ...onboardForm, emergencyContact: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
@@ -1476,7 +1479,7 @@ NexaHR Workforce Systems`;
                 )}
 
                 {/* Executive Form Actions Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
                   <div className="flex items-center gap-2">
                     {onboardTab !== 'basic' && (
                       <button
@@ -1486,7 +1489,7 @@ NexaHR Workforce Systems`;
                           const idx = tabs.indexOf(onboardTab);
                           if (idx > 0) setOnboardTab(tabs[idx - 1]);
                         }}
-                        className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                        className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors text-xs"
                       >
                         Previous
                       </button>
@@ -1499,7 +1502,7 @@ NexaHR Workforce Systems`;
                           const idx = tabs.indexOf(onboardTab);
                           if (idx < tabs.length - 1) setOnboardTab(tabs[idx + 1]);
                         }}
-                        className="px-4.5 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 cursor-pointer transition-all border border-indigo-200/50 dark:border-indigo-800/50"
+                        className="px-5 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 cursor-pointer transition-all border border-indigo-200/60 dark:border-indigo-800/60 text-xs"
                       >
                         Next Step →
                       </button>
@@ -1510,14 +1513,14 @@ NexaHR Workforce Systems`;
                     <button
                       type="button"
                       onClick={() => setIsOnboardOpen(false)}
-                      className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                      className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-7 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-black text-xs shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
                     >
                       {submitting ? (
                         <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1539,22 +1542,23 @@ NexaHR Workforce Systems`;
       {/* ========================================================================= */}
       {isEditOpen && editingEmployee && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-amber-950/20 dark:shadow-black/60 border border-amber-200/70 dark:border-amber-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
-            {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-amber-200/50 dark:border-amber-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-yellow-50/60 dark:from-slate-900/80 dark:via-amber-950/30 dark:to-slate-900/80 relative z-10 overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-64 h-64 bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-orange-300/20 dark:bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
+            {/* Ambient background blur orbs */}
+            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-400/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
 
+            {/* Modal Header */}
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/30 ring-4 ring-amber-100/70 dark:ring-amber-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
                   <Edit3 className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                     Edit Profile: {editForm.firstName} {editForm.lastName}
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
-                    Update role ACL authorizations, workplace position, compensation matrix, and personal directory information.
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                    Update role authorizations, workplace position, compensation matrix, and directory info.
                   </p>
                 </div>
               </div>
@@ -1567,9 +1571,9 @@ NexaHR Workforce Systems`;
             </div>
 
             {/* Scrollable Form Body */}
-            <div className="overflow-y-auto flex-1 p-6 sm:p-7 md:p-8 space-y-6 custom-scrollbar text-xs relative z-10">
+            <div className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-5 custom-scrollbar text-xs relative z-10 bg-gradient-to-b from-white/40 via-indigo-50/15 to-purple-50/20 dark:from-transparent dark:via-indigo-950/10 dark:to-purple-950/10">
               {/* Modal Segmented Stepper Tabs */}
-              <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-2xl text-xs font-extrabold no-scrollbar overflow-x-auto border border-slate-200/80 dark:border-slate-800/80 shrink-0 shadow-inner-light">
+              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl text-xs font-bold no-scrollbar overflow-x-auto border border-slate-200/70 dark:border-slate-800/70 shrink-0">
                 {[
                   { id: 'basic', step: '01', label: 'Identity & Role' },
                   { id: 'position', step: '02', label: 'Job Position' },
@@ -1580,13 +1584,13 @@ NexaHR Workforce Systems`;
                     key={tab.id}
                     type="button"
                     onClick={() => setEditTab(tab.id)}
-                    className={`flex-1 py-2.5 px-3.5 rounded-xl transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
+                    className={`flex-1 py-2 px-3 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
                       editTab === tab.id
-                        ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-md shadow-amber-500/30 font-black'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-bold'
+                        ? 'bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white shadow-md shadow-indigo-600/25 font-bold'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium hover:bg-white/50 dark:hover:bg-slate-800/50'
                     }`}
                   >
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${editTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${editTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-800 text-slate-500'}`}>
                       {tab.step}
                     </span>
                     <span>{tab.label}</span>
@@ -1594,62 +1598,62 @@ NexaHR Workforce Systems`;
                 ))}
               </div>
 
-              <form onSubmit={handleEditSubmit} className="space-y-5 text-xs">
+              <form onSubmit={handleEditSubmit} className="space-y-4 text-xs">
                 {/* EDIT TAB 1: IDENTITY & ROLE */}
                 {editTab === 'basic' && (
-                  <div className="space-y-4 animate-in fade-in">
+                  <div className="space-y-4 animate-in fade-in duration-150">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">First Name *</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">First Name *</label>
                         <input
                           type="text"
                           required
                           value={editForm.firstName || ''}
                           onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Last Name *</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Last Name *</label>
                         <input
                           type="text"
                           required
                           value={editForm.lastName || ''}
                           onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Work Email *</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Work Email *</label>
                         <input
                           type="email"
                           required
                           value={editForm.email || ''}
                           onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Employee Code</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Employee Code</label>
                         <input
                           type="text"
                           value={editForm.employeeCode || ''}
                           onChange={(e) => setEditForm({ ...editForm, employeeCode: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-mono font-bold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Role Authorization ACL</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Role Authorization ACL</label>
                         <select
                           value={editForm.role || 'EMPLOYEE'}
                           onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
                           <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
@@ -1657,11 +1661,11 @@ NexaHR Workforce Systems`;
                         </select>
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Employment Status</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Employment Status</label>
                         <select
                           value={editForm.isActive ? 'true' : 'false'}
                           onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'true' })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           <option value="true">Active & Verified Employee</option>
                           <option value="false">Inactive / Suspended</option>
@@ -1673,14 +1677,14 @@ NexaHR Workforce Systems`;
 
                 {/* EDIT TAB 2: JOB POSITION */}
                 {editTab === 'position' && (
-                  <div className="space-y-4 animate-in fade-in">
+                  <div className="space-y-4 animate-in fade-in duration-150">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Department</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Department</label>
                         <select
                           value={editForm.departmentName || 'Engineering'}
                           onChange={(e) => setEditForm({ ...editForm, departmentName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           {deptOptions.map((d) => (
                             <option key={d} value={d}>
@@ -1690,34 +1694,34 @@ NexaHR Workforce Systems`;
                         </select>
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Designation Title / Position</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Designation Title / Position</label>
                         <input
                           type="text"
                           required
                           value={editForm.designationTitle || ''}
                           onChange={(e) => setEditForm({ ...editForm, designationTitle: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Workplace Location</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Workplace Location</label>
                         <input
                           type="text"
                           value={editForm.location || ''}
                           onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Joining Date</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Joining Date</label>
                         <input
                           type="date"
                           value={editForm.joiningDate || ''}
                           onChange={(e) => setEditForm({ ...editForm, joiningDate: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-xs cursor-pointer"
                         />
                       </div>
                     </div>
@@ -1726,14 +1730,19 @@ NexaHR Workforce Systems`;
 
                 {/* EDIT TAB 3: COMPENSATION & SALARY */}
                 {editTab === 'salary' && (
-                  <div className="space-y-4 animate-in fade-in">
-                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                        <span className="font-bold text-emerald-900 dark:text-emerald-200 text-xs">Payroll Compensation Matrix</span>
+                  <div className="space-y-4 animate-in fade-in duration-150">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-purple-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                          <DollarSign className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-extrabold text-slate-900 dark:text-white text-xs">Payroll Compensation Matrix</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Automatic payroll sync & calculation</div>
+                        </div>
                       </div>
-                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
-                        Calculated Net: ${(
+                      <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+                        Net: ${(
                           parseFloat(editForm.basicSalary || 0) +
                           parseFloat(editForm.housingAllowance || 0) +
                           parseFloat(editForm.transportAllowance || 0) -
@@ -1744,42 +1753,42 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Basic Base Salary ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Basic Base Salary ($/mo)</label>
                         <input
                           type="number"
                           value={editForm.basicSalary || ''}
                           onChange={(e) => setEditForm({ ...editForm, basicSalary: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Housing Allowance ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Housing Allowance ($/mo)</label>
                         <input
                           type="number"
                           value={editForm.housingAllowance || ''}
                           onChange={(e) => setEditForm({ ...editForm, housingAllowance: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Transport Allowance ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Transport Allowance ($/mo)</label>
                         <input
                           type="number"
                           value={editForm.transportAllowance || ''}
                           onChange={(e) => setEditForm({ ...editForm, transportAllowance: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Tax Deductions ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Tax Deductions ($/mo)</label>
                         <input
                           type="number"
                           value={editForm.taxDeductions || ''}
                           onChange={(e) => setEditForm({ ...editForm, taxDeductions: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
@@ -1788,23 +1797,23 @@ NexaHR Workforce Systems`;
 
                 {/* EDIT TAB 4: PERSONAL & CONTACT */}
                 {editTab === 'personal' && (
-                  <div className="space-y-4 animate-in fade-in">
+                  <div className="space-y-4 animate-in fade-in duration-150">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Phone Number</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Phone Number</label>
                         <input
                           type="text"
                           value={editForm.phone || ''}
                           onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Gender</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Gender</label>
                         <select
                           value={editForm.gender || 'Not Specified'}
                           onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
                         >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -1816,21 +1825,21 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Residential Address</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Residential Address</label>
                         <input
                           type="text"
                           value={editForm.address || ''}
                           onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-extrabold mb-1.5 uppercase tracking-wider text-[11px]">Emergency Contact Info</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Emergency Contact Info</label>
                         <input
                           type="text"
                           value={editForm.emergencyContact || ''}
                           onChange={(e) => setEditForm({ ...editForm, emergencyContact: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white font-semibold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
                         />
                       </div>
                     </div>
@@ -1838,11 +1847,11 @@ NexaHR Workforce Systems`;
                 )}
 
                 {/* Form Actions Footer */}
-                <div className="flex items-center justify-between pt-5 border-t border-slate-100 dark:border-slate-800/80">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
                   <button
                     type="button"
                     onClick={() => setIsEditOpen(false)}
-                    className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 font-extrabold hover:bg-slate-200 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                   >
                     Cancel
                   </button>
@@ -1851,7 +1860,7 @@ NexaHR Workforce Systems`;
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-8 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
                     >
                       {submitting ? (
                         <RefreshCw className="w-4 h-4 animate-spin" />
