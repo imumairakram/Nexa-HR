@@ -78,7 +78,7 @@ const SEARCH_SHORTCUTS = [
   { label: 'New Employee Onboarding', icon: User, path: '/app/hr/new-employee', category: 'HR' },
   { label: 'Company Directory & Team', icon: Users, path: '/app/employees', category: 'HR' },
   { label: 'Department Management', icon: Building2, path: '/app/departments', category: 'HR' },
-  { label: 'Designations', icon: Building2, path: '/app/hr/designation', category: 'HR' },
+  { label: 'Designations & Roles', icon: Building2, path: '/app/departments', category: 'HR' },
   { label: 'Attendance & Logs', icon: Clock, path: '/app/attendance', category: 'Attendance' },
   { label: 'Employment Status', icon: User, path: '/app/employment-status', category: 'Attendance' },
   { label: 'Leave Requests', icon: FileText, path: '/app/leaves', category: 'Leaves' },

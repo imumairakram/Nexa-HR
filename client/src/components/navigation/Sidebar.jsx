@@ -92,7 +92,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
         { label: 'New Employee', path: '/app/hr/new-employee' },
         { label: 'Company Directory & Team', path: '/app/employees' },
         { label: 'Department', path: '/app/departments' },
-        { label: 'Designation', path: '/app/hr/designation' },
       ],
     },
 

@@ -18,7 +18,6 @@ import UserAccessControl from './pages/app/UserAccessControl';
 
 // HR Sub-pages
 import NewEmployee from './pages/app/hr/NewEmployee';
-import Designation from './pages/app/hr/Designation';
 
 // Attendance & Schedule
 import EmploymentStatus from './pages/app/EmploymentStatus';
@@ -101,10 +100,10 @@ function App() {
           <Route path="hr/roles" element={<Navigate to="/app/employees" replace />} />
           <Route path="hr/department" element={<Navigate to="/app/departments" replace />} />
           <Route path="hr/departments" element={<Navigate to="/app/departments" replace />} />
-          <Route path="hr/designation" element={<Designation />} />
-          <Route path="hr/designations" element={<Navigate to="/app/hr/designation" replace />} />
-          <Route path="designation" element={<Navigate to="/app/hr/designation" replace />} />
-          <Route path="designations" element={<Navigate to="/app/hr/designation" replace />} />
+          <Route path="hr/designation" element={<Navigate to="/app/departments" replace />} />
+          <Route path="hr/designations" element={<Navigate to="/app/departments" replace />} />
+          <Route path="designation" element={<Navigate to="/app/departments" replace />} />
+          <Route path="designations" element={<Navigate to="/app/departments" replace />} />
 
           {/* Attendance & Schedule */}
           <Route path="attendance" element={<Attendance />} />

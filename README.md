@@ -239,7 +239,7 @@ NexaHR/
 │   │   │   │   ├── Accounts.jsx            # Company Accounts & Ledger Management
 │   │   │   │   ├── Announcement.jsx        # Admin Circulars & Bulletins
 │   │   │   │   ├── holiday/                # Public Holidays Planner
-│   │   │   │   ├── hr/                     # Designation Hierarchy & New Employee Wizard
+│   │   │   │   ├── hr/                     # New Employee Onboarding Wizard
 │   │   │   │   ├── payroll/                # Calculate Payroll & Payslip List
 │   │   │   │   └── recruitment/            # Recruitment ATS Desk, Board & Jobs Catalog
 │   │   │   └── employee/                   # Employee Self-Service Pages
