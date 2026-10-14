@@ -28,6 +28,7 @@ import {
   FileCheck,
   Building,
   Zap,
+  Trash2,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -97,50 +98,6 @@ const DEFAULT_PERSONAL_DOCS = [
     issuer: 'NexaHR People Operations',
     description: 'Signed full-time indefinite employment agreement with job scope, compensation tier, and organizational charter.',
   },
-  {
-    id: 'DOC-102',
-    title: 'Annual Compensation & Equity Grant FY26',
-    type: 'COMPENSATION',
-    typeLabel: 'Compensation Grant',
-    issueDate: 'Apr 01, 2026',
-    size: '850 KB',
-    status: 'VERIFIED',
-    issuer: 'Executive Board & Remuneration Committee',
-    description: 'Annual salary revision statement, performance bonus tier, and stock option vesting schedule breakdown.',
-  },
-  {
-    id: 'DOC-103',
-    title: 'Signed Non-Disclosure & IP Assignment (NDA)',
-    type: 'LEGAL',
-    typeLabel: 'Legal & Compliance',
-    issueDate: 'Mar 15, 2022',
-    size: '1.1 MB',
-    status: 'VERIFIED',
-    issuer: 'Corporate Legal Dept',
-    description: 'Intellectual property ownership assignment and proprietary code confidentiality charter.',
-  },
-  {
-    id: 'DOC-104',
-    title: 'Tax Withholding & Annual Deduction Summary (W-2)',
-    type: 'TAX_FORM',
-    typeLabel: 'Statutory Tax Certificate',
-    issueDate: 'Jan 31, 2026',
-    size: '620 KB',
-    status: 'VERIFIED',
-    issuer: 'Finance & Payroll Operations',
-    description: 'Annual statutory tax deduction certificate for individual income tax return filing.',
-  },
-  {
-    id: 'DOC-105',
-    title: 'AWS Certified Solutions Architect Certificate',
-    type: 'CERTIFICATE',
-    typeLabel: 'Professional Certificate',
-    issueDate: 'May 10, 2025',
-    size: '1.5 MB',
-    status: 'VERIFIED',
-    issuer: 'Amazon Web Services',
-    description: 'Verified professional cloud architecture certification accredited by AWS training partner network.',
-  },
 ];
 
 const EmployeeDocuments = () => {
@@ -148,7 +105,16 @@ const EmployeeDocuments = () => {
   const [personalDocs, setPersonalDocs] = useState(() => {
     try {
       const saved = localStorage.getItem('nexahr_personal_docs');
-      return saved ? JSON.parse(saved) : DEFAULT_PERSONAL_DOCS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const deletedIds = ['DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'];
+        const cleaned = parsed.filter((d) => !deletedIds.includes(d.id));
+        if (cleaned.length !== parsed.length) {
+          localStorage.setItem('nexahr_personal_docs', JSON.stringify(cleaned));
+        }
+        return cleaned;
+      }
+      return DEFAULT_PERSONAL_DOCS;
     } catch {
       return DEFAULT_PERSONAL_DOCS;
     }
@@ -193,6 +159,12 @@ const EmployeeDocuments = () => {
     } catch (e) {
       console.warn('LocalStorage error:', e);
     }
+  };
+
+  const handleDeleteDoc = (docId) => {
+    const updated = personalDocs.filter((d) => d.id !== docId);
+    savePersonalDocs(updated);
+    showToast('Document deleted from personal vault');
   };
 
   const handleUploadSubmit = (e) => {
@@ -621,6 +593,13 @@ const EmployeeDocuments = () => {
                             <Download className="w-3 h-3" />
                             <span>Download</span>
                           </button>
+                          <button
+                            onClick={() => handleDeleteDoc(doc.id)}
+                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                            title="Delete Document"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -653,13 +632,22 @@ const EmployeeDocuments = () => {
 
                   <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
                     <span className="text-[11px] text-slate-400 font-mono">{doc.size}</span>
-                    <button
-                      onClick={() => handleDownload(doc)}
-                      className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDeleteDoc(doc.id)}
+                        className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 transition-colors cursor-pointer"
+                        title="Delete Document"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDownload(doc)}
+                        className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
