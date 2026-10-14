@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'nexahr_saas_super_secret_jwt_key_2026';
-const JWT_EXPIRES_IN = '24h'; // Strict 24-hour session lifespan
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h'; // Strict 1-hour session lifespan
 
 /**
- * Standard Auth Token for logged-in sessions (24 Hours lifespan)
+ * Standard Auth Token for logged-in sessions (1 Hour lifespan)
  */
 const generateToken = (payload) => {
   return jwt.sign(

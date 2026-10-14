@@ -59,8 +59,13 @@ import EmployeeDocuments from './pages/employee/EmployeeDocuments';
 import EmployeeProfile from './pages/employee/EmployeeProfile';
 import EmployeeSettings from './pages/employee/EmployeeSettings';
 
+import { isSessionValid } from './utils/session';
+
 // Admin Route Guard Component - strictly for System Admin (ADMIN)
 const AdminRoute = ({ children }) => {
+  if (!isSessionValid()) {
+    return <Navigate to="/?expired=1" replace />;
+  }
   try {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const isAdmin = user.role === 'ADMIN';

@@ -4,9 +4,16 @@ import EmployeeSidebar from '../components/navigation/EmployeeSidebar';
 import EmployeeBottomNav from '../components/navigation/EmployeeBottomNav';
 import ErrorBoundary from '../components/common/ErrorBoundary';
 import FirstLoginPasswordModal from '../components/common/FirstLoginPasswordModal';
+import { isSessionValid, useSessionExpiry } from '../utils/session';
 
 const EmployeeLayout = () => {
-  const [authToken] = useState(() => localStorage.getItem('token'));
+  const valid = isSessionValid();
+
+  // Active 1-Hour Session Timer: auto-expires and redirects when lifespan ends
+  useSessionExpiry(() => {
+    window.location.href = '/?expired=1';
+  });
+
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try {
       return localStorage.getItem('nexahr_employee_sidebar_collapsed') === 'true';
@@ -27,8 +34,8 @@ const EmployeeLayout = () => {
     });
   };
 
-  if (!authToken) {
-    return <Navigate to="/" replace />;
+  if (!valid) {
+    return <Navigate to="/?expired=1" replace />;
   }
 
   return (

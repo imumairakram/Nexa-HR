@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { clearSession } from '../../utils/session';
 import {
   Search,
   Bell,
@@ -278,19 +279,10 @@ const AppPageHeader = ({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('user_avatar');
-    // Clear all user-scoped cached avatars
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('user_avatar_')) {
-        localStorage.removeItem(key);
-      }
-    });
-    sessionStorage.clear();
+    api.logout().catch(() => {});
+    clearSession();
     setCurrentUser(null);
     setUserAvatar(null);
-    window.dispatchEvent(new Event('user_profile_updated'));
     window.location.href = '/';
   };
 
@@ -381,22 +373,20 @@ const AppPageHeader = ({
         </div>
       )}
 
-      {/* Top Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Left Side Title & Subtitle Date */}
-        <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+      {/* Top Header Row: Responsive Grid on Mobile, Flex on Desktop */}
+      <div className="grid grid-cols-[1fr_auto] gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 w-full">
+        {/* Left Side Title & Subtitle Date: Row 1 Col 1 on Mobile, Left flex on Desktop */}
+        <div className="col-start-1 row-start-1 min-w-0 sm:flex-1 sm:order-1">
+          <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
             {title}
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 sm:line-clamp-none">
             {displaySubtitle}
           </p>
         </div>
-
-        {/* Right Side Controls */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
-          {/* Search Bar & Interactive Palette */}
-          <div className="relative min-w-[140px] sm:w-56 md:w-64 lg:w-72" ref={searchRef}>
+        {/* Search Bar: Row 2 Col-span-2 on Mobile, Center/Right on Desktop */}
+        <div className="col-span-2 sm:col-auto w-full sm:w-auto flex items-center gap-2 sm:gap-3 sm:order-2 shrink-0">
+          <div className="relative w-full sm:w-56 md:w-64 lg:w-72" ref={searchRef}>
             <div className="relative flex items-center">
               <input
                 ref={inputRef}
@@ -469,6 +459,7 @@ const AppPageHeader = ({
               </div>
             )}
           </div>
+        </div>
 
           {/* Refresh Button */}
           <button

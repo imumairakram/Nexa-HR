@@ -1,5 +1,6 @@
 // Centralized High-Performance API Client for NexaHR Frontend Integration
 // Features: In-memory SWR caching, in-flight deduplication, and instant mutation invalidation.
+import { startSession, isSessionValid, clearSession } from '../utils/session';
 
 const rawBase = import.meta.env.VITE_API_URL || '';
 const BASE_URL = rawBase ? (rawBase.endsWith('/api') ? rawBase : `${rawBase.replace(/\/+$/, '')}/api`) : '/api';
@@ -61,7 +62,18 @@ async function fetchAPI(endpoint, options = {}) {
     }
   }
 
+  // Check if session has expired (1-hour window) before issuing authenticated API requests
   const token = localStorage.getItem('token');
+  const isAuthEndpoint = endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/forgot-password') || endpoint.startsWith('/auth/verify-otp') || endpoint.startsWith('/auth/reset-password');
+
+  if (token && !isAuthEndpoint && !isSessionValid()) {
+    clearSession('Your 1-hour session has expired. Please log in again.');
+    if (typeof window !== 'undefined' && window.location.pathname !== '/' && window.location.pathname !== '/login') {
+      window.location.href = '/?expired=1';
+    }
+    throw new Error('Your 1-hour session has expired. Please log in again.');
+  }
+
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -88,8 +100,12 @@ async function fetchAPI(endpoint, options = {}) {
       }
 
       if (!response.ok) {
-        if (response.status === 401 && endpoint !== '/auth/login') {
+        if (response.status === 401 && !isAuthEndpoint) {
           console.warn('Authentication expired or unauthorized on endpoint:', endpoint);
+          clearSession('Your 1-hour session has expired. Please log in again.');
+          if (typeof window !== 'undefined' && window.location.pathname !== '/' && window.location.pathname !== '/login') {
+            window.location.href = '/?expired=1';
+          }
         }
         throw new Error(data.message || `Server error (${response.status})`);
       }
@@ -163,9 +179,7 @@ export const api = {
       body: JSON.stringify(credentials),
     });
     if (res.data?.token) {
-      localStorage.removeItem('user_avatar');
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
     }
     return res;
   },
@@ -176,11 +190,19 @@ export const api = {
       body: JSON.stringify(adminData),
     });
     if (res.data?.token) {
-      localStorage.removeItem('user_avatar');
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
     }
     return res;
+  },
+
+  logout: async () => {
+    try {
+      await fetchAPI('/auth/logout', { method: 'POST' });
+    } catch {
+      // Continue client cleanup even if network fails
+    } finally {
+      clearSession();
+    }
   },
 
   getMe: async () => {

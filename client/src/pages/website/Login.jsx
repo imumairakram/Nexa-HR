@@ -19,11 +19,14 @@ import {
   Sparkles,
   Zap,
   ArrowRight,
+  Clock,
+  X,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import Logo from '../../components/common/Logo';
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal';
+import { isSessionValid, clearSession, consumeSessionExpiredNotice } from '../../utils/session';
 
 
 // High-fidelity SVG Donut Chart for Workforce Presence
@@ -89,6 +92,23 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
+  const [sessionExpiredNotice, setSessionExpiredNotice] = useState(null);
+
+  // Check for expired session query param or stored notice on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const noticeFromStorage = consumeSessionExpiredNotice();
+    if (params.get('expired') === '1' || noticeFromStorage) {
+      setSessionExpiredNotice(
+        noticeFromStorage || 'Your 1-hour session has expired for security. Please sign in again.'
+      );
+      // Clean query param from URL without reload
+      try {
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, '', cleanUrl);
+      } catch { }
+    }
+  }, []);
 
   // Handle Tab Switch
   const handleRoleTabChange = (role) => {
@@ -130,9 +150,9 @@ const Login = () => {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  // If already authenticated, redirect to appropriate portal
-  const token = localStorage.getItem('token');
-  if (token) {
+  // If already authenticated with an active valid 1-hour session, redirect to portal
+  const hasValidSession = isSessionValid();
+  if (hasValidSession) {
     let storedRole = 'ADMIN';
     try {
       const u = JSON.parse(localStorage.getItem('user'));
@@ -157,14 +177,12 @@ const Login = () => {
 
         // Strict role validation guard against cross-portal login
         if (loginRole === 'hr' && userRole === 'EMPLOYEE') {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          clearSession();
           setError('Access denied: Employee accounts cannot sign in through the HR Admin portal. Please switch to the Employee tab.');
           return;
         }
         if (loginRole === 'employee' && (userRole === 'ADMIN' || userRole === 'HR_MANAGER')) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          clearSession();
           setError('Access denied: Administrator accounts cannot sign in through the Employee portal. Please switch to the HR Admin tab.');
           return;
         }
@@ -301,6 +319,24 @@ const Login = () => {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* 1-Hour Session Expired Alert Notification Banner */}
+              {sessionExpiredNotice && (
+                <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 text-xs font-semibold border border-amber-200/80 dark:border-amber-800/60 flex items-start sm:items-center justify-between gap-2 shadow-sm animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>{sessionExpiredNotice}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSessionExpiredNotice(null)}
+                    className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 p-0.5 rounded cursor-pointer transition-colors"
+                    title="Dismiss"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
               {resetSuccessNotification && (
                 <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold text-center border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />

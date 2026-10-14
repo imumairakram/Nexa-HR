@@ -23,7 +23,7 @@ const getCookieOptions = () => {
     httpOnly: true, // Mitigates XSS token theft
     secure: isProduction, // HTTPS only in production
     sameSite: isProduction ? 'strict' : 'lax', // Mitigates CSRF
-    maxAge: 24 * 60 * 60 * 1000, // Strict 24 Hours
+    maxAge: 60 * 60 * 1000, // Strict 1 Hour session lifespan (3,600,000 ms)
     path: '/',
   };
 };
@@ -102,6 +102,7 @@ const registerAdmin = async (req, res) => {
       message: 'System Administrator registered successfully.',
       data: {
         token, // Provided for API/mobile interoperability
+        expiresIn: 3600, // Strict 1-hour validity window (seconds)
         user: {
           id: user.id,
           employeeCode: user.employeeCode,
@@ -206,6 +207,7 @@ const login = async (req, res) => {
         message: 'Login successful.',
         data: {
           token,
+          expiresIn: 3600, // Strict 1-hour validity window (seconds)
           user: {
             id: user.id,
             employeeCode: user.employeeCode,
@@ -281,6 +283,7 @@ const login = async (req, res) => {
       message: 'Login successful.',
       data: {
         token, // Included for backward compatibility with clients passing Authorization header
+        expiresIn: 3600, // Strict 1-hour validity window (seconds)
         user: {
           id: user.id,
           employeeCode: user.employeeCode,

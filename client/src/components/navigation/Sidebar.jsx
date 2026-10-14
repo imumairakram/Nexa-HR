@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { clearSession } from '../../utils/session';
+import { api } from '../../services/api';
 import {
   LayoutGrid,
   Users,
@@ -62,16 +64,8 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('user_avatar');
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('user_avatar_')) {
-        localStorage.removeItem(key);
-      }
-    });
-    sessionStorage.clear();
-    window.dispatchEvent(new Event('user_profile_updated'));
+    api.logout().catch(() => {});
+    clearSession();
     window.location.href = '/';
   };
 

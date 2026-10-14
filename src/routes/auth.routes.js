@@ -29,7 +29,7 @@ const {
 // ====================================================
 router.post('/register-admin', registerAdmin);
 router.post('/login', authRateLimiter, loginValidationRules, login);
-router.post('/logout', verifyToken, logout);
+router.post('/logout', logout);
 router.get('/me', verifyToken, getMe);
 router.put('/profile', verifyToken, updateMyProfile);
 router.put('/change-password', verifyToken, changeMyPassword);
