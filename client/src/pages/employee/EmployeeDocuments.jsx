@@ -89,14 +89,25 @@ const COMPANY_POLICIES = [
 const DEFAULT_PERSONAL_DOCS = [
   {
     id: 'DOC-101',
-    title: 'Official Employment Contract & Offer Letter',
+    title: 'Official Employment Agreement & Contract',
     type: 'CONTRACT',
-    typeLabel: 'Employment Contract',
+    typeLabel: 'Employment Agreement',
     issueDate: 'Mar 15, 2022',
     size: '2.4 MB',
     status: 'VERIFIED',
     issuer: 'NexaHR People Operations',
-    description: 'Signed full-time indefinite employment agreement with job scope, compensation tier, and organizational charter.',
+    description: 'Signed full-time indefinite employment agreement with job scope, confidentiality, and organizational charter.',
+  },
+  {
+    id: 'DOC-102',
+    title: 'Official Job Offer Letter & Appointment Order',
+    type: 'OFFER_LETTER',
+    typeLabel: 'Offer Letter',
+    issueDate: 'Oct 14, 2026',
+    size: '1.6 MB',
+    status: 'VERIFIED',
+    issuer: 'NexaHR Talent Acquisition & People Operations',
+    description: 'Official verified appointment letter with comprehensive breakdown of designation, annualized salary structure, equity vesting, joining benefits, and corporate terms.',
   },
 ];
 
@@ -107,12 +118,16 @@ const EmployeeDocuments = () => {
       const saved = localStorage.getItem('nexahr_personal_docs');
       if (saved) {
         const parsed = JSON.parse(saved);
-        const deletedIds = ['DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'];
-        const cleaned = parsed.filter((d) => !deletedIds.includes(d.id));
-        if (cleaned.length !== parsed.length) {
-          localStorage.setItem('nexahr_personal_docs', JSON.stringify(cleaned));
-        }
-        return cleaned;
+        const filtered = parsed.filter(
+          (d) =>
+            !['DOC-103', 'DOC-104', 'DOC-105'].includes(d.id) &&
+            !(d.id === 'DOC-102' && d.title?.includes('Compensation'))
+        );
+        const hasOffer = filtered.some((d) => d.id === 'DOC-102' || d.type === 'OFFER_LETTER');
+        const offerDoc = DEFAULT_PERSONAL_DOCS.find((d) => d.id === 'DOC-102');
+        const updated = hasOffer ? filtered : [...filtered, offerDoc].filter(Boolean);
+        localStorage.setItem('nexahr_personal_docs', JSON.stringify(updated));
+        return updated;
       }
       return DEFAULT_PERSONAL_DOCS;
     } catch {
@@ -180,10 +195,14 @@ const EmployeeDocuments = () => {
       title: uploadForm.title.trim(),
       type: uploadForm.type,
       typeLabel:
-        uploadForm.type === 'CERTIFICATE'
+        uploadForm.type === 'OFFER_LETTER'
+          ? 'Offer Letter'
+          : uploadForm.type === 'CERTIFICATE'
           ? 'Professional Certificate'
           : uploadForm.type === 'IDENTIFICATION'
           ? 'National ID / Passport'
+          : uploadForm.type === 'CONTRACT'
+          ? 'Employment Agreement'
           : 'Official Document',
       issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       size: uploadForm.file ? `${(uploadForm.file.size / (1024 * 1024)).toFixed(1)} MB` : '1.4 MB',
@@ -791,13 +810,14 @@ const EmployeeDocuments = () => {
                   <span className="text-[10px] text-slate-400 font-normal">Select the file classification</span>
                 </label>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3">
                   {[
-                    { id: 'CERTIFICATE', label: 'Professional Certificate', icon: Award, desc: 'AWS, Scrum, PMP, CFA' },
-                    { id: 'IDENTIFICATION', label: 'National ID / Passport', icon: ShieldCheck, desc: 'Passport, CNIC, License' },
-                    { id: 'ACADEMIC', label: 'Academic Transcript', icon: BookOpen, desc: 'Degrees & Diplomas' },
-                    { id: 'TAX_FORM', label: 'Tax Certificate', icon: FileSpreadsheet, desc: 'W-2, 1099, Deductions' },
-                    { id: 'CONTRACT', label: 'Agreement & NDA', icon: FileCheck, desc: 'Signed contracts & NDAs' },
+                    { id: 'OFFER_LETTER', label: 'Offer Letter', icon: FileText, desc: 'Appointment & terms' },
+                    { id: 'CONTRACT', label: 'Agreement & NDA', icon: FileCheck, desc: 'Signed contracts' },
+                    { id: 'CERTIFICATE', label: 'Certificate', icon: Award, desc: 'AWS, Scrum, PMP' },
+                    { id: 'IDENTIFICATION', label: 'National ID', icon: ShieldCheck, desc: 'Passport, CNIC' },
+                    { id: 'ACADEMIC', label: 'Academic', icon: BookOpen, desc: 'Degrees & Diplomas' },
+                    { id: 'TAX_FORM', label: 'Tax Form', icon: FileSpreadsheet, desc: 'W-2, 1099' },
                   ].map((cat) => {
                     const CatIcon = cat.icon;
                     const isSelected = uploadForm.type === cat.id;
