@@ -461,8 +461,11 @@ const AppPageHeader = ({
           </div>
         </div>
 
+        {/* Utility Action Buttons: Row 1 Col 2 on Mobile, Right side on Desktop */}
+        <div className="col-start-2 row-start-1 self-start justify-self-end flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap sm:order-3">
           {/* Refresh Button */}
           <button
+            type="button"
             onClick={handleRefreshClick}
             title="Refresh Data"
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-sm border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95"
@@ -476,6 +479,7 @@ const AppPageHeader = ({
 
           {/* Theme Switcher Toggle */}
           <button
+            type="button"
             onClick={toggleTheme}
             title={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-sm border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95"
@@ -490,6 +494,7 @@ const AppPageHeader = ({
           {/* Notification Icon & Dropdown */}
           <div className="relative" ref={notifyRef}>
             <button
+              type="button"
               onClick={() => setIsNotifyOpen(!isNotifyOpen)}
               title="Notifications"
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-sm border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer active:scale-95"
@@ -501,7 +506,7 @@ const AppPageHeader = ({
             </button>
 
             {isNotifyOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto sm:right-0 top-16 sm:top-auto sm:mt-2 sm:w-80 bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-3">
                   <div className="flex items-center gap-2">
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white">System Notifications</h4>
@@ -600,6 +605,7 @@ const AppPageHeader = ({
           {/* User Profile Circular Avatar Button */}
           <div className="relative" ref={profileRef}>
             <button
+              type="button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               title={userFullName}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 p-0.5 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all cursor-pointer shrink-0 flex items-center justify-center overflow-hidden active:scale-95"
@@ -615,7 +621,7 @@ const AppPageHeader = ({
             </button>
 
             {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto sm:right-0 top-16 sm:top-auto sm:mt-2 sm:w-56 bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                   <img
                     src={userAvatar || DEFAULT_AVATAR}
