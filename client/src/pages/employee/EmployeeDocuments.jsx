@@ -1008,14 +1008,9 @@ const EmployeeDocuments = () => {
                   <FileText className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-teal-100/80 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
-                      {selectedDoc.typeLabel || selectedDoc.type}
-                    </span>
-                    <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate">
-                      {selectedDoc.title}
-                    </h3>
-                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate">
+                    {selectedDoc.title}
+                  </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
                     Issuer: <strong className="text-slate-800 dark:text-slate-100 font-bold">{selectedDoc.issuer}</strong>
                   </p>
