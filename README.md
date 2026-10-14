@@ -47,14 +47,14 @@
   │   🏢 HR Executive Command Center                👤 Employee Self-Service (ESS)          │
   │     • 360° Workforce Intelligence & BI            • Live Punch Terminal & Sessions      │
   │     • 6-Tab Employee Dossier & PIM                • Overtime & Regularization Logs      │
-  │     • Hardware Biometric Gateway Sync             • Interactive Leave Quota Meters      │
+  │     • Hardware Biometric Gateway & Batch Punch    • Interactive Leave Quota Meters      │
   │     • Dynamic Payroll & Auto-Tax Processor        • Printable PDF-Styled Payslip Vault  │
   │     • Full Recruitment ATS & Interview Desk       • Team Roster & Live Presence         │
   │     • Company Accounts, Ledgers & Audits          • Helpdesk & IT Service Desk          │
   │     • User Access Control (Granular RBAC)         • Encrypted Document Vault & Policies │
-  │     • Corporate Announcements & Bulletins         • Holiday Countdown & Weekend Planner │
-  │     • In-App Notifications Hub                    • Vector Sparkline Analytics & Cards  │
-  │     • Zero-Layout-Shift Shimmer Skeleton Loading  • Multi-Currency Regional Preferences │
+  │     • Sub-Millisecond In-Memory Smart Caching     • Holiday Countdown & Weekend Planner │
+  │     • Zero-Layout-Shift Shimmer Skeleton Loading  • First-Login Password Hardening      │
+  │     • Render Free-Tier Keep-Alive Daemon          • Multi-Currency Regional Preferences │
   └─────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -68,13 +68,13 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Workforce Intelligence & BI Dashboard**: Headcount analytics, gender distribution, department distribution charts, live presence gauge, quick action shortcuts, and recruitment pipeline status.
 * **Personnel Information Management (PIM)**: Complete employee directory with 6-tab dossiers (Personal, Professional, Financial, Documents, Assets, Emergency Contact), search, department filtering, and status management.
 * **Multi-Step Onboarding Engine**: Guided employee onboarding wizard with profile picture upload, salary structure configuration, and automated account credential generation.
-* **Biometric & Geo Attendance Control**: Live biometric hardware gateway integration, daily punch logs, overtime records, and shift tracking (Present, Late, Half-Day, Absent, On Leave).
+* **Biometric & Geo Attendance Control**: Live biometric hardware gateway integration (`/api/attendance/hardware-sync`), daily punch logs, batch punch-in for active personnel (`/api/attendance/punch-all-today`), overtime records, and shift tracking (Present, Late, Half-Day, Absent, On Leave).
 * **Leave Management & Policy Engine**: Global leave quota rules, paid/unpaid policies, multi-tier approval workflows, and audit history.
 * **Automated Payroll & Tax Computation**: Dynamic allowances (HRA, transport, custom), tax deductions, unpaid leave penalties, and one-click monthly batch payslip generation.
 * **Recruitment & Applicant Tracking System (ATS)**: Job Desk, Job Board, Jobs catalog, Applicant pipeline stages, Candidate interview scheduler, Job categories, Skills matrix, Location manager, and Experience tags.
 * **Organization Hierarchy & Designations**: Dynamic department creation, designation hierarchy mapping, and team reporting structure.
 * **User Access Control & Security**: Fine-grained Role-Based Access Control (RBAC) permission matrices, user status activation/deactivation, and security audit logs.
-* **Accounts, Ledgers & Financial Audits**: Departmental cost tracking, payroll disbursement logs, expense accounts, and exportable financial summaries.
+* **Accounts, Ledgers & Financial Audits**: Departmental cost tracking, payroll disbursement logs, expense accounts, batch operations, and exportable financial summaries.
 * **Corporate Announcements**: Rich-text company broadcasts, department targeting, priority tags, and pinning capabilities.
 
 ### 👤 Employee Self-Service (ESS) Portal (`/employee/*`)
@@ -83,8 +83,8 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Smart Leave Manager**: Visual quota progress meters (Annual, Casual, Sick, Parental), instant date duration calculations, reason attachments, and approval tracking.
 * **Interactive Payslip Vault**: Detailed earnings vs. deductions breakdown, year-to-date (YTD) salary trends, and pixel-perfect PDF-styled printable payslip view.
 * **Company Team Directory & Roster**: Searchable colleague directory filtered by department and live presence (In Office, Remote, On Leave), with direct email actions.
-* **Helpdesk & HR Service Desk**: Multi-category support ticket creation (HR, IT Hardware, Payroll, Benefits), priority levels, and live conversation threads.
-* **Encrypted Documents & Policy Center**: Personal contracts, signed NDAs, tax forms, certificate upload modal, and company policy handbook repository.
+* **Helpdesk & HR Service Desk**: Multi-category support ticket creation (HR, IT Hardware, Payroll, Benefits), priority levels, resolution status tracking, and threaded conversations.
+* **Encrypted Document Vault & Policy Center**: Personal contracts, signed NDAs, tax forms, certificate upload modal with type filtering, and company policy handbook repository (Code of Conduct, Benefits Guide, Remote Work Policy, InfoSec Charter).
 * **Holiday Schedule & Long Weekend Planner**: Next holiday countdown hero banner, full official calendar, and long weekend optimization badges.
 * **Multi-Tab Profile & Settings**: Comprehensive personal dossier view, theme engine customization (Dark/Light/System), and security settings.
 
@@ -94,10 +94,12 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 
 * **Zero-Layout-Shift Shimmer Skeleton Loading**:
   - Implemented via a comprehensive [`Skeleton.jsx`](client/src/components/common/Skeleton.jsx) module.
-  - Tailored skeleton primitives for Employee Cards, Department Cards, Data Tables (custom rows/cols), KPI Metric Grids, Announcement Bulletins, Support Tickets, Leave Policies, and RBAC Split-Screen Rosters.
+  - Tailored skeleton primitives for Employee Cards, Department Cards, Data Tables (custom rows/cols), KPI Metric Grids, Announcement Bulletins, Support Tickets, Leave Policies, Document Cards, and RBAC Split-Screen Rosters.
   - Seamless CSS linear gradient animations synchronized across Light and Dark themes.
 * **Interactive Vector Sparkline Metrics**:
   - Vector SVG-based high-fidelity sparkline cards with micro-tooltips and smooth cubic Bézier curves ([`SparkMetricCard.jsx`](client/src/components/common/SparkMetricCard.jsx)).
+* **First-Login Credential Hardening**:
+  - Intercepting security modal ([`FirstLoginPasswordModal.jsx`](client/src/components/common/FirstLoginPasswordModal.jsx)) that compels newly onboarded staff to set a private password before accessing their dashboard.
 * **Regional & Currency Settings Engine**:
   - Global context ([`RegionalSettingsContext.jsx`](client/src/context/RegionalSettingsContext.jsx)) providing real-time currency formatting (USD, EUR, GBP, PKR, INR, AED, CAD), regional date styles, and time displays.
 
@@ -108,6 +110,11 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Multi-Channel Password Recovery**: 
   - Ephemeral 6-digit OTP verification via Corporate SMTP (Nodemailer) or WhatsApp Cloud API (Twilio / Meta).
   - SHA-256 hashed OTPs with strict 10-minute expiry and brute-force attempt limits.
+* **Sub-Millisecond Tag-Based Caching Engine**:
+  - In-memory caching layer ([`cache.service.js`](src/services/cache.service.js)) optimizing high-throughput reads (dashboard analytics, employee lists, attendance, tickets).
+  - Automated mutation invalidator middleware that purges tagged cache keys whenever `POST`, `PUT`, `PATCH`, or `DELETE` requests succeed.
+* **Render Free-Tier Keep-Alive Daemon**:
+  - Background self-ping service ([`selfPing.service.js`](src/services/selfPing.service.js)) that periodically pings `/api/health` every 14 minutes, eliminating 50+ second cold-start delays on free hosting tiers.
 * **Cloudinary Media Pipeline**:
   - Direct memory stream profile picture uploads to Cloudinary CDN via Multer (zero disk footprint for ephemeral platforms like Render/Vercel).
   - Built-in webcam capture and local base64 preview fallback.
@@ -146,6 +153,8 @@ NexaHR includes pre-configured demo credentials for instant testing:
 ### **Backend Server & Infrastructure**
 * **Runtime**: [Node.js](https://nodejs.org/) (v18+ LTS)
 * **REST Framework**: [Express.js 4.21](https://expressjs.com/) (Modular Route-Controller-Service-Middleware architecture)
+* **Performance & Caching**: Custom Tag-Based In-Memory Caching Engine (`cache.service.js`) with automatic mutation invalidation
+* **Keep-Alive Daemon**: Background HTTP Health Pinger (`selfPing.service.js`) for anti-spindown resilience on Render
 * **ORM & Database**: [Prisma ORM 5.22](https://www.prisma.io/) + [PostgreSQL 15+](https://www.postgresql.org/)
 * **Authentication**: JWT (JSON Web Tokens) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
 * **Media Storage**: [Cloudinary CDN](https://cloudinary.com/) with Multer MemoryStorage
@@ -176,6 +185,10 @@ flowchart TB
         L[Payroll & Tax Calculation]
         M[Department & Designation Engine]
         N[Notification & Announcement Hub]
+        T[IT Helpdesk & Tickets Controller]
+        U[Accounts & Ledger Controller]
+        V[Tag-Based In-Memory Cache Service]
+        W[Anti-Spindown Self-Ping Daemon]
     end
 
     subgraph Storage["Persistence & External Cloud Services"]
@@ -188,11 +201,13 @@ flowchart TB
 
     A & B & C & D --> F
     F --> G
-    G --> H & I & J & K & L & M & N
-    H & I & J & K & L & M & N --> O
+    G --> H & I & J & K & L & M & N & T & U
+    H & I & J & K & L & M & N & T & U <--> V
+    H & I & J & K & L & M & N & T & U --> O
     I --> P
     H & N --> Q & R
     J <--> S
+    W -.->|14-min keepalive ping| F
 ```
 
 ---
@@ -205,16 +220,16 @@ NexaHR/
 │   ├── public/                             # Public static assets & SVG icons
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── auth/                       # ForgotPasswordModal
-│   │   │   ├── common/                     # Skeleton, SparkMetricCard, Logo, ErrorBoundary
-│   │   │   └── navigation/                 # Admin & Employee Sidebar, Header, PageHeaders
+│   │   │   ├── auth/                       # ForgotPasswordModal (Email & WhatsApp OTP)
+│   │   │   ├── common/                     # Skeleton, FirstLoginPasswordModal, SparkMetricCard, Logo, ErrorBoundary
+│   │   │   └── navigation/                 # Admin & Employee Sidebar, Header, MobileBottomNav, PageHeaders
 │   │   ├── context/                        # ThemeContext & RegionalSettingsContext
 │   │   ├── layouts/                        # MainLayout (Admin) & EmployeeLayout (ESS)
 │   │   ├── pages/
 │   │   │   ├── app/                        # HR Executive & Admin Command Center Pages
 │   │   │   │   ├── Dashboard.jsx           # 360° Workforce BI & Analytics
 │   │   │   │   ├── Employees.jsx           # Directory, Table, and 6-Tab Dossier Modal
-│   │   │   │   ├── Attendance.jsx          # Biometric Hardware Sync & Punch Logs
+│   │   │   │   ├── Attendance.jsx          # Biometric Hardware Sync, Daily Logs & Batch Punch
 │   │   │   │   ├── Leaves.jsx              # Company-wide Leave Approvals
 │   │   │   │   ├── LeavePolicy.jsx         # Quota Rules & Policy Configuration
 │   │   │   │   ├── Payroll.jsx             # Payroll Ledger & Structure Management
@@ -253,10 +268,10 @@ NexaHR/
 │
 ├── src/                                    # Backend Express.js REST API
 │   ├── config/                             # Prisma Client & Cloudinary Configuration
-│   ├── controllers/                        # Dedicated Controllers (Auth, Employee, Leaves, etc.)
-│   ├── middlewares/                        # JWT Auth, RBAC, Rate Limiters, Upload, Validators
-│   ├── routes/                             # Express REST API Endpoints
-│   ├── services/                           # Notification Dispatch & Tax Services
+│   ├── controllers/                        # Dedicated Controllers (Auth, Employee, Leaves, Tickets, Accounts, etc.)
+│   ├── middlewares/                        # JWT Auth, RBAC, Rate Limiters, Upload, Tenant, Validators
+│   ├── routes/                             # Express REST API Endpoints (Auth, Attendance, Tickets, Accounts, etc.)
+│   ├── services/                           # In-Memory Cache, Self-Ping, Notification Dispatch & Tax Services
 │   ├── utils/                              # Password Hashing & JWT Helpers
 │   └── index.js                            # Express Server Entrypoint (Port 5000)
 │
@@ -321,16 +336,31 @@ JWT_SECRET="nexahr_super_secure_jwt_secret_key_2026"
 JWT_EXPIRES_IN="7d"
 FRONTEND_URL="http://localhost:5173"
 
-# Optional Cloud Integrations
+# Self-Ping Anti-Spindown Service (Render Free-Tier)
+BACKEND_URL="https://your-app.onrender.com"
+
+# Hardware Biometric Terminal Gateway Key
+HARDWARE_SECRET_KEY="your_hardware_secret_key"
+
+# Cloudinary Cloud Storage Configuration
 CLOUDINARY_CLOUD_NAME="your_cloud_name"
 CLOUDINARY_API_KEY="your_api_key"
 CLOUDINARY_API_SECRET="your_api_secret"
 
+# Corporate SMTP Email Configuration (Nodemailer)
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT=587
+SMTP_SECURE=false
 SMTP_USER="your_email@gmail.com"
 SMTP_PASS="your_app_password"
 EMAIL_FROM="NexaHR Security <no-reply@nexahr.com>"
+
+# WhatsApp OTP Dispatch API (Twilio / Meta Cloud API)
+TWILIO_ACCOUNT_SID="your_twilio_account_sid"
+TWILIO_AUTH_TOKEN="your_twilio_auth_token"
+TWILIO_WHATSAPP_NUMBER="whatsapp:+14155238886"
+META_WHATSAPP_TOKEN="your_meta_whatsapp_cloud_api_token"
+WHATSAPP_PHONE_NUMBER_ID="your_whatsapp_phone_number_id"
 ```
 
 Generate Prisma client & run database migrations:
@@ -399,7 +429,8 @@ The client includes pre-configured single-page application routing rules in [`cl
    - `DATABASE_URL` = `postgresql://...` (from Neon, Supabase, AWS RDS, or Render PostgreSQL)
    - `JWT_SECRET` = `<your-secure-secret>`
    - `FRONTEND_URL` = `https://your-nexahr-app.vercel.app`
-   - *(Optional)* Cloudinary and SMTP credentials.
+   - `BACKEND_URL` = `https://your-backend-api.onrender.com` *(Activates automatic anti-spindown self-ping every 14 minutes)*
+   - *(Optional)* Cloudinary, SMTP, and WhatsApp credentials.
 
 ---
 
@@ -416,6 +447,7 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | `GET` | `/api/auth/me` | Fetch active user session profile | Yes |
 | `PUT` | `/api/auth/profile` | Update personal profile details | Yes |
 | `PUT` | `/api/auth/change-password` | Update account password | Yes |
+| `POST` | `/api/auth/forgot-password/check` | Verify user identity channel (Email / Phone) | No (Rate Limited) |
 | `POST` | `/api/auth/forgot-password` | Initiate multi-channel OTP password recovery | No (Rate Limited) |
 | `POST` | `/api/auth/verify-otp` | Verify 6-digit cryptographic OTP | No (Rate Limited) |
 | `POST` | `/api/auth/reset-password` | Complete password reset with verified OTP | No (Rate Limited) |
@@ -437,6 +469,7 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | `POST` | `/api/attendance/hardware-sync` | Ingest biometric hardware punch sync | `x-hardware-key` |
 | `GET` | `/api/attendance/my-logs` | Fetch authenticated employee punch logs | Yes |
 | `GET` | `/api/attendance` | Fetch company-wide attendance overview | Admin / HR |
+| `POST` | `/api/attendance/punch-all-today` | Batch punch-in all active employees today | Admin / HR |
 
 ### 🏖️ Leave Management
 | Method | Endpoint | Description | Auth Required |
@@ -469,6 +502,29 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | `POST` | `/api/designations` | Create new job designation | Admin / HR |
 | `PUT` | `/api/designations/:id` | Update job designation | Admin / HR |
 | `DELETE` | `/api/designations/:id` | Delete job designation | Admin / HR |
+
+### 🎫 Support Tickets & Helpdesk
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/tickets/my` | Fetch authenticated employee's support tickets | Yes |
+| `GET` | `/api/tickets` | List all company support tickets | Admin / HR |
+| `GET` | `/api/tickets/:id` | Fetch detailed support ticket & reply thread | Yes |
+| `POST` | `/api/tickets` | Create new support ticket inquiry | Yes |
+| `POST` | `/api/tickets/:id/replies` | Submit reply to support ticket thread | Yes |
+| `PATCH` | `/api/tickets/:id/status` | Update ticket status (`OPEN`, `RESOLVED`, etc.) | Admin / HR |
+
+### 💳 Financial Accounts & Ledgers
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/accounts/stats` | Financial metrics, revenue & expense analytics | Admin / HR |
+| `GET` | `/api/accounts/transactions` | List financial transactions with filters | Admin / HR |
+| `POST` | `/api/accounts/transactions` | Record new financial transaction | Admin / HR |
+| `PUT` | `/api/accounts/transactions/:id` | Update existing transaction record | Admin / HR |
+| `DELETE` | `/api/accounts/transactions/:id` | Delete financial transaction | Admin / HR |
+| `POST` | `/api/accounts/batch-delete` | Bulk delete transaction records | Admin / HR |
+| `POST` | `/api/accounts/batch-status` | Bulk update transaction statuses | Admin / HR |
+| `POST` | `/api/accounts/seed` | Seed default ledger transactions | Admin / HR |
+| `POST` | `/api/accounts/clear` | Purge financial transactions | Admin / HR |
 
 ### 📢 Announcements & Notifications
 | Method | Endpoint | Description | Auth Required |
