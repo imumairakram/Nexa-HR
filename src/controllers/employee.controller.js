@@ -273,25 +273,24 @@ const getEmployees = async (req, res) => {
 const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, role } = req.user;
+    const currentUserId = req.user?.id || req.user?.userId;
+    const role = req.user?.role;
 
-    // Strict Anti-IDOR Enforcement:
-    // If role is EMPLOYEE, they can strictly ONLY access their own userId
-    let targetId = id;
-    if (role === 'EMPLOYEE') {
-      if (id !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: 'Access Denied: You are not authorized to view details of other employees.',
-        });
-      }
-      targetId = userId;
+    // Security Check (IDOR Protection):
+    // Compare requested ID with logged-in user ID.
+    // Deny Access: If current user role is EMPLOYEE and ID does not match, block DB call and return 403 Forbidden.
+    if (role === 'EMPLOYEE' && id !== currentUserId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access Denied: You are not authorized to view details of other employees.',
+      });
     }
 
-    const isPrivileged = role === 'ADMIN' || role === 'HR_MANAGER' || targetId === userId;
+    // Grant Access: If IDs match, OR user role is ADMIN or HR_MANAGER, fetch profile via Prisma
+    const isPrivileged = role === 'ADMIN' || role === 'HR_MANAGER' || id === currentUserId;
 
     const user = await prisma.user.findUnique({
-      where: { id: targetId },
+      where: { id },
       select: {
         id: true,
         employeeCode: true,

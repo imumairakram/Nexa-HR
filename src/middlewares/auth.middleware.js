@@ -4,6 +4,10 @@ const cacheService = require('../services/cache.service');
 
 const verifyToken = async (req, res, next) => {
   try {
+    if (req.user && (req.user.id || req.user.userId)) {
+      return next();
+    }
+
     let token = null;
 
     // 1. Primary Vector: Secure HttpOnly Cookie
@@ -24,12 +28,13 @@ const verifyToken = async (req, res, next) => {
 
     // 3. Cryptographic Verification of JWT
     const decoded = verifyJwtToken(token);
+    const decodedUserId = decoded.userId || decoded.id;
 
     // 4. Verify user exists and is active (Fast in-memory cache lookup)
-    let user = cacheService.getCachedUser(decoded.userId);
+    let user = cacheService.getCachedUser(decodedUserId);
     if (!user) {
       user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
+        where: { id: decodedUserId },
         select: {
           id: true,
           email: true,
@@ -40,7 +45,7 @@ const verifyToken = async (req, res, next) => {
         },
       });
       if (user && user.isActive) {
-        cacheService.setCachedUser(decoded.userId, user);
+        cacheService.setCachedUser(decodedUserId, user);
       }
     }
 
@@ -53,6 +58,7 @@ const verifyToken = async (req, res, next) => {
 
     // 5. Attach authenticated user context to request
     req.user = {
+      id: user.id,
       userId: user.id,
       email: user.email,
       role: user.role,

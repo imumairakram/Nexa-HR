@@ -26,7 +26,7 @@ const canManageEmployees = checkRole('ADMIN', 'HR_MANAGER');
 router.post('/', canManageEmployees, onboardEmployee);
 router.post('/onboard', canManageEmployees, onboardEmployee);
 router.get('/', canManageEmployees, cacheService.middleware({ ttlSeconds: 60, tags: ['employees'] }), getEmployees);
-router.get('/:id', cacheService.middleware({ ttlSeconds: 60, tags: ['employees'] }), getEmployeeById);
+router.get('/:id', verifyToken, cacheService.middleware({ ttlSeconds: 60, tags: ['employees'] }), getEmployeeById);
 router.put('/:id', canManageEmployees, updateEmployee);
 router.patch('/:id', canManageEmployees, updateEmployee);
 router.delete('/:id', canManageEmployees, deleteEmployee);
