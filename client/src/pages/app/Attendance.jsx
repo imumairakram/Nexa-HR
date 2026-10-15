@@ -88,24 +88,7 @@ const Attendance = () => {
     fetchAttendance();
   }, []);
 
-  const handlePunchAllToday = async () => {
-    setIsSyncing(true);
-    setToastMsg('Recording today punch-in for all active employees...');
-    try {
-      const res = await api.punchAllUsersToday();
-      if (res && res.success) {
-        setToastMsg(`Successfully punched in ${res.data?.totalPunched || 'all'} employees for today!`);
-        await fetchAttendance();
-      } else {
-        setToastMsg(res?.message || 'Failed to punch in all employees');
-      }
-    } catch (err) {
-      setToastMsg(`Error: ${err.message}`);
-    } finally {
-      setIsSyncing(false);
-      setTimeout(() => setToastMsg(''), 4000);
-    }
-  };
+
 
   const handleSyncHardware = async () => {
     setIsSyncing(true);
@@ -190,14 +173,11 @@ const Attendance = () => {
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Biometric sync engine active</div>
             </div>
             <div className="flex flex-col w-full gap-2">
-              <button
-                onClick={handlePunchAllToday}
-                disabled={isSyncing}
-                className="w-full px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
-              >
-                <Fingerprint className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? 'Processing...' : 'Punch-In All (Today)'}</span>
-              </button>
+              {/* Hardware-only punch-in notice */}
+              <div className="w-full px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 text-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Punch-in via hardware only</span>
+              </div>
               <button
                 onClick={handleSyncHardware}
                 disabled={isSyncing}
