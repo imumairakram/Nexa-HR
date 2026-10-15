@@ -385,7 +385,7 @@ const AppPageHeader = ({
           </p>
         </div>
         {/* Search Bar: Row 2 Col-span-2 on Mobile, Center/Right on Desktop */}
-        <div className="col-span-2 sm:col-auto w-full sm:w-auto flex items-center gap-2 sm:gap-3 sm:order-2 shrink-0">
+        <div className="col-span-2 sm:col-auto w-full sm:w-auto flex items-center gap-2 sm:gap-3 sm:order-2 shrink-0 sm:self-center">
           <div className="relative w-full sm:w-56 md:w-64 lg:w-72" ref={searchRef}>
             <div className="relative flex items-center">
               <input
@@ -462,7 +462,7 @@ const AppPageHeader = ({
         </div>
 
         {/* Utility Action Buttons: Row 1 Col 2 on Mobile, Right side on Desktop */}
-        <div className="col-start-2 row-start-1 self-start justify-self-end flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap sm:order-3">
+        <div className="col-start-2 row-start-1 self-start sm:self-center justify-self-end flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap sm:order-3">
           {/* Refresh Button */}
           <button
             type="button"
