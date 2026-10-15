@@ -88,10 +88,9 @@ const SEARCH_SHORTCUTS = [
   { label: 'Payslip List', icon: FileText, path: '/app/payroll/payslips', category: 'Payroll' },
   { label: 'Payroll Management', icon: DollarSign, path: '/app/payroll', category: 'Payroll' },
   { label: 'Announcements', icon: Megaphone, path: '/app/announcement', category: 'Operations' },
-  { label: 'Recruitment - Job Desk', icon: Briefcase, path: '/app/recruitment/desk', category: 'Recruitment' },
-  { label: 'Recruitment - Active Jobs', icon: Users, path: '/app/recruitment/jobs', category: 'Recruitment' },
-  { label: 'Recruitment - Applications', icon: FileText, path: '/app/recruitment/applications', category: 'Recruitment' },
-  { label: 'Recruitment - Job Board', icon: Layers, path: '/app/recruitment/board', category: 'Recruitment' },
+  { label: 'Recruitment - Workspace & Jobs', icon: Briefcase, path: '/app/recruitment/workspace', category: 'Recruitment' },
+  { label: 'Recruitment - ATS Candidate Pipeline', icon: Users, path: '/app/recruitment/pipeline', category: 'Recruitment' },
+  { label: 'Recruitment - Master Settings', icon: Sliders, path: '/app/recruitment/settings', category: 'Recruitment' },
   { label: 'My Profile', icon: User, path: '/app/profile', category: 'System' },
   { label: 'System Settings', icon: Sliders, path: '/app/settings', category: 'System' }
 ];

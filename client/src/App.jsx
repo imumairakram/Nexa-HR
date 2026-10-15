@@ -34,17 +34,10 @@ import PayslipList from './pages/app/payroll/PayslipList';
 // Engagement & Operations
 import Announcement from './pages/app/Announcement';
 
-// Recruitment Module Sub-pages
-import JobCategory from './pages/app/recruitment/JobCategory';
-import JobType from './pages/app/recruitment/JobType';
-import JobLocation from './pages/app/recruitment/JobLocation';
-import JobSkills from './pages/app/recruitment/JobSkills';
-import JobExperience from './pages/app/recruitment/JobExperience';
-import Jobs from './pages/app/recruitment/Jobs';
-import JobApplication from './pages/app/recruitment/JobApplication';
-import JobBoard from './pages/app/recruitment/JobBoard';
-import JobInterview from './pages/app/recruitment/JobInterview';
-import JobDesk from './pages/app/recruitment/JobDesk';
+// Unified Recruitment Module
+import JobsWorkspace from './pages/app/recruitment/JobsWorkspace';
+import ATSPipeline from './pages/app/recruitment/ATSPipeline';
+import RecruitmentSettings from './pages/app/recruitment/RecruitmentSettings';
 
 // Employee Portal Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -130,17 +123,23 @@ function App() {
           <Route path="award" element={<Navigate to="/app/announcement" replace />} />
           <Route path="project" element={<Navigate to="/app/dashboard" replace />} />
 
-          {/* Recruitment Module */}
-          <Route path="recruitment/job-category" element={<JobCategory />} />
-          <Route path="recruitment/job-type" element={<JobType />} />
-          <Route path="recruitment/job-location" element={<JobLocation />} />
-          <Route path="recruitment/job-skills" element={<JobSkills />} />
-          <Route path="recruitment/job-experience" element={<JobExperience />} />
-          <Route path="recruitment/jobs" element={<Jobs />} />
-          <Route path="recruitment/applications" element={<JobApplication />} />
-          <Route path="recruitment/board" element={<JobBoard />} />
-          <Route path="recruitment/interviews" element={<JobInterview />} />
-          <Route path="recruitment/desk" element={<JobDesk />} />
+          {/* Unified Recruitment Module */}
+          <Route path="recruitment" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/workspace" element={<JobsWorkspace />} />
+          <Route path="recruitment/pipeline" element={<ATSPipeline />} />
+          <Route path="recruitment/settings" element={<RecruitmentSettings />} />
+
+          {/* Legacy recruitment route redirects */}
+          <Route path="recruitment/jobs" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/desk" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/board" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/applications" element={<Navigate to="/app/recruitment/pipeline" replace />} />
+          <Route path="recruitment/interviews" element={<Navigate to="/app/recruitment/pipeline" replace />} />
+          <Route path="recruitment/job-category" element={<Navigate to="/app/recruitment/settings" replace />} />
+          <Route path="recruitment/job-type" element={<Navigate to="/app/recruitment/settings" replace />} />
+          <Route path="recruitment/job-location" element={<Navigate to="/app/recruitment/settings" replace />} />
+          <Route path="recruitment/job-skills" element={<Navigate to="/app/recruitment/settings" replace />} />
+          <Route path="recruitment/job-experience" element={<Navigate to="/app/recruitment/settings" replace />} />
 
           {/* System */}
           <Route path="departments" element={<Departments />} />
