@@ -194,7 +194,17 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
             }`}
         >
           {/* Logo Brand */}
-          <Logo collapsed={isCollapsed} />
+          <div className="flex flex-col">
+            <Logo collapsed={isCollapsed} />
+            {!isCollapsed && (
+              <div className="flex items-center gap-1.5 mt-1.5 pl-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                  {isAdmin ? 'System Admin' : 'HR Portal'}
+                </span>
+              </div>
+            )}
+          </div>
 
           {/* Collapse / Expand Toggle Button */}
           <button
@@ -376,7 +386,15 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
           {/* Top Section: Logo & Close Button */}
           <div className="w-full flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
-              <Logo collapsed={false} />
+              <div className="flex flex-col">
+                <Logo collapsed={false} />
+                <div className="flex items-center gap-1.5 mt-1.5 pl-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                  <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                    {isAdmin ? 'System Admin' : 'HR Portal'}
+                  </span>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsMobileOpen(false)}

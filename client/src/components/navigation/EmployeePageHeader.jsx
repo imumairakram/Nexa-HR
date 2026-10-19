@@ -360,15 +360,15 @@ const EmployeePageHeader = ({
           <div className="min-w-0 flex-1">
             {resolvedMobileTitle ? (
               <>
-                <h1 className="sm:hidden text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight truncate">
+                <h1 className="sm:hidden text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight truncate">
                   {resolvedMobileTitle}
                 </h1>
-                <h1 className="hidden sm:block text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+                <h1 className="hidden sm:block text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
                   {title}
                 </h1>
               </>
             ) : (
-              <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+              <h1 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
                 {title}
               </h1>
             )}
