@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clearSession } from '../../utils/session';
 import {
@@ -99,9 +99,14 @@ const SEARCH_SHORTCUTS = [
 const AppPageHeader = ({
   title = 'Welcome Back, Admin',
   subtitle = null,
+  mobileTitle = null,
+  hideMobileSubtitle = false,
+  hideMobileSearch = false,
   onSearch = null,
   onRefresh = null,
   loading = false,
+  action = null,
+  children = null,
 }) => {
   const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -358,6 +363,42 @@ const AppPageHeader = ({
 
   const userHandle = currentUser ? `@${currentUser.firstName?.toLowerCase()}` : '@system';
 
+  // Resolved role-based title for mobile header
+  const resolvedMobileTitle = useMemo(() => {
+    if (mobileTitle && mobileTitle !== 'auto') return mobileTitle;
+    if (mobileTitle === 'auto' || (!mobileTitle && (title.includes('Control Center') || title.includes('Dashboard')))) {
+      const role = (currentUser?.role || '').toUpperCase();
+      const portalRole = (currentUser?.portalRole || '').toLowerCase();
+      const email = (currentUser?.email || '').toLowerCase();
+      const designation = (currentUser?.designation || '').toLowerCase();
+
+      if (role === 'ADMIN' || role === 'SUPER_ADMIN' || email.startsWith('admin@')) {
+        return 'Admin Dashboard';
+      }
+      if (
+        role === 'HR_MANAGER' ||
+        role === 'HR' ||
+        role.includes('HR') ||
+        portalRole === 'hr' ||
+        email.startsWith('hr@') ||
+        designation.includes('hr')
+      ) {
+        return 'HR Dashboard';
+      }
+      if (
+        role === 'EMPLOYEE' ||
+        role === 'STAFF' ||
+        portalRole === 'employee' ||
+        email.startsWith('user@') ||
+        email.startsWith('employee@')
+      ) {
+        return 'Employee Dashboard';
+      }
+      return 'Admin Dashboard';
+    }
+    return null;
+  }, [mobileTitle, title, currentUser]);
+
   // Filter shortcuts based on searchQuery
   const filteredShortcuts = SEARCH_SHORTCUTS.filter((s) =>
     s.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -376,27 +417,50 @@ const AppPageHeader = ({
       {/* Top Header Row: Responsive Grid on Mobile, Flex on Desktop */}
       <div className="grid grid-cols-[1fr_auto] gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 w-full">
         {/* Left Side Title & Subtitle Date: Row 1 Col 1 on Mobile, Left flex on Desktop */}
-        <div className="col-start-1 row-start-1 min-w-0 sm:flex-1 sm:order-1 flex items-start sm:items-center gap-2.5">
+        <div className={`col-start-1 row-start-1 min-w-0 sm:flex-1 sm:order-1 flex ${hideMobileSubtitle ? 'items-center' : 'items-start sm:items-center'} gap-2 sm:gap-2.5`}>
           <button
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent('nexahr_open_mobile_sidebar'))}
             title="Open Navigation Menu"
             aria-label="Open Navigation Menu"
-            className="lg:hidden mt-0.5 sm:mt-0 w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 shrink-0 cursor-pointer active:scale-95 transition-all"
+            className={`lg:hidden ${hideMobileSubtitle ? '' : 'mt-0.5 sm:mt-0'} w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 shrink-0 cursor-pointer active:scale-95 transition-all`}
           >
             <Menu className="w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[2.2]" />
           </button>
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
-              {title}
-            </h1>
-            <p className="text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 sm:line-clamp-none">
-              {displaySubtitle}
-            </p>
+            {resolvedMobileTitle ? (
+              <>
+                <h1 className="sm:hidden text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight truncate">
+                  {resolvedMobileTitle}
+                </h1>
+                <h1 className="hidden sm:block text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+                  {title}
+                </h1>
+              </>
+            ) : (
+              <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+                {title}
+              </h1>
+            )}
+            {displaySubtitle && (
+              <p
+                className={`${
+                  hideMobileSubtitle ? 'hidden sm:block' : 'line-clamp-2 sm:line-clamp-none'
+                } text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5`}
+              >
+                {displaySubtitle}
+              </p>
+            )}
           </div>
         </div>
-        {/* Search Bar: Row 2 Col-span-2 on Mobile, Center/Right on Desktop */}
-        <div className="col-span-2 sm:col-auto w-full sm:w-auto flex items-center gap-2 sm:gap-3 sm:order-2 shrink-0 sm:self-center">
+
+        {/* Search Bar & Custom Action: Row 2 Col-span-2 on Mobile, Center/Right on Desktop */}
+        <div
+          className={`${
+            hideMobileSearch ? 'hidden sm:flex' : 'flex'
+          } col-span-2 sm:col-auto w-full sm:w-auto items-center gap-2 sm:gap-3 sm:order-2 shrink-0 sm:self-center`}
+        >
+          {action || children}
           <div className="relative w-full sm:w-56 md:w-64 lg:w-72" ref={searchRef}>
             <div className="relative flex items-center">
               <input
@@ -473,7 +537,7 @@ const AppPageHeader = ({
         </div>
 
         {/* Utility Action Buttons: Row 1 Col 2 on Mobile, Right side on Desktop */}
-        <div className="col-start-2 row-start-1 self-start sm:self-center justify-self-end flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap sm:order-3">
+        <div className="col-start-2 row-start-1 self-center justify-self-end flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap sm:order-3">
           {/* Refresh Button */}
           <button
             type="button"

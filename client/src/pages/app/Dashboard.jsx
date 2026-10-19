@@ -39,6 +39,71 @@ import { api } from '../../services/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    const syncUser = () => {
+      try {
+        const stored = localStorage.getItem('user');
+        if (stored) setCurrentUser(JSON.parse(stored));
+      } catch {}
+    };
+    window.addEventListener('user_profile_updated', syncUser);
+    window.addEventListener('session_started', syncUser);
+    return () => {
+      window.removeEventListener('user_profile_updated', syncUser);
+      window.removeEventListener('session_started', syncUser);
+    };
+  }, []);
+
+  const mobileDashboardTitle = useMemo(() => {
+    const role = (currentUser?.role || '').toUpperCase();
+    const portalRole = (currentUser?.portalRole || '').toLowerCase();
+    const email = (currentUser?.email || '').toLowerCase();
+    const designation = (currentUser?.designation || '').toLowerCase();
+
+    if (role === 'ADMIN' || role === 'SUPER_ADMIN' || email.startsWith('admin@')) {
+      return 'Admin Dashboard';
+    }
+    if (
+      role === 'HR_MANAGER' ||
+      role === 'HR' ||
+      role.includes('HR') ||
+      portalRole === 'hr' ||
+      email.startsWith('hr@') ||
+      designation.includes('hr')
+    ) {
+      return 'HR Dashboard';
+    }
+    if (
+      role === 'EMPLOYEE' ||
+      role === 'STAFF' ||
+      portalRole === 'employee' ||
+      email.startsWith('user@') ||
+      email.startsWith('employee@')
+    ) {
+      return 'Employee Dashboard';
+    }
+    return 'Admin Dashboard';
+  }, [currentUser]);
+
+  const desktopTitle = useMemo(() => {
+    if (mobileDashboardTitle === 'HR Dashboard') {
+      return 'HR Control Center & Performance Dashboard';
+    }
+    if (mobileDashboardTitle === 'Employee Dashboard') {
+      return 'Employee Performance Dashboard';
+    }
+    return 'Admin Control Center & Performance Dashboard';
+  }, [mobileDashboardTitle]);
+
   const [metricsData, setMetricsData] = useState(() => api.getCached('/dashboard/admin')?.data || null);
   const [loading, setLoading] = useState(() => !api.hasCached('/dashboard/admin'));
   const [deptTimeframe, setDeptTimeframe] = useState('today');
@@ -267,7 +332,10 @@ const Dashboard = () => {
 
       {/* Top Header */}
       <AppPageHeader
-        title="Admin Control Center & Performance Dashboard"
+        title={desktopTitle}
+        mobileTitle={mobileDashboardTitle}
+        hideMobileSubtitle={true}
+        hideMobileSearch={true}
         subtitle="Live PostgreSQL analytics, workforce biometric attendance tracking, and leave pipeline."
         onRefresh={() => loadDashboardMetrics()}
         loading={loading}

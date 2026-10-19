@@ -411,6 +411,9 @@ const EmployeeDashboard = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
         title={`Welcome, ${currentUser?.firstName || 'Alex'}`}
+        mobileTitle="Employee Dashboard"
+        hideMobileSubtitle={true}
+        hideMobileSearch={true}
         subtitle="Here is your personal attendance, schedule, and self-service pulse for today."
         onRefresh={fetchDashboard}
         loading={loading}
