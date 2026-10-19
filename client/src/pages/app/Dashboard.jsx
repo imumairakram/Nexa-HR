@@ -104,6 +104,10 @@ const Dashboard = () => {
     return 'Admin Control Center & Performance Dashboard';
   }, [mobileDashboardTitle]);
 
+  const isHrPortal = useMemo(() => {
+    return mobileDashboardTitle === 'HR Dashboard';
+  }, [mobileDashboardTitle]);
+
   const [metricsData, setMetricsData] = useState(() => api.getCached('/dashboard/admin')?.data || null);
   const [loading, setLoading] = useState(() => !api.hasCached('/dashboard/admin'));
   const [deptTimeframe, setDeptTimeframe] = useState('today');
@@ -340,18 +344,20 @@ const Dashboard = () => {
         onRefresh={() => loadDashboardMetrics()}
         loading={loading}
         action={
-          <button
-            onClick={() => setIsPunchModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-2xl shadow-sm transition-all cursor-pointer"
-          >
-            <Zap className="w-3.5 h-3.5" />
-            <span>Simulate Punch</span>
-          </button>
+          !isHrPortal && mobileDashboardTitle === 'Admin Dashboard' ? (
+            <button
+              onClick={() => setIsPunchModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-2xl shadow-sm transition-all cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>Simulate Punch</span>
+            </button>
+          ) : null
         }
       />
 
       {/* TOP METRICS CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Total Headcount */}
         <SparkMetricCard
           variant="dark"
@@ -805,12 +811,14 @@ const Dashboard = () => {
               <div className="h-44 flex flex-col items-center justify-center text-center p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                 <Clock className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-1" />
                 <p className="text-xs font-bold text-slate-600 dark:text-slate-300">No Logs Recorded Today</p>
-                <button
-                  onClick={() => setIsPunchModalOpen(true)}
-                  className="mt-2 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                >
-                  Quick Punch Simulator →
-                </button>
+                {!isHrPortal && mobileDashboardTitle === 'Admin Dashboard' && (
+                  <button
+                    onClick={() => setIsPunchModalOpen(true)}
+                    className="mt-2 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  >
+                    Quick Punch Simulator →
+                  </button>
+                )}
               </div>
             )}
           </div>
