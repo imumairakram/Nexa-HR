@@ -100,8 +100,8 @@ const AppPageHeader = ({
   title = 'Welcome Back, Admin',
   subtitle = null,
   mobileTitle = null,
-  hideMobileSubtitle = false,
-  hideMobileSearch = false,
+  hideMobileSubtitle = true,
+  hideMobileSearch = true,
   onSearch = null,
   onRefresh = null,
   loading = false,
@@ -396,7 +396,35 @@ const AppPageHeader = ({
       }
       return 'Admin Dashboard';
     }
-    return null;
+
+    const lower = (title || '').toLowerCase();
+    if (lower.includes('attendance')) return 'Attendance';
+    if (lower.includes('directory') || lower.includes('workforce') || lower.includes('employee list') || lower.includes('employees')) return 'Employees';
+    if (lower.includes('new employee') || lower.includes('onboarding')) return 'New Employee';
+    if (lower.includes('employment status')) return 'Employment Status';
+    if (lower.includes('leave policy')) return 'Leave Policy';
+    if (lower.includes('holiday')) return 'Public Holidays';
+    if (lower.includes('leave')) return 'Leaves';
+    if (lower.includes('calculate payroll')) return 'Calculate Payroll';
+    if (lower.includes('payslip')) return 'Payslips';
+    if (lower.includes('payroll')) return 'Payroll';
+    if (lower.includes('announcement') || lower.includes('notice')) return 'Announcements';
+    if (lower.includes('pipeline') || lower.includes('ats')) return 'ATS Pipeline';
+    if (lower.includes('recruitment settings')) return 'Recruitment Settings';
+    if (lower.includes('workspace')) return 'Jobs Workspace';
+    if (lower.includes('recruitment') || lower.includes('job')) return 'Recruitment';
+    if (lower.includes('department')) return 'Departments';
+    if (lower.includes('designation')) return 'Departments';
+    if (lower.includes('access control') || lower.includes('permission')) return 'Access Control';
+    if (lower.includes('setting')) return 'Settings';
+    if (lower.includes('profile')) return 'My Profile';
+
+    if (title.includes('&')) return title.split('&')[0].trim();
+    if (title.includes('—')) return title.split('—')[0].trim();
+    if (title.includes('-')) return title.split('-')[0].trim();
+    if (title.includes(':')) return title.split(':')[0].trim();
+
+    return title;
   }, [mobileTitle, title, currentUser]);
 
   // Filter shortcuts based on searchQuery

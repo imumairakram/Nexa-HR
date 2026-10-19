@@ -66,8 +66,8 @@ const EmployeePageHeader = ({
   title = 'Employee Portal',
   subtitle = null,
   mobileTitle = null,
-  hideMobileSubtitle = false,
-  hideMobileSearch = false,
+  hideMobileSubtitle = true,
+  hideMobileSearch = true,
   onSearch = null,
   onRefresh = null,
   loading = false,
@@ -331,8 +331,26 @@ const EmployeePageHeader = ({
 
   const resolvedMobileTitle = useMemo(() => {
     if (mobileTitle && mobileTitle !== 'auto') return mobileTitle;
-    return 'Employee Dashboard';
-  }, [mobileTitle]);
+    
+    const lower = (title || '').toLowerCase();
+    if (lower.includes('dashboard') || lower.includes('welcome')) return 'Employee Dashboard';
+    if (lower.includes('attendance') || lower.includes('clock')) return 'My Attendance';
+    if (lower.includes('leave')) return 'My Leaves';
+    if (lower.includes('payslip') || lower.includes('compensation') || lower.includes('salary')) return 'My Payslips';
+    if (lower.includes('holiday')) return 'Company Holidays';
+    if (lower.includes('announcement') || lower.includes('notice') || lower.includes('board')) return 'Announcements';
+    if (lower.includes('helpdesk') || lower.includes('support')) return 'Helpdesk & Support';
+    if (lower.includes('document') || lower.includes('policy')) return 'Documents & Policies';
+    if (lower.includes('profile')) return 'My Profile';
+    if (lower.includes('setting')) return 'Settings';
+
+    if (title.includes('&')) return title.split('&')[0].trim();
+    if (title.includes('—')) return title.split('—')[0].trim();
+    if (title.includes('-')) return title.split('-')[0].trim();
+    if (title.includes(':')) return title.split(':')[0].trim();
+
+    return title;
+  }, [mobileTitle, title]);
 
   return (
     <div className="mb-6 relative">
