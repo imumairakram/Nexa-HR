@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { clearSession } from '../../utils/session';
 import { api } from '../../services/api';
@@ -24,6 +24,7 @@ import {
   KeyRound,
   ShieldCheck,
   User,
+  X,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import Logo from '../common/Logo';
@@ -46,6 +47,51 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
   const toggleMenu = (key) => {
     setOpenMenus((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  // Mobile Drawer State & Event Listeners
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = () => setIsMobileOpen(true);
+    const handleClose = () => setIsMobileOpen(false);
+    const handleToggle = () => setIsMobileOpen((prev) => !prev);
+
+    window.addEventListener('nexahr_open_mobile_sidebar', handleOpen);
+    window.addEventListener('nexahr_close_mobile_sidebar', handleClose);
+    window.addEventListener('nexahr_toggle_mobile_sidebar', handleToggle);
+
+    return () => {
+      window.removeEventListener('nexahr_open_mobile_sidebar', handleOpen);
+      window.removeEventListener('nexahr_close_mobile_sidebar', handleClose);
+      window.removeEventListener('nexahr_toggle_mobile_sidebar', handleToggle);
+    };
+  }, []);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
+  // Handle escape key and body scroll lock when mobile drawer is open
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsMobileOpen(false);
+      }
+    };
+
+    if (isMobileOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
 
   const handleAccordionClick = (item) => {
     if (isCollapsed) {
@@ -136,7 +182,8 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
   ];
 
   return (
-    <aside
+    <>
+      <aside
       className={`hidden lg:flex flex-col justify-between py-5 bg-white dark:bg-[#1E293B] rounded-[32px] fixed left-3 top-3 bottom-3 shadow-soft border border-slate-100/80 dark:border-slate-800 shrink-0 z-40 transition-all duration-300 ${isCollapsed ? 'w-20 px-2 items-center' : 'w-64 px-3'
         }`}
     >
@@ -308,6 +355,182 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
         </button>
       </div>
     </aside>
+
+    {/* Mobile Left Sidebar Drawer */}
+    {isMobileOpen && (
+      <div className="lg:hidden fixed inset-0 z-[70] flex">
+        {/* Backdrop Blur Overlay */}
+        <div
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+          onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* Slide-over Left Navigation Panel */}
+        <aside
+          className="relative w-[285px] max-w-[85vw] h-full bg-white dark:bg-[#1E293B] shadow-2xl z-10 flex flex-col justify-between p-4 border-r border-slate-200/80 dark:border-slate-800 animate-in slide-in-from-left duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Left Navigation Menu"
+        >
+          {/* Top Section: Logo & Close Button */}
+          <div className="w-full flex-1 flex flex-col min-h-0">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
+              <Logo collapsed={false} />
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen(false)}
+                title="Close Navigation Menu"
+                aria-label="Close Navigation Menu"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            {/* Scrollable Navigation Items */}
+            <nav className="flex-1 overflow-y-auto overflow-x-hidden pt-3 space-y-1 w-full pr-1 custom-scrollbar">
+              {menuStructure.map((item) => {
+                if (item.type === 'link') {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setIsMobileOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-3 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
+                          isActive
+                            ? 'bg-[#E6F4EA] dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-400 font-bold shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <Icon
+                            className={`w-4 h-4 shrink-0 stroke-[2] ${
+                              isActive
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-slate-500 dark:text-slate-400'
+                            }`}
+                          />
+                          <span className="truncate">{item.label}</span>
+                        </>
+                      )}
+                    </NavLink>
+                  );
+                }
+
+                if (item.type === 'accordion') {
+                  const Icon = item.icon;
+                  const isOpen = openMenus[item.key];
+                  const isChildActive = item.children.some((child) => location.pathname === child.path);
+
+                  return (
+                    <div key={item.key} className="w-full my-0.5">
+                      <button
+                        type="button"
+                        onClick={() => toggleMenu(item.key)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                          isChildActive
+                            ? 'text-emerald-800 dark:text-emerald-400 font-bold bg-emerald-50/50 dark:bg-emerald-950/30'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <Icon
+                            className={`w-4 h-4 shrink-0 stroke-[2] ${
+                              isChildActive
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-slate-500 dark:text-slate-400'
+                            }`}
+                          />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        <span className="text-slate-400">
+                          {isOpen ? (
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          )}
+                        </span>
+                      </button>
+
+                      {isOpen && (
+                        <div className="pl-7 pr-1 py-1 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-5 my-1">
+                          {item.children.map((child) => (
+                            <NavLink
+                              key={child.path}
+                              to={child.path}
+                              onClick={() => setIsMobileOpen(false)}
+                              className={({ isActive }) =>
+                                `block px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                                  isActive
+                                    ? 'bg-emerald-100/70 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-300 font-bold'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/40'
+                                }`
+                              }
+                            >
+                              {child.label}
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
+            </nav>
+          </div>
+
+          {/* Bottom Section: Theme & Logout */}
+          <div className="w-full pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-1 shrink-0">
+            {/* User Profile Mini Dossier */}
+            {currentUser?.firstName && (
+              <div className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/60 mb-2 flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                    {currentUser.firstName} {currentUser.lastName || ''}
+                  </p>
+                  <p className="text-[10px] text-slate-400 truncate">
+                    {currentUser.role || 'Staff'} • {currentUser.email || ''}
+                  </p>
+                </div>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              </div>
+            )}
+
+            {/* Theme Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              {resolvedTheme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400 stroke-[2] shrink-0" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600 dark:text-slate-400 stroke-[2] shrink-0" />
+              )}
+              <span>{resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
+
+            {/* Logout */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400 transition-all cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    )}
+  </>
   );
 };
 

@@ -24,7 +24,8 @@ import {
   Megaphone,
   Briefcase,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Menu,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
@@ -375,13 +376,24 @@ const AppPageHeader = ({
       {/* Top Header Row: Responsive Grid on Mobile, Flex on Desktop */}
       <div className="grid grid-cols-[1fr_auto] gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 w-full">
         {/* Left Side Title & Subtitle Date: Row 1 Col 1 on Mobile, Left flex on Desktop */}
-        <div className="col-start-1 row-start-1 min-w-0 sm:flex-1 sm:order-1">
-          <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
-            {title}
-          </h1>
-          <p className="text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 sm:line-clamp-none">
-            {displaySubtitle}
-          </p>
+        <div className="col-start-1 row-start-1 min-w-0 sm:flex-1 sm:order-1 flex items-start sm:items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('nexahr_open_mobile_sidebar'))}
+            title="Open Navigation Menu"
+            aria-label="Open Navigation Menu"
+            className="lg:hidden mt-0.5 sm:mt-0 w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 shrink-0 cursor-pointer active:scale-95 transition-all"
+          >
+            <Menu className="w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[2.2]" />
+          </button>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+              {title}
+            </h1>
+            <p className="text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 sm:line-clamp-none">
+              {displaySubtitle}
+            </p>
+          </div>
         </div>
         {/* Search Bar: Row 2 Col-span-2 on Mobile, Center/Right on Desktop */}
         <div className="col-span-2 sm:col-auto w-full sm:w-auto flex items-center gap-2 sm:gap-3 sm:order-2 shrink-0 sm:self-center">

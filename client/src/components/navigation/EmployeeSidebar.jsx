@@ -26,6 +26,7 @@ import {
   ArrowRightLeft,
   LifeBuoy,
   BookOpen,
+  X,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import Logo from '../common/Logo';
@@ -60,6 +61,51 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
     };
   }, []);
 
+  // Mobile Drawer State & Event Listeners
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = () => setIsMobileOpen(true);
+    const handleClose = () => setIsMobileOpen(false);
+    const handleToggle = () => setIsMobileOpen((prev) => !prev);
+
+    window.addEventListener('nexahr_open_mobile_sidebar', handleOpen);
+    window.addEventListener('nexahr_close_mobile_sidebar', handleClose);
+    window.addEventListener('nexahr_toggle_mobile_sidebar', handleToggle);
+
+    return () => {
+      window.removeEventListener('nexahr_open_mobile_sidebar', handleOpen);
+      window.removeEventListener('nexahr_close_mobile_sidebar', handleClose);
+      window.removeEventListener('nexahr_toggle_mobile_sidebar', handleToggle);
+    };
+  }, []);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
+  // Handle escape key and body scroll lock when mobile drawer is open
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsMobileOpen(false);
+      }
+    };
+
+    if (isMobileOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
+
   const handleLogout = () => {
     api.logout().catch(() => {});
     clearSession();
@@ -81,7 +127,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
 
 
   return (
-    <aside
+    <>
+      <aside
       className={`hidden lg:flex flex-col justify-between py-5 bg-white dark:bg-[#1E293B] rounded-2xl fixed left-3 top-3 bottom-3 shadow-soft border border-slate-100/80 dark:border-slate-800 shrink-0 z-40 transition-all duration-300 ${
         isCollapsed ? 'w-20 px-2 items-center' : 'w-64 px-3'
       }`}
@@ -204,6 +251,127 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
         </button>
       </div>
     </aside>
+
+    {/* Mobile Left Sidebar Drawer for Employee Portal */}
+    {isMobileOpen && (
+      <div className="lg:hidden fixed inset-0 z-[70] flex">
+        {/* Backdrop Blur Overlay */}
+        <div
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+          onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* Slide-over Left Navigation Panel */}
+        <aside
+          className="relative w-[285px] max-w-[85vw] h-full bg-white dark:bg-[#1E293B] shadow-2xl z-10 flex flex-col justify-between p-4 border-r border-slate-200/80 dark:border-slate-800 animate-in slide-in-from-left duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Employee Navigation Menu"
+        >
+          {/* Top Section: Brand & Close Button */}
+          <div className="w-full flex-1 flex flex-col min-h-0">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex flex-col">
+                <Logo collapsed={false} />
+                <div className="flex items-center gap-1.5 mt-1.5 pl-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                    Employee Portal
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen(false)}
+                title="Close Navigation Menu"
+                aria-label="Close Navigation Menu"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            {/* Scrollable Navigation Items */}
+            <nav className="flex-1 overflow-y-auto overflow-x-hidden pt-3 space-y-1 w-full pr-1 custom-scrollbar">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                        isActive
+                          ? 'bg-gradient-to-r from-emerald-50 to-teal-50/80 dark:from-emerald-950/70 dark:to-teal-950/40 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-emerald-200/50 dark:border-emerald-800/40'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Icon
+                          className={`w-4 h-4 shrink-0 stroke-[2] ${
+                            isActive
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-slate-500 dark:text-slate-400'
+                          }`}
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Bottom Section: Theme & Logout */}
+          <div className="w-full pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-1 shrink-0">
+            {/* User Profile Mini Dossier */}
+            {currentUser?.firstName && (
+              <div className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 mb-2 flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                    {currentUser.firstName} {currentUser.lastName || ''}
+                  </p>
+                  <p className="text-[10px] text-slate-400 truncate">
+                    {currentUser.role || 'Employee'} • {currentUser.email || ''}
+                  </p>
+                </div>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              </div>
+            )}
+
+            {/* Theme Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              {resolvedTheme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400 stroke-[2] shrink-0" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600 dark:text-slate-400 stroke-[2] shrink-0" />
+              )}
+              <span>{resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
+
+            {/* Logout */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400 transition-all cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    )}
+  </>
   );
 };
 
