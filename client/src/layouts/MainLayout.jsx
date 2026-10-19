@@ -51,7 +51,7 @@ const MainLayout = () => {
       <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 transition-all duration-300">
+      <main className="flex-1 min-w-0 transition-all duration-300 pb-28 lg:pb-6">
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>

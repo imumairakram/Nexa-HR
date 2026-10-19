@@ -136,14 +136,14 @@ const Attendance = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC BIOMETRIC HERO BANNER (EMERALD-TEAL LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           {/* Left Side: Biometric Telemetry */}
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+          <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
+            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Biometric Attendance & Workforce Time Engine
             </h2>
 
@@ -151,7 +151,7 @@ const Attendance = () => {
               Synchronize real-time clock-in logs from hardware face-ID terminals, turnstile gates, and monitor on-time workforce compliance.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
               <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <Fingerprint className="w-3.5 h-3.5" />
                 <span>{stats.present} Staff Clocked In Today</span>
@@ -163,8 +163,8 @@ const Attendance = () => {
             </div>
           </div>
 
-          {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[260px] shrink-0 space-y-3">
+          {/* Right Side: Action Glassmorphic Card (Desktop / Tablet) */}
+          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[260px] shrink-0 space-y-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <Cpu className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -173,7 +173,6 @@ const Attendance = () => {
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Biometric sync engine active</div>
             </div>
             <div className="flex flex-col w-full gap-2">
-              {/* Hardware-only punch-in notice */}
               <div className="w-full px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 text-xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                 <span className="font-semibold text-slate-500 dark:text-slate-400">Punch-in via hardware only</span>
@@ -188,14 +187,25 @@ const Attendance = () => {
               </button>
             </div>
           </div>
+
+          {/* Mobile Quick Action */}
+          <div className="sm:hidden pt-1 flex items-center gap-2">
+            <button
+              onClick={handleSyncHardware}
+              disabled={isSyncing}
+              className="flex-1 py-3 px-4 rounded-2xl bg-emerald-600 active:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? 'Syncing...' : 'Sync Biometric Logs'}</span>
+            </button>
+          </div>
         </div>
       </div>
-
 
       {/* ========================================================================= */}
       {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1 */}
         <SparkMetricCard
           variant="dark"
