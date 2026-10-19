@@ -555,7 +555,74 @@ const PublicHoliday = () => {
               <p className="text-sm font-semibold">No holidays match the search query for {selectedYear}.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {filteredHolidays.map((h) => (
+                    <div
+                      key={h.id}
+                      className={`bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs transition-all flex flex-col justify-between ${
+                        h.status === 'ACTIVE_TODAY' ? 'ring-2 ring-emerald-500/40 bg-emerald-50/20' : ''
+                      }`}
+                    >
+                      <div className="space-y-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs">
+                              <span className="text-[9px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider">
+                                {h.monthShort}
+                              </span>
+                              <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
+                                {h.dayNum}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.name}</div>
+                              <div className="text-[10px] text-slate-400 font-mono">{h.displayDate} • {h.day}</div>
+                            </div>
+                          </div>
+                          {h.isCustom && (
+                            <button
+                              onClick={() => handleDelete(h.id)}
+                              className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                              title="Delete Holiday"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                            {h.type}
+                          </span>
+                          {h.isIslamic && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center gap-1">
+                              <Moon className="w-2.5 h-2.5" />
+                              <span>{h.hijriDateText || 'Islamic Lunar'}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {h.description && (
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
+                            {h.description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                        <span className="text-[10px] uppercase font-bold text-slate-400">{h.statusText}</span>
+                        <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400">{h.countdownText || 'Observed'}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-black uppercase text-slate-400 tracking-wider bg-slate-50/60 dark:bg-slate-800/40">
@@ -672,6 +739,7 @@ const PublicHoliday = () => {
                 </tbody>
               </table>
             </div>
+          </>
           )}
         </div>
       )}

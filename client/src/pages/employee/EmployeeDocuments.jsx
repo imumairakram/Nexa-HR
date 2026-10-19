@@ -491,7 +491,7 @@ const EmployeeDocuments = () => {
             )}
           </div>
 
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl">
+          <div className="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl">
             <button
               onClick={() => setViewMode('list')}
               title="Table List View"
@@ -538,16 +538,25 @@ const EmployeeDocuments = () => {
           </div>
 
           {loading ? (
-            viewMode === 'list' ? (
-              <TableSkeleton rows={5} cols={6} />
-            ) : (
-              <div className="p-6">
+            <>
+              <div className="p-6 md:hidden">
                 <DocumentCardSkeleton count={6} />
               </div>
-            )
-          ) : viewMode === 'list' ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <div className="hidden md:block">
+                {viewMode === 'list' ? (
+                  <TableSkeleton rows={5} cols={6} />
+                ) : (
+                  <div className="p-6">
+                    <DocumentCardSkeleton count={6} />
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {viewMode === 'list' && (
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                   <tr>
                     <th className="py-3.5 px-6">Document Title</th>
@@ -626,8 +635,8 @@ const EmployeeDocuments = () => {
                 </tbody>
               </table>
             </div>
-          ) : (
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          )}
+          <div className={`p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${viewMode === 'list' ? 'md:hidden' : ''}`}>
               {filteredPersonalDocs.map((doc) => (
                 <div
                   key={doc.id}
@@ -671,6 +680,7 @@ const EmployeeDocuments = () => {
                 </div>
               ))}
             </div>
+          </>
           )}
         </div>
       )}

@@ -324,53 +324,116 @@ const Payroll = () => {
         </div>
 
         {history.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-6">Pay Period Cycle</th>
-                  <th className="py-3.5 px-4">Disbursement Date</th>
-                  <th className="py-3.5 px-4">Payees</th>
-                  <th className="py-3.5 px-4">Gross Salaries</th>
-                  <th className="py-3.5 px-4">Tax Deductions</th>
-                  <th className="py-3.5 px-4">Net Disbursed</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <>
+            {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+            <div className="block md:hidden p-3.5 sm:p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {history.map((run) => (
-                  <tr key={run.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="font-extrabold text-slate-900 dark:text-white">{run.month}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">{run.id}</div>
-                    </td>
-                    <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{run.payDate}</td>
-                    <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">{run.employeesCount} Staff</td>
-                    <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">${run.totalGross.toLocaleString()}</td>
-                    <td className="py-4 px-4 font-semibold text-rose-500">-${run.totalDeductions.toLocaleString()}</td>
-                    <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                      ${run.netPayable.toLocaleString()}
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>{run.status}</span>
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <button
-                        onClick={() => navigate('/app/payroll/payslips')}
-                        className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold transition-all cursor-pointer"
-                      >
-                        Inspect Slips
-                      </button>
-                    </td>
-                  </tr>
+                  <div
+                    key={run.id}
+                    className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-blue-400/60 dark:hover:border-blue-600/60 transition-all flex flex-col justify-between"
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="font-extrabold text-slate-900 dark:text-white text-sm">{run.month}</div>
+                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">{run.id}</div>
+                        </div>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold shrink-0">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>{run.status}</span>
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                        <span className="text-slate-500 dark:text-slate-400 font-medium">{run.payDate}</span>
+                        <span className="font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900/60 px-2.5 py-1 rounded-xl border border-slate-100 dark:border-slate-800">
+                          {run.employeesCount} Staff
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-center">
+                        <div>
+                          <div className="text-[9px] uppercase font-bold text-slate-400">Gross</div>
+                          <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
+                            ${run.totalGross.toLocaleString()}
+                          </div>
+                        </div>
+                        <div className="border-x border-slate-100 dark:border-slate-800">
+                          <div className="text-[9px] uppercase font-bold text-slate-400">Tax</div>
+                          <div className="text-xs font-bold text-rose-500 mt-0.5">
+                            -${run.totalDeductions.toLocaleString()}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[9px] uppercase font-bold text-slate-400">Net</div>
+                          <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                            ${run.netPayable.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => navigate('/app/payroll/payslips')}
+                      className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold transition-all cursor-pointer text-center"
+                    >
+                      Inspect Slips
+                    </button>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </div>
+
+            {/* Desktop Table View (Hidden on Mobile) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                  <tr>
+                    <th className="py-3.5 px-6">Pay Period Cycle</th>
+                    <th className="py-3.5 px-4">Disbursement Date</th>
+                    <th className="py-3.5 px-4">Payees</th>
+                    <th className="py-3.5 px-4">Gross Salaries</th>
+                    <th className="py-3.5 px-4">Tax Deductions</th>
+                    <th className="py-3.5 px-4">Net Disbursed</th>
+                    <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {history.map((run) => (
+                    <tr key={run.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="font-extrabold text-slate-900 dark:text-white">{run.month}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">{run.id}</div>
+                      </td>
+                      <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{run.payDate}</td>
+                      <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">{run.employeesCount} Staff</td>
+                      <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">${run.totalGross.toLocaleString()}</td>
+                      <td className="py-4 px-4 font-semibold text-rose-500">-${run.totalDeductions.toLocaleString()}</td>
+                      <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                        ${run.netPayable.toLocaleString()}
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>{run.status}</span>
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <button
+                          onClick={() => navigate('/app/payroll/payslips')}
+                          className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold transition-all cursor-pointer"
+                        >
+                          Inspect Slips
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center flex flex-col items-center justify-center">
             <CreditCard className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />

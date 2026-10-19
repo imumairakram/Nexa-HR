@@ -321,7 +321,75 @@ const Attendance = () => {
         <TableSkeleton rows={6} cols={7} />
       ) : (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+        <div className="block md:hidden p-3.5 sm:p-4">
+          {filteredLogs.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {filteredLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-blue-400/60 dark:hover:border-blue-600/60 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-extrabold text-slate-900 dark:text-white text-sm">
+                        {log.user?.firstName} {log.user?.lastName}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                        {log.user?.employeeCode} • {log.user?.department}
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
+                        log.status === 'PRESENT'
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                          : log.status === 'LATE'
+                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                          : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                      }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                      <span>{log.status.replace('_', ' ')}</span>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-center">
+                    <div>
+                      <div className="text-[9px] uppercase font-bold text-slate-400">Check In</div>
+                      <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                        {log.checkInTime ? new Date(log.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}
+                      </div>
+                    </div>
+                    <div className="border-x border-slate-100 dark:border-slate-800">
+                      <div className="text-[9px] uppercase font-bold text-slate-400">Check Out</div>
+                      <div className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                        {log.checkOutTime ? new Date(log.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[9px] uppercase font-bold text-slate-400">Total</div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white mt-0.5">
+                        {log.totalHours > 0 ? `${log.totalHours}h` : '--'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">{log.date}</span>
+                    <span className="truncate max-w-[170px] text-right font-medium">{log.notes || 'Terminal Synced'}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center text-slate-400 font-medium text-xs">
+              No attendance records found in database.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View (Hidden on Mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
               <tr>

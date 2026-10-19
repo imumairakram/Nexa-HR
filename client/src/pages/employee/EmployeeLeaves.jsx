@@ -380,7 +380,67 @@ const EmployeeLeaves = () => {
           </div>
 
           {requests.length > 0 ? (
-            <div className="overflow-x-auto">
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {requests.map((req) => (
+                    <div
+                      key={req.id}
+                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-blue-400/60 transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                              <Layers className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                                {req.leaveType?.name || 'General Leave'}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                            </div>
+                          </div>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border shrink-0 ${
+                              req.status === 'APPROVED'
+                                ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40'
+                                : req.status === 'REJECTED'
+                                ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
+                                : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
+                            }`}
+                          >
+                            {req.status}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                          <span className="text-slate-500 font-medium">Duration:</span>
+                          <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                            {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                          </span>
+                        </div>
+
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
+                          <div className="font-semibold text-slate-700 dark:text-slate-300">
+                            {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
+                          </div>
+                          {req.reason && <p className="line-clamp-2 text-slate-600 dark:text-slate-400">{req.reason}</p>}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                        <span className="font-bold text-slate-500">Remarks: </span>
+                        <span>{req.rejectionReason || (req.status === 'APPROVED' ? 'Approved by HR Lead' : 'Pending Supervisor Review')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-xs tracking-wider border-b border-slate-100 dark:border-slate-800">
                   <tr>
@@ -439,6 +499,7 @@ const EmployeeLeaves = () => {
                 </tbody>
               </table>
             </div>
+          </>
           ) : (
             <div className="p-12 text-center flex flex-col items-center justify-center">
               <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />

@@ -593,7 +593,7 @@ const ATSPipeline = () => {
             </button>
             <button
               onClick={() => setCurrentView('table')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 currentView === 'table' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -611,9 +611,9 @@ const ATSPipeline = () => {
         <TableSkeleton rows={6} cols={6} />
       ) : (
         <>
-          {/* VIEW 1: UNIFIED KANBAN BOARD WITH DRAG & DROP */}
-          {currentView === 'kanban' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start">
+          {/* VIEW 1: UNIFIED KANBAN BOARD WITH DRAG & DROP (Always on mobile if table selected) */}
+          {(currentView === 'kanban' || currentView === 'table') && (
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start ${currentView === 'table' ? 'md:hidden' : ''}`}>
               {STAGES.map((stage, sIdx) => {
                 const stageCandidates = filteredCandidates.filter((c) => c.stage === stage.key);
                 const isOver = dragOverStage === stage.key;
@@ -743,7 +743,69 @@ const ATSPipeline = () => {
           {/* VIEW 2: INTERVIEW SCHEDULES LIST */}
           {currentView === 'interviews' && (
             <div className="bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
-              <div className="overflow-x-auto">
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                {interviews.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {interviews.map((iv) => (
+                      <div
+                        key={iv.id}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-purple-400/60 transition-all flex flex-col justify-between"
+                      >
+                        <div className="space-y-2.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                                <Video className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <p className="font-extrabold text-slate-900 dark:text-white leading-snug text-sm">{iv.candidate}</p>
+                                <p className="text-[10px] text-slate-400">{iv.role}</p>
+                              </div>
+                            </div>
+                            <span
+                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                iv.status === 'SCHEDULED'
+                                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
+                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                              }`}
+                            >
+                              {iv.status}
+                            </span>
+                          </div>
+
+                          <div className="text-xs space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-slate-600 dark:text-slate-300">
+                            <div><span className="text-slate-400 font-medium">Interviewer: </span><span className="font-semibold">{iv.interviewer}</span></div>
+                            <div className="flex items-center gap-1.5 font-medium">
+                              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{iv.date}</span>
+                              <span className="text-slate-400">• {iv.time}</span>
+                            </div>
+                            <div><span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg text-[10px] font-semibold">{iv.type}</span></div>
+                          </div>
+                        </div>
+
+                        <a
+                          href={iv.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-full py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1.5 text-xs"
+                        >
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Join Meet</span>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No interviews scheduled yet
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
@@ -820,9 +882,9 @@ const ATSPipeline = () => {
             </div>
           )}
 
-          {/* VIEW 3: ALL CANDIDATES ROSTER TABLE */}
+          {/* VIEW 3: ALL CANDIDATES ROSTER TABLE (Desktop Only) */}
           {currentView === 'table' && (
-            <div className="bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
+            <div className="hidden md:block bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>

@@ -234,7 +234,31 @@ const JobLocation = () => {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+        <div className="block md:hidden p-3.5 sm:p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {filtered.map((l) => (
+              <div
+                key={l.id}
+                className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">{l.name}</div>
+                  <span className="font-black text-slate-900 dark:text-white text-xs bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full shrink-0">
+                    {l.count} Roles
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">{l.city}, {l.country}</span>
+                  <span className="font-mono text-[10px] text-slate-400">{l.timezone}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View (Hidden on Mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
               <tr>

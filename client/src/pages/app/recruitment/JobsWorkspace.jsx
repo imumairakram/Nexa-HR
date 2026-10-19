@@ -477,7 +477,7 @@ const JobsWorkspace = () => {
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-xl transition-all cursor-pointer ${
+              className={`hidden md:block p-1.5 rounded-xl transition-all cursor-pointer ${
                 viewMode === 'table' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
               }`}
               title="Table View"
@@ -510,16 +510,23 @@ const JobsWorkspace = () => {
       {/* 4. ACTIVE JOBS DISPLAY (ZERO-LAYOUT-SHIFT SKELETONS) */}
       {/* ========================================================================= */}
       {loading ? (
-        viewMode === 'table' ? (
-          <TableSkeleton rows={6} cols={6} />
-        ) : (
-          <JobCardSkeleton count={6} />
-        )
+        <>
+          <div className="md:hidden">
+            <JobCardSkeleton count={6} />
+          </div>
+          <div className="hidden md:block">
+            {viewMode === 'table' ? (
+              <TableSkeleton rows={6} cols={6} />
+            ) : (
+              <JobCardSkeleton count={6} />
+            )}
+          </div>
+        </>
       ) : (
         <>
-          {/* VIEW 1: RICH GLASSMORHIC GRID CARDS */}
-          {viewMode === 'grid' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {/* VIEW 1: RICH GLASSMORHIC GRID CARDS (Always on mobile, and desktop when grid) */}
+          {(viewMode === 'grid' || viewMode === 'table') && (
+            <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
               {filteredJobs.length > 0 ? (
                 filteredJobs.map((job) => (
                   <div
@@ -617,9 +624,9 @@ const JobsWorkspace = () => {
             </div>
           )}
 
-          {/* VIEW 2: DATA TABLE VIEW */}
+          {/* VIEW 2: DATA TABLE VIEW (Desktop Only) */}
           {viewMode === 'table' && (
-            <div className="bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
+            <div className="hidden md:block bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>

@@ -822,8 +822,8 @@ NexaHR Workforce Systems`;
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto">
-            {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0">
+            {/* View Mode Toggle: Hidden on mobile (mobile strictly displays Grid View) */}
+            <div className="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-xl transition-all cursor-pointer ${
@@ -873,13 +873,21 @@ NexaHR Workforce Systems`;
       {/* 3. EMPLOYEES GRID / TABLE */}
       {/* ========================================================================= */}
       {loading ? (
-        viewMode === 'grid' ? (
-          <EmployeeCardSkeleton count={6} />
-        ) : (
-          <TableSkeleton rows={6} cols={6} />
-        )
-      ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
+        <>
+          <div className="md:hidden">
+            <EmployeeCardSkeleton count={6} />
+          </div>
+          <div className="hidden md:block">
+            {viewMode === 'grid' ? (
+              <EmployeeCardSkeleton count={6} />
+            ) : (
+              <TableSkeleton rows={6} cols={6} />
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
           {filteredEmployees.map((emp, idx) => (
             <div
               key={emp.id || idx}
@@ -1021,8 +1029,8 @@ NexaHR Workforce Systems`;
             </div>
           ))}
         </div>
-      ) : (
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+        {viewMode === 'table' && (
+          <div className="hidden md:block bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
@@ -1103,6 +1111,8 @@ NexaHR Workforce Systems`;
             </table>
           </div>
         </div>
+        )}
+      </>
       )}
 
       {/* ========================================================================= */}

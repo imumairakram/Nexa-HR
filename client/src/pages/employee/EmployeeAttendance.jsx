@@ -467,7 +467,72 @@ const EmployeeAttendance = () => {
 
         {/* Table / Timeline Data Grid */}
         {filteredLogs.length > 0 ? (
-          <div className="overflow-x-auto">
+          <>
+            {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+            <div className="block md:hidden p-3.5 sm:p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {filteredLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-indigo-400/60 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                          <CalendarDays className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">{log.formattedDate}</div>
+                          <div className="text-[10px] text-slate-400 font-medium">{log.day}</div>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
+                          log.status === 'PRESENT'
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
+                        }`}
+                      >
+                        {log.status}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-center">
+                      <div>
+                        <div className="text-[9px] uppercase font-bold text-slate-400">Punch In</div>
+                        <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                          {log.checkIn}
+                        </div>
+                      </div>
+                      <div className="border-x border-slate-100 dark:border-slate-800">
+                        <div className="text-[9px] uppercase font-bold text-slate-400">Punch Out</div>
+                        <div className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                          {log.checkOut}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] uppercase font-bold text-slate-400">Hours</div>
+                        <div className="text-xs font-black text-slate-800 dark:text-slate-200 mt-0.5">
+                          {log.hours ? `${Number(log.hours).toFixed(1)}h` : '--'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                      <span className="font-mono">{log.method}</span>
+                      {log.ot > 0 && (
+                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                          +{log.ot}h Overtime
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Table View (Hidden on Mobile) */}
+            <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                 <tr>
@@ -536,6 +601,7 @@ const EmployeeAttendance = () => {
               </tbody>
             </table>
           </div>
+          </>
         ) : (
           <div className="p-12 text-center flex flex-col items-center justify-center">
             <Fingerprint className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />

@@ -260,7 +260,36 @@ const JobCategory = () => {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+        <div className="block md:hidden p-3.5 sm:p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {filtered.map((c) => (
+              <div
+                key={c.id}
+                className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">{c.name}</div>
+                  <span className="font-mono text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg shrink-0">
+                    {c.code}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">{c.lead}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
+                    {c.status}
+                  </span>
+                </div>
+                <div className="text-right font-black text-slate-900 dark:text-white text-xs pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                  {c.count} Roles
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View (Hidden on Mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
               <tr>

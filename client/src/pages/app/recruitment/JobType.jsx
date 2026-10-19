@@ -234,7 +234,42 @@ const JobType = () => {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+        <div className="block md:hidden p-3.5 sm:p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {filtered.map((t) => (
+              <div
+                key={t.id}
+                className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">{t.name}</div>
+                  <span className="font-mono text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg shrink-0">
+                    {t.code}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-500 py-1 border-t border-slate-100 dark:border-slate-800/80">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase font-bold">Hours</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{t.hours}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase font-bold">Roles</span>
+                    <span className="font-black text-slate-900 dark:text-white">{t.count} Roles</span>
+                  </div>
+                </div>
+                {t.benefits && (
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                    {t.benefits}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View (Hidden on Mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
               <tr>

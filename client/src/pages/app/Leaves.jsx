@@ -352,84 +352,163 @@ const Leaves = () => {
       ) : (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
           {filtered.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-6">Employee</th>
-                  <th className="py-3.5 px-4">Leave Policy</th>
-                  <th className="py-3.5 px-4">Duration & Dates</th>
-                  <th className="py-3.5 px-4">Reason / Notes</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {filtered.map((req) => (
-                  <tr key={req.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="font-extrabold text-slate-900 dark:text-white">
-                        {req.user?.firstName} {req.user?.lastName}
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {filtered.map((req) => (
+                    <div
+                      key={req.id}
+                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-blue-400/60 dark:hover:border-blue-600/60 transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="font-extrabold text-slate-900 dark:text-white text-sm">
+                              {req.user?.firstName} {req.user?.lastName}
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-medium">
+                              {req.user?.email}
+                            </div>
+                          </div>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase shrink-0 ${
+                              req.status === 'APPROVED'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                                : req.status === 'REJECTED'
+                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                                : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                            }`}
+                          >
+                            {req.status}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                          <span className="font-bold text-slate-700 dark:text-slate-300">
+                            {req.leaveType?.name || 'General Leave'}
+                          </span>
+                          <span className="font-black text-blue-600 dark:text-blue-400">
+                            {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                          </span>
+                        </div>
+
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/60 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <div className="text-[10px] uppercase font-bold text-slate-400 mb-0.5">Timeline & Reason</div>
+                          <div className="font-semibold text-slate-700 dark:text-slate-300">
+                            {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
+                          </div>
+                          {req.reason && <p className="mt-1 line-clamp-2 text-slate-600 dark:text-slate-400">{req.reason}</p>}
+                        </div>
                       </div>
-                      <div className="text-[10px] text-slate-400">{req.user?.email}</div>
-                    </td>
-                    <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">
-                      {req.leaveType?.name || 'General Leave'}
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-slate-900 dark:text-white">
-                        {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
-                      </div>
-                      <div className="text-[10px] text-slate-400">
-                        {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 max-w-xs truncate text-slate-600 dark:text-slate-300">
-                      {req.reason}
-                    </td>
-                    <td className="py-4 px-4">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                          req.status === 'APPROVED'
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                            : req.status === 'REJECTED'
-                            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
-                            : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                        }`}
-                      >
-                        {req.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
+
                       {req.status === 'PENDING' ? (
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                           <button
                             onClick={() => handleUpdateStatus(req.id, 'APPROVED')}
                             disabled={submitting}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 text-xs font-bold transition-all cursor-pointer"
+                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs text-center"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleUpdateStatus(req.id, 'REJECTED')}
                             disabled={submitting}
-                            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer"
+                            className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer text-center"
                           >
                             Reject
                           </button>
                         </div>
                       ) : (
-                        <span className="text-[11px] font-medium text-slate-400">
-                          {req.status === 'APPROVED' ? 'Approved' : 'Declined'}
-                        </span>
+                        <div className="text-[11px] text-center font-medium text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          {req.status === 'APPROVED' ? 'Approved by HR Lead' : 'Application Declined'}
+                        </div>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                    <tr>
+                      <th className="py-3.5 px-6">Employee</th>
+                      <th className="py-3.5 px-4">Leave Policy</th>
+                      <th className="py-3.5 px-4">Duration & Dates</th>
+                      <th className="py-3.5 px-4">Reason / Notes</th>
+                      <th className="py-3.5 px-4">Status</th>
+                      <th className="py-3.5 px-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {filtered.map((req) => (
+                      <tr key={req.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="font-extrabold text-slate-900 dark:text-white">
+                            {req.user?.firstName} {req.user?.lastName}
+                          </div>
+                          <div className="text-[10px] text-slate-400">{req.user?.email}</div>
+                        </td>
+                        <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">
+                          {req.leaveType?.name || 'General Leave'}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="font-bold text-slate-900 dark:text-white">
+                            {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 max-w-xs truncate text-slate-600 dark:text-slate-300">
+                          {req.reason}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                              req.status === 'APPROVED'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                                : req.status === 'REJECTED'
+                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                                : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                            }`}
+                          >
+                            {req.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          {req.status === 'PENDING' ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleUpdateStatus(req.id, 'APPROVED')}
+                                disabled={submitting}
+                                className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 text-xs font-bold transition-all cursor-pointer"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleUpdateStatus(req.id, 'REJECTED')}
+                                disabled={submitting}
+                                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[11px] font-medium text-slate-400">
+                              {req.status === 'APPROVED' ? 'Approved' : 'Declined'}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
           <div className="p-12 text-center flex flex-col items-center justify-center">
             <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
             <h4 className="text-base font-black text-slate-900 dark:text-white">No Leave Applications Found</h4>

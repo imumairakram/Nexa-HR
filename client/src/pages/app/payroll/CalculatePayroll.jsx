@@ -277,7 +277,56 @@ const CalculatePayroll = () => {
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+          <div className="block md:hidden p-3.5 sm:p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {data.map((row) => (
+                <div
+                  key={row.id}
+                  className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-emerald-400/60 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-extrabold text-slate-900 dark:text-white text-sm">{row.name}</div>
+                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">{row.id}</div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      {row.dept}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Days Ratio</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">{row.daysWorked}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Base Salary</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">${row.base.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Overtime</span>
+                      <span className="font-semibold text-emerald-600">+${row.overtime.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Tax Withheld</span>
+                      <span className="font-semibold text-rose-500">-${row.tax.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                    <span className="text-xs font-bold text-slate-500">Net Payable:</span>
+                    <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                      ${row.net.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop Table View (Hidden on Mobile) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                 <tr>

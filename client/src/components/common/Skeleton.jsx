@@ -143,7 +143,26 @@ export const TableSkeleton = ({ rows = 6, cols = 5 }) => {
           <Skeleton className="h-9 w-20 rounded-xl" />
         </div>
       </div>
-      <div className="overflow-x-auto">
+      {/* Mobile Card Grid Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:hidden">
+        {Array.from({ length: Math.min(rows, 4) }).map((_, rIdx) => (
+          <div key={rIdx} className="p-4 rounded-2xl bg-slate-50/60 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-2xl shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <Skeleton className="h-4 w-3/4 rounded-md" />
+                <Skeleton className="h-3 w-1/2 rounded-md" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+              <Skeleton className="h-3 w-20 rounded-md" />
+              <Skeleton className="h-3 w-16 rounded-md ml-auto" />
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Desktop Table Skeleton */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left">
           <thead className="bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800">
             <tr>

@@ -432,9 +432,62 @@ const JobApplication = () => {
         </div>
       </div>
 
-      {/* Applications Table */}
+      {/* Applications Table / Cards */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+        <div className="block md:hidden p-3.5 sm:p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {filtered.map((a) => (
+              <div
+                key={a.id}
+                className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-blue-400/60 transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-extrabold text-slate-900 dark:text-white text-sm">{a.name}</div>
+                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">{a.id}</div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 font-black text-amber-500 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md text-[10px] shrink-0">
+                      <Star className="w-3 h-3 fill-current" /> {a.rating}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                    <span className="font-semibold text-blue-600 dark:text-blue-400">{a.role}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                      a.stage === 'HIRED'
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                        : a.stage === 'OFFER'
+                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                        : a.stage === 'INTERVIEWING'
+                        ? 'bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+                        : 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                    }`}>
+                      {a.stage}
+                    </span>
+                  </div>
+
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/60 p-2 rounded-xl border border-slate-100 dark:border-slate-800 space-y-0.5">
+                    <div>{a.email}</div>
+                    <div className="text-[10px] text-slate-400 font-mono">{a.phone} • Applied: {a.date}</div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedApp(a)}
+                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Inspect Dossier</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View (Hidden on Mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
               <tr>

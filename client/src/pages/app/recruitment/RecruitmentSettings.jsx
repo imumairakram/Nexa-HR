@@ -564,7 +564,66 @@ const RecruitmentSettings = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
           {/* TAB 1: CATEGORIES */}
           {activeTab === 'categories' && (
-            <div className="overflow-x-auto">
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                {filteredCategories.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {filteredCategories.map((cat) => (
+                      <div
+                        key={cat.id}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                                <Tag className="w-4 h-4" />
+                              </div>
+                              <span className="font-bold text-slate-900 dark:text-white text-xs">{cat.name}</span>
+                            </div>
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                              {cat.code}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80 text-slate-600 dark:text-slate-300">
+                            <span>Lead: <strong className="text-slate-800 dark:text-slate-200">{cat.lead}</strong></span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              <span>{cat.status || 'ACTIVE'}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          <button
+                            onClick={() => handleOpenEdit(cat)}
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                            title="Edit Category"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(cat.id)}
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                            title="Delete Category"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No categories found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
@@ -627,283 +686,553 @@ const RecruitmentSettings = () => {
                 </tbody>
               </table>
             </div>
+            </>
           )}
 
           {/* TAB 2: CONTRACT TYPES */}
           {activeTab === 'types' && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
-                    <th className="py-4 px-6">Contract Model</th>
-                    <th className="py-4 px-6">Code</th>
-                    <th className="py-4 px-6">Standard Hours</th>
-                    <th className="py-4 px-6">Compensation & Benefits Track</th>
-                    <th className="py-4 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                  {filteredTypes.length > 0 ? (
-                    filteredTypes.map((type) => (
-                      <tr key={type.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                            <Briefcase className="w-4 h-4" />
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                {filteredTypes.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {filteredTypes.map((type) => (
+                      <div
+                        key={type.id}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                <Briefcase className="w-4 h-4" />
+                              </div>
+                              <span className="font-bold text-slate-900 dark:text-white text-xs">{type.name}</span>
+                            </div>
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                              {type.code}
+                            </span>
                           </div>
-                          <span>{type.name}</span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                            {type.code}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{type.hours}</td>
-                        <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{type.benefits}</td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="inline-flex items-center gap-1">
-                            <button
-                              onClick={() => handleOpenEdit(type)}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
-                              title="Edit Type"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(type.id)}
-                              className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
-                              title="Delete Type"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+
+                          <div className="text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-1 text-slate-600 dark:text-slate-300">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Standard Hours:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{type.hours}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Benefits:</span>
+                              <span className="font-medium text-slate-700 dark:text-slate-300 truncate max-w-[150px]">{type.benefits}</span>
+                            </div>
                           </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          <button
+                            onClick={() => handleOpenEdit(type)}
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                            title="Edit Type"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(type.id)}
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                            title="Delete Type"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No contract types found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
+                      <th className="py-4 px-6">Contract Model</th>
+                      <th className="py-4 px-6">Code</th>
+                      <th className="py-4 px-6">Standard Hours</th>
+                      <th className="py-4 px-6">Compensation & Benefits Track</th>
+                      <th className="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                    {filteredTypes.length > 0 ? (
+                      filteredTypes.map((type) => (
+                        <tr key={type.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                              <Briefcase className="w-4 h-4" />
+                            </div>
+                            <span>{type.name}</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                              {type.code}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{type.hours}</td>
+                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{type.benefits}</td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() => handleOpenEdit(type)}
+                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                                title="Edit Type"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(type.id)}
+                                className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                                title="Delete Type"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
+                          No contract types found matching "{searchQuery}"
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
-                        No contract types found matching "{searchQuery}"
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* TAB 3: LOCATIONS */}
           {activeTab === 'locations' && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
-                    <th className="py-4 px-6">Hiring Hub / Office Campus</th>
-                    <th className="py-4 px-6">City & Country</th>
-                    <th className="py-4 px-6">Timezone</th>
-                    <th className="py-4 px-6">Classification</th>
-                    <th className="py-4 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                  {filteredLocations.length > 0 ? (
-                    filteredLocations.map((loc) => (
-                      <tr key={loc.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                            <MapPin className="w-4 h-4" />
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                {filteredLocations.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {filteredLocations.map((loc) => (
+                      <div
+                        key={loc.id}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <MapPin className="w-4 h-4" />
+                              </div>
+                              <span className="font-bold text-slate-900 dark:text-white text-xs">{loc.name}</span>
+                            </div>
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                loc.status === 'PRIMARY_HQ'
+                                  ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
+                                  : loc.status === 'REMOTE'
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                              }`}
+                            >
+                              {loc.status || 'BRANCH'}
+                            </span>
                           </div>
-                          <span>{loc.name}</span>
-                        </td>
-                        <td className="py-4 px-6 text-slate-600 dark:text-slate-300">
-                          {loc.city}, {loc.country}
-                        </td>
-                        <td className="py-4 px-6 font-mono text-[11px] text-slate-500">{loc.timezone}</td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              loc.status === 'PRIMARY_HQ'
-                                ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
-                                : loc.status === 'REMOTE'
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                            }`}
+
+                          <div className="text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-1 text-slate-600 dark:text-slate-300">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">City, Country:</span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">{loc.city}, {loc.country}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Timezone:</span>
+                              <span className="font-mono text-[11px] text-slate-500">{loc.timezone}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          <button
+                            onClick={() => handleOpenEdit(loc)}
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                            title="Edit Location"
                           >
-                            {loc.status || 'BRANCH'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="inline-flex items-center gap-1">
-                            <button
-                              onClick={() => handleOpenEdit(loc)}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
-                              title="Edit Location"
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(loc.id)}
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                            title="Delete Location"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No locations found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
+                      <th className="py-4 px-6">Hiring Hub / Office Campus</th>
+                      <th className="py-4 px-6">City & Country</th>
+                      <th className="py-4 px-6">Timezone</th>
+                      <th className="py-4 px-6">Classification</th>
+                      <th className="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                    {filteredLocations.length > 0 ? (
+                      filteredLocations.map((loc) => (
+                        <tr key={loc.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                              <MapPin className="w-4 h-4" />
+                            </div>
+                            <span>{loc.name}</span>
+                          </td>
+                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300">
+                            {loc.city}, {loc.country}
+                          </td>
+                          <td className="py-4 px-6 font-mono text-[11px] text-slate-500">{loc.timezone}</td>
+                          <td className="py-4 px-6">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                loc.status === 'PRIMARY_HQ'
+                                  ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
+                                  : loc.status === 'REMOTE'
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                              }`}
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(loc.id)}
-                              className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
-                              title="Delete Location"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                              {loc.status || 'BRANCH'}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() => handleOpenEdit(loc)}
+                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                                title="Edit Location"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(loc.id)}
+                                className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                                title="Delete Location"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
+                          No locations found matching "{searchQuery}"
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
-                        No locations found matching "{searchQuery}"
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* TAB 4: SKILLS */}
           {activeTab === 'skills' && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
-                    <th className="py-4 px-6">Skill Name & Framework</th>
-                    <th className="py-4 px-6">Domain Category</th>
-                    <th className="py-4 px-6">Proficiency Level</th>
-                    <th className="py-4 px-6">Evaluation Weight</th>
-                    <th className="py-4 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                  {filteredSkills.length > 0 ? (
-                    filteredSkills.map((skill) => (
-                      <tr key={skill.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                            <Code className="w-4 h-4" />
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                {filteredSkills.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {filteredSkills.map((skill) => (
+                      <div
+                        key={skill.id}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                                <Code className="w-4 h-4" />
+                              </div>
+                              <span className="font-bold text-slate-900 dark:text-white text-xs">{skill.name}</span>
+                            </div>
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                skill.weight === 'Mandatory'
+                                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                              }`}
+                            >
+                              {skill.weight}
+                            </span>
                           </div>
-                          <span>{skill.name}</span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="font-semibold text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800">
-                            {skill.category}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
-                            <ShieldCheck className="w-3 h-3 text-indigo-500" />
-                            <span>{skill.proficiency}</span>
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              skill.weight === 'Mandatory'
-                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                                : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            }`}
+
+                          <div className="text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-1 text-slate-600 dark:text-slate-300">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Category:</span>
+                              <span className="font-semibold text-slate-700 dark:text-slate-300">{skill.category}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Proficiency:</span>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                                <ShieldCheck className="w-3 h-3 text-indigo-500" />
+                                <span>{skill.proficiency}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          <button
+                            onClick={() => handleOpenEdit(skill)}
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                            title="Edit Skill"
                           >
-                            {skill.weight}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="inline-flex items-center gap-1">
-                            <button
-                              onClick={() => handleOpenEdit(skill)}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
-                              title="Edit Skill"
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(skill.id)}
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                            title="Delete Skill"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No skills found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
+                      <th className="py-4 px-6">Skill Name & Framework</th>
+                      <th className="py-4 px-6">Domain Category</th>
+                      <th className="py-4 px-6">Proficiency Level</th>
+                      <th className="py-4 px-6">Evaluation Weight</th>
+                      <th className="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                    {filteredSkills.length > 0 ? (
+                      filteredSkills.map((skill) => (
+                        <tr key={skill.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                              <Code className="w-4 h-4" />
+                            </div>
+                            <span>{skill.name}</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="font-semibold text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+                              {skill.category}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                              <ShieldCheck className="w-3 h-3 text-indigo-500" />
+                              <span>{skill.proficiency}</span>
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                skill.weight === 'Mandatory'
+                                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                              }`}
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(skill.id)}
-                              className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
-                              title="Delete Skill"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                              {skill.weight}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() => handleOpenEdit(skill)}
+                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                                title="Edit Skill"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(skill.id)}
+                                className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                                title="Delete Skill"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
+                          No skills found matching "{searchQuery}"
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
-                        No skills found matching "{searchQuery}"
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* TAB 5: EXPERIENCE */}
           {activeTab === 'experience' && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
-                    <th className="py-4 px-6">Seniority Band & Track</th>
-                    <th className="py-4 px-6">Level Code</th>
-                    <th className="py-4 px-6">Tenure Bracket</th>
-                    <th className="py-4 px-6">Compensation Benchmark Range</th>
-                    <th className="py-4 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                  {filteredExperiences.length > 0 ? (
-                    filteredExperiences.map((exp) => (
-                      <tr key={exp.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                            <Clock className="w-4 h-4" />
+            <>
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                {filteredExperiences.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {filteredExperiences.map((exp) => (
+                      <div
+                        key={exp.id}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5 shadow-xs flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <Clock className="w-4 h-4" />
+                              </div>
+                              <span className="font-bold text-slate-900 dark:text-white text-xs">{exp.label}</span>
+                            </div>
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                              {exp.code}
+                            </span>
                           </div>
-                          <span>{exp.label}</span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                            {exp.code}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-slate-600 dark:text-slate-300">
-                          {exp.minYears} - {exp.maxYears} Years
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-emerald-600 dark:text-emerald-400">
-                          {exp.salaryRange}
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="inline-flex items-center gap-1">
-                            <button
-                              onClick={() => handleOpenEdit(exp)}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
-                              title="Edit Experience Band"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(exp.id)}
-                              className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
-                              title="Delete Experience Band"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+
+                          <div className="text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-1 text-slate-600 dark:text-slate-300">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Tenure:</span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">{exp.minYears} - {exp.maxYears} Years</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Salary Benchmark:</span>
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400">{exp.salaryRange}</span>
+                            </div>
                           </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          <button
+                            onClick={() => handleOpenEdit(exp)}
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                            title="Edit Experience Band"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(exp.id)}
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                            title="Delete Experience Band"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No experience seniority bands found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
+                      <th className="py-4 px-6">Seniority Band & Track</th>
+                      <th className="py-4 px-6">Level Code</th>
+                      <th className="py-4 px-6">Tenure Bracket</th>
+                      <th className="py-4 px-6">Compensation Benchmark Range</th>
+                      <th className="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                    {filteredExperiences.length > 0 ? (
+                      filteredExperiences.map((exp) => (
+                        <tr key={exp.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                              <Clock className="w-4 h-4" />
+                            </div>
+                            <span>{exp.label}</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                              {exp.code}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300">
+                            {exp.minYears} - {exp.maxYears} Years
+                          </td>
+                          <td className="py-4 px-6 font-semibold text-emerald-600 dark:text-emerald-400">
+                            {exp.salaryRange}
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() => handleOpenEdit(exp)}
+                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                                title="Edit Experience Band"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(exp.id)}
+                                className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                                title="Delete Experience Band"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
+                          No experience seniority bands found matching "{searchQuery}"
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
-                        No experience seniority bands found matching "{searchQuery}"
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       )}
