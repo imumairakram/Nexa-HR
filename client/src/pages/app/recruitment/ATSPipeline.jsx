@@ -32,7 +32,6 @@ import {
   Trash2,
   Edit2,
   ExternalLink,
-  Sparkles,
 } from 'lucide-react';
 
 const STAGES = [
@@ -491,10 +490,6 @@ const ATSPipeline = () => {
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-indigo-100/70 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200 dark:border-indigo-800/60">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Full ATS Lifecycle</span>
-            </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Candidate Kanban Pipeline & Interviews
             </h2>
