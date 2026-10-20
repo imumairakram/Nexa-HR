@@ -71,7 +71,11 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Biometric & Geo Attendance Control**: Live biometric hardware gateway integration (`/api/attendance/hardware-sync`), daily punch logs, batch punch-in for active personnel (`/api/attendance/punch-all-today`), overtime records, and shift tracking (Present, Late, Half-Day, Absent, On Leave).
 * **Leave Management & Policy Engine**: Global leave quota rules, paid/unpaid policies, multi-tier approval workflows, and audit history.
 * **Automated Payroll & Tax Computation**: Dynamic allowances (HRA, transport, custom), tax deductions, unpaid leave penalties, and one-click monthly batch payslip generation.
-* **Recruitment & Applicant Tracking System (ATS)**: Job Desk, Job Board, Jobs catalog, Applicant pipeline stages, Candidate interview scheduler, Job categories, Skills matrix, Location manager, and Experience tags.
+* **Full-Lifecycle Recruitment & Applicant Tracking System (ATS)**:
+  - **Requisition Command & Workspace**: Live sparkline KPI telemetry cards (`Published Openings` [Dark Navy/Purple], `Total Applicants` [Light/Orange], `Paused / On Hold` [Light/Amber], and `Offer Acceptance` [Light/Rose]) with interactive vector sparklines, dual Grid and Table view modes, department and status filters, and instant requisition create/edit slide drawer.
+  - **Interactive Kanban Candidate Funnel**: 5-stage drag-and-drop / progression pipeline (`APPLIED` ➔ `SCREENING` ➔ `INTERVIEWING` ➔ `OFFER` ➔ `HIRED`), candidate scorecard ratings, full resume review drawer, and fast-track candidate creation modal.
+  - **Candidate Interview Desk**: Multi-round interview coordination (Technical, System Design, Leadership Fit), interviewer assignment, Google Meet room link generation, and real-time pass/reschedule status.
+  - **Unified Master Taxonomy & Settings**: 5-in-1 centralized management for Job Categories, Contract Types, Hiring Locations, Skill Competency Taxonomy, and Seniority Career Bands with database persistence and zero dummy-data fallbacks.
 * **Organization Hierarchy & Designations**: Dynamic department creation, designation hierarchy mapping, and team reporting structure.
 * **User Access Control & Security**: Fine-grained Role-Based Access Control (RBAC) permission matrices, user status activation/deactivation, and security audit logs.
 * **Accounts, Ledgers & Financial Audits**: Departmental cost tracking, payroll disbursement logs, expense accounts, batch operations, and exportable financial summaries.
@@ -96,8 +100,9 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
   - Implemented via a comprehensive [`Skeleton.jsx`](client/src/components/common/Skeleton.jsx) module.
   - Tailored skeleton primitives for Employee Cards, Department Cards, Data Tables (custom rows/cols), KPI Metric Grids, Announcement Bulletins, Support Tickets, Leave Policies, Document Cards, and RBAC Split-Screen Rosters.
   - Seamless CSS linear gradient animations synchronized across Light and Dark themes.
-* **Interactive Vector Sparkline Metrics**:
-  - Vector SVG-based high-fidelity sparkline cards with micro-tooltips and smooth cubic Bézier curves ([`SparkMetricCard.jsx`](client/src/components/common/SparkMetricCard.jsx)).
+* **Interactive Vector Sparkline Metrics & Telemetry Cards**:
+  - Vector SVG-based high-fidelity sparkline cards with micro-tooltips, smooth cubic Bézier curves, dynamic color themes (`purple`, `orange`, `amber`, `rose`, `emerald`, `blue`), pulse indicators, and date boundary markers ([`SparkMetricCard.jsx`](client/src/components/common/SparkMetricCard.jsx)).
+  - Used across the Executive Dashboard and the Recruitment Workspace with real-time zero-state handling (graceful flat zero lines when datasets are empty).
 * **First-Login Credential Hardening**:
   - Intercepting security modal ([`FirstLoginPasswordModal.jsx`](client/src/components/common/FirstLoginPasswordModal.jsx)) that compels newly onboarded staff to set a private password before accessing their dashboard.
 * **Regional & Currency Settings Engine**:
@@ -187,6 +192,7 @@ flowchart TB
         N[Notification & Announcement Hub]
         T[IT Helpdesk & Tickets Controller]
         U[Accounts & Ledger Controller]
+        X[Recruitment & ATS Controller]
         V[Tag-Based In-Memory Cache Service]
         W[Anti-Spindown Self-Ping Daemon]
     end
@@ -201,9 +207,9 @@ flowchart TB
 
     A & B & C & D --> F
     F --> G
-    G --> H & I & J & K & L & M & N & T & U
-    H & I & J & K & L & M & N & T & U <--> V
-    H & I & J & K & L & M & N & T & U --> O
+    G --> H & I & J & K & L & M & N & T & U & X
+    H & I & J & K & L & M & N & T & U & X <--> V
+    H & I & J & K & L & M & N & T & U & X --> O
     I --> P
     H & N --> Q & R
     J <--> S
@@ -241,7 +247,20 @@ NexaHR/
 │   │   │   │   ├── holiday/                # Public Holidays Planner
 │   │   │   │   ├── hr/                     # New Employee Onboarding Wizard
 │   │   │   │   ├── payroll/                # Calculate Payroll & Payslip List
-│   │   │   │   └── recruitment/            # Recruitment ATS Desk, Board & Jobs Catalog
+│   │   │   │   └── recruitment/            # Recruitment ATS & Talent Intelligence Suite
+│   │   │   │       ├── JobsWorkspace.jsx   # Requisition Command & SparkMetric Telemetry
+│   │   │   │       ├── ATSPipeline.jsx     # Interactive 5-Stage Kanban & Candidate Dossier
+│   │   │   │       ├── JobDesk.jsx         # Recruiter Command Desk & Velocity Telemetry
+│   │   │   │       ├── JobBoard.jsx        # Stage Advancement & Candidate Funnel
+│   │   │   │       ├── JobApplication.jsx  # Candidate Applications Directory
+│   │   │   │       ├── JobInterview.jsx    # Interview Rounds & Scheduling
+│   │   │   │       ├── Jobs.jsx            # Job Requisition Catalog
+│   │   │   │       ├── JobCategory.jsx     # Functional Disciplines Taxonomy
+│   │   │   │       ├── JobType.jsx         # Contract & Employment Commitments
+│   │   │   │       ├── JobLocation.jsx     # Regional Offices & Remote Hubs
+│   │   │   │       ├── JobSkills.jsx       # Skill & Tech Stack Taxonomy
+│   │   │   │       ├── JobExperience.jsx   # Seniority Bands & Salary Ranges
+│   │   │   │       └── RecruitmentSettings.jsx # Unified 5-in-1 Master Configuration
 │   │   │   └── employee/                   # Employee Self-Service Pages
 │   │   │       ├── EmployeeDashboard.jsx   # Shift Pulse & Action Hub
 │   │   │       ├── EmployeeAttendance.jsx  # Clock-In/Out & Monthly Logs
@@ -502,6 +521,34 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | `POST` | `/api/designations` | Create new job designation | Admin / HR |
 | `PUT` | `/api/designations/:id` | Update job designation | Admin / HR |
 | `DELETE` | `/api/designations/:id` | Delete job designation | Admin / HR |
+
+### 🎯 Recruitment, ATS & Candidate Pipeline
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/recruitment/stats` | Aggregated recruitment metrics, counts & offer conversion rate | Yes |
+| `POST` | `/api/recruitment/seed` | Seed default recruitment data & enterprise pipeline | Admin / HR |
+| `DELETE` | `/api/recruitment/clear-all` | Wipe all recruitment data (openings, candidates, interviews, taxonomies) | Admin / HR |
+| `GET` | `/api/recruitment/jobs` | List job openings with search, department & status filters | Yes |
+| `GET` | `/api/recruitment/jobs/:id` | Fetch detailed job opening requisition | Yes |
+| `POST` | `/api/recruitment/jobs` | Create new job opening requisition | Admin / HR |
+| `PUT` | `/api/recruitment/jobs/:id` | Update job opening requisition | Admin / HR |
+| `PATCH` | `/api/recruitment/jobs/:id/status`| Toggle requisition status (`ACTIVE` / `PAUSED` / `CLOSED`) | Admin / HR |
+| `DELETE` | `/api/recruitment/jobs/:id` | Delete job opening requisition | Admin / HR |
+| `GET` | `/api/recruitment/applications` | List candidate applications with search & stage filters | Yes |
+| `GET` | `/api/recruitment/applications/:id`| Fetch candidate application profile & dossier | Yes |
+| `POST` | `/api/recruitment/applications` | Submit / create new candidate application | Admin / HR |
+| `PUT` | `/api/recruitment/applications/:id`| Update candidate profile & resume summary | Admin / HR |
+| `PATCH` | `/api/recruitment/applications/:id/stage`| Advance candidate pipeline stage (`APPLIED` ➔ `HIRED`) | Admin / HR |
+| `DELETE` | `/api/recruitment/applications/:id`| Delete candidate application | Admin / HR |
+| `GET` | `/api/recruitment/interviews` | List scheduled interviews with round & date filters | Yes |
+| `POST` | `/api/recruitment/interviews` | Schedule new interview round with Google Meet link | Admin / HR |
+| `PUT` | `/api/recruitment/interviews/:id` | Update interview schedule, status, feedback & score | Admin / HR |
+| `DELETE` | `/api/recruitment/interviews/:id` | Delete / cancel scheduled interview | Admin / HR |
+| `GET` | `/api/recruitment/taxonomies` | List recruitment taxonomies (`CATEGORY`, `TYPE`, `LOCATION`, `SKILL`, `EXPERIENCE`) | Yes |
+| `POST` | `/api/recruitment/taxonomies` | Create new recruitment taxonomy item | Admin / HR |
+| `PUT` | `/api/recruitment/taxonomies/:id` | Update recruitment taxonomy item | Admin / HR |
+| `PATCH` | `/api/recruitment/taxonomies/:id/toggle`| Toggle taxonomy active status | Admin / HR |
+| `DELETE` | `/api/recruitment/taxonomies/:id` | Delete recruitment taxonomy item | Admin / HR |
 
 ### 🎫 Support Tickets & Helpdesk
 | Method | Endpoint | Description | Auth Required |

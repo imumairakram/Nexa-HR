@@ -462,7 +462,7 @@ const ATSPipeline = () => {
           {/* View Mode Tabs */}
           <div className="flex items-center bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs">
             <button
-              onClick={() => setViewMode('kanban')}
+              onClick={() => setCurrentView('kanban')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 currentView === 'kanban' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
