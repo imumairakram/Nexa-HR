@@ -208,11 +208,15 @@ const EmployeeDashboard = () => {
 
   const netSalaryAmount = latestPayslip?.netSalary
     ? formatCurrency(latestPayslip.netSalary)
-    : formatCurrency(currentUser?.salaryStructure?.basicSalary || 8500);
+    : currentUser?.salaryStructure?.basicSalary
+    ? formatCurrency(currentUser.salaryStructure.basicSalary)
+    : formatCurrency(0);
 
   const payslipPeriod = latestPayslip?.month
     ? `Paid for Month ${latestPayslip.month}/${latestPayslip.year}`
-    : `Period • ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+    : currentUser?.salaryStructure
+    ? `Base Rate • ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
+    : 'No Payroll Record';
 
   // Calculations for fully dynamic employee portal metric cards
   const attendanceOnTimeRate = useMemo(() => {
@@ -316,7 +320,7 @@ const EmployeeDashboard = () => {
   const salarySparkData = useMemo(() => {
     if (payslipHistory && payslipHistory.length >= 2) {
       return payslipHistory.slice(0, 6).reverse().map((p) => {
-        const amount = Number(p.netSalary) || 8500;
+        const amount = Number(p.netSalary) || 0;
         return {
           value: amount,
           label: `M${p.month}`,
@@ -324,9 +328,9 @@ const EmployeeDashboard = () => {
         };
       });
     }
-    const base = currentUser?.salaryStructure?.basicSalary || 8500;
-    const allowances = (currentUser?.salaryStructure?.housingAllowance || 0) + (currentUser?.salaryStructure?.transportAllowance || 0);
-    const deductions = (currentUser?.salaryStructure?.taxDeductions || 0) + (currentUser?.salaryStructure?.otherDeductions || 0);
+    const base = Number(currentUser?.salaryStructure?.basicSalary) || 0;
+    const allowances = (Number(currentUser?.salaryStructure?.housingAllowance) || 0) + (Number(currentUser?.salaryStructure?.transportAllowance) || 0);
+    const deductions = (Number(currentUser?.salaryStructure?.taxDeductions) || 0) + (Number(currentUser?.salaryStructure?.otherDeductions) || 0);
     const gross = base + allowances;
     const net = gross - deductions;
     return [
@@ -404,8 +408,11 @@ const EmployeeDashboard = () => {
     if (latestPayslip?.status === 'DRAFT') {
       return { text: 'Processing', type: 'neutral', icon: 'dot', sub: payslipPeriod };
     }
-    return { text: 'Configured', type: 'positive', icon: 'dot', sub: 'Active Salary Structure' };
-  }, [latestPayslip, payslipPeriod]);
+    if (currentUser?.salaryStructure?.basicSalary) {
+      return { text: 'Configured', type: 'positive', icon: 'dot', sub: 'Active Salary Structure' };
+    }
+    return { text: 'No Records', type: 'neutral', icon: 'dot', sub: 'No Payroll Setup' };
+  }, [latestPayslip, currentUser, payslipPeriod]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">

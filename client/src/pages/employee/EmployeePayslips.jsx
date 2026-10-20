@@ -75,8 +75,8 @@ const EmployeePayslips = () => {
     (acc, p) => acc + (Number(p.taxDeductions) || 0) + (Number(p.otherDeductions) || 0) + (Number(p.unpaidLeaveDeduction) || 0),
     0
   );
-  const latestGross = latestSlip?.grossSalary || 9550;
-  const latestNet = latestSlip?.netSalary || 8350;
+  const latestGross = latestSlip ? (Number(latestSlip.grossSalary) || 0) : 0;
+  const latestNet = latestSlip ? (Number(latestSlip.netSalary) || 0) : 0;
 
   // Dynamic Sparkline Data for Compensation
   const netSparkData = useMemo(() => {
@@ -87,15 +87,23 @@ const EmployeePayslips = () => {
         tooltip: `${MONTH_NAMES[(p.month || 1) - 1]} ${p.year}: ${formatCurrency(p.netSalary)} (Net)`,
       }));
     }
-    const basic = latestSlip?.basicSalary || 8500;
-    const gross = latestGross || 9550;
-    const deduct = totalDeductionsAllTime || 1200;
-    const net = latestNet || 8350;
+    if (latestSlip) {
+      const basic = latestSlip.basicSalary || 0;
+      const gross = latestGross || 0;
+      const deduct = totalDeductionsAllTime || 0;
+      const net = latestNet || 0;
+      return [
+        { value: basic, label: 'Basic', tooltip: `Basic Salary: ${formatCurrency(basic)}` },
+        { value: gross, label: 'Gross', tooltip: `Gross Salary: ${formatCurrency(gross)}` },
+        { value: deduct, label: 'Deduct', tooltip: `Deductions: ${formatCurrency(deduct)}` },
+        { value: net, label: 'Net', tooltip: `Net Take-Home: ${formatCurrency(net)}` },
+      ];
+    }
     return [
-      { value: basic, label: 'Basic', tooltip: `Basic Salary: ${formatCurrency(basic)}` },
-      { value: gross, label: 'Gross', tooltip: `Gross Salary: ${formatCurrency(gross)}` },
-      { value: deduct, label: 'Deduct', tooltip: `Deductions: ${formatCurrency(deduct)}` },
-      { value: net, label: 'Net', tooltip: `Net Take-Home: ${formatCurrency(net)}` },
+      { value: 0, label: 'Basic', tooltip: `Basic Salary: ${formatCurrency(0)}` },
+      { value: 0, label: 'Gross', tooltip: `Gross Salary: ${formatCurrency(0)}` },
+      { value: 0, label: 'Deduct', tooltip: `Deductions: ${formatCurrency(0)}` },
+      { value: 0, label: 'Net', tooltip: `Net Take-Home: ${formatCurrency(0)}` },
     ];
   }, [payslips, latestSlip, latestGross, latestNet, totalDeductionsAllTime, formatCurrency]);
 
@@ -107,12 +115,19 @@ const EmployeePayslips = () => {
         tooltip: `${MONTH_NAMES[(p.month || 1) - 1]} ${p.year}: ${formatCurrency(p.grossSalary)} (Gross)`,
       }));
     }
-    const base = latestSlip?.basicSalary || 8500;
-    const house = 600;
+    if (latestSlip) {
+      const base = latestSlip.basicSalary || 0;
+      const house = latestSlip.housingAllowance || 0;
+      return [
+        { value: base, label: 'Base', tooltip: `Base Rate: ${formatCurrency(base)}` },
+        { value: base + house, label: 'Allowances', tooltip: `Base + Allowances: ${formatCurrency(base + house)}` },
+        { value: latestGross, label: 'Gross', tooltip: `Total Gross: ${formatCurrency(latestGross)}` },
+      ];
+    }
     return [
-      { value: base, label: 'Base', tooltip: `Base Rate: ${formatCurrency(base)}` },
-      { value: base + house, label: 'Housing', tooltip: `Base + Housing: ${formatCurrency(base + house)}` },
-      { value: latestGross, label: 'Gross', tooltip: `Total Gross: ${formatCurrency(latestGross)}` },
+      { value: 0, label: 'Base', tooltip: `Base Rate: ${formatCurrency(0)}` },
+      { value: 0, label: 'Allowances', tooltip: `Base + Allowances: ${formatCurrency(0)}` },
+      { value: 0, label: 'Gross', tooltip: `Total Gross: ${formatCurrency(0)}` },
     ];
   }, [payslips, latestSlip, latestGross, formatCurrency]);
 
@@ -129,15 +144,15 @@ const EmployeePayslips = () => {
       });
     }
     return [
-      { value: latestNet, label: 'M1', tooltip: `Cycle 1: ${formatCurrency(latestNet)}` },
-      { value: latestNet * 2, label: 'M2', tooltip: `Cycle 2: ${formatCurrency(latestNet * 2)}` },
-      { value: latestNet * 3, label: 'M3', tooltip: `Cycle 3: ${formatCurrency(latestNet * 3)}` },
+      { value: 0, label: 'M1', tooltip: `Cycle 1: ${formatCurrency(0)}` },
+      { value: 0, label: 'M2', tooltip: `Cycle 2: ${formatCurrency(0)}` },
+      { value: 0, label: 'M3', tooltip: `Cycle 3: ${formatCurrency(0)}` },
     ];
-  }, [payslips, latestNet, formatCurrency]);
+  }, [payslips, formatCurrency]);
 
   const deductionsSparkData = useMemo(() => {
-    const tax = latestSlip?.taxDeductions || 550;
-    const other = latestSlip?.otherDeductions || 300;
+    const tax = latestSlip?.taxDeductions || 0;
+    const other = latestSlip?.otherDeductions || 0;
     const unpaid = latestSlip?.unpaidLeaveDeduction || 0;
     return [
       { value: tax, label: 'Tax', tooltip: `Statutory Tax: ${formatCurrency(tax)}` },
@@ -184,7 +199,7 @@ const EmployeePayslips = () => {
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
               <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
                 <CalendarDays className="w-3.5 h-3.5" />
-                <span>Latest Cycle: {latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year}` : 'Current Month'}</span>
+                <span>Latest Cycle: {latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year}` : 'No Records'}</span>
               </span>
               <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <CreditCard className="w-3.5 h-3.5" />
@@ -199,13 +214,19 @@ const EmployeePayslips = () => {
             <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
               {formatCurrency(latestNet)}
             </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Direct Bank Wire Disbursed</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+              {latestSlip ? 'Direct Bank Wire Disbursed' : 'No Disbursal Recorded'}
+            </div>
             <button
+              disabled={!latestSlip}
               onClick={() => {
                 if (latestSlip) handleDownload(latestSlip);
-                else showToast('Payslip records available below.');
               }}
-              className="w-full mt-1 px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className={`w-full mt-1 px-5 py-2.5 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all ${
+                latestSlip
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20 cursor-pointer hover:scale-105'
+                  : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none'
+              }`}
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download Payslip</span>
@@ -224,10 +245,10 @@ const EmployeePayslips = () => {
           title="Net Take-Home Pay"
           value={formatCurrency(latestNet)}
           unit=""
-          badgeText={latestSlip?.status === 'PAID' ? 'Disbursed' : 'Active Rate'}
-          badgeType="positive"
-          badgeIcon="up"
-          subtext={latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year} Cycle` : 'Active Salary Structure'}
+          badgeText={latestSlip ? (latestSlip.status === 'PAID' ? 'Disbursed' : 'Active Rate') : 'No Records'}
+          badgeType={latestSlip ? 'positive' : 'neutral'}
+          badgeIcon={latestSlip ? 'up' : 'dot'}
+          subtext={latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year} Cycle` : 'No Disbursal Record'}
           chartColor="purple"
           presetWave="wave1"
           dataPoints={netSparkData}
@@ -240,10 +261,10 @@ const EmployeePayslips = () => {
           title="Latest Gross Salary"
           value={formatCurrency(latestGross)}
           unit=""
-          badgeText={`+${formatCurrency(Math.max(0, latestGross - latestNet))} Allowances`}
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Taxable Base Earnings"
+          badgeText={latestSlip ? `+${formatCurrency(Math.max(0, latestGross - latestNet))} Allowances` : '0 Allowances'}
+          badgeType={latestSlip ? 'positive' : 'neutral'}
+          badgeIcon={latestSlip ? 'up' : 'dot'}
+          subtext={latestSlip ? 'Taxable Base Earnings' : 'No Earnings Record'}
           chartColor="coral"
           presetWave="wave2"
           dataPoints={grossSparkData}
@@ -254,12 +275,12 @@ const EmployeePayslips = () => {
         <SparkMetricCard
           variant="light"
           title="Total Net Disbursed"
-          value={formatCurrency(totalNetAllTime || latestNet * (payslips.length || 1))}
+          value={formatCurrency(totalNetAllTime)}
           unit=""
-          badgeText={`${payslips.length > 0 ? payslips.length : 1} Cycles Paid`}
-          badgeType="positive"
+          badgeText={`${payslips.length} Cycles Paid`}
+          badgeType={payslips.length > 0 ? 'positive' : 'neutral'}
           badgeIcon="dot"
-          subtext="Direct Corporate Bank Wire"
+          subtext={payslips.length > 0 ? 'Direct Corporate Bank Wire' : 'No Disbursals'}
           chartColor="amber"
           presetWave="wave3"
           dataPoints={disbursedSparkData}
@@ -270,12 +291,12 @@ const EmployeePayslips = () => {
         <SparkMetricCard
           variant="light"
           title="Total Deductions"
-          value={formatCurrency(totalDeductionsAllTime || 850)}
+          value={formatCurrency(totalDeductionsAllTime)}
           unit=""
-          badgeText="Withholdings"
+          badgeText={totalDeductionsAllTime > 0 ? 'Withholdings' : 'No Deductions'}
           badgeType="neutral"
           badgeIcon="dot"
-          subtext="Statutory Tax & Insurance"
+          subtext={totalDeductionsAllTime > 0 ? 'Statutory Tax & Insurance' : 'Zero Deductions'}
           chartColor="rose"
           presetWave="wave4"
           dataPoints={deductionsSparkData}
