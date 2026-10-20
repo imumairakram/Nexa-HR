@@ -199,7 +199,12 @@ const createJobOpening = async (req, res) => {
     }
 
     const count = await prisma.jobOpening.count();
-    const jobCode = `JOB-${101 + count}`;
+    let jobCode = `JOB-${101 + count}`;
+    let suffix = 0;
+    while (await prisma.jobOpening.findUnique({ where: { jobCode } })) {
+      suffix++;
+      jobCode = `JOB-${101 + count + suffix}`;
+    }
 
     const newJob = await prisma.jobOpening.create({
       data: {
@@ -509,7 +514,12 @@ const createApplication = async (req, res) => {
     }
 
     const count = await prisma.jobApplication.count();
-    const applicationId = `APP-${9901 + count}`;
+    let applicationId = `APP-${9901 + count}`;
+    let suffix = 0;
+    while (await prisma.jobApplication.findUnique({ where: { applicationId } })) {
+      suffix++;
+      applicationId = `APP-${9901 + count + suffix}`;
+    }
 
     const newApp = await prisma.jobApplication.create({
       data: {
@@ -767,20 +777,61 @@ const createInterview = async (req, res) => {
       meetLink,
     } = req.body;
 
-    if (!applicationId || !candidateName || !role || !date) {
+    if (!candidateName || !role || !date) {
       return res.status(400).json({
         success: false,
-        message: 'Candidate, Role, and Interview Date are mandatory.',
+        message: 'Candidate Name, Role, and Interview Date are mandatory.',
       });
     }
 
+    let targetAppId = applicationId;
+    if (!targetAppId) {
+      const existingApp = await prisma.jobApplication.findFirst({
+        where: {
+          OR: [
+            ...(candidateEmail ? [{ email: candidateEmail.trim().toLowerCase() }] : []),
+            { name: candidateName.trim() },
+          ],
+        },
+      });
+
+      if (existingApp) {
+        targetAppId = existingApp.id;
+      } else {
+        const appCount = await prisma.jobApplication.count();
+        let appIdCode = `APP-${9901 + appCount}`;
+        let s = 0;
+        while (await prisma.jobApplication.findUnique({ where: { applicationId: appIdCode } })) {
+          s++;
+          appIdCode = `APP-${9901 + appCount + s}`;
+        }
+        const createdApp = await prisma.jobApplication.create({
+          data: {
+            applicationId: appIdCode,
+            name: candidateName.trim(),
+            email: candidateEmail ? candidateEmail.trim().toLowerCase() : `${candidateName.toLowerCase().replace(/\s+/g, '.')}@talent.org`,
+            role: role.trim(),
+            department: 'Engineering & DevOps',
+            location: 'Islamabad HQ / Hybrid',
+            stage: 'INTERVIEW',
+          },
+        });
+        targetAppId = createdApp.id;
+      }
+    }
+
     const count = await prisma.jobInterview.count();
-    const interviewCode = `IV-${4011 + count}`;
+    let interviewCode = `IV-${4011 + count}`;
+    let suffix = 0;
+    while (await prisma.jobInterview.findUnique({ where: { interviewCode } })) {
+      suffix++;
+      interviewCode = `IV-${4011 + count + suffix}`;
+    }
 
     const newInterview = await prisma.jobInterview.create({
       data: {
         interviewCode,
-        applicationId,
+        applicationId: targetAppId,
         jobOpeningId: jobOpeningId || null,
         candidateName: candidateName.trim(),
         candidateEmail: candidateEmail ? candidateEmail.trim().toLowerCase() : null,

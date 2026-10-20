@@ -194,17 +194,22 @@ const RecruitmentSettings = () => {
         };
 
         if (editingItem) {
-          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
-          const updated = categories.map((c) =>
-            c.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...c, ...payload }) : c
-          );
-          persistCategories(updated);
-          showToast('Category updated successfully');
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload);
+          if (res?.success && res.data?.item) {
+            const updated = categories.map((c) => (c.id === editingItem.id ? res.data.item : c));
+            persistCategories(updated);
+            showToast('Category updated successfully');
+          } else {
+            throw new Error(res?.message || 'Failed to update category');
+          }
         } else {
-          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
-          const item = res?.success && res.data?.item ? res.data.item : { id: `CAT-${Date.now()}`, ...payload };
-          persistCategories([item, ...categories]);
-          showToast('New Job Category created');
+          const res = await api.createRecruitmentTaxonomy(payload);
+          if (res?.success && res.data?.item) {
+            persistCategories([res.data.item, ...categories]);
+            showToast('New Job Category saved to database!');
+          } else {
+            throw new Error(res?.message || 'Failed to save category');
+          }
         }
       } else if (activeTab === 'types') {
         if (!typeForm.name.trim()) return;
@@ -218,17 +223,22 @@ const RecruitmentSettings = () => {
         };
 
         if (editingItem) {
-          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
-          const updated = types.map((t) =>
-            t.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...t, ...payload }) : t
-          );
-          persistTypes(updated);
-          showToast('Contract format updated successfully');
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload);
+          if (res?.success && res.data?.item) {
+            const updated = types.map((t) => (t.id === editingItem.id ? res.data.item : t));
+            persistTypes(updated);
+            showToast('Contract format updated successfully');
+          } else {
+            throw new Error(res?.message || 'Failed to update contract format');
+          }
         } else {
-          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
-          const item = res?.success && res.data?.item ? res.data.item : { id: `TYPE-${Date.now()}`, ...payload };
-          persistTypes([item, ...types]);
-          showToast('New Contract Format created');
+          const res = await api.createRecruitmentTaxonomy(payload);
+          if (res?.success && res.data?.item) {
+            persistTypes([res.data.item, ...types]);
+            showToast('New Contract Format saved to database!');
+          } else {
+            throw new Error(res?.message || 'Failed to save contract format');
+          }
         }
       } else if (activeTab === 'locations') {
         if (!locationForm.name.trim()) return;
@@ -243,17 +253,22 @@ const RecruitmentSettings = () => {
         };
 
         if (editingItem) {
-          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
-          const updated = locations.map((l) =>
-            l.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...l, ...payload }) : l
-          );
-          persistLocations(updated);
-          showToast('Hiring location updated successfully');
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload);
+          if (res?.success && res.data?.item) {
+            const updated = locations.map((l) => (l.id === editingItem.id ? res.data.item : l));
+            persistLocations(updated);
+            showToast('Hiring location updated successfully');
+          } else {
+            throw new Error(res?.message || 'Failed to update location');
+          }
         } else {
-          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
-          const item = res?.success && res.data?.item ? res.data.item : { id: `LOC-${Date.now()}`, ...payload };
-          persistLocations([item, ...locations]);
-          showToast('New Hiring Location registered');
+          const res = await api.createRecruitmentTaxonomy(payload);
+          if (res?.success && res.data?.item) {
+            persistLocations([res.data.item, ...locations]);
+            showToast('New Hiring Location saved to database!');
+          } else {
+            throw new Error(res?.message || 'Failed to save location');
+          }
         }
       } else if (activeTab === 'skills') {
         if (!skillForm.name.trim()) return;
@@ -267,17 +282,22 @@ const RecruitmentSettings = () => {
         };
 
         if (editingItem) {
-          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
-          const updated = skills.map((s) =>
-            s.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...s, ...payload }) : s
-          );
-          persistSkills(updated);
-          showToast('Skill definition updated');
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload);
+          if (res?.success && res.data?.item) {
+            const updated = skills.map((s) => (s.id === editingItem.id ? res.data.item : s));
+            persistSkills(updated);
+            showToast('Skill definition updated');
+          } else {
+            throw new Error(res?.message || 'Failed to update skill');
+          }
         } else {
-          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
-          const item = res?.success && res.data?.item ? res.data.item : { id: `SKILL-${Date.now()}`, ...payload };
-          persistSkills([item, ...skills]);
-          showToast('New Skill added to taxonomy');
+          const res = await api.createRecruitmentTaxonomy(payload);
+          if (res?.success && res.data?.item) {
+            persistSkills([res.data.item, ...skills]);
+            showToast('New Skill saved to database!');
+          } else {
+            throw new Error(res?.message || 'Failed to save skill');
+          }
         }
       } else if (activeTab === 'experience') {
         if (!experienceForm.label.trim()) return;
@@ -293,22 +313,27 @@ const RecruitmentSettings = () => {
         };
 
         if (editingItem) {
-          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
-          const updated = experiences.map((exp) =>
-            exp.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...exp, ...payload }) : exp
-          );
-          persistExperiences(updated);
-          showToast('Experience track updated');
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload);
+          if (res?.success && res.data?.item) {
+            const updated = experiences.map((exp) => (exp.id === editingItem.id ? res.data.item : exp));
+            persistExperiences(updated);
+            showToast('Experience track updated');
+          } else {
+            throw new Error(res?.message || 'Failed to update experience track');
+          }
         } else {
-          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
-          const item = res?.success && res.data?.item ? res.data.item : { id: `EXP-${Date.now()}`, ...payload };
-          persistExperiences([item, ...experiences]);
-          showToast('New Experience Track created');
+          const res = await api.createRecruitmentTaxonomy(payload);
+          if (res?.success && res.data?.item) {
+            persistExperiences([res.data.item, ...experiences]);
+            showToast('New Experience Track saved to database!');
+          } else {
+            throw new Error(res?.message || 'Failed to save experience track');
+          }
         }
       }
     } catch (err) {
       console.error('Error saving settings entry:', err);
-      showToast('Error saving settings entry');
+      showToast(`Error: ${err.message || 'Failed to save settings entry'}`);
     } finally {
       setIsModalOpen(false);
     }

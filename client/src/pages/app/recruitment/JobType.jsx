@@ -31,30 +31,42 @@ const JobType = () => {
     loadTypes();
   }, []);
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newType.name.trim()) return;
-    const updated = [
-      ...types,
-      {
-        id: Date.now(),
+
+    try {
+      const payload = {
+        type: 'TYPE',
         name: newType.name.trim(),
         code: newType.code.toUpperCase().trim() || 'TYPE',
         hours: newType.hours,
         benefits: newType.benefits,
         count: 0,
-      },
-    ];
-    setTypes(updated);
-    try {
-      localStorage.setItem('nexahr_job_types', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
+      };
+
+      const res = await api.createRecruitmentTaxonomy(payload);
+      if (res?.success && res.data?.item) {
+        const item = res.data.item;
+        const updated = [item, ...types];
+        setTypes(updated);
+        try {
+          localStorage.setItem('nexahr_job_types', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Employment contract "${newType.name}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save job type');
+      }
+    } catch (err) {
+      console.error('Error saving job type:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save job type to database'}`);
+    } finally {
+      setIsAddOpen(false);
+      setNewType({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
+      setTimeout(() => setToastMsg(''), 2500);
     }
-    setIsAddOpen(false);
-    setNewType({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
-    setToastMsg('Employment contract arrangement created successfully!');
-    setTimeout(() => setToastMsg(''), 2500);
   };
 
   const filtered = types.filter((t) =>

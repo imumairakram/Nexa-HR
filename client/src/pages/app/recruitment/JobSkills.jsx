@@ -37,47 +37,66 @@ const JobSkills = () => {
     weight: 'Mandatory',
   });
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return;
 
-    const newSkill = {
-      id: Date.now(),
-      name: form.name.trim(),
-      category: form.category,
-      assessmentsCount: 0,
-      proficiency: form.proficiency,
-      weight: form.weight,
-    };
-
-    const updated = [newSkill, ...skills];
-    setSkills(updated);
     try {
-      localStorage.setItem('nexahr_job_skills', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
-    }
+      const payload = {
+        type: 'SKILL',
+        name: form.name.trim(),
+        category: form.category,
+        proficiency: form.proficiency,
+        weight: form.weight,
+        assessmentsCount: 0,
+      };
 
-    setIsAddOpen(false);
-    setForm({
-      name: '',
-      category: 'Engineering',
-      proficiency: 'Advanced',
-      weight: 'Mandatory',
-    });
-    setToastMsg(`Skill "${form.name}" registered into taxonomy!`);
-    setTimeout(() => setToastMsg(''), 2500);
+      const res = await api.createRecruitmentTaxonomy(payload);
+      if (res?.success && res.data?.item) {
+        const item = res.data.item;
+        const updated = [item, ...skills];
+        setSkills(updated);
+        try {
+          localStorage.setItem('nexahr_job_skills', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Skill "${form.name}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save skill');
+      }
+    } catch (err) {
+      console.error('Error saving skill:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save skill to database'}`);
+    } finally {
+      setIsAddOpen(false);
+      setForm({
+        name: '',
+        category: 'Engineering',
+        proficiency: 'Advanced',
+        weight: 'Mandatory',
+      });
+      setTimeout(() => setToastMsg(''), 2500);
+    }
   };
 
-  const handleDelete = (id) => {
-    const updated = skills.filter((s) => s.id !== id);
-    setSkills(updated);
+  const handleDelete = async (id) => {
     try {
-      localStorage.setItem('nexahr_job_skills', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
+      await api.deleteRecruitmentTaxonomy(id);
+      const updated = skills.filter((s) => s.id !== id);
+      setSkills(updated);
+      try {
+        localStorage.setItem('nexahr_job_skills', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      setToastMsg('Skill removed from database.');
+    } catch (err) {
+      console.error('Error deleting skill:', err);
+      const updated = skills.filter((s) => s.id !== id);
+      setSkills(updated);
+      setToastMsg('Skill removed.');
     }
-    setToastMsg('Skill removed.');
     setTimeout(() => setToastMsg(''), 2500);
   };
 

@@ -16,6 +16,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+import { api } from '../../../services/api';
+
 const STAGES = [
   { key: 'APPLIED', label: '1. Sourced & Applied', color: 'border-blue-500' },
   { key: 'SCREENING', label: '2. Screening Call', color: 'border-amber-500' },
@@ -33,20 +35,8 @@ const INITIAL_PIPELINE = {
 };
 
 const JobBoard = () => {
-  const [columns, setColumns] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_recruitment_kanban');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const hasItems = Object.values(parsed).some((list) => list && list.length > 0);
-        if (hasItems) return parsed;
-      }
-    } catch (e) {
-      console.warn(e);
-    }
-    return INITIAL_PIPELINE;
-  });
-
+  const [columns, setColumns] = useState(INITIAL_PIPELINE);
+  const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newCandidate, setNewCandidate] = useState({
@@ -57,25 +47,50 @@ const JobBoard = () => {
     exp: '4 Years',
   });
 
-  const moveCandidate = (candidate, fromCol, toCol) => {
+  const loadPipeline = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getJobApplications();
+      if (res?.success && res.data?.applications) {
+        const apps = res.data.applications;
+        const pipeline = {
+          APPLIED: apps.filter((a) => a.stage === 'APPLIED'),
+          SCREENING: apps.filter((a) => a.stage === 'SCREENING'),
+          INTERVIEWING: apps.filter((a) => a.stage === 'INTERVIEWING' || a.stage === 'INTERVIEW'),
+          OFFER: apps.filter((a) => a.stage === 'OFFER'),
+          HIRED: apps.filter((a) => a.stage === 'HIRED'),
+        };
+        setColumns(pipeline);
+      } else {
+        setColumns(INITIAL_PIPELINE);
+      }
+    } catch (err) {
+      console.warn('Failed to load applications from database:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPipeline();
+  }, []);
+
+  const moveCandidate = async (candidate, fromCol, toCol) => {
+    const backendStage = toCol === 'INTERVIEWING' ? 'INTERVIEW' : toCol;
+    try {
+      await api.updateJobApplicationStage(candidate.id, backendStage);
+    } catch (e) {
+      console.warn('API error updating candidate stage:', e);
+    }
+
     const updated = {
       ...columns,
       [fromCol]: (columns[fromCol] || []).filter((c) => c.id !== candidate.id),
-      [toCol]: [...(columns[toCol] || []), candidate],
+      [toCol]: [...(columns[toCol] || []), { ...candidate, stage: toCol }],
     };
     setColumns(updated);
     try {
       localStorage.setItem('nexahr_recruitment_kanban', JSON.stringify(updated));
-
-      // Synchronize back to applications
-      const apps = JSON.parse(localStorage.getItem('nexahr_recruitment_applications') || '[]');
-      const updatedApps = apps.map((a) => {
-        if (a.id === candidate.id) {
-          return { ...a, stage: toCol };
-        }
-        return a;
-      });
-      localStorage.setItem('nexahr_recruitment_applications', JSON.stringify(updatedApps));
     } catch (e) {
       console.error(e);
     }
@@ -83,42 +98,54 @@ const JobBoard = () => {
     setTimeout(() => setToastMsg(''), 2500);
   };
 
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
     if (!newCandidate.name.trim()) return;
 
-    const cand = {
-      id: `APP-${Math.floor(1000 + Math.random() * 9000)}`,
-      name: newCandidate.name.trim(),
-      role: newCandidate.role,
-      rating: parseFloat(newCandidate.rating) || 4.7,
-      exp: newCandidate.exp,
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-    };
-
-    const targetStage = newCandidate.stage;
-    const updated = {
-      ...columns,
-      [targetStage]: [cand, ...(columns[targetStage] || [])],
-    };
-
-    setColumns(updated);
     try {
-      localStorage.setItem('nexahr_recruitment_kanban', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
-    }
+      const targetStage = newCandidate.stage;
+      const backendStage = targetStage === 'INTERVIEWING' ? 'INTERVIEW' : targetStage;
+      const payload = {
+        name: newCandidate.name.trim(),
+        role: newCandidate.role,
+        department: 'Engineering & DevOps',
+        email: `${newCandidate.name.toLowerCase().replace(/\s+/g, '.')}@talent.org`,
+        stage: backendStage,
+        experience: newCandidate.exp,
+        rating: parseFloat(newCandidate.rating) || 4.7,
+      };
 
-    setIsAddOpen(false);
-    setNewCandidate({
-      name: '',
-      role: 'Senior Software Engineer',
-      stage: 'APPLIED',
-      rating: '4.8',
-      exp: '4 Years',
-    });
-    setToastMsg(`Candidate "${cand.name}" added to ${targetStage} board!`);
-    setTimeout(() => setToastMsg(''), 2500);
+      const res = await api.createJobApplication(payload);
+      if (res?.success && res.data?.application) {
+        const cand = res.data.application;
+        const updated = {
+          ...columns,
+          [targetStage]: [cand, ...(columns[targetStage] || [])],
+        };
+        setColumns(updated);
+        try {
+          localStorage.setItem('nexahr_recruitment_kanban', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Candidate "${cand.name}" saved to database in ${targetStage} board!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save candidate to database');
+      }
+    } catch (err) {
+      console.error('Error saving candidate:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save candidate'}`);
+    } finally {
+      setIsAddOpen(false);
+      setNewCandidate({
+        name: '',
+        role: 'Senior Software Engineer',
+        stage: 'APPLIED',
+        rating: '4.8',
+        exp: '4 Years',
+      });
+      setTimeout(() => setToastMsg(''), 2500);
+    }
   };
 
   const totalCandidates = Object.values(columns).reduce((acc, list) => acc + (list ? list.length : 0), 0);

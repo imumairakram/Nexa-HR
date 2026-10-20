@@ -32,30 +32,41 @@ const JobCategory = () => {
     loadCategories();
   }, []);
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newCat.name.trim()) return;
-    const updated = [
-      ...categories,
-      {
-        id: Date.now(),
+
+    try {
+      const payload = {
+        type: 'CATEGORY',
         name: newCat.name.trim(),
         code: newCat.code.toUpperCase().trim() || 'CAT',
-        count: 0,
         lead: newCat.lead || 'Department Head',
         status: 'ACTIVE',
-      },
-    ];
-    setCategories(updated);
-    try {
-      localStorage.setItem('nexahr_job_categories', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
+      };
+
+      const res = await api.createRecruitmentTaxonomy(payload);
+      if (res?.success && res.data?.item) {
+        const item = res.data.item;
+        const updated = [item, ...categories];
+        setCategories(updated);
+        try {
+          localStorage.setItem('nexahr_job_categories', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Job Category "${newCat.name}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save category');
+      }
+    } catch (err) {
+      console.error('Error saving job category:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save category to database'}`);
+    } finally {
+      setIsAddOpen(false);
+      setNewCat({ name: '', code: '', lead: 'Department Head' });
+      setTimeout(() => setToastMsg(''), 2500);
     }
-    setIsAddOpen(false);
-    setNewCat({ name: '', code: '', lead: 'Department Head' });
-    setToastMsg('Job Category created successfully!');
-    setTimeout(() => setToastMsg(''), 2500);
   };
 
   const filtered = categories.filter((c) =>

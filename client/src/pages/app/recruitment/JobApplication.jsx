@@ -89,45 +89,63 @@ const JobApplication = () => {
     }
   };
 
-  const handleCreateApplicant = (e) => {
+  const handleCreateApplicant = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) return;
 
-    const newApp = {
-      id: `APP-${Math.floor(1000 + Math.random() * 9000)}`,
-      name: form.name.trim(),
-      role: form.role,
-      department: form.department,
-      email: form.email.trim(),
-      phone: form.phone.trim() || '+92 300 0000000',
-      experience: form.experience,
-      location: form.location,
-      rating: parseFloat(form.rating) || 4.5,
-      stage: 'APPLIED',
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      status: 'ACTIVE',
-      resumeSummary: form.resumeSummary.trim() || 'Direct candidate portal submission with verified qualifications.',
-    };
+    try {
+      const payload = {
+        name: form.name.trim(),
+        role: form.role,
+        department: form.department,
+        email: form.email.trim(),
+        phone: form.phone.trim() || '+92 300 0000000',
+        experience: form.experience,
+        location: form.location,
+        rating: parseFloat(form.rating) || 4.5,
+        stage: 'APPLIED',
+        resumeSummary: form.resumeSummary.trim() || 'Direct candidate portal submission with verified qualifications.',
+      };
 
-    const updated = [newApp, ...applications];
-    saveApplications(updated);
-    setIsAddModalOpen(false);
-    setForm({
-      name: '',
-      role: 'Senior React & Node Engineer',
-      department: 'Engineering & DevOps',
-      email: '',
-      phone: '',
-      experience: '4 Years',
-      location: 'Islamabad HQ',
-      rating: '4.8',
-      resumeSummary: '',
-    });
-    setToastMsg(`Applicant "${newApp.name}" submitted into hiring pipeline!`);
-    setTimeout(() => setToastMsg(''), 3000);
+      const res = await api.createJobApplication(payload);
+      if (res?.success && res.data?.application) {
+        const created = res.data.application;
+        const formatted = {
+          ...created,
+          date: new Date(created.createdAt || created.appliedDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        };
+        const updated = [formatted, ...applications];
+        saveApplications(updated);
+        setToastMsg(`Applicant "${formatted.name}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save application');
+      }
+    } catch (err) {
+      console.error('Error saving application:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save applicant to database'}`);
+    } finally {
+      setIsAddModalOpen(false);
+      setForm({
+        name: '',
+        role: 'Senior React & Node Engineer',
+        department: 'Engineering & DevOps',
+        email: '',
+        phone: '',
+        experience: '4 Years',
+        location: 'Islamabad HQ',
+        rating: '4.8',
+        resumeSummary: '',
+      });
+      setTimeout(() => setToastMsg(''), 3000);
+    }
   };
 
-  const handleAdvanceStage = (appId, nextStage) => {
+  const handleAdvanceStage = async (appId, nextStage) => {
+    try {
+      await api.updateJobApplicationStage(appId, nextStage);
+    } catch (err) {
+      console.warn('API error advancing stage:', err);
+    }
     const updated = applications.map((a) => {
       if (a.id === appId) {
         return { ...a, stage: nextStage };

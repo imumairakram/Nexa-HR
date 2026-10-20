@@ -238,33 +238,32 @@ const ATSPipeline = () => {
     };
 
     try {
-      const res = await api.createJobInterview(payload).catch(() => null);
-      const created = res?.success && res.data?.interview ? res.data.interview : {
-        id: `IV-${Date.now()}`,
-        ...payload,
-        status: 'SCHEDULED',
-      };
+      const res = await api.createJobInterview(payload);
+      if (res?.success && res.data?.interview) {
+        const created = res.data.interview;
+        const updatedInterviews = [created, ...interviews];
+        persistInterviews(updatedInterviews);
 
-      const updatedInterviews = [created, ...interviews];
-      persistInterviews(updatedInterviews);
+        // Auto-advance candidate to INTERVIEW stage if currently in APPLIED or SCREENING
+        if (scheduleCandidate.stage === 'APPLIED' || scheduleCandidate.stage === 'SCREENING') {
+          moveCandidateStage(scheduleCandidate.id, 'INTERVIEW');
+        }
 
-      // Auto-advance candidate to INTERVIEW stage if currently in APPLIED or SCREENING
-      if (scheduleCandidate.stage === 'APPLIED' || scheduleCandidate.stage === 'SCREENING') {
-        moveCandidateStage(scheduleCandidate.id, 'INTERVIEW');
+        if (selectedCandidate && selectedCandidate.id === scheduleCandidate.id) {
+          setSelectedCandidate({
+            ...selectedCandidate,
+            stage: 'INTERVIEW',
+            interview: created,
+          });
+        }
+
+        showToast(`Interview scheduled for ${scheduleCandidate.name} and saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save interview to database');
       }
-
-      if (selectedCandidate && selectedCandidate.id === scheduleCandidate.id) {
-        setSelectedCandidate({
-          ...selectedCandidate,
-          stage: 'INTERVIEW',
-          interview: created,
-        });
-      }
-
-      showToast(`Interview scheduled for ${scheduleCandidate.name} on ${interviewForm.date}`);
     } catch (err) {
-      console.error('Failed scheduling interview:', err);
-      showToast('Interview scheduled.');
+      console.error('Error saving interview:', err);
+      showToast(`Error: ${err.message || 'Failed to schedule interview'}`);
     } finally {
       setIsScheduleOpen(false);
     }
@@ -288,23 +287,16 @@ const ATSPipeline = () => {
     };
 
     try {
-      const res = await api.createJobApplication(payload).catch(() => null);
+      const res = await api.createJobApplication(payload);
       if (res?.success && res.data?.application) {
         persistCandidates([res.data.application, ...candidates]);
+        showToast(`Candidate ${payload.name} saved to database!`);
       } else {
-        const fallback = {
-          id: `APP-${Math.floor(1000 + Math.random() * 9000)}`,
-          ...payload,
-          rating: 4.8,
-          status: 'ACTIVE',
-          appliedDate: new Date().toISOString(),
-        };
-        persistCandidates([fallback, ...candidates]);
+        throw new Error(res?.message || 'Failed to save candidate to database');
       }
-      showToast(`Candidate ${payload.name} added to pipeline`);
     } catch (err) {
       console.error('Error adding candidate:', err);
-      showToast('Candidate added to pipeline');
+      showToast(`Error: ${err.message || 'Failed to save candidate to database'}`);
     } finally {
       setIsAddCandidateOpen(false);
       setNewCandidateForm({

@@ -146,6 +146,9 @@ async function fetchAPI(endpoint, options = {}) {
         } else if (endpoint.includes('/accounts')) {
           invalidateClientCache('/accounts');
           invalidateClientCache('/dashboard');
+        } else if (endpoint.includes('/recruitment')) {
+          invalidateClientCache('/recruitment');
+          invalidateClientCache('/dashboard');
         } else {
           clientCache.clear();
         }

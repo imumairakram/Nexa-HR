@@ -79,6 +79,8 @@ class CacheService {
       this.invalidateTags(['tickets']);
     } else if (clean.includes('/accounts')) {
       this.invalidateTags(['accounts', 'dashboard']);
+    } else if (clean.includes('/recruitment')) {
+      this.invalidateTags(['recruitment', 'dashboard']);
     } else {
       // Fallback: clear all
       this.clear();

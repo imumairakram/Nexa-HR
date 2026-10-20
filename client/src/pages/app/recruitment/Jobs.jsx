@@ -65,37 +65,51 @@ const Jobs = () => {
     loadJobsData();
   }, []);
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
 
-    const newJob = {
-      id: Date.now(),
-      title: form.title.trim(),
-      dept: form.dept,
-      location: form.location,
-      type: form.type,
-      salary: form.salary,
-      applicants: 0,
-      status: 'ACTIVE',
-      posted: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-    };
-
-    const updated = [newJob, ...jobs];
-    setJobs(updated);
     try {
-      localStorage.setItem('nexahr_recruitment_jobs', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
-    }
+      const payload = {
+        title: form.title.trim(),
+        department: form.dept,
+        location: form.location,
+        type: form.type,
+        salary: form.salary,
+        status: 'ACTIVE',
+      };
 
-    setIsAddOpen(false);
-    setForm((prev) => ({
-      ...prev,
-      title: '',
-    }));
-    setToastMsg(`Job requisition "${form.title}" published!`);
-    setTimeout(() => setToastMsg(''), 3000);
+      const res = await api.createJobOpening(payload);
+      if (res?.success && res.data?.job) {
+        const created = res.data.job;
+        const formatted = {
+          ...created,
+          dept: created.department || created.dept,
+          applicants: created.applicants || 0,
+          posted: new Date(created.createdAt || created.postedDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        };
+        const updated = [formatted, ...jobs];
+        setJobs(updated);
+        try {
+          localStorage.setItem('nexahr_recruitment_jobs', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Job requisition "${form.title}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save job to database');
+      }
+    } catch (err) {
+      console.error('Error saving job to database:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save job requisition'}`);
+    } finally {
+      setIsAddOpen(false);
+      setForm((prev) => ({
+        ...prev,
+        title: '',
+      }));
+      setTimeout(() => setToastMsg(''), 3000);
+    }
   };
 
   const filtered = jobs.filter(

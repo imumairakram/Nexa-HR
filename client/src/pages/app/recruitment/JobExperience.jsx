@@ -31,31 +31,44 @@ const JobExperience = () => {
     loadExperiences();
   }, []);
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newItem.label.trim()) return;
-    const updated = [
-      ...items,
-      {
-        id: Date.now(),
+
+    try {
+      const payload = {
+        type: 'EXPERIENCE',
+        name: newItem.label.trim(),
         label: newItem.label.trim(),
         code: newItem.code.toUpperCase().trim() || 'EXP',
         minYears: 1,
         maxYears: 3,
         salaryRange: newItem.salaryRange,
         count: 0,
-      },
-    ];
-    setItems(updated);
-    try {
-      localStorage.setItem('nexahr_job_experiences', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
+      };
+
+      const res = await api.createRecruitmentTaxonomy(payload);
+      if (res?.success && res.data?.item) {
+        const item = res.data.item;
+        const updated = [item, ...items];
+        setItems(updated);
+        try {
+          localStorage.setItem('nexahr_job_experiences', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Experience seniority track "${newItem.label}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save experience tier');
+      }
+    } catch (err) {
+      console.error('Error saving experience tier:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save experience tier to database'}`);
+    } finally {
+      setIsAddOpen(false);
+      setNewItem({ label: '', code: '', salaryRange: '$100k - $130k' });
+      setTimeout(() => setToastMsg(''), 2500);
     }
-    setIsAddOpen(false);
-    setNewItem({ label: '', code: '', salaryRange: '$100k - $130k' });
-    setToastMsg('Experience seniority track added successfully!');
-    setTimeout(() => setToastMsg(''), 2500);
   };
 
   const filtered = items.filter((i) =>

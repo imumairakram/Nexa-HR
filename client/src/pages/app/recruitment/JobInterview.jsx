@@ -75,40 +75,60 @@ const JobInterview = () => {
     loadData();
   }, []);
 
-  const handleSchedule = (e) => {
+  const handleSchedule = async (e) => {
     e.preventDefault();
     if (!form.candidate.trim()) return;
 
-    const newInt = {
-      id: Date.now(),
-      candidate: form.candidate.trim(),
-      role: form.role,
-      interviewer: form.interviewer || (employees[0] ? `${employees[0].firstName} ${employees[0].lastName}` : 'Hiring Lead'),
-      date: form.date,
-      time: form.time,
-      type: form.type,
-      link: 'https://meet.google.com/nxa-hr-auto',
-      status: 'SCHEDULED',
-    };
-
-    const updated = [newInt, ...interviews];
-    setInterviews(updated);
     try {
-      localStorage.setItem('nexahr_recruitment_interviews', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
-    }
+      const payload = {
+        candidateName: form.candidate.trim(),
+        role: form.role,
+        interviewer: form.interviewer || (employees[0] ? `${employees[0].firstName} ${employees[0].lastName}` : 'Hiring Lead'),
+        date: form.date,
+        time: form.time,
+        round: form.type,
+        meetLink: 'https://meet.google.com/nxa-hr-auto',
+      };
 
-    setIsAddOpen(false);
-    setForm((prev) => ({
-      ...prev,
-      candidate: '',
-    }));
-    setToastMsg(`Interview scheduled for ${newInt.candidate}!`);
-    setTimeout(() => setToastMsg(''), 3000);
+      const res = await api.createJobInterview(payload);
+      if (res?.success && res.data?.interview) {
+        const created = res.data.interview;
+        const formatted = {
+          ...created,
+          candidate: created.candidateName,
+          type: created.round,
+          link: created.meetLink,
+        };
+        const updated = [formatted, ...interviews];
+        setInterviews(updated);
+        try {
+          localStorage.setItem('nexahr_recruitment_interviews', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Interview scheduled for ${formatted.candidate} and saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to schedule interview');
+      }
+    } catch (err) {
+      console.error('Error scheduling interview:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save interview to database'}`);
+    } finally {
+      setIsAddOpen(false);
+      setForm((prev) => ({
+        ...prev,
+        candidate: '',
+      }));
+      setTimeout(() => setToastMsg(''), 3000);
+    }
   };
 
-  const handleUpdateStatus = (id, newStatus) => {
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      await api.updateJobInterview(id, { status: newStatus });
+    } catch (err) {
+      console.warn('API error updating interview:', err);
+    }
     const updated = interviews.map((item) => {
       if (item.id === id) {
         return { ...item, status: newStatus };
@@ -125,7 +145,12 @@ const JobInterview = () => {
     setTimeout(() => setToastMsg(''), 2500);
   };
 
-  const handleDeleteInterview = (id) => {
+  const handleDeleteInterview = async (id) => {
+    try {
+      await api.deleteJobInterview(id);
+    } catch (err) {
+      console.warn('API error deleting interview:', err);
+    }
     const updated = interviews.filter((item) => item.id !== id);
     setInterviews(updated);
     try {

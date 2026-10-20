@@ -31,31 +31,43 @@ const JobLocation = () => {
     loadLocations();
   }, []);
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newLoc.name.trim()) return;
-    const updated = [
-      ...locations,
-      {
-        id: Date.now(),
+
+    try {
+      const payload = {
+        type: 'LOCATION',
         name: newLoc.name.trim(),
         city: newLoc.city.trim(),
         country: newLoc.country,
         timezone: newLoc.timezone,
         count: 0,
         status: 'BRANCH',
-      },
-    ];
-    setLocations(updated);
-    try {
-      localStorage.setItem('nexahr_job_locations', JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
+      };
+
+      const res = await api.createRecruitmentTaxonomy(payload);
+      if (res?.success && res.data?.item) {
+        const item = res.data.item;
+        const updated = [item, ...locations];
+        setLocations(updated);
+        try {
+          localStorage.setItem('nexahr_job_locations', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        setToastMsg(`Office location "${newLoc.name}" saved to database!`);
+      } else {
+        throw new Error(res?.message || 'Failed to save location');
+      }
+    } catch (err) {
+      console.error('Error saving location:', err);
+      setToastMsg(`Error: ${err.message || 'Failed to save location to database'}`);
+    } finally {
+      setIsAddOpen(false);
+      setNewLoc({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)' });
+      setTimeout(() => setToastMsg(''), 2500);
     }
-    setIsAddOpen(false);
-    setNewLoc({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)' });
-    setToastMsg('Office location registered successfully!');
-    setTimeout(() => setToastMsg(''), 2500);
   };
 
   const filtered = locations.filter((l) =>

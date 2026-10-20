@@ -179,23 +179,19 @@ const JobsWorkspace = () => {
           description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
         };
 
-        const res = await api.createJobOpening(payload).catch(() => null);
+        const res = await api.createJobOpening(payload);
         if (res?.success && res.data?.job) {
           setJobs((prev) => [res.data.job, ...prev]);
+          showToast(`Job requisition "${form.title}" saved to database!`);
+          // Silently refresh stats
+          api.getRecruitmentStats().then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
         } else {
-          const fallback = {
-            id: `JOB-${Date.now()}`,
-            ...payload,
-            applicants: 0,
-            posted: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-          };
-          setJobs((prev) => [fallback, ...prev]);
+          throw new Error(res?.message || 'Failed to save job to database');
         }
-        showToast(`New Job requisition "${form.title}" published!`);
       }
     } catch (err) {
       console.error('Error saving job:', err);
-      showToast('Error saving job requisition.');
+      showToast(`Error: ${err.message || 'Failed to save job requisition'}`);
     } finally {
       setIsDrawerOpen(false);
     }
