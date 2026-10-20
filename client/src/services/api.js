@@ -607,6 +607,143 @@ export const api = {
     });
   },
 
+  // --- Recruitment & ATS Enterprise Operations ---
+  getRecruitmentStats: async () => {
+    return await fetchAPI('/recruitment/stats');
+  },
+
+  getJobOpenings: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/recruitment/jobs${query ? `?${query}` : ''}`);
+  },
+
+  getJobOpeningById: async (id) => {
+    return await fetchAPI(`/recruitment/jobs/${id}`);
+  },
+
+  createJobOpening: async (jobData) => {
+    return await fetchAPI('/recruitment/jobs', {
+      method: 'POST',
+      body: JSON.stringify(jobData),
+    });
+  },
+
+  updateJobOpening: async (id, jobData) => {
+    return await fetchAPI(`/recruitment/jobs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(jobData),
+    });
+  },
+
+  toggleJobOpeningStatus: async (id) => {
+    return await fetchAPI(`/recruitment/jobs/${id}/status`, {
+      method: 'PATCH',
+    });
+  },
+
+  deleteJobOpening: async (id) => {
+    return await fetchAPI(`/recruitment/jobs/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getJobApplications: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/recruitment/applications${query ? `?${query}` : ''}`);
+  },
+
+  getJobApplicationById: async (id) => {
+    return await fetchAPI(`/recruitment/applications/${id}`);
+  },
+
+  createJobApplication: async (appData) => {
+    return await fetchAPI('/recruitment/applications', {
+      method: 'POST',
+      body: JSON.stringify(appData),
+    });
+  },
+
+  updateJobApplication: async (id, appData) => {
+    return await fetchAPI(`/recruitment/applications/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(appData),
+    });
+  },
+
+  updateJobApplicationStage: async (id, stage) => {
+    return await fetchAPI(`/recruitment/applications/${id}/stage`, {
+      method: 'PATCH',
+      body: JSON.stringify({ stage }),
+    });
+  },
+
+  deleteJobApplication: async (id) => {
+    return await fetchAPI(`/recruitment/applications/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getJobInterviews: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/recruitment/interviews${query ? `?${query}` : ''}`);
+  },
+
+  createJobInterview: async (interviewData) => {
+    return await fetchAPI('/recruitment/interviews', {
+      method: 'POST',
+      body: JSON.stringify(interviewData),
+    });
+  },
+
+  updateJobInterview: async (id, interviewData) => {
+    return await fetchAPI(`/recruitment/interviews/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(interviewData),
+    });
+  },
+
+  deleteJobInterview: async (id) => {
+    return await fetchAPI(`/recruitment/interviews/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getRecruitmentTaxonomies: async (type = 'ALL') => {
+    return await fetchAPI(`/recruitment/taxonomies?type=${type}`);
+  },
+
+  createRecruitmentTaxonomy: async (taxData) => {
+    return await fetchAPI('/recruitment/taxonomies', {
+      method: 'POST',
+      body: JSON.stringify(taxData),
+    });
+  },
+
+  updateRecruitmentTaxonomy: async (id, taxData) => {
+    return await fetchAPI(`/recruitment/taxonomies/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taxData),
+    });
+  },
+
+  toggleRecruitmentTaxonomy: async (id) => {
+    return await fetchAPI(`/recruitment/taxonomies/${id}/toggle`, {
+      method: 'PATCH',
+    });
+  },
+
+  deleteRecruitmentTaxonomy: async (id) => {
+    return await fetchAPI(`/recruitment/taxonomies/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  seedRecruitmentData: async (force = false) => {
+    return await fetchAPI(`/recruitment/seed${force ? '?force=true' : ''}`, {
+      method: 'POST',
+    });
+  },
+
   // --- Client Cache Utilities ---
   getCached: (endpoint) => {
     const entry = clientCache.get(endpoint);

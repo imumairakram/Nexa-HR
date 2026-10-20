@@ -240,53 +240,51 @@ const ATSPipeline = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      // 1. Load Candidates
-      let apps = [];
-      try {
-        const localApps = localStorage.getItem('nexahr_recruitment_applications');
-        if (localApps) {
-          const parsed = JSON.parse(localApps);
-          if (parsed && parsed.length > 0) apps = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-      if (apps.length === 0) {
-        apps = DEFAULT_APPLICATIONS;
-        try {
-          localStorage.setItem('nexahr_recruitment_applications', JSON.stringify(DEFAULT_APPLICATIONS));
-        } catch (e) {}
-      }
-      setCandidates(apps);
+      const [appsRes, ivsRes, empRes] = await Promise.allSettled([
+        api.getJobApplications(),
+        api.getJobInterviews(),
+        api.getEmployees(),
+      ]);
 
-      // 2. Load Interviews
-      let ivs = [];
-      try {
-        const localIvs = localStorage.getItem('nexahr_recruitment_interviews');
-        if (localIvs) {
-          const parsed = JSON.parse(localIvs);
-          if (parsed && parsed.length > 0) ivs = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-      if (ivs.length === 0) {
-        ivs = DEFAULT_INTERVIEWS;
+      if (appsRes.status === 'fulfilled' && appsRes.value?.success && appsRes.value.data?.applications) {
+        setCandidates(appsRes.value.data.applications);
+      } else {
         try {
-          localStorage.setItem('nexahr_recruitment_interviews', JSON.stringify(DEFAULT_INTERVIEWS));
-        } catch (e) {}
+          const localApps = localStorage.getItem('nexahr_recruitment_applications');
+          if (localApps) {
+            const parsed = JSON.parse(localApps);
+            if (parsed && parsed.length > 0) setCandidates(parsed);
+          } else {
+            setCandidates(DEFAULT_APPLICATIONS);
+          }
+        } catch {
+          setCandidates(DEFAULT_APPLICATIONS);
+        }
       }
-      setInterviews(ivs);
 
-      // 3. Load Employees for Interviewer dropdown
-      const empRes = await api.getEmployees();
-      if (empRes?.success && empRes.data?.employees) {
-        setEmployees(empRes.data.employees);
+      if (ivsRes.status === 'fulfilled' && ivsRes.value?.success && ivsRes.value.data?.interviews) {
+        setInterviews(ivsRes.value.data.interviews);
+      } else {
+        try {
+          const localIvs = localStorage.getItem('nexahr_recruitment_interviews');
+          if (localIvs) {
+            const parsed = JSON.parse(localIvs);
+            if (parsed && parsed.length > 0) setInterviews(parsed);
+          } else {
+            setInterviews(DEFAULT_INTERVIEWS);
+          }
+        } catch {
+          setInterviews(DEFAULT_INTERVIEWS);
+        }
+      }
+
+      if (empRes.status === 'fulfilled' && empRes.value?.success && empRes.value.data?.employees) {
+        setEmployees(empRes.value.data.employees);
       }
     } catch (err) {
       console.error('Failed to load ATS Pipeline data:', err);
     } finally {
-      setTimeout(() => setLoading(false), 200);
+      setLoading(false);
     }
   };
 
@@ -317,16 +315,23 @@ const ATSPipeline = () => {
     }
   };
 
-  // Move candidate to a stage
-  const moveCandidateStage = (candidateId, newStage) => {
+  // Move candidate to a stage with Live Backend API Sync
+  const moveCandidateStage = async (candidateId, newStage) => {
     const candidate = candidates.find((c) => c.id === candidateId);
     if (!candidate) return;
 
+    // Optimistic UI state update
     const updated = candidates.map((c) => (c.id === candidateId ? { ...c, stage: newStage } : c));
     persistCandidates(updated);
 
     if (selectedCandidate && selectedCandidate.id === candidateId) {
       setSelectedCandidate({ ...selectedCandidate, stage: newStage });
+    }
+
+    try {
+      await api.updateJobApplicationStage(candidateId, newStage).catch(() => null);
+    } catch (e) {
+      console.warn('Backend stage sync error, keeping optimistic state:', e);
     }
 
     const stageObj = STAGES.find((s) => s.key === newStage);
@@ -374,93 +379,123 @@ const ATSPipeline = () => {
     setIsScheduleOpen(true);
   };
 
-  const handleSaveInterview = (e) => {
+  // Save Interview with Live Backend API
+  const handleSaveInterview = async (e) => {
     e.preventDefault();
     if (!scheduleCandidate) return;
 
-    const newInterview = {
-      id: Date.now(),
-      candidate: scheduleCandidate.name,
+    const payload = {
+      applicationId: scheduleCandidate.id,
+      candidateName: scheduleCandidate.name,
+      candidateEmail: scheduleCandidate.email,
       role: scheduleCandidate.role,
+      round: interviewForm.type,
       interviewer: interviewForm.interviewer,
       date: interviewForm.date,
       time: interviewForm.time,
-      type: interviewForm.type,
-      link: interviewForm.link,
-      status: 'SCHEDULED',
+      meetLink: interviewForm.link,
     };
 
-    const updatedInterviews = [newInterview, ...interviews];
-    persistInterviews(updatedInterviews);
+    try {
+      const res = await api.createJobInterview(payload).catch(() => null);
+      const created = res?.success && res.data?.interview ? res.data.interview : {
+        id: `IV-${Date.now()}`,
+        ...payload,
+        status: 'SCHEDULED',
+      };
 
-    // Update candidate's interview info and advance to INTERVIEWING stage if needed
-    const updatedCandidates = candidates.map((c) =>
-      c.id === scheduleCandidate.id
-        ? {
-            ...c,
-            stage: c.stage === 'APPLIED' || c.stage === 'SCREENING' ? 'INTERVIEWING' : c.stage,
-            interview: {
-              interviewer: interviewForm.interviewer,
-              date: interviewForm.date,
-              time: interviewForm.time,
-              type: interviewForm.type,
-              link: interviewForm.link,
-            },
-          }
-        : c
-    );
-    persistCandidates(updatedCandidates);
+      const updatedInterviews = [created, ...interviews];
+      persistInterviews(updatedInterviews);
 
-    if (selectedCandidate && selectedCandidate.id === scheduleCandidate.id) {
-      setSelectedCandidate({
-        ...selectedCandidate,
-        stage: selectedCandidate.stage === 'APPLIED' || selectedCandidate.stage === 'SCREENING' ? 'INTERVIEWING' : selectedCandidate.stage,
-        interview: newInterview,
-      });
+      // Auto-advance candidate to INTERVIEW stage if currently in APPLIED or SCREENING
+      if (scheduleCandidate.stage === 'APPLIED' || scheduleCandidate.stage === 'SCREENING') {
+        moveCandidateStage(scheduleCandidate.id, 'INTERVIEW');
+      }
+
+      if (selectedCandidate && selectedCandidate.id === scheduleCandidate.id) {
+        setSelectedCandidate({
+          ...selectedCandidate,
+          stage: 'INTERVIEW',
+          interview: created,
+        });
+      }
+
+      showToast(`Interview scheduled for ${scheduleCandidate.name} on ${interviewForm.date}`);
+    } catch (err) {
+      console.error('Failed scheduling interview:', err);
+      showToast('Interview scheduled.');
+    } finally {
+      setIsScheduleOpen(false);
     }
-
-    setIsScheduleOpen(false);
-    showToast(`Interview scheduled for ${scheduleCandidate.name} on ${interviewForm.date}`);
   };
 
-  // Add Candidate
-  const handleAddCandidate = (e) => {
+  // Add Candidate with Live Backend API
+  const handleAddCandidate = async (e) => {
     e.preventDefault();
     if (!newCandidateForm.name.trim()) return;
 
-    const candidate = {
-      id: `APP-${Math.floor(1000 + Math.random() * 9000)}`,
+    const payload = {
       name: newCandidateForm.name.trim(),
       role: newCandidateForm.role,
       department: newCandidateForm.department,
-      email: newCandidateForm.email || 'candidate@talent.org',
+      email: newCandidateForm.email || `${newCandidateForm.name.toLowerCase().replace(/\s+/g, '.')}@talent.org`,
       phone: newCandidateForm.phone || '+92 300 0000000',
       experience: newCandidateForm.experience,
       location: newCandidateForm.location,
-      rating: 4.8,
       stage: newCandidateForm.stage,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      status: 'ACTIVE',
       resumeSummary: newCandidateForm.resumeSummary || 'Evaluated against core technical requirements and culture fit.',
     };
 
-    persistCandidates([candidate, ...candidates]);
-    setIsAddCandidateOpen(false);
-    setNewCandidateForm({
-      name: '',
-      role: 'Senior React & Node Engineer',
-      department: 'Engineering & DevOps',
-      email: '',
-      phone: '',
-      experience: '4.0 Years',
-      location: 'Islamabad HQ / Hybrid',
-      stage: 'APPLIED',
-      resumeSummary: '',
-      fastTrack: true,
-      emailConfirm: true,
-      autoAssessment: false,
-    });
-    showToast(`Candidate ${candidate.name} added to pipeline`);
+    try {
+      const res = await api.createJobApplication(payload).catch(() => null);
+      if (res?.success && res.data?.application) {
+        persistCandidates([res.data.application, ...candidates]);
+      } else {
+        const fallback = {
+          id: `APP-${Math.floor(1000 + Math.random() * 9000)}`,
+          ...payload,
+          rating: 4.8,
+          status: 'ACTIVE',
+          appliedDate: new Date().toISOString(),
+        };
+        persistCandidates([fallback, ...candidates]);
+      }
+      showToast(`Candidate ${payload.name} added to pipeline`);
+    } catch (err) {
+      console.error('Error adding candidate:', err);
+      showToast('Candidate added to pipeline');
+    } finally {
+      setIsAddCandidateOpen(false);
+      setNewCandidateForm({
+        name: '',
+        role: 'Senior React & Node Engineer',
+        department: 'Engineering & DevOps',
+        email: '',
+        phone: '',
+        experience: '4.0 Years',
+        location: 'Islamabad HQ / Hybrid',
+        stage: 'APPLIED',
+        resumeSummary: '',
+        fastTrack: true,
+        emailConfirm: true,
+        autoAssessment: false,
+      });
+    }
+  };
+
+  // Delete Candidate with Live Backend API
+  const handleDeleteCandidate = async (candidateId) => {
+    try {
+      await api.deleteJobApplication(candidateId).catch(() => null);
+      persistCandidates(candidates.filter((c) => c.id !== candidateId));
+      setIsDetailDrawerOpen(false);
+      showToast('Candidate removed from recruitment pipeline');
+    } catch (err) {
+      console.error('Error deleting candidate:', err);
+      persistCandidates(candidates.filter((c) => c.id !== candidateId));
+      setIsDetailDrawerOpen(false);
+      showToast('Candidate removed');
+    }
   };
 
   // Filtering
@@ -1129,12 +1164,7 @@ const ATSPipeline = () => {
                 {/* Drawer Footer */}
                 <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
                   <button
-                    onClick={() => {
-                      const updated = candidates.filter((c) => c.id !== selectedCandidate.id);
-                      persistCandidates(updated);
-                      setIsDetailDrawerOpen(false);
-                      showToast('Candidate removed from pipeline');
-                    }}
+                    onClick={() => handleDeleteCandidate(selectedCandidate.id)}
                     className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1.5 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

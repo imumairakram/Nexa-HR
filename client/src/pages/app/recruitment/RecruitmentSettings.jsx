@@ -97,90 +97,56 @@ const RecruitmentSettings = () => {
   const [skillForm, setSkillForm] = useState({ name: '', category: 'Frontend', proficiency: 'Advanced', weight: 'Mandatory' });
   const [experienceForm, setExperienceForm] = useState({ label: '', code: '', minYears: 1, maxYears: 3, salaryRange: '$80k - $110k' });
 
-  // Initial load
+  // Initial load with Live Backend API Integration
   const loadMasterData = async () => {
     setLoading(true);
     try {
-      // 1. Categories
-      let catData = [];
-      try {
-        const local = localStorage.getItem('nexahr_job_categories');
-        if (local) catData = JSON.parse(local);
-      } catch (e) {
-        console.warn(e);
-      }
-      if (!catData || catData.length === 0) {
-        const res = await api.getDepartments();
-        if (res?.success && res.data?.departments && res.data.departments.length > 0) {
-          catData = res.data.departments.map((d, idx) => ({
-            id: d.id || idx + 1,
-            name: d.name,
-            code: (d.code || d.name.substring(0, 3)).toUpperCase(),
-            count: 0,
-            lead: 'Department Head',
-            status: 'ACTIVE',
-          }));
-        } else {
-          catData = DEFAULT_CATEGORIES;
-        }
-      }
-      setCategories(catData);
+      const [taxRes, deptRes] = await Promise.allSettled([
+        api.getRecruitmentTaxonomies('ALL'),
+        api.getDepartments(),
+      ]);
 
-      // 2. Types
-      let typeData = DEFAULT_TYPES;
-      try {
-        const local = localStorage.getItem('nexahr_job_types');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (parsed && parsed.length > 0) typeData = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-      setTypes(typeData);
+      if (taxRes.status === 'fulfilled' && taxRes.value?.success && taxRes.value.data?.items) {
+        const items = taxRes.value.data.items;
 
-      // 3. Locations
-      let locData = DEFAULT_LOCATIONS;
-      try {
-        const local = localStorage.getItem('nexahr_job_locations');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (parsed && parsed.length > 0) locData = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-      setLocations(locData);
+        const cats = items.filter((i) => i.type === 'CATEGORY');
+        if (cats.length > 0) setCategories(cats);
+        else setCategories(DEFAULT_CATEGORIES);
 
-      // 4. Skills
-      let skillData = DEFAULT_SKILLS;
-      try {
-        const local = localStorage.getItem('nexahr_job_skills');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (parsed && parsed.length > 0) skillData = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-      setSkills(skillData);
+        const typs = items.filter((i) => i.type === 'TYPE');
+        if (typs.length > 0) setTypes(typs);
+        else setTypes(DEFAULT_TYPES);
 
-      // 5. Experience
-      let expData = DEFAULT_EXPERIENCE;
-      try {
-        const local = localStorage.getItem('nexahr_job_experiences');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (parsed && parsed.length > 0) expData = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
+        const locs = items.filter((i) => i.type === 'LOCATION');
+        if (locs.length > 0) setLocations(locs);
+        else setLocations(DEFAULT_LOCATIONS);
+
+        const skls = items.filter((i) => i.type === 'SKILL');
+        if (skls.length > 0) setSkills(skls);
+        else setSkills(DEFAULT_SKILLS);
+
+        const exps = items.filter((i) => i.type === 'EXPERIENCE');
+        if (exps.length > 0) setExperiences(exps);
+        else setExperiences(DEFAULT_EXPERIENCE);
+      } else {
+        // Fallback to local storage if offline
+        try {
+          const localCats = localStorage.getItem('nexahr_job_categories');
+          if (localCats) setCategories(JSON.parse(localCats));
+          const localTypes = localStorage.getItem('nexahr_job_types');
+          if (localTypes) setTypes(JSON.parse(localTypes));
+          const localLocs = localStorage.getItem('nexahr_job_locations');
+          if (localLocs) setLocations(JSON.parse(localLocs));
+          const localSkills = localStorage.getItem('nexahr_job_skills');
+          if (localSkills) setSkills(JSON.parse(localSkills));
+          const localExps = localStorage.getItem('nexahr_job_experiences');
+          if (localExps) setExperiences(JSON.parse(localExps));
+        } catch {}
       }
-      setExperiences(expData);
     } catch (err) {
       console.error('Failed to load recruitment master data:', err);
     } finally {
-      setTimeout(() => setLoading(false), 200);
+      setLoading(false);
     }
   };
 
@@ -261,54 +227,63 @@ const RecruitmentSettings = () => {
   };
 
   // Submit Handler
-  const handleSubmit = (e) => {
+  // Submit Handler with Live Backend API
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (activeTab === 'categories') {
-      if (!categoryForm.name.trim()) return;
-      if (editingItem) {
-        const updated = categories.map((c) => (c.id === editingItem.id ? { ...c, ...categoryForm, code: categoryForm.code.toUpperCase().trim() } : c));
-        persistCategories(updated);
-        showToast('Category updated successfully');
-      } else {
-        const item = {
-          id: Date.now(),
+    try {
+      if (activeTab === 'categories') {
+        if (!categoryForm.name.trim()) return;
+        const payload = {
+          type: 'CATEGORY',
           name: categoryForm.name.trim(),
           code: categoryForm.code.toUpperCase().trim() || 'CAT',
           lead: categoryForm.lead || 'Department Lead',
           status: categoryForm.status,
-          count: 0,
+          openPositions: 0,
         };
-        persistCategories([item, ...categories]);
-        showToast('New Job Category created');
-      }
-    } else if (activeTab === 'types') {
-      if (!typeForm.name.trim()) return;
-      if (editingItem) {
-        const updated = types.map((t) => (t.id === editingItem.id ? { ...t, ...typeForm, code: typeForm.code.toUpperCase().trim() } : t));
-        persistTypes(updated);
-        showToast('Contract type updated successfully');
-      } else {
-        const item = {
-          id: Date.now(),
+
+        if (editingItem) {
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
+          const updated = categories.map((c) =>
+            c.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...c, ...payload }) : c
+          );
+          persistCategories(updated);
+          showToast('Category updated successfully');
+        } else {
+          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
+          const item = res?.success && res.data?.item ? res.data.item : { id: `CAT-${Date.now()}`, ...payload };
+          persistCategories([item, ...categories]);
+          showToast('New Job Category created');
+        }
+      } else if (activeTab === 'types') {
+        if (!typeForm.name.trim()) return;
+        const payload = {
+          type: 'TYPE',
           name: typeForm.name.trim(),
           code: typeForm.code.toUpperCase().trim() || 'TYPE',
           hours: typeForm.hours,
           benefits: typeForm.benefits,
           count: 0,
         };
-        persistTypes([item, ...types]);
-        showToast('New Contract Type created');
-      }
-    } else if (activeTab === 'locations') {
-      if (!locationForm.name.trim()) return;
-      if (editingItem) {
-        const updated = locations.map((l) => (l.id === editingItem.id ? { ...l, ...locationForm } : l));
-        persistLocations(updated);
-        showToast('Location updated successfully');
-      } else {
-        const item = {
-          id: Date.now(),
+
+        if (editingItem) {
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
+          const updated = types.map((t) =>
+            t.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...t, ...payload }) : t
+          );
+          persistTypes(updated);
+          showToast('Contract format updated successfully');
+        } else {
+          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
+          const item = res?.success && res.data?.item ? res.data.item : { id: `TYPE-${Date.now()}`, ...payload };
+          persistTypes([item, ...types]);
+          showToast('New Contract Format created');
+        }
+      } else if (activeTab === 'locations') {
+        if (!locationForm.name.trim()) return;
+        const payload = {
+          type: 'LOCATION',
           name: locationForm.name.trim(),
           city: locationForm.city.trim() || 'HQ',
           country: locationForm.country,
@@ -316,36 +291,49 @@ const RecruitmentSettings = () => {
           status: locationForm.status,
           count: 0,
         };
-        persistLocations([item, ...locations]);
-        showToast('New Hiring Location added');
-      }
-    } else if (activeTab === 'skills') {
-      if (!skillForm.name.trim()) return;
-      if (editingItem) {
-        const updated = skills.map((s) => (s.id === editingItem.id ? { ...s, ...skillForm } : s));
-        persistSkills(updated);
-        showToast('Skill definition updated');
-      } else {
-        const item = {
-          id: Date.now(),
+
+        if (editingItem) {
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
+          const updated = locations.map((l) =>
+            l.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...l, ...payload }) : l
+          );
+          persistLocations(updated);
+          showToast('Hiring location updated successfully');
+        } else {
+          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
+          const item = res?.success && res.data?.item ? res.data.item : { id: `LOC-${Date.now()}`, ...payload };
+          persistLocations([item, ...locations]);
+          showToast('New Hiring Location registered');
+        }
+      } else if (activeTab === 'skills') {
+        if (!skillForm.name.trim()) return;
+        const payload = {
+          type: 'SKILL',
           name: skillForm.name.trim(),
           category: skillForm.category,
           proficiency: skillForm.proficiency,
           weight: skillForm.weight,
           assessmentsCount: 0,
         };
-        persistSkills([item, ...skills]);
-        showToast('New Skill added to taxonomy');
-      }
-    } else if (activeTab === 'experience') {
-      if (!experienceForm.label.trim()) return;
-      if (editingItem) {
-        const updated = experiences.map((exp) => (exp.id === editingItem.id ? { ...exp, ...experienceForm, code: experienceForm.code.toUpperCase().trim() } : exp));
-        persistExperiences(updated);
-        showToast('Experience track updated');
-      } else {
-        const item = {
-          id: Date.now(),
+
+        if (editingItem) {
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
+          const updated = skills.map((s) =>
+            s.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...s, ...payload }) : s
+          );
+          persistSkills(updated);
+          showToast('Skill definition updated');
+        } else {
+          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
+          const item = res?.success && res.data?.item ? res.data.item : { id: `SKILL-${Date.now()}`, ...payload };
+          persistSkills([item, ...skills]);
+          showToast('New Skill added to taxonomy');
+        }
+      } else if (activeTab === 'experience') {
+        if (!experienceForm.label.trim()) return;
+        const payload = {
+          type: 'EXPERIENCE',
+          name: experienceForm.label.trim(),
           label: experienceForm.label.trim(),
           code: experienceForm.code.toUpperCase().trim() || 'EXP',
           minYears: Number(experienceForm.minYears) || 0,
@@ -353,16 +341,37 @@ const RecruitmentSettings = () => {
           salaryRange: experienceForm.salaryRange,
           count: 0,
         };
-        persistExperiences([item, ...experiences]);
-        showToast('New Experience Track created');
-      }
-    }
 
-    setIsModalOpen(false);
+        if (editingItem) {
+          const res = await api.updateRecruitmentTaxonomy(editingItem.id, payload).catch(() => null);
+          const updated = experiences.map((exp) =>
+            exp.id === editingItem.id ? (res?.success && res.data?.item ? res.data.item : { ...exp, ...payload }) : exp
+          );
+          persistExperiences(updated);
+          showToast('Experience track updated');
+        } else {
+          const res = await api.createRecruitmentTaxonomy(payload).catch(() => null);
+          const item = res?.success && res.data?.item ? res.data.item : { id: `EXP-${Date.now()}`, ...payload };
+          persistExperiences([item, ...experiences]);
+          showToast('New Experience Track created');
+        }
+      }
+    } catch (err) {
+      console.error('Error saving settings entry:', err);
+      showToast('Error saving settings entry');
+    } finally {
+      setIsModalOpen(false);
+    }
   };
 
-  // Delete Handler
-  const handleDelete = (id) => {
+  // Delete Handler with Live Backend API
+  const handleDelete = async (id) => {
+    try {
+      await api.deleteRecruitmentTaxonomy(id).catch(() => null);
+    } catch (e) {
+      console.error(e);
+    }
+
     if (activeTab === 'categories') {
       persistCategories(categories.filter((c) => c.id !== id));
       showToast('Category deleted');

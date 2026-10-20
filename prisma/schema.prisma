@@ -5,8 +5,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ====================================================
@@ -412,3 +413,115 @@ model AccountTransaction {
   @@map("account_transactions")
 }
 
+// ====================================================
+// RECRUITMENT & TALENT ACQUISITION (ATS)
+// ====================================================
+
+model JobOpening {
+  id           String           @id @default(uuid())
+  jobCode      String           @unique // e.g. "JOB-101"
+  title        String
+  department   String
+  location     String
+  type         String           @default("Full Time")
+  experience   String           @default("3+ Years")
+  salary       String?          @default("$100k - $140k")
+  status       String           @default("ACTIVE") // "ACTIVE", "PAUSED", "CLOSED"
+  description  String?
+  requirements String?
+  skills       String[]         @default([])
+  urgent       Boolean          @default(false)
+  postedDate   DateTime         @default(now())
+  closingDate  DateTime?
+  createdById  String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  applications JobApplication[]
+  interviews   JobInterview[]
+
+  @@index([status])
+  @@index([department])
+  @@index([createdAt])
+  @@map("job_openings")
+}
+
+model JobApplication {
+  id            String         @id @default(uuid())
+  applicationId String         @unique // e.g. "APP-9901"
+  jobOpeningId  String?
+  name          String
+  email         String
+  phone         String?
+  role          String
+  department    String
+  location      String
+  experience    String         @default("3 Years")
+  rating        Float          @default(5.0)
+  stage         String         @default("APPLIED") // "APPLIED" | "SCREENING" | "INTERVIEW" | "OFFER" | "HIRED" | "REJECTED"
+  status        String         @default("ACTIVE") // "ACTIVE" | "ARCHIVED"
+  resumeSummary String?
+  notes         String?
+  tags          String[]       @default([])
+  source        String?        @default("Career Portal")
+  appliedDate   DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  jobOpening    JobOpening?    @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
+  interviews    JobInterview[]
+
+  @@index([stage])
+  @@index([jobOpeningId])
+  @@index([email])
+  @@index([createdAt])
+  @@map("job_applications")
+}
+
+model JobInterview {
+  id              String          @id @default(uuid())
+  interviewCode   String          @unique // e.g. "IV-4011"
+  applicationId   String
+  jobOpeningId    String?
+  candidateName   String
+  candidateEmail  String?
+  role            String
+  round           String          @default("Technical Round")
+  interviewer     String          @default("HR Hiring Manager")
+  interviewerRole String?
+  date            DateTime        @default(now())
+  time            String          @default("10:00 AM")
+  duration        String          @default("45 mins")
+  meetLink        String?
+  status          String          @default("SCHEDULED") // "SCHEDULED", "COMPLETED", "CANCELLED", "RESCHEDULED"
+  feedback        String?
+  score           Float?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  application     JobApplication  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  jobOpening      JobOpening?     @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
+
+  @@index([applicationId])
+  @@index([jobOpeningId])
+  @@index([date])
+  @@index([status])
+  @@map("job_interviews")
+}
+
+model RecruitmentTaxonomy {
+  id          String   @id @default(uuid())
+  type        String   // "CATEGORY" | "TYPE" | "LOCATION" | "SKILL" | "EXPERIENCE"
+  name        String
+  code        String?
+  description String?
+  extra       String?  // JSON stringified metadata for custom tab properties
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([active])
+  @@map("recruitment_taxonomies")
+}
