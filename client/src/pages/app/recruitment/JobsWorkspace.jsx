@@ -364,50 +364,94 @@ const JobsWorkspace = () => {
       {/* ========================================================================= */}
       {/* 2. RECRUITMENT KPI TELEMETRY CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        <div className="rounded-[28px] bg-white dark:bg-[#1E293B] p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Published Openings</p>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white">{totalOpenings}</h3>
-            <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" /> +2 new this week
-            </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Card 1 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Published Openings</span>
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Briefcase className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-            <Briefcase className="w-6 h-6 stroke-[2]" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {totalOpenings} <span className="text-base font-bold text-slate-400">Roles</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" /> +2 new this week
+              </span>
+              <span className="text-slate-400">Active</span>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-[28px] bg-white dark:bg-[#1E293B] p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Applicants</p>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white">{totalApplicants}</h3>
-            <p className="text-[10px] text-indigo-600 font-semibold flex items-center gap-1">Across all requisitions</p>
+        {/* Card 2 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Applicants</span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Users className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <Users className="w-6 h-6 stroke-[2]" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              {totalApplicants} <span className="text-base font-bold text-slate-400">Candidates</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Across all requisitions</span>
+              <span className="text-slate-400">Talent Funnel</span>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-[28px] bg-white dark:bg-[#1E293B] p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Paused / On Hold</p>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white">{totalPaused}</h3>
-            <p className="text-[10px] text-amber-600 font-semibold flex items-center gap-1">Pending allocation</p>
+        {/* Card 3 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-amber-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Paused / On Hold</span>
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <Clock className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <Clock className="w-6 h-6 stroke-[2]" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {totalPaused} <span className="text-base font-bold text-slate-400">Roles</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-amber-600 dark:text-amber-400 font-bold">Pending allocation</span>
+              <span className="text-slate-400">Review</span>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-[28px] bg-white dark:bg-[#1E293B] p-5 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Offer Acceptance</p>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white">92.4%</h3>
-            <p className="text-[10px] text-purple-600 font-semibold flex items-center gap-1">Target benchmark exceeded</p>
+        {/* Card 4 */}
+        <div className="relative overflow-hidden bg-white dark:bg-[#1E293B] rounded-[28px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800/80 hover:border-purple-500/40 group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-purple-500/10 blur-2xl pointer-events-none group-hover:bg-purple-500/20 transition-all" />
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Offer Acceptance</span>
+            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/60 dark:border-purple-800/50 group-hover:scale-110 transition-transform shadow-xs">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 stroke-[2]" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
+              92.4% <span className="text-base font-bold text-slate-400">Rate</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 text-xs font-semibold">
+              <span className="text-purple-600 dark:text-purple-400 font-bold">Target benchmark exceeded</span>
+              <span className="text-slate-400">Velocity</span>
+            </div>
           </div>
         </div>
       </div>

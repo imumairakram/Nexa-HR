@@ -23,6 +23,10 @@ import {
   ArrowRight,
   ChevronRight,
   Filter,
+  DollarSign,
+  Users,
+  Bot,
+  Sparkles,
 } from 'lucide-react';
 
 const TABS = [
@@ -1240,64 +1244,85 @@ const RecruitmentSettings = () => {
       {/* ========================================================================= */}
       {/* 5. ADD / EDIT MODAL FOR MASTER DATA */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* 5. STITCH-INSPIRED LUXURY ADD / EDIT MODAL FOR MASTER DATA */}
+      {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[32px] p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                  <CurrentIcon className="w-5 h-5 stroke-[2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-2xl sm:max-w-3xl w-full shadow-2xl border border-sky-200/70 dark:border-slate-700/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Modal Header */}
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-100 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-indigo-50/80 to-emerald-50/60 dark:from-slate-900/90 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20 ring-4 ring-sky-500/15">
+                  <CurrentIcon className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
                     {editingItem ? 'Edit' : 'Create'} {currentTabObj.label.replace('Master', '').trim()}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{currentTabObj.desc}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                    {currentTabObj.desc}
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-4 custom-scrollbar text-xs relative z-10">
               {/* Tab 1 Fields */}
               {activeTab === 'categories' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Category Name</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Engineering & DevOps"
-                      value={categoryForm.name}
-                      onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Code</label>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                      Category Name <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Tag className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="ENG"
-                        value={categoryForm.code}
-                        onChange={(e) => setCategoryForm({ ...categoryForm, code: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        required
+                        placeholder="e.g. Engineering & DevOps"
+                        value={categoryForm.name}
+                        onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Department Lead</label>
-                      <input
-                        type="text"
-                        placeholder="Lead Name"
-                        value={categoryForm.lead}
-                        onChange={(e) => setCategoryForm({ ...categoryForm, lead: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      />
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Taxonomy Code</label>
+                      <div className="relative">
+                        <Layers className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="ENG"
+                          value={categoryForm.code}
+                          onChange={(e) => setCategoryForm({ ...categoryForm, code: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Department Lead</label>
+                      <div className="relative">
+                        <Users className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="Lead Name"
+                          value={categoryForm.lead}
+                          onChange={(e) => setCategoryForm({ ...categoryForm, lead: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                   </div>
                 </>
@@ -1307,47 +1332,61 @@ const RecruitmentSettings = () => {
               {activeTab === 'types' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Contract Name</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Full-Time Permanent"
-                      value={typeForm.name}
-                      onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Code</label>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                      Contract Name <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="FT"
-                        value={typeForm.code}
-                        onChange={(e) => setTypeForm({ ...typeForm, code: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        required
+                        placeholder="e.g. Full-Time Permanent"
+                        value={typeForm.name}
+                        onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Work Hours</label>
-                      <input
-                        type="text"
-                        placeholder="40 hrs / week"
-                        value={typeForm.hours}
-                        onChange={(e) => setTypeForm({ ...typeForm, hours: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      />
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Contract Code</label>
+                      <div className="relative">
+                        <Layers className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="FT"
+                          value={typeForm.code}
+                          onChange={(e) => setTypeForm({ ...typeForm, code: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Work Hours</label>
+                      <div className="relative">
+                        <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="40 hrs / week"
+                          value={typeForm.hours}
+                          onChange={(e) => setTypeForm({ ...typeForm, hours: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Benefits & Perks Track</label>
-                    <input
-                      type="text"
-                      placeholder="Health, Equity & Allowances"
-                      value={typeForm.benefits}
-                      onChange={(e) => setTypeForm({ ...typeForm, benefits: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">Benefits & Perks Track</label>
+                    <div className="relative">
+                      <Award className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="Health, Equity & Allowances"
+                        value={typeForm.benefits}
+                        onChange={(e) => setTypeForm({ ...typeForm, benefits: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                      />
+                    </div>
                   </div>
                 </>
               )}
@@ -1356,60 +1395,77 @@ const RecruitmentSettings = () => {
               {activeTab === 'locations' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Campus / Hub Name</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Islamabad HQ & Innovation Campus"
-                      value={locationForm.name}
-                      onChange={(e) => setLocationForm({ ...locationForm, name: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">City</label>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                      Campus / Hub Name <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="Islamabad"
-                        value={locationForm.city}
-                        onChange={(e) => setLocationForm({ ...locationForm, city: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Country</label>
-                      <input
-                        type="text"
-                        placeholder="Pakistan"
-                        value={locationForm.country}
-                        onChange={(e) => setLocationForm({ ...locationForm, country: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        required
+                        placeholder="e.g. Islamabad HQ & Innovation Campus"
+                        value={locationForm.name}
+                        onChange={(e) => setLocationForm({ ...locationForm, name: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Timezone</label>
-                      <input
-                        type="text"
-                        placeholder="PKT (UTC+5)"
-                        value={locationForm.timezone}
-                        onChange={(e) => setLocationForm({ ...locationForm, timezone: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      />
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">City</label>
+                      <div className="relative">
+                        <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="Islamabad"
+                          value={locationForm.city}
+                          onChange={(e) => setLocationForm({ ...locationForm, city: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Classification</label>
-                      <select
-                        value={locationForm.status}
-                        onChange={(e) => setLocationForm({ ...locationForm, status: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      >
-                        <option value="PRIMARY_HQ">Primary HQ</option>
-                        <option value="BRANCH">Regional Branch</option>
-                        <option value="REMOTE">Remote Async</option>
-                      </select>
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Country</label>
+                      <div className="relative">
+                        <Globe className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="Pakistan"
+                          value={locationForm.country}
+                          onChange={(e) => setLocationForm({ ...locationForm, country: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Timezone</label>
+                      <div className="relative">
+                        <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="PKT (UTC+5)"
+                          value={locationForm.timezone}
+                          onChange={(e) => setLocationForm({ ...locationForm, timezone: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Duty Station Classification</label>
+                      <div className="relative">
+                        <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <select
+                          value={locationForm.status}
+                          onChange={(e) => setLocationForm({ ...locationForm, status: e.target.value })}
+                          className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
+                        >
+                          <option value="PRIMARY_HQ">Primary HQ</option>
+                          <option value="BRANCH">Regional Branch</option>
+                          <option value="REMOTE">Remote Async</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -1419,51 +1475,65 @@ const RecruitmentSettings = () => {
               {activeTab === 'skills' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Skill / Tech Stack Name</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. React.js & Tailwind CSS"
-                      value={skillForm.name}
-                      onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Category</label>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                      Skill / Tech Stack Name <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Code className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="Frontend"
-                        value={skillForm.category}
-                        onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        required
+                        placeholder="e.g. React.js & Tailwind CSS"
+                        value={skillForm.name}
+                        onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Proficiency</label>
-                      <select
-                        value={skillForm.proficiency}
-                        onChange={(e) => setSkillForm({ ...skillForm, proficiency: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-2 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none"
-                      >
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
-                        <option value="Expert">Expert</option>
-                      </select>
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Category</label>
+                      <div className="relative">
+                        <Tag className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="Frontend"
+                          value={skillForm.category}
+                          onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Weight</label>
-                      <select
-                        value={skillForm.weight}
-                        onChange={(e) => setSkillForm({ ...skillForm, weight: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-2 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none"
-                      >
-                        <option value="Mandatory">Mandatory</option>
-                        <option value="Preferred">Preferred</option>
-                        <option value="Optional">Optional</option>
-                      </select>
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Proficiency</label>
+                      <div className="relative">
+                        <Award className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <select
+                          value={skillForm.proficiency}
+                          onChange={(e) => setSkillForm({ ...skillForm, proficiency: e.target.value })}
+                          className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
+                        >
+                          <option value="Beginner">Beginner</option>
+                          <option value="Intermediate">Intermediate</option>
+                          <option value="Advanced">Advanced</option>
+                          <option value="Expert">Expert</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Weight</label>
+                      <div className="relative">
+                        <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <select
+                          value={skillForm.weight}
+                          onChange={(e) => setSkillForm({ ...skillForm, weight: e.target.value })}
+                          className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
+                        >
+                          <option value="Mandatory">Mandatory</option>
+                          <option value="Preferred">Preferred</option>
+                          <option value="Optional">Optional</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -1473,74 +1543,124 @@ const RecruitmentSettings = () => {
               {activeTab === 'experience' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Seniority Track Label</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Senior Specialist (5 - 8 Years)"
-                      value={experienceForm.label}
-                      onChange={(e) => setExperienceForm({ ...experienceForm, label: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Code</label>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                      Seniority Track Label <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="SENIOR"
-                        value={experienceForm.code}
-                        onChange={(e) => setExperienceForm({ ...experienceForm, code: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        required
+                        placeholder="e.g. Senior Specialist (5 - 8 Years)"
+                        value={experienceForm.label}
+                        onChange={(e) => setExperienceForm({ ...experienceForm, label: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Min Years</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={experienceForm.minYears}
-                        onChange={(e) => setExperienceForm({ ...experienceForm, minYears: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      />
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Track Code</label>
+                      <div className="relative">
+                        <Layers className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="SENIOR"
+                          value={experienceForm.code}
+                          onChange={(e) => setExperienceForm({ ...experienceForm, code: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Max Years</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={experienceForm.maxYears}
-                        onChange={(e) => setExperienceForm({ ...experienceForm, maxYears: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                      />
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Min Years</label>
+                      <div className="relative">
+                        <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="number"
+                          min="0"
+                          value={experienceForm.minYears}
+                          onChange={(e) => setExperienceForm({ ...experienceForm, minYears: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-slate-800 dark:text-slate-200 font-bold">Max Years</label>
+                      <div className="relative">
+                        <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="number"
+                          min="0"
+                          value={experienceForm.maxYears}
+                          onChange={(e) => setExperienceForm({ ...experienceForm, maxYears: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Salary Benchmark Range</label>
-                    <input
-                      type="text"
-                      placeholder="$110k - $150k"
-                      value={experienceForm.salaryRange}
-                      onChange={(e) => setExperienceForm({ ...experienceForm, salaryRange: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
-                    />
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold">Salary Benchmark Range</label>
+                    <div className="relative">
+                      <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="$110k - $150k"
+                        value={experienceForm.salaryRange}
+                        onChange={(e) => setExperienceForm({ ...experienceForm, salaryRange: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
+                      />
+                    </div>
                   </div>
                 </>
               )}
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+              {/* Master Data System Automation & Sync Card */}
+              <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-slate-800/70 dark:via-slate-800/40 dark:to-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-3 relative overflow-hidden">
+                <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/70 dark:border-slate-700/60">
+                  <div className="flex items-center gap-2 font-black text-slate-900 dark:text-white text-xs">
+                    <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                    <span>Master Data & System Automation</span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
+                    <Sparkles className="w-3 h-3 text-sky-600 dark:text-sky-400" />
+                    <span>Live Sync</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Job Requisition Scope</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Available in job creator & ATS pipeline.</div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">Active</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Enterprise Indexing</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Indexed across corporate reports.</div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">Synchronized</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 hover:from-emerald-700 hover:to-sky-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
-                  {editingItem ? 'Save Changes' : 'Create Entry'}
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                  <span>{editingItem ? 'Save Changes' : 'Create Entry'}</span>
                 </button>
               </div>
             </form>
