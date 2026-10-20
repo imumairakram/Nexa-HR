@@ -282,11 +282,11 @@ const EmployeeHelpdesk = () => {
     });
 
     return [
-      { value: catMap.IT_HARDWARE || 1, label: 'IT', tooltip: `IT & Equipment: ${catMap.IT_HARDWARE} Tickets` },
-      { value: catMap.PAYROLL || 2, label: 'Payroll', tooltip: `Payroll & Tax: ${catMap.PAYROLL} Tickets` },
-      { value: catMap.BENEFITS || 1, label: 'Benefits', tooltip: `Benefits: ${catMap.BENEFITS} Tickets` },
-      { value: catMap.WORKPLACE || 1, label: 'Admin', tooltip: `Workplace: ${catMap.WORKPLACE} Tickets` },
-      { value: catMap.GENERAL_HR || 1, label: 'HR', tooltip: `General HR: ${catMap.GENERAL_HR} Tickets` },
+      { value: catMap.IT_HARDWARE || 0, label: 'IT', tooltip: `IT & Equipment: ${catMap.IT_HARDWARE} Tickets` },
+      { value: catMap.PAYROLL || 0, label: 'Payroll', tooltip: `Payroll & Tax: ${catMap.PAYROLL} Tickets` },
+      { value: catMap.BENEFITS || 0, label: 'Benefits', tooltip: `Benefits: ${catMap.BENEFITS} Tickets` },
+      { value: catMap.WORKPLACE || 0, label: 'Admin', tooltip: `Workplace: ${catMap.WORKPLACE} Tickets` },
+      { value: catMap.GENERAL_HR || 0, label: 'HR', tooltip: `General HR: ${catMap.GENERAL_HR} Tickets` },
     ];
   }, [tickets]);
 
@@ -294,8 +294,8 @@ const EmployeeHelpdesk = () => {
     const openCount = tickets.filter((t) => t.status === 'OPEN').length;
     const inProgCount = tickets.filter((t) => t.status === 'IN_PROGRESS').length;
     return [
-      { value: openCount || 1, label: 'Queued', tooltip: `Newly Queued: ${openCount} Tickets` },
-      { value: inProgCount || 2, label: 'Review', tooltip: `Active Investigation: ${inProgCount} Tickets` },
+      { value: openCount, label: 'Queued', tooltip: `Newly Queued: ${openCount} Tickets` },
+      { value: inProgCount, label: 'Review', tooltip: `Active Investigation: ${inProgCount} Tickets` },
       { value: Math.max(0, openCount + inProgCount), label: 'Total', tooltip: `Total Pending: ${openCount + inProgCount} Active` },
     ];
   }, [tickets]);

@@ -151,16 +151,10 @@ const EmployeeDashboard = () => {
 
   // Compute dynamic leave quota & balances from real database leave types and requests
   const dynamicLeaveBalances = useMemo(() => {
-    const defaultTypes = [
-      { id: 'lt-1', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18 },
-      { id: 'lt-2', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 8 },
-      { id: 'lt-3', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12 },
-    ];
+    if (!leaveTypes || leaveTypes.length === 0) return [];
 
-    const typesToUse = leaveTypes && leaveTypes.length > 0 ? leaveTypes : defaultTypes;
-
-    return typesToUse.slice(0, 3).map((type, idx) => {
-      const totalAllowed = Number(type.daysAllowed) || (idx === 0 ? 18 : idx === 1 ? 10 : 6);
+    return leaveTypes.slice(0, 3).map((type, idx) => {
+      const totalAllowed = Number(type.daysAllowed) || 0;
       const approvedDays = leaveRequests
         .filter(
           (r) =>
@@ -182,7 +176,7 @@ const EmployeeDashboard = () => {
         .reduce((sum, r) => sum + (Number(r.totalDays) || 1), 0);
 
       const remaining = Math.max(0, totalAllowed - approvedDays);
-      const percentage = Math.min(100, Math.max(0, Math.round((remaining / totalAllowed) * 100)));
+      const percentage = totalAllowed > 0 ? Math.min(100, Math.max(0, Math.round((remaining / totalAllowed) * 100))) : 0;
 
       return {
         id: type.id || idx,
@@ -230,7 +224,7 @@ const EmployeeDashboard = () => {
   }, [dynamicLeaveBalances]);
 
   const totalAllowedLeaves = useMemo(() => {
-    return dynamicLeaveBalances.reduce((acc, q) => acc + (q.totalAllowed || 0), 0) || 34;
+    return dynamicLeaveBalances.reduce((acc, q) => acc + (q.totalAllowed || 0), 0);
   }, [dynamicLeaveBalances]);
 
   const avgDailyHours = useMemo(() => {
@@ -311,9 +305,7 @@ const EmployeeDashboard = () => {
       }));
     }
     return [
-      { value: 18, label: 'Annual', tooltip: 'Annual Vacation: 18/18 days left' },
-      { value: 10, label: 'Sick', tooltip: 'Medical & Sick: 10/10 days left' },
-      { value: 6, label: 'Casual', tooltip: 'Casual & Emergency: 6/6 days left' },
+      { value: 0, label: 'Leaves', tooltip: 'No Leave Quotas Allocated' },
     ];
   }, [dynamicLeaveBalances]);
 
@@ -414,10 +406,12 @@ const EmployeeDashboard = () => {
     return { text: 'No Records', type: 'neutral', icon: 'dot', sub: 'No Payroll Setup' };
   }, [latestPayslip, currentUser, payslipPeriod]);
 
+  const employeeShift = currentUser?.profile?.shift || currentUser?.shift || 'General Standard Shift';
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title={`Welcome, ${currentUser?.firstName || 'Alex'}`}
+        title={`Welcome, ${currentUser?.firstName || 'Employee'}`}
         mobileTitle="Employee Dashboard"
         hideMobileSubtitle={true}
         hideMobileSearch={true}
@@ -436,7 +430,7 @@ const EmployeeDashboard = () => {
           <div className="space-y-3 flex-1 min-w-0">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-400 text-xs font-bold border border-white/10">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>General Shift: 09:00 AM – 05:30 PM (8.5 hrs)</span>
+              <span>{employeeShift}</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight leading-tight whitespace-nowrap">
@@ -812,7 +806,7 @@ const EmployeeDashboard = () => {
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between py-1.5 border-b border-white/10">
                 <span className="text-slate-400">Shift Name</span>
-                <span className="font-bold text-white">General Standard Shift</span>
+                <span className="font-bold text-white truncate max-w-[180px]">{employeeShift}</span>
               </div>
               <div className="flex items-center justify-between py-1.5 border-b border-white/10">
                 <span className="text-slate-400">Working Hours</span>

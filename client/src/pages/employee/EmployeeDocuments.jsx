@@ -270,11 +270,11 @@ const EmployeeDocuments = () => {
     });
 
     return [
-      { value: typeCount.CONTRACT || 1, label: 'Contract', tooltip: `Contracts: ${typeCount.CONTRACT || 1} Files` },
-      { value: typeCount.COMPENSATION || 1, label: 'Comp', tooltip: `Compensation: ${typeCount.COMPENSATION || 1} Files` },
-      { value: typeCount.LEGAL || 1, label: 'Legal', tooltip: `Legal & NDA: ${typeCount.LEGAL || 1} Files` },
-      { value: typeCount.TAX_FORM || 1, label: 'Tax', tooltip: `Tax Forms: ${typeCount.TAX_FORM || 1} Files` },
-      { value: typeCount.CERTIFICATE || 1, label: 'Certs', tooltip: `Certificates: ${typeCount.CERTIFICATE || 1} Files` },
+      { value: typeCount.CONTRACT || 0, label: 'Contract', tooltip: `Contracts: ${typeCount.CONTRACT || 0} Files` },
+      { value: typeCount.COMPENSATION || 0, label: 'Comp', tooltip: `Compensation: ${typeCount.COMPENSATION || 0} Files` },
+      { value: typeCount.LEGAL || 0, label: 'Legal', tooltip: `Legal & NDA: ${typeCount.LEGAL || 0} Files` },
+      { value: typeCount.TAX_FORM || 0, label: 'Tax', tooltip: `Tax Forms: ${typeCount.TAX_FORM || 0} Files` },
+      { value: typeCount.CERTIFICATE || 0, label: 'Certs', tooltip: `Certificates: ${typeCount.CERTIFICATE || 0} Files` },
     ];
   }, [personalDocs]);
 

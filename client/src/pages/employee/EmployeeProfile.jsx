@@ -132,13 +132,13 @@ const EmployeeProfile = () => {
     emergencyRelation: 'Parent / Guardian',
     emergencyPhone: '',
     // Payroll & Bank Details
-    bankName: 'Standard Chartered Bank (Corporate Wing)',
+    bankName: '',
     accountNumber: '',
-    branchCode: '0142 (Corporate Wing)',
+    branchCode: '',
     payoutMethod: 'Direct Bank Transfer',
     ntnNumber: '',
-    taxStatus: 'Verified Active Filer',
-    providentFund: 'Enrolled (8.33% Tier)',
+    taxStatus: '',
+    providentFund: '',
   });
 
   // Password state
@@ -163,20 +163,19 @@ const EmployeeProfile = () => {
     );
 
     const empCode = u.employeeCode || u.empCode || '';
-    const empNumDigits = (empCode || '101').replace(/[^0-9]/g, '').padStart(6, '0');
 
     const resolvedJoinDate = u.profile?.joiningDate || u.joiningDate || u.createdAt;
-    const rawShift = u.profile?.shift || u.shift || 'General Shift (09:00 AM – 05:30 PM)';
+    const rawShift = u.profile?.shift || u.shift || 'General Morning (09:00 - 17:30)';
     const rawEmpType = u.profile?.employmentType || u.employmentType || 'FULL_TIME';
 
     const resolvedBank = u.bankDetails || {};
-    const bankName = resolvedBank.bankName || u.bankName || 'Standard Chartered Bank (Corporate Wing)';
-    const accountNumber = resolvedBank.accountNumber || u.accountNumber || `PK72SCBL000000${empNumDigits}01`;
-    const branchCode = resolvedBank.branchCode || u.branchCode || '0142 (Corporate Wing)';
+    const bankName = resolvedBank.bankName || u.bankName || '';
+    const accountNumber = resolvedBank.accountNumber || u.accountNumber || '';
+    const branchCode = resolvedBank.branchCode || u.branchCode || '';
     const payoutMethod = resolvedBank.payoutMethod || u.payoutMethod || 'Direct Bank Transfer';
-    const taxStatus = resolvedBank.taxStatus || u.taxStatus || 'Verified Active Filer';
-    const ntnNumber = resolvedBank.ntnNumber || u.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`;
-    const providentFund = resolvedBank.providentFund || u.providentFund || 'Enrolled (8.33% Tier)';
+    const taxStatus = resolvedBank.taxStatus || u.taxStatus || '';
+    const ntnNumber = resolvedBank.ntnNumber || u.ntnNumber || '';
+    const providentFund = resolvedBank.providentFund || u.providentFund || '';
 
     setFormData((prev) => ({
       ...prev,
@@ -185,18 +184,18 @@ const EmployeeProfile = () => {
       lastName: u.lastName ?? prev.lastName,
       email: u.email ?? prev.email,
       phone: u.phone ?? prev.phone,
-      designation: u.profile?.designation?.title || u.designation || prev.designation || 'Software Engineer',
-      department: u.profile?.department?.name || u.department || prev.department || 'Engineering',
+      designation: u.profile?.designation?.title || u.designation || prev.designation || '',
+      department: u.profile?.department?.name || u.department || prev.department || '',
       address: userAddr,
       location: userAddr,
       empCode: empCode || prev.empCode,
       joinDate: resolvedJoinDate ? formatDate(resolvedJoinDate) : prev.joinDate,
       employmentType: formatEmploymentType(rawEmpType),
-      reportingManager: u.reportingManager || prev.reportingManager || 'Zeeshan Haider (HR Manager)',
+      reportingManager: u.reportingManager || prev.reportingManager || '',
       shift: rawShift,
       dob: u.profile?.dateOfBirth ? u.profile.dateOfBirth.split('T')[0] : (u.dob ? u.dob.split('T')[0] : prev.dob),
       gender: u.profile?.gender || u.gender || prev.gender || 'Male',
-      bloodGroup: u.profile?.bloodGroup || u.bloodGroup || prev.bloodGroup || 'O+ Positive',
+      bloodGroup: u.profile?.bloodGroup || u.bloodGroup || prev.bloodGroup || '',
       emergencyName: parsedEmergency.emergencyName || prev.emergencyName,
       emergencyRelation: parsedEmergency.emergencyRelation || prev.emergencyRelation || 'Parent / Guardian',
       emergencyPhone: parsedEmergency.emergencyPhone || prev.emergencyPhone,
@@ -921,9 +920,13 @@ const EmployeeProfile = () => {
                   <p className="text-xs text-slate-400 font-medium">Corporate salary account</p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+              <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+                formData.accountNumber
+                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
+                  : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+              }`}>
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Verified by HR</span>
+                <span>{formData.accountNumber ? 'Verified by HR' : 'Pending Configuration'}</span>
               </span>
             </div>
 
@@ -931,7 +934,7 @@ const EmployeeProfile = () => {
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Bank Name</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Standard Chartered Bank'}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Not Configured'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
@@ -943,12 +946,12 @@ const EmployeeProfile = () => {
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Account / IBAN</span>
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'PK72SCBL000000101'}</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'Pending Configuration'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Branch Code</span>
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || '0142 (Corporate Wing)'}</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || 'Not Set'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">

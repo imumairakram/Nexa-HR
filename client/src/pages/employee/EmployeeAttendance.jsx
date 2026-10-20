@@ -69,10 +69,10 @@ const EmployeeAttendance = () => {
             day: dayName,
             checkIn: inTime,
             checkOut: outTime,
-            hours: att.totalHours || (att.checkInTime && att.checkOutTime ? 8.5 : 0),
+            hours: att.totalHours || (att.checkInTime && att.checkOutTime ? parseFloat((Math.max(0, new Date(att.checkOutTime) - new Date(att.checkInTime)) / 3600000).toFixed(1)) : 0),
             ot: att.totalHours && att.totalHours > 8.0 ? parseFloat((att.totalHours - 8.0).toFixed(1)) : 0,
             status: att.status || 'PRESENT',
-            method: att.notes || 'Biometric Face-ID (Terminal 01)',
+            method: att.notes || 'Biometric Gate Terminal',
             notes: att.notes || 'Biometric verified entry',
           };
         });
@@ -146,11 +146,11 @@ const EmployeeAttendance = () => {
       }));
     }
     return [
-      { value: 0, label: 'Mon', tooltip: 'Mon: On-Time (09:04 AM)' },
-      { value: 0, label: 'Tue', tooltip: 'Tue: On-Time (08:58 AM)' },
-      { value: lateArrivals > 0 ? 2 : 0, label: 'Wed', tooltip: lateArrivals > 0 ? 'Wed: Late Check-In' : 'Wed: On-Time' },
-      { value: 0, label: 'Thu', tooltip: 'Thu: On-Time (09:05 AM)' },
-      { value: 0, label: 'Fri', tooltip: 'Fri: On-Time (09:00 AM)' },
+      { value: 0, label: 'Mon', tooltip: 'No Entry Logged' },
+      { value: 0, label: 'Tue', tooltip: 'No Entry Logged' },
+      { value: lateArrivals > 0 ? 2 : 0, label: 'Wed', tooltip: lateArrivals > 0 ? 'Late Check-In' : 'No Entry' },
+      { value: 0, label: 'Thu', tooltip: 'No Entry Logged' },
+      { value: 0, label: 'Fri', tooltip: 'No Entry Logged' },
     ];
   }, [logs, lateArrivals]);
 
@@ -189,11 +189,11 @@ const EmployeeAttendance = () => {
       }));
     }
     return [
-      { value: 2, label: 'D1', tooltip: 'Terminal 01: In & Out Verified' },
-      { value: 2, label: 'D2', tooltip: 'Terminal 01: In & Out Verified' },
-      { value: 2, label: 'D3', tooltip: 'Terminal 02: In & Out Verified' },
-      { value: 2, label: 'D4', tooltip: 'Terminal 01: In & Out Verified' },
-      { value: 1, label: 'Today', tooltip: todayLog?.checkIn ? `Today Punch: ${todayLog.checkIn}` : 'Awaiting Entry' },
+      { value: 0, label: 'D1', tooltip: 'No Biometric Punch' },
+      { value: 0, label: 'D2', tooltip: 'No Biometric Punch' },
+      { value: 0, label: 'D3', tooltip: 'No Biometric Punch' },
+      { value: 0, label: 'D4', tooltip: 'No Biometric Punch' },
+      { value: todayLog?.checkIn ? 1 : 0, label: 'Today', tooltip: todayLog?.checkIn ? `Today Punch: ${todayLog.checkIn}` : 'Awaiting Entry' },
     ];
   }, [logs, todayLog]);
 

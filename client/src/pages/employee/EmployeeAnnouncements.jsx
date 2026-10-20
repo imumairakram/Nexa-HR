@@ -292,10 +292,17 @@ const EmployeeAnnouncements = () => {
                   <Clock className="w-3.5 h-3.5" />
                   <span>{heroNotice.readTime}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{heroNotice.acknowledgedCount} / {heroNotice.totalTargetCount} Acknowledged</span>
-                </span>
+                {heroNotice.totalTargetCount ? (
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{heroNotice.acknowledgedCount || 0} / {heroNotice.totalTargetCount} Acknowledged</span>
+                  </span>
+                ) : heroNotice.acknowledged ? (
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Acknowledged</span>
+                  </span>
+                ) : null}
               </div>
             </div>
 

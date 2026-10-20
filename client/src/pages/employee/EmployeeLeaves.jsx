@@ -168,10 +168,10 @@ const EmployeeLeaves = () => {
   });
 
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
-  const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0) || 34;
+  const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
   const totalPendingRequests = requests.filter((r) => r.status === 'PENDING').length;
-  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || quotaCards[0] || { available: 18, total: 18, used: 0, percent: 100, pending: 0 };
-  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || quotaCards[1] || { available: 10, total: 10, used: 0, percent: 100, pending: 0 };
+  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || quotaCards[0] || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || quotaCards[1] || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
 
   // Dynamic Sparkline Data for Leaves
   const totalLeavesSparkData = useMemo(() => {
@@ -183,14 +183,12 @@ const EmployeeLeaves = () => {
       }));
     }
     return [
-      { value: 18, label: 'Annual', tooltip: 'Annual Leave: 18 Days Available' },
-      { value: 10, label: 'Sick', tooltip: 'Sick & Medical: 10 Days Available' },
-      { value: 6, label: 'Casual', tooltip: 'Casual Leave: 6 Days Available' },
+      { value: 0, label: 'Leaves', tooltip: 'No Leave Quotas Allocated' },
     ];
   }, [quotaCards]);
 
   const annualSparkData = useMemo(() => {
-    const total = annualCard.total || 18;
+    const total = annualCard.total || 0;
     const used = annualCard.used || 0;
     const avail = annualCard.available || (total - used);
     return [
@@ -201,7 +199,7 @@ const EmployeeLeaves = () => {
   }, [annualCard]);
 
   const sickSparkData = useMemo(() => {
-    const total = sickCard.total || 10;
+    const total = sickCard.total || 0;
     const used = sickCard.used || 0;
     const avail = sickCard.available || (total - used);
     return [
@@ -260,7 +258,7 @@ const EmployeeLeaves = () => {
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800/60">
                 <CalendarDays className="w-3.5 h-3.5" />
-                <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves || 34})</span>
+                <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves})</span>
               </span>
               {totalPendingRequests > 0 && (
                 <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/60">
