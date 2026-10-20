@@ -24,9 +24,7 @@ import {
   Trash2,
   LayoutGrid,
   List,
-  BarChart3,
   ShieldCheck,
-  Zap,
   ChevronRight,
   SlidersHorizontal,
   Building2,
@@ -122,7 +120,7 @@ const JobsWorkspace = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table' | 'analytics'
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
   const [toastMsg, setToastMsg] = useState('');
 
   // Side-drawer state (Create / Edit)
@@ -484,15 +482,6 @@ const JobsWorkspace = () => {
             >
               <List className="w-4 h-4" />
             </button>
-            <button
-              onClick={() => setViewMode('analytics')}
-              className={`p-1.5 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'analytics' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
-              }`}
-              title="Desk Funnel Telemetry"
-            >
-              <BarChart3 className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Add Job Button */}
@@ -711,61 +700,6 @@ const JobsWorkspace = () => {
                     )}
                   </tbody>
                 </table>
-              </div>
-            </div>
-          )}
-
-          {/* VIEW 3: DESK FUNNEL & VELOCITY ANALYTICS */}
-          {viewMode === 'analytics' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-white dark:bg-[#1E293B] rounded-[32px] p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-indigo-500" />
-                  <span>Applicant Conversion Funnel Telemetry</span>
-                </h3>
-                <div className="space-y-4 pt-2">
-                  {[
-                    { stage: '1. Sourced & Applied', count: 52, percent: 100, color: 'bg-blue-500' },
-                    { stage: '2. Screening Call', count: 28, percent: 54, color: 'bg-amber-500' },
-                    { stage: '3. Technical Interview', count: 14, percent: 27, color: 'bg-purple-500' },
-                    { stage: '4. Offer Extended', count: 6, percent: 11, color: 'bg-indigo-500' },
-                    { stage: '5. Signed & Hired', count: 5, percent: 9.6, color: 'bg-emerald-500' },
-                  ].map((s, idx) => (
-                    <div key={idx} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-800 dark:text-slate-200">{s.stage}</span>
-                        <span className="text-slate-400 font-semibold">{s.count} Candidates ({s.percent}%)</span>
-                      </div>
-                      <div className="w-full h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${s.color} transition-all duration-500`}
-                          style={{ width: `${s.percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-[#1E293B] rounded-[32px] p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-amber-500" />
-                  <span>Talent Pipeline Velocity</span>
-                </h3>
-                <div className="space-y-3 pt-2 text-xs">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                    <p className="font-bold text-slate-800 dark:text-slate-200">Engineering Velocity</p>
-                    <p className="text-slate-400 text-[11px] mt-0.5">Average 16 days from application to offer</p>
-                  </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                    <p className="font-bold text-slate-800 dark:text-slate-200">Interview Pass Rate</p>
-                    <p className="text-slate-400 text-[11px] mt-0.5">64% candidates clear first technical screening</p>
-                  </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                    <p className="font-bold text-slate-800 dark:text-slate-200">Sourcing Efficiency</p>
-                    <p className="text-slate-400 text-[11px] mt-0.5">72% applicants sourced through internal referrals</p>
-                  </div>
-                </div>
               </div>
             </div>
           )}
