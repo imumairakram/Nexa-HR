@@ -1,25 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { MapPin, Plus, CheckCircle2, X, Search, Building2, Globe, RefreshCw } from 'lucide-react';
+import { api } from '../../../services/api';
 
 const JobLocation = () => {
-  const [locations, setLocations] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_job_locations');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn(e);
-    }
-    return [
-      { id: 1, name: 'Islamabad HQ & Innovation Campus', city: 'Islamabad', country: 'Pakistan', timezone: 'PKT (UTC+5)', count: 0, status: 'PRIMARY_HQ' },
-      { id: 2, name: 'Remote & Distributed Async', city: 'Remote', country: 'Global', timezone: 'Flexible Timezones', count: 0, status: 'REMOTE' },
-    ];
-  });
-
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newLoc, setNewLoc] = useState({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)' });
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadLocations = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getRecruitmentTaxonomies('LOCATION');
+      if (res?.success && res.data?.items) {
+        setLocations(res.data.items);
+      } else {
+        setLocations([]);
+      }
+    } catch {
+      setLocations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLocations();
+  }, []);
 
   const handleAdd = (e) => {
     e.preventDefault();

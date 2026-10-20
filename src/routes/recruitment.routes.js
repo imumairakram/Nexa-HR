@@ -28,14 +28,16 @@ const {
   toggleTaxonomyActive,
   deleteTaxonomy,
   seedRecruitmentData,
+  clearAllRecruitmentData,
 } = require('../controllers/recruitment.controller');
 
 // Require authentication for all recruitment endpoints
 router.use(verifyToken);
 
-// --- Telemetry & Seeding ---
+// --- Telemetry, Seeding & Wiping ---
 router.get('/stats', getRecruitmentStats);
 router.post('/seed', checkRole('ADMIN', 'HR_MANAGER'), seedRecruitmentData);
+router.delete('/clear-all', checkRole('ADMIN', 'HR_MANAGER'), clearAllRecruitmentData);
 
 // --- Job Openings ---
 router.get('/jobs', getJobOpenings);

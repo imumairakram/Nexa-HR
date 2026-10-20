@@ -1,27 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { Briefcase, Plus, CheckCircle2, X, Search, Clock, Users, ShieldCheck, RefreshCw } from 'lucide-react';
+import { api } from '../../../services/api';
 
 const JobType = () => {
-  const [types, setTypes] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_job_types');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn(e);
-    }
-    return [
-      { id: 1, name: 'Full-Time Permanent', code: 'FT', hours: '40 hrs / week', benefits: 'Full Health & Insurance', count: 0 },
-      { id: 2, name: 'Fixed-Term Contract', code: 'CON', hours: 'Project Scope Based', benefits: 'Standard Hourly Stipend', count: 0 },
-      { id: 3, name: 'Full-Time Remote', code: 'REM', hours: '40 hrs / week (Async)', benefits: 'Home Office Allowance', count: 0 },
-      { id: 4, name: 'Internship / Graduate Fellow', code: 'INT', hours: '20 - 40 hrs / week', benefits: 'Learning Stipend & Mentorship', count: 0 },
-    ];
-  });
-
+  const [types, setTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newType, setNewType] = useState({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadTypes = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getRecruitmentTaxonomies('TYPE');
+      if (res?.success && res.data?.items) {
+        setTypes(res.data.items);
+      } else {
+        setTypes([]);
+      }
+    } catch {
+      setTypes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTypes();
+  }, []);
 
   const handleAdd = (e) => {
     e.preventDefault();

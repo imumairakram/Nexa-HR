@@ -1424,6 +1424,38 @@ const seedRecruitmentData = async (req, res) => {
   }
 };
 
+/**
+ * Wipe / Delete all recruitment data (interviews, applications, openings, taxonomies)
+ */
+const clearAllRecruitmentData = async (req, res) => {
+  try {
+    const [ivs, apps, jobs, tax] = await Promise.all([
+      prisma.jobInterview.deleteMany({}),
+      prisma.jobApplication.deleteMany({}),
+      prisma.jobOpening.deleteMany({}),
+      prisma.recruitmentTaxonomy.deleteMany({}),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: 'All recruitment data deleted successfully.',
+      deleted: {
+        interviews: ivs.count,
+        applications: apps.count,
+        openings: jobs.count,
+        taxonomies: tax.count,
+      },
+    });
+  } catch (error) {
+    console.error('Error clearing recruitment data:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to clear recruitment data.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getRecruitmentStats,
   // Jobs
@@ -1451,6 +1483,7 @@ module.exports = {
   updateTaxonomy,
   toggleTaxonomyActive,
   deleteTaxonomy,
-  // Seeding
+  // Seeding & Wiping
   seedRecruitmentData,
+  clearAllRecruitmentData,
 };

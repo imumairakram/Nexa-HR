@@ -1,27 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { Clock, Plus, CheckCircle2, Search, X, Users, Award, ShieldCheck, Briefcase, RefreshCw } from 'lucide-react';
+import { api } from '../../../services/api';
 
 const JobExperience = () => {
-  const [items, setItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_job_experiences');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn(e);
-    }
-    return [
-      { id: 1, label: 'Entry Level (0 - 2 Years)', code: 'ENTRY', minYears: 0, maxYears: 2, salaryRange: '$85k - $110k', count: 0 },
-      { id: 2, label: 'Mid-Level Professional (2 - 5 Years)', code: 'MID', minYears: 2, maxYears: 5, salaryRange: '$110k - $140k', count: 0 },
-      { id: 3, label: 'Senior Specialist (5 - 8 Years)', code: 'SENIOR', minYears: 5, maxYears: 8, salaryRange: '$140k - $175k', count: 0 },
-      { id: 4, label: 'Staff / Principal / Director (8+ Years)', code: 'LEAD', minYears: 8, maxYears: 15, salaryRange: '$175k - $220k', count: 0 },
-    ];
-  });
-
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newItem, setNewItem] = useState({ label: '', code: '', salaryRange: '$100k - $130k' });
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadExperiences = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getRecruitmentTaxonomies('EXPERIENCE');
+      if (res?.success && res.data?.items) {
+        setItems(res.data.items);
+      } else {
+        setItems([]);
+      }
+    } catch {
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadExperiences();
+  }, []);
 
   const handleAdd = (e) => {
     e.preventDefault();

@@ -1,26 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers, RefreshCw } from 'lucide-react';
+import { api } from '../../../services/api';
 
 const JobSkills = () => {
-  const [skills, setSkills] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_job_skills');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn(e);
-    }
-    return [
-      { id: 1, name: 'React.js & Tailwind CSS', category: 'Frontend', assessmentsCount: 0, proficiency: 'Advanced', weight: 'Mandatory' },
-      { id: 2, name: 'Node.js & Express Architecture', category: 'Backend', assessmentsCount: 0, proficiency: 'Advanced', weight: 'Mandatory' },
-      { id: 3, name: 'PostgreSQL & Relational Data Modeling', category: 'Databases', assessmentsCount: 0, proficiency: 'Intermediate', weight: 'Preferred' },
-      { id: 4, name: 'Docker & Microservices', category: 'DevOps', assessmentsCount: 0, proficiency: 'Intermediate', weight: 'Preferred' },
-    ];
-  });
-
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadSkills = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getRecruitmentTaxonomies('SKILL');
+      if (res?.success && res.data?.items) {
+        setSkills(res.data.items);
+      } else {
+        setSkills([]);
+      }
+    } catch {
+      setSkills([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSkills();
+  }, []);
 
   const [form, setForm] = useState({
     name: '',

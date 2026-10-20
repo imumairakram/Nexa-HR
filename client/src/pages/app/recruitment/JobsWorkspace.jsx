@@ -32,86 +32,7 @@ import {
   Share2,
 } from 'lucide-react';
 
-const INITIAL_JOBS = [
-  {
-    id: 101,
-    title: 'Senior React & Node Engineer',
-    dept: 'Engineering & DevOps',
-    location: 'Islamabad HQ / Hybrid',
-    type: 'Full-Time',
-    experience: '5 - 8 Years',
-    salary: '$140k - $170k',
-    applicants: 14,
-    status: 'ACTIVE',
-    posted: 'Aug 15, 2026',
-    description: 'Lead high-throughput microservices, React design systems, PostgreSQL optimization, and cloud deployments.',
-  },
-  {
-    id: 102,
-    title: 'Lead Product Designer (Figma)',
-    dept: 'Product & Design',
-    location: 'Karachi Regional Hub',
-    type: 'Full-Time',
-    experience: '5 - 8 Years',
-    salary: '$120k - $150k',
-    applicants: 8,
-    status: 'ACTIVE',
-    posted: 'Aug 18, 2026',
-    description: 'Architect multi-tenant design tokens, user flow journey maps, and intuitive enterprise SaaS interfaces.',
-  },
-  {
-    id: 103,
-    title: 'DevOps & Kubernetes Architect',
-    dept: 'Engineering & DevOps',
-    location: 'Remote & Distributed',
-    type: 'Full-Time Remote',
-    experience: '8+ Years',
-    salary: '$150k - $185k',
-    applicants: 6,
-    status: 'ACTIVE',
-    posted: 'Aug 20, 2026',
-    description: 'Own Terraform infrastructure-as-code, CI/CD pipeline security, multi-region cluster resilience.',
-  },
-  {
-    id: 104,
-    title: 'Technical Talent Acquisition Partner',
-    dept: 'People Operations & HR',
-    location: 'Islamabad HQ',
-    type: 'Full-Time',
-    experience: '3 - 5 Years',
-    salary: '$75k - $95k',
-    applicants: 11,
-    status: 'ACTIVE',
-    posted: 'Aug 22, 2026',
-    description: 'Scale engineering and executive hiring, drive pipeline velocity, manage candidate interview experience.',
-  },
-  {
-    id: 105,
-    title: 'Data Platform Engineer',
-    dept: 'Engineering & DevOps',
-    location: 'Remote & Distributed',
-    type: 'Full-Time Remote',
-    experience: '4 - 7 Years',
-    salary: '$135k - $165k',
-    applicants: 5,
-    status: 'ACTIVE',
-    posted: 'Aug 24, 2026',
-    description: 'Build real-time telemetry streaming pipelines, ETL data lakes, and dimensional warehouse schemas.',
-  },
-  {
-    id: 106,
-    title: 'Financial Operations Analyst',
-    dept: 'Finance & Accounts',
-    location: 'Islamabad HQ',
-    type: 'Full-Time',
-    experience: '2 - 5 Years',
-    salary: '$80k - $105k',
-    applicants: 9,
-    status: 'PAUSED',
-    posted: 'Aug 10, 2026',
-    description: 'Corporate budgeting, payroll ledger auditing, statutory fiscal compliance, and board reporting.',
-  },
-];
+const INITIAL_JOBS = [];
 
 const JobsWorkspace = () => {
   const navigate = useNavigate();
@@ -152,17 +73,7 @@ const JobsWorkspace = () => {
       if (jobsRes.status === 'fulfilled' && jobsRes.value?.success && jobsRes.value.data?.jobs) {
         setJobs(jobsRes.value.data.jobs);
       } else {
-        try {
-          const local = localStorage.getItem('nexahr_recruitment_jobs');
-          if (local) {
-            const parsed = JSON.parse(local);
-            if (parsed && parsed.length > 0) setJobs(parsed);
-          } else {
-            setJobs(INITIAL_JOBS);
-          }
-        } catch {
-          setJobs(INITIAL_JOBS);
-        }
+        setJobs([]);
       }
 
       if (statsRes.status === 'fulfilled' && statsRes.value?.success && statsRes.value.data) {
@@ -337,7 +248,7 @@ const JobsWorkspace = () => {
   const totalOpenings = telemetry?.activeOpenings ?? jobs.filter((j) => j.status === 'ACTIVE').length;
   const totalApplicants = telemetry?.totalApplicants ?? jobs.reduce((acc, curr) => acc + (curr.applicants || 0), 0);
   const totalPaused = telemetry?.pausedOpenings ?? jobs.filter((j) => j.status === 'PAUSED').length;
-  const offerRate = telemetry?.offerAcceptanceRate || '92.4%';
+  const offerRate = (totalOpenings === 0 && totalApplicants === 0) ? '0%' : (telemetry?.offerAcceptanceRate || '0%');
 
   // 7-day Sparkline Dates ending Today (e.g. Oct 14 ... Oct 20)
   const sparkDates = useMemo(() => {
@@ -351,8 +262,8 @@ const JobsWorkspace = () => {
   }, []);
 
   const openingsSparkData = useMemo(() => {
-    const total = totalOpenings || 5;
-    const progression = [
+    const total = totalOpenings || 0;
+    const progression = total > 0 ? [
       Math.max(1, total - 2),
       Math.max(1, total - 2),
       Math.max(1, total - 1),
@@ -360,7 +271,7 @@ const JobsWorkspace = () => {
       Math.max(1, total),
       Math.max(1, total),
       total,
-    ];
+    ] : [0, 0, 0, 0, 0, 0, 0];
     return sparkDates.map((day, i) => ({
       value: progression[i],
       label: day,
@@ -369,8 +280,8 @@ const JobsWorkspace = () => {
   }, [totalOpenings, sparkDates]);
 
   const applicantsSparkData = useMemo(() => {
-    const base = totalApplicants || 53;
-    const progression = [
+    const base = totalApplicants || 0;
+    const progression = base > 0 ? [
       Math.max(0, base - 14),
       Math.max(0, base - 10),
       Math.max(0, base - 7),
@@ -378,7 +289,7 @@ const JobsWorkspace = () => {
       Math.max(0, base - 2),
       Math.max(0, base - 1),
       base,
-    ];
+    ] : [0, 0, 0, 0, 0, 0, 0];
     return sparkDates.map((day, i) => ({
       value: progression[i],
       label: day,
@@ -387,8 +298,8 @@ const JobsWorkspace = () => {
   }, [totalApplicants, sparkDates]);
 
   const pausedSparkData = useMemo(() => {
-    const base = totalPaused || 1;
-    const progression = [
+    const base = totalPaused || 0;
+    const progression = base > 0 ? [
       Math.max(0, base),
       Math.max(0, base + 1),
       Math.max(0, base + 1),
@@ -396,7 +307,7 @@ const JobsWorkspace = () => {
       Math.max(0, base + 1),
       base,
       base,
-    ];
+    ] : [0, 0, 0, 0, 0, 0, 0];
     return sparkDates.map((day, i) => ({
       value: progression[i],
       label: day,
@@ -405,8 +316,8 @@ const JobsWorkspace = () => {
   }, [totalPaused, sparkDates]);
 
   const offerSparkData = useMemo(() => {
-    const num = parseFloat(String(offerRate).replace('%', '')) || 92.4;
-    const progression = [
+    const num = parseFloat(String(offerRate).replace('%', '')) || 0;
+    const progression = num > 0 ? [
       Math.max(0, num - 4.5),
       Math.max(0, num - 3.2),
       Math.max(0, num - 2.8),
@@ -414,7 +325,7 @@ const JobsWorkspace = () => {
       Math.max(0, num - 0.7),
       Math.max(0, num - 0.2),
       num,
-    ];
+    ] : [0, 0, 0, 0, 0, 0, 0];
     return sparkDates.map((day, i) => ({
       value: progression[i],
       label: day,

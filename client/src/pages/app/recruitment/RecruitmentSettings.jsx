@@ -37,43 +37,11 @@ const TABS = [
   { id: 'experience', label: 'Seniority Tracks', icon: Clock, desc: 'Career bands, tenure & compensation ranges' },
 ];
 
-const DEFAULT_CATEGORIES = [
-  { id: 1, name: 'Engineering & DevOps', code: 'ENG', count: 6, lead: 'Sarah Jenkins', status: 'ACTIVE' },
-  { id: 2, name: 'Product Management & Design', code: 'PMD', count: 3, lead: 'Ayesha Tariq', status: 'ACTIVE' },
-  { id: 3, name: 'People Operations & HR', code: 'HRM', count: 2, lead: 'Fatima Noor', status: 'ACTIVE' },
-  { id: 4, name: 'Finance & Enterprise Risk', code: 'FIN', count: 2, lead: 'Zainab Qureshi', status: 'ACTIVE' },
-  { id: 5, name: 'Growth, Marketing & Sales', code: 'MKT', count: 1, lead: 'Alex Mercer', status: 'ACTIVE' },
-];
-
-const DEFAULT_TYPES = [
-  { id: 1, name: 'Full-Time Permanent', code: 'FT', hours: '40 hrs / week', benefits: 'Full Health, Equity & Annual Leave', count: 8 },
-  { id: 2, name: 'Fixed-Term Contract', code: 'CON', hours: 'Project Scope Based', benefits: 'Standard Hourly Stipend & Equipment', count: 2 },
-  { id: 3, name: 'Full-Time Remote', code: 'REM', hours: '40 hrs / week (Async)', benefits: 'Home Office Allowance & Healthcare', count: 4 },
-  { id: 4, name: 'Internship / Graduate Fellow', code: 'INT', hours: '20 - 40 hrs / week', benefits: 'Learning Stipend & 1:1 Mentorship', count: 1 },
-];
-
-const DEFAULT_LOCATIONS = [
-  { id: 1, name: 'Islamabad HQ & Innovation Campus', city: 'Islamabad', country: 'Pakistan', timezone: 'PKT (UTC+5)', count: 7, status: 'PRIMARY_HQ' },
-  { id: 2, name: 'Remote & Distributed Async', city: 'Remote', country: 'Global', timezone: 'Flexible Timezones', count: 5, status: 'REMOTE' },
-  { id: 3, name: 'Karachi Regional Hub', city: 'Karachi', country: 'Pakistan', timezone: 'PKT (UTC+5)', count: 2, status: 'BRANCH' },
-  { id: 4, name: 'Lahore Regional Tech Center', city: 'Lahore', country: 'Pakistan', timezone: 'PKT (UTC+5)', count: 1, status: 'BRANCH' },
-];
-
-const DEFAULT_SKILLS = [
-  { id: 1, name: 'React.js & Tailwind CSS', category: 'Frontend', assessmentsCount: 14, proficiency: 'Advanced', weight: 'Mandatory' },
-  { id: 2, name: 'Node.js & Express Architecture', category: 'Backend', assessmentsCount: 12, proficiency: 'Advanced', weight: 'Mandatory' },
-  { id: 3, name: 'PostgreSQL & Relational Data Modeling', category: 'Databases', assessmentsCount: 9, proficiency: 'Intermediate', weight: 'Preferred' },
-  { id: 4, name: 'Docker & Kubernetes Orchestration', category: 'DevOps', assessmentsCount: 7, proficiency: 'Intermediate', weight: 'Preferred' },
-  { id: 5, name: 'Figma Systems & Interaction Design', category: 'Design', assessmentsCount: 8, proficiency: 'Expert', weight: 'Mandatory' },
-  { id: 6, name: 'TypeScript & Next.js Ecosystem', category: 'Frontend', assessmentsCount: 11, proficiency: 'Advanced', weight: 'Mandatory' },
-];
-
-const DEFAULT_EXPERIENCE = [
-  { id: 1, label: 'Entry Level (0 - 2 Years)', code: 'ENTRY', minYears: 0, maxYears: 2, salaryRange: '$40k - $65k', count: 2 },
-  { id: 2, label: 'Mid-Level Professional (2 - 5 Years)', code: 'MID', minYears: 2, maxYears: 5, salaryRange: '$70k - $100k', count: 6 },
-  { id: 3, label: 'Senior Specialist (5 - 8 Years)', code: 'SENIOR', minYears: 5, maxYears: 8, salaryRange: '$110k - $150k', count: 5 },
-  { id: 4, label: 'Staff / Principal / Director (8+ Years)', code: 'LEAD', minYears: 8, maxYears: 15, salaryRange: '$160k - $220k', count: 2 },
-];
+const DEFAULT_CATEGORIES = [];
+const DEFAULT_TYPES = [];
+const DEFAULT_LOCATIONS = [];
+const DEFAULT_SKILLS = [];
+const DEFAULT_EXPERIENCE = [];
 
 const RecruitmentSettings = () => {
   const [activeTab, setActiveTab] = useState('categories');
@@ -108,43 +76,25 @@ const RecruitmentSettings = () => {
 
       if (taxRes.status === 'fulfilled' && taxRes.value?.success && taxRes.value.data?.items) {
         const items = taxRes.value.data.items;
-
-        const cats = items.filter((i) => i.type === 'CATEGORY');
-        if (cats.length > 0) setCategories(cats);
-        else setCategories(DEFAULT_CATEGORIES);
-
-        const typs = items.filter((i) => i.type === 'TYPE');
-        if (typs.length > 0) setTypes(typs);
-        else setTypes(DEFAULT_TYPES);
-
-        const locs = items.filter((i) => i.type === 'LOCATION');
-        if (locs.length > 0) setLocations(locs);
-        else setLocations(DEFAULT_LOCATIONS);
-
-        const skls = items.filter((i) => i.type === 'SKILL');
-        if (skls.length > 0) setSkills(skls);
-        else setSkills(DEFAULT_SKILLS);
-
-        const exps = items.filter((i) => i.type === 'EXPERIENCE');
-        if (exps.length > 0) setExperiences(exps);
-        else setExperiences(DEFAULT_EXPERIENCE);
+        setCategories(items.filter((i) => i.type === 'CATEGORY'));
+        setTypes(items.filter((i) => i.type === 'TYPE'));
+        setLocations(items.filter((i) => i.type === 'LOCATION'));
+        setSkills(items.filter((i) => i.type === 'SKILL'));
+        setExperiences(items.filter((i) => i.type === 'EXPERIENCE'));
       } else {
-        // Fallback to local storage if offline
-        try {
-          const localCats = localStorage.getItem('nexahr_job_categories');
-          if (localCats) setCategories(JSON.parse(localCats));
-          const localTypes = localStorage.getItem('nexahr_job_types');
-          if (localTypes) setTypes(JSON.parse(localTypes));
-          const localLocs = localStorage.getItem('nexahr_job_locations');
-          if (localLocs) setLocations(JSON.parse(localLocs));
-          const localSkills = localStorage.getItem('nexahr_job_skills');
-          if (localSkills) setSkills(JSON.parse(localSkills));
-          const localExps = localStorage.getItem('nexahr_job_experiences');
-          if (localExps) setExperiences(JSON.parse(localExps));
-        } catch {}
+        setCategories([]);
+        setTypes([]);
+        setLocations([]);
+        setSkills([]);
+        setExperiences([]);
       }
     } catch (err) {
       console.error('Failed to load recruitment master data:', err);
+      setCategories([]);
+      setTypes([]);
+      setLocations([]);
+      setSkills([]);
+      setExperiences([]);
     } finally {
       setLoading(false);
     }

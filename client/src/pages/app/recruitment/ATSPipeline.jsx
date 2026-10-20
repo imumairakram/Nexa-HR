@@ -48,148 +48,9 @@ const STAGES = [
   { key: 'HIRED', label: '5. Signed & Hired', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300', dot: 'bg-emerald-500', border: 'border-emerald-200 dark:border-emerald-900/60' },
 ];
 
-const DEFAULT_APPLICATIONS = [
-  {
-    id: 'APP-9901',
-    name: 'David K. Vance',
-    role: 'Senior React & Node Engineer',
-    department: 'Engineering & DevOps',
-    email: 'david.vance@techlead.io',
-    phone: '+92 300 1234567',
-    experience: '6.5 Years',
-    location: 'Islamabad HQ / Hybrid',
-    rating: 4.9,
-    stage: 'INTERVIEWING',
-    date: 'Aug 22, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Full-stack specialist proficient in React 19, TypeScript, PostgreSQL, microservices, and Docker high-availability infrastructure.',
-    interview: {
-      interviewer: 'Sarah Jenkins',
-      date: '2026-08-28',
-      time: '14:30',
-      type: 'System Architecture Round',
-      link: 'https://meet.google.com/nxa-hr-auto',
-    },
-  },
-  {
-    id: 'APP-9902',
-    name: 'Ayesha Tariq',
-    role: 'Lead Product Designer (Figma)',
-    department: 'Product & Design',
-    email: 'ayesha.tariq@designcraft.com',
-    phone: '+92 321 9876543',
-    experience: '5.0 Years',
-    location: 'Karachi Regional Hub',
-    rating: 4.8,
-    stage: 'OFFER',
-    date: 'Aug 18, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Proven track record designing enterprise SaaS design systems, user journey wireframes, and design token architectures.',
-    interview: {
-      interviewer: 'Muhammad Umair',
-      date: '2026-08-27',
-      time: '16:00',
-      type: 'Leadership & Culture Fit',
-      link: 'https://meet.google.com/nxa-hr-auto',
-    },
-  },
-  {
-    id: 'APP-9903',
-    name: 'Michael Zhang',
-    role: 'DevOps & Kubernetes Architect',
-    department: 'Engineering & DevOps',
-    email: 'michael.zhang@cloudops.net',
-    phone: '+1 415 889 2031',
-    experience: '8.0 Years',
-    location: 'Remote & Distributed',
-    rating: 4.7,
-    stage: 'SCREENING',
-    date: 'Aug 25, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'CI/CD pipeline automation, Terraform infrastructure-as-code, AWS/GCP Kubernetes clusters, and zero-trust security postures.',
-  },
-  {
-    id: 'APP-9904',
-    name: 'Fatima Noor',
-    role: 'Senior Talent Acquisition Specialist',
-    department: 'People Operations & HR',
-    email: 'fatima.noor@hrnetwork.org',
-    phone: '+92 333 4567890',
-    experience: '4.5 Years',
-    location: 'Lahore Regional Office',
-    rating: 4.6,
-    stage: 'APPLIED',
-    date: 'Aug 26, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Technical hiring specialist experienced in scaling high-performing engineering organizations and candidate experience lifecycle.',
-  },
-  {
-    id: 'APP-9905',
-    name: 'Zainab Qureshi',
-    role: 'Financial Operations Analyst',
-    department: 'Finance & Accounts',
-    email: 'zainab.q@finmetrics.com',
-    phone: '+92 301 5554321',
-    experience: '3.5 Years',
-    location: 'Islamabad HQ',
-    rating: 4.9,
-    stage: 'HIRED',
-    date: 'Aug 10, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Corporate financial auditing, statutory payroll taxation, and cash flow ledger modeling.',
-  },
-  {
-    id: 'APP-9906',
-    name: 'Bilal Ahmed',
-    role: 'Data Platform Engineer',
-    department: 'Engineering & DevOps',
-    email: 'bilal.ahmed@datalake.io',
-    phone: '+92 345 1122334',
-    experience: '4.0 Years',
-    location: 'Remote & Distributed',
-    rating: 4.5,
-    stage: 'APPLIED',
-    date: 'Aug 27, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Apache Spark, Kafka streaming pipelines, Python ETL processes, and ClickHouse data analytics.',
-  },
-];
+const DEFAULT_APPLICATIONS = [];
 
-const DEFAULT_INTERVIEWS = [
-  {
-    id: 101,
-    candidate: 'David K. Vance',
-    role: 'Senior React & Node Engineer',
-    interviewer: 'Sarah Jenkins',
-    date: '2026-08-28',
-    time: '14:30',
-    type: 'System Architecture Round',
-    link: 'https://meet.google.com/nxa-hr-auto',
-    status: 'SCHEDULED',
-  },
-  {
-    id: 102,
-    candidate: 'Michael Zhang',
-    role: 'DevOps & Kubernetes Architect',
-    interviewer: 'Alex Mercer',
-    date: '2026-08-29',
-    time: '11:00',
-    type: 'Technical Live Coding',
-    link: 'https://meet.google.com/nxa-hr-auto',
-    status: 'SCHEDULED',
-  },
-  {
-    id: 103,
-    candidate: 'Ayesha Tariq',
-    role: 'Lead Product Designer (Figma)',
-    interviewer: 'Muhammad Umair',
-    date: '2026-08-27',
-    time: '16:00',
-    type: 'Leadership & Culture Fit',
-    link: 'https://meet.google.com/nxa-hr-auto',
-    status: 'PASSED',
-  },
-];
+const DEFAULT_INTERVIEWS = [];
 
 const ATSPipeline = () => {
   const [candidates, setCandidates] = useState([]);
@@ -249,33 +110,13 @@ const ATSPipeline = () => {
       if (appsRes.status === 'fulfilled' && appsRes.value?.success && appsRes.value.data?.applications) {
         setCandidates(appsRes.value.data.applications);
       } else {
-        try {
-          const localApps = localStorage.getItem('nexahr_recruitment_applications');
-          if (localApps) {
-            const parsed = JSON.parse(localApps);
-            if (parsed && parsed.length > 0) setCandidates(parsed);
-          } else {
-            setCandidates(DEFAULT_APPLICATIONS);
-          }
-        } catch {
-          setCandidates(DEFAULT_APPLICATIONS);
-        }
+        setCandidates([]);
       }
 
       if (ivsRes.status === 'fulfilled' && ivsRes.value?.success && ivsRes.value.data?.interviews) {
         setInterviews(ivsRes.value.data.interviews);
       } else {
-        try {
-          const localIvs = localStorage.getItem('nexahr_recruitment_interviews');
-          if (localIvs) {
-            const parsed = JSON.parse(localIvs);
-            if (parsed && parsed.length > 0) setInterviews(parsed);
-          } else {
-            setInterviews(DEFAULT_INTERVIEWS);
-          }
-        } catch {
-          setInterviews(DEFAULT_INTERVIEWS);
-        }
+        setInterviews([]);
       }
 
       if (empRes.status === 'fulfilled' && empRes.value?.success && empRes.value.data?.employees) {

@@ -36,25 +36,26 @@ const Jobs = () => {
   const loadJobsData = async () => {
     setLoading(true);
     try {
-      let savedJobs = [];
-      try {
-        const saved = localStorage.getItem('nexahr_recruitment_jobs');
-        if (saved) savedJobs = JSON.parse(saved);
-      } catch (e) {
-        console.warn(e);
+      const [jobsRes, deptRes] = await Promise.allSettled([
+        api.getJobOpenings(),
+        api.getDepartments(),
+      ]);
+
+      if (jobsRes.status === 'fulfilled' && jobsRes.value?.success && jobsRes.value.data?.jobs) {
+        setJobs(jobsRes.value.data.jobs);
+      } else {
+        setJobs([]);
       }
 
-      const res = await api.getDepartments();
-      if (res?.success && res.data?.departments) {
-        setDepartments(res.data.departments);
-        if (res.data.departments.length > 0 && !form.dept) {
-          setForm((prev) => ({ ...prev, dept: res.data.departments[0].name }));
+      if (deptRes.status === 'fulfilled' && deptRes.value?.success && deptRes.value.data?.departments) {
+        setDepartments(deptRes.value.data.departments);
+        if (deptRes.value.data.departments.length > 0 && !form.dept) {
+          setForm((prev) => ({ ...prev, dept: deptRes.value.data.departments[0].name }));
         }
       }
-
-      setJobs(savedJobs);
     } catch (err) {
       console.error('Failed to load recruitment jobs:', err);
+      setJobs([]);
     } finally {
       setLoading(false);
     }

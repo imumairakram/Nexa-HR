@@ -19,41 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../../services/api';
 
-const DEFAULT_INTERVIEWS = [
-  {
-    id: 101,
-    candidate: 'David K. Vance',
-    role: 'Senior React & Node Engineer',
-    interviewer: 'Sarah Jenkins',
-    date: '2026-08-28',
-    time: '14:30',
-    type: 'System Architecture Round',
-    link: 'https://meet.google.com/nxa-hr-auto',
-    status: 'SCHEDULED',
-  },
-  {
-    id: 102,
-    candidate: 'Michael Zhang',
-    role: 'DevOps & Kubernetes Architect',
-    interviewer: 'Alex Mercer',
-    date: '2026-08-29',
-    time: '11:00',
-    type: 'Technical Live Coding',
-    link: 'https://meet.google.com/nxa-hr-auto',
-    status: 'SCHEDULED',
-  },
-  {
-    id: 103,
-    candidate: 'Ayesha Tariq',
-    role: 'Lead Product Designer (Figma)',
-    interviewer: 'Muhammad Umair',
-    date: '2026-08-27',
-    time: '16:00',
-    type: 'Leadership & Culture Fit',
-    link: 'https://meet.google.com/nxa-hr-auto',
-    status: 'PASSED',
-  },
-];
+const DEFAULT_INTERVIEWS = [];
 
 const JobInterview = () => {
   const [interviews, setInterviews] = useState([]);
@@ -76,29 +42,19 @@ const JobInterview = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      let savedInterviews = [];
-      try {
-        const saved = localStorage.getItem('nexahr_recruitment_interviews');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.length > 0) savedInterviews = parsed;
-        }
-      } catch (e) {
-        console.warn(e);
+      const [ivRes, empRes] = await Promise.allSettled([
+        api.getJobInterviews(),
+        api.getEmployees(),
+      ]);
+
+      if (ivRes.status === 'fulfilled' && ivRes.value?.success && ivRes.value.data?.interviews) {
+        setInterviews(ivRes.value.data.interviews);
+      } else {
+        setInterviews([]);
       }
 
-      if (savedInterviews.length === 0) {
-        savedInterviews = DEFAULT_INTERVIEWS;
-        try {
-          localStorage.setItem('nexahr_recruitment_interviews', JSON.stringify(savedInterviews));
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      const res = await api.getEmployees();
-      if (res?.success && res.data?.employees) {
-        const emps = res.data.employees;
+      if (empRes.status === 'fulfilled' && empRes.value?.success && empRes.value.data?.employees) {
+        const emps = empRes.value.data.employees;
         setEmployees(emps);
         if (emps.length > 0 && !form.interviewer) {
           setForm((prev) => ({
@@ -107,10 +63,9 @@ const JobInterview = () => {
           }));
         }
       }
-
-      setInterviews(savedInterviews);
     } catch (err) {
       console.error('Failed to load interviews:', err);
+      setInterviews([]);
     } finally {
       setLoading(false);
     }

@@ -11,6 +11,7 @@ import {
   Calendar,
   Zap,
 } from 'lucide-react';
+import { api } from '../../../services/api';
 
 const JobDesk = () => {
   const navigate = useNavigate();
@@ -19,16 +20,25 @@ const JobDesk = () => {
   const [interviewsCount, setInterviewsCount] = useState(0);
 
   useEffect(() => {
-    try {
-      const jobs = JSON.parse(localStorage.getItem('nexahr_recruitment_jobs') || '[]');
-      const apps = JSON.parse(localStorage.getItem('nexahr_recruitment_applications') || '[]');
-      const interviews = JSON.parse(localStorage.getItem('nexahr_recruitment_interviews') || '[]');
-      setJobsCount(jobs.length);
-      setCandidatesCount(apps.length);
-      setInterviewsCount(interviews.length);
-    } catch (e) {
-      console.warn(e);
-    }
+    const fetchStats = async () => {
+      try {
+        const res = await api.getRecruitmentStats();
+        if (res?.success && res.data) {
+          setJobsCount(res.data.totalOpenings || 0);
+          setCandidatesCount(res.data.totalApplicants || 0);
+          setInterviewsCount(res.data.scheduledInterviews || 0);
+        } else {
+          setJobsCount(0);
+          setCandidatesCount(0);
+          setInterviewsCount(0);
+        }
+      } catch {
+        setJobsCount(0);
+        setCandidatesCount(0);
+        setInterviewsCount(0);
+      }
+    };
+    fetchStats();
   }, []);
 
   return (

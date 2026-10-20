@@ -14,32 +14,15 @@ const JobCategory = () => {
   const loadCategories = async () => {
     setLoading(true);
     try {
-      let saved = [];
-      try {
-        const local = localStorage.getItem('nexahr_job_categories');
-        if (local) saved = JSON.parse(local);
-      } catch (e) {
-        console.warn(e);
+      const res = await api.getRecruitmentTaxonomies('CATEGORY');
+      if (res?.success && res.data?.items) {
+        setCategories(res.data.items);
+      } else {
+        setCategories([]);
       }
-
-      if (saved.length === 0) {
-        // Sync with real departments as starting categories if not yet stored
-        const res = await api.getDepartments();
-        if (res?.success && res.data?.departments && res.data.departments.length > 0) {
-          saved = res.data.departments.map((d, idx) => ({
-            id: d.id || idx + 1,
-            name: d.name,
-            code: d.code || 'DEPT',
-            count: 0,
-            lead: 'Department Head',
-            status: 'ACTIVE',
-          }));
-        }
-      }
-
-      setCategories(saved);
     } catch (err) {
       console.error('Failed to load categories:', err);
+      setCategories([]);
     } finally {
       setLoading(false);
     }

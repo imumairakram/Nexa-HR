@@ -744,6 +744,12 @@ export const api = {
     });
   },
 
+  clearAllRecruitmentData: async () => {
+    return await fetchAPI('/recruitment/clear-all', {
+      method: 'DELETE',
+    });
+  },
+
   // --- Client Cache Utilities ---
   getCached: (endpoint) => {
     const entry = clientCache.get(endpoint);

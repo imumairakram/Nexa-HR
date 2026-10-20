@@ -22,106 +22,40 @@ import {
   Clock,
   RefreshCw,
 } from 'lucide-react';
+import { api } from '../../../services/api';
 
-const DEFAULT_APPLICATIONS = [
-  {
-    id: 'APP-9901',
-    name: 'David K. Vance',
-    role: 'Senior React & Node Engineer',
-    department: 'Engineering & DevOps',
-    email: 'david.vance@techlead.io',
-    phone: '+92 300 1234567',
-    experience: '6.5 Years',
-    location: 'Islamabad HQ / Hybrid',
-    rating: 4.9,
-    stage: 'INTERVIEWING',
-    date: 'Aug 22, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Expert in full-stack JavaScript architectures, PostgreSQL, microservices, and React performance optimization.',
-  },
-  {
-    id: 'APP-9902',
-    name: 'Ayesha Tariq',
-    role: 'Lead Product Designer (Figma)',
-    department: 'Product & Design',
-    email: 'ayesha.tariq@designcraft.com',
-    phone: '+92 321 9876543',
-    experience: '5.0 Years',
-    location: 'Karachi Regional Hub',
-    rating: 4.8,
-    stage: 'OFFER',
-    date: 'Aug 18, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Proven track record designing enterprise SaaS platforms, design systems, and conducting customer research.',
-  },
-  {
-    id: 'APP-9903',
-    name: 'Michael Zhang',
-    role: 'DevOps & Kubernetes Architect',
-    department: 'Engineering & DevOps',
-    email: 'michael.zhang@cloudops.net',
-    phone: '+1 415 889 2031',
-    experience: '8.0 Years',
-    location: 'Remote & Distributed',
-    rating: 4.7,
-    stage: 'SCREENING',
-    date: 'Aug 25, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'CI/CD pipeline automation, Terraform infrastructure-as-code, AWS/GCP high availability clusters.',
-  },
-  {
-    id: 'APP-9904',
-    name: 'Fatima Noor',
-    role: 'Senior Talent Acquisition Specialist',
-    department: 'People Operations & HR',
-    email: 'fatima.noor@hrnetwork.org',
-    phone: '+92 333 4567890',
-    experience: '4.5 Years',
-    location: 'Lahore Regional Office',
-    rating: 4.6,
-    stage: 'APPLIED',
-    date: 'Aug 26, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Technical hiring specialist experienced in building high-performing engineering and product teams.',
-  },
-  {
-    id: 'APP-9905',
-    name: 'Zainab Qureshi',
-    role: 'Financial Operations Analyst',
-    department: 'Finance & Accounts',
-    email: 'zainab.q@finmetrics.com',
-    phone: '+92 301 5554321',
-    experience: '3.5 Years',
-    location: 'Islamabad HQ',
-    rating: 4.9,
-    stage: 'HIRED',
-    date: 'Aug 10, 2026',
-    status: 'ACTIVE',
-    resumeSummary: 'Corporate budgeting, payroll ledger auditing, and statutory financial reporting.',
-  },
-];
+const DEFAULT_APPLICATIONS = [];
 
 const STAGES = ['APPLIED', 'SCREENING', 'INTERVIEWING', 'OFFER', 'HIRED'];
 
 const JobApplication = () => {
-  const [applications, setApplications] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexahr_recruitment_applications');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      console.warn(e);
-    }
-    return DEFAULT_APPLICATIONS;
-  });
-
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [stageFilter, setStageFilter] = useState('ALL');
   const [selectedApp, setSelectedApp] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+
+  const loadApplications = async () => {
+    setLoading(true);
+    try {
+      const res = await api.getJobApplications();
+      if (res?.success && res.data?.applications) {
+        setApplications(res.data.applications);
+      } else {
+        setApplications([]);
+      }
+    } catch {
+      setApplications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadApplications();
+  }, []);
 
   // New Application Form State
   const [form, setForm] = useState({

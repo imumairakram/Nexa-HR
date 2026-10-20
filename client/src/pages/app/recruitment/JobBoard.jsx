@@ -25,56 +25,11 @@ const STAGES = [
 ];
 
 const INITIAL_PIPELINE = {
-  APPLIED: [
-    {
-      id: 'APP-9904',
-      name: 'Fatima Noor',
-      role: 'Senior Talent Acquisition Specialist',
-      rating: 4.6,
-      exp: '4.5 Years',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-    },
-  ],
-  SCREENING: [
-    {
-      id: 'APP-9903',
-      name: 'Michael Zhang',
-      role: 'DevOps & Kubernetes Architect',
-      rating: 4.7,
-      exp: '8.0 Years',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-    },
-  ],
-  INTERVIEWING: [
-    {
-      id: 'APP-9901',
-      name: 'David K. Vance',
-      role: 'Senior React & Node Engineer',
-      rating: 4.9,
-      exp: '6.5 Years',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-    },
-  ],
-  OFFER: [
-    {
-      id: 'APP-9902',
-      name: 'Ayesha Tariq',
-      role: 'Lead Product Designer (Figma)',
-      rating: 4.8,
-      exp: '5.0 Years',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-    },
-  ],
-  HIRED: [
-    {
-      id: 'APP-9905',
-      name: 'Zainab Qureshi',
-      role: 'Financial Operations Analyst',
-      rating: 4.9,
-      exp: '3.5 Years',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
-    },
-  ],
+  APPLIED: [],
+  SCREENING: [],
+  INTERVIEWING: [],
+  OFFER: [],
+  HIRED: [],
 };
 
 const JobBoard = () => {
