@@ -32,8 +32,8 @@ const JobInterview = () => {
 
   const [form, setForm] = useState({
     candidate: '',
-    role: 'Senior Software Engineer',
-    interviewer: 'Sarah Jenkins',
+    role: '',
+    interviewer: '',
     date: new Date().toISOString().split('T')[0],
     time: '14:00',
     type: 'Technical Round',
@@ -422,15 +422,11 @@ const JobInterview = () => {
                   {employees.length > 0 ? (
                     employees.map((emp) => (
                       <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
-                        {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || 'Staff Specialist'})
+                        {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || emp.designation?.name || 'Staff Specialist'})
                       </option>
                     ))
                   ) : (
-                    <>
-                      <option value="Sarah Jenkins">Sarah Jenkins (Lead Staff Engineer)</option>
-                      <option value="Alex Mercer">Alex Mercer (Principal UI/UX Designer)</option>
-                      <option value="Muhammad Umair">Muhammad Umair (System Administrator)</option>
-                    </>
+                    <option value="">No Active Employees</option>
                   )}
                 </select>
               </div>

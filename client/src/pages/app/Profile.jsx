@@ -133,13 +133,13 @@ const Profile = () => {
     emergencyRelation: 'Parent / Guardian',
     emergencyPhone: '',
     // Payroll & Bank Details
-    bankName: 'Standard Chartered Bank (Corporate Wing)',
+    bankName: '',
     accountNumber: '',
-    branchCode: '0142 (Corporate Wing)',
+    branchCode: '',
     payoutMethod: 'Direct Bank Transfer',
     ntnNumber: '',
-    taxStatus: 'Verified Active Filer',
-    providentFund: 'Enrolled (8.33% Tier)',
+    taxStatus: 'Active Filer',
+    providentFund: 'Standard',
   });
 
   // Password state
@@ -190,13 +190,13 @@ const Profile = () => {
       : 'HR Operations';
 
     const resolvedBank = u.bankDetails || {};
-    const bankName = resolvedBank.bankName || u.bankName || 'Standard Chartered Bank (Corporate Wing)';
-    const accountNumber = resolvedBank.accountNumber || u.accountNumber || `PK72SCBL000000${empNumDigits}01`;
-    const branchCode = resolvedBank.branchCode || u.branchCode || '0142 (Corporate Wing)';
+    const bankName = resolvedBank.bankName || u.bankName || '';
+    const accountNumber = resolvedBank.accountNumber || u.accountNumber || '';
+    const branchCode = resolvedBank.branchCode || u.branchCode || '';
     const payoutMethod = resolvedBank.payoutMethod || u.payoutMethod || 'Direct Bank Transfer';
-    const taxStatus = resolvedBank.taxStatus || u.taxStatus || 'Verified Active Filer';
-    const ntnNumber = resolvedBank.ntnNumber || u.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`;
-    const providentFund = resolvedBank.providentFund || u.providentFund || 'Enrolled (8.33% Tier)';
+    const taxStatus = resolvedBank.taxStatus || u.taxStatus || 'Active Filer';
+    const ntnNumber = resolvedBank.ntnNumber || u.ntnNumber || '';
+    const providentFund = resolvedBank.providentFund || u.providentFund || 'Standard';
 
     setFormData((prev) => ({
       ...prev,
@@ -950,24 +950,24 @@ const Profile = () => {
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Bank Name</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Standard Chartered Bank'}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Not Configured'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Account Title</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200">
-                  {formData.firstName || 'Administrator'} {formData.lastName || ''}
+                  {formData.firstName || 'User'} {formData.lastName || ''}
                 </span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Account / IBAN</span>
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'PK72SCBL000000101'}</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'Not Configured'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Branch Code</span>
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || '0142 (Corporate Wing)'}</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || '-'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">

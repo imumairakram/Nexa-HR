@@ -36,10 +36,10 @@ const Attendance = () => {
         totalHours: item.totalHours || (item.checkInTime && item.checkOutTime ? 8.5 : 0),
         notes: item.notes || 'Biometric Face-ID Terminal',
         user: {
-          employeeCode: item.user?.employeeCode || 'EMP-100',
-          firstName: item.user?.firstName || 'Staff',
-          lastName: item.user?.lastName || 'Member',
-          department: item.user?.profile?.department?.name || 'Engineering',
+          employeeCode: item.user?.employeeCode || '',
+          firstName: item.user?.firstName || 'Employee',
+          lastName: item.user?.lastName || '',
+          department: item.user?.profile?.department?.name || 'General',
         },
       }));
     }
@@ -69,10 +69,10 @@ const Attendance = () => {
           totalHours: item.totalHours || (item.checkInTime && item.checkOutTime ? 8.5 : 0),
           notes: item.notes || 'Biometric Face-ID Terminal',
           user: {
-            employeeCode: item.user?.employeeCode || 'EMP-100',
-            firstName: item.user?.firstName || 'Staff',
-            lastName: item.user?.lastName || 'Member',
-            department: item.user?.profile?.department?.name || 'Engineering',
+            employeeCode: item.user?.employeeCode || '',
+            firstName: item.user?.firstName || 'Employee',
+            lastName: item.user?.lastName || '',
+            department: item.user?.profile?.department?.name || 'General',
           },
         }));
         setLogs(formatted);
@@ -111,11 +111,15 @@ const Attendance = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const totalHoursLogged = logs.reduce((acc, l) => acc + (Number(l.totalHours) || 0), 0);
+  const activeGateways = new Set(logs.map((l) => l.notes).filter(Boolean)).size || (logs.length > 0 ? 1 : 0);
+
   const stats = {
     present: logs.filter((l) => l.status === 'PRESENT' || l.status === 'LATE').length,
     late: logs.filter((l) => l.status === 'LATE').length,
     onLeave: logs.filter((l) => l.status === 'ON_LEAVE').length,
-    overtime: '14.5 Hours',
+    totalHours: `${totalHoursLogged.toFixed(1)} Hours`,
+    gatewaysCount: activeGateways,
   };
 
   return (
@@ -254,13 +258,13 @@ const Attendance = () => {
         {/* Card 4 */}
         <SparkMetricCard
           variant="light"
-          title="Hardware Gateways"
-          value={4}
-          unit="Terminals"
-          badgeText="100% Online"
+          title="Hours Logged"
+          value={stats.totalHours}
+          unit=""
+          badgeText={stats.gatewaysCount > 0 ? `${stats.gatewaysCount} Active ${stats.gatewaysCount === 1 ? 'Station' : 'Stations'}` : 'Station Ready'}
           badgeType="positive"
           badgeIcon="dot"
-          subtext="Face-ID + RFID"
+          subtext="Biometric Shift Work"
           chartColor="rose"
           presetWave="wave4"
           loading={loading}

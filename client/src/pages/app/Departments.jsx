@@ -499,7 +499,7 @@ const Departments = () => {
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-normal">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span className="truncate">
-                        Cost Center: {dept.code ? `CC-${dept.code}` : 'CC-CORP'} • San Francisco HQ
+                        Cost Center: {dept.code ? `CC-${dept.code}` : 'CC-CORP'} • Corporate Division
                       </span>
                     </div>
 
@@ -931,7 +931,7 @@ const Departments = () => {
                 <div className="p-3.5 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40">
                   <div className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Allocation</div>
                   <div className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
-                    HQ (San Francisco)
+                    Corporate Division
                   </div>
                 </div>
               </div>

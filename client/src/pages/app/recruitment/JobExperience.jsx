@@ -8,7 +8,7 @@ const JobExperience = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newItem, setNewItem] = useState({ label: '', code: '', salaryRange: '$100k - $130k' });
+  const [newItem, setNewItem] = useState({ label: '', code: '', salaryRange: '' });
   const [toastMsg, setToastMsg] = useState('');
 
   const loadExperiences = async () => {
@@ -66,7 +66,7 @@ const JobExperience = () => {
       setToastMsg(`Error: ${err.message || 'Failed to save experience tier to database'}`);
     } finally {
       setIsAddOpen(false);
-      setNewItem({ label: '', code: '', salaryRange: '$100k - $130k' });
+      setNewItem({ label: '', code: '', salaryRange: '' });
       setTimeout(() => setToastMsg(''), 2500);
     }
   };

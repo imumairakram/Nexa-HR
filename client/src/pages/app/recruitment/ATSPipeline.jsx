@@ -56,6 +56,7 @@ const ATSPipeline = () => {
   const [candidates, setCandidates] = useState([]);
   const [interviews, setInterviews] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
@@ -74,7 +75,7 @@ const ATSPipeline = () => {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [scheduleCandidate, setScheduleCandidate] = useState(null);
   const [interviewForm, setInterviewForm] = useState({
-    interviewer: 'Sarah Jenkins',
+    interviewer: '',
     date: new Date().toISOString().split('T')[0],
     time: '14:00',
     type: 'Technical Round',
@@ -85,12 +86,12 @@ const ATSPipeline = () => {
   const [isAddCandidateOpen, setIsAddCandidateOpen] = useState(false);
   const [newCandidateForm, setNewCandidateForm] = useState({
     name: '',
-    role: 'Senior React & Node Engineer',
-    department: 'Engineering & DevOps',
+    role: '',
+    department: 'Organization-Wide (All Employees)',
     email: '',
     phone: '',
-    experience: '4.0 Years',
-    location: 'Islamabad HQ / Hybrid',
+    experience: '',
+    location: 'All Duty Stations (HQ + Regional + Remote)',
     stage: 'APPLIED',
     resumeSummary: '',
     fastTrack: true,
@@ -101,10 +102,11 @@ const ATSPipeline = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [appsRes, ivsRes, empRes] = await Promise.allSettled([
+      const [appsRes, ivsRes, empRes, deptRes] = await Promise.allSettled([
         api.getJobApplications(),
         api.getJobInterviews(),
         api.getEmployees(),
+        api.getDepartments(),
       ]);
 
       if (appsRes.status === 'fulfilled' && appsRes.value?.success && appsRes.value.data?.applications) {
@@ -120,7 +122,18 @@ const ATSPipeline = () => {
       }
 
       if (empRes.status === 'fulfilled' && empRes.value?.success && empRes.value.data?.employees) {
-        setEmployees(empRes.value.data.employees);
+        const emps = empRes.value.data.employees;
+        setEmployees(emps);
+        if (emps.length > 0 && !interviewForm.interviewer) {
+          setInterviewForm((prev) => ({
+            ...prev,
+            interviewer: `${emps[0].firstName} ${emps[0].lastName}`,
+          }));
+        }
+      }
+
+      if (deptRes.status === 'fulfilled' && deptRes.value?.data?.departments) {
+        setDepartments(deptRes.value.data.departments);
       }
     } catch (err) {
       console.error('Failed to load ATS Pipeline data:', err);
@@ -211,7 +224,7 @@ const ATSPipeline = () => {
   const handleOpenSchedule = (candidate) => {
     setScheduleCandidate(candidate);
     setInterviewForm({
-      interviewer: employees.length > 0 ? `${employees[0].firstName} ${employees[0].lastName}` : 'Sarah Jenkins',
+      interviewer: employees.length > 0 ? `${employees[0].firstName} ${employees[0].lastName}` : '',
       date: new Date().toISOString().split('T')[0],
       time: '14:00',
       type: 'Technical Live Coding',
@@ -301,12 +314,12 @@ const ATSPipeline = () => {
       setIsAddCandidateOpen(false);
       setNewCandidateForm({
         name: '',
-        role: 'Senior React & Node Engineer',
-        department: 'Engineering & DevOps',
+        role: '',
+        department: departments.length > 0 ? departments[0].name : 'Organization-Wide (All Employees)',
         email: '',
         phone: '',
-        experience: '4.0 Years',
-        location: 'Islamabad HQ / Hybrid',
+        experience: '',
+        location: 'All Duty Stations (HQ + Regional + Remote)',
         stage: 'APPLIED',
         resumeSummary: '',
         fastTrack: true,
@@ -1052,15 +1065,15 @@ const ATSPipeline = () => {
                   onChange={(e) => setInterviewForm({ ...interviewForm, interviewer: e.target.value })}
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                 >
-                  <option value="Sarah Jenkins">Sarah Jenkins (Engineering Director)</option>
-                  <option value="Alex Mercer">Alex Mercer (Staff DevOps Architect)</option>
-                  <option value="Muhammad Umair">Muhammad Umair (Product & Design Lead)</option>
-                  <option value="Fatima Noor">Fatima Noor (Lead Talent Acquisition)</option>
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
-                      {emp.firstName} {emp.lastName} ({emp.designation?.name || 'Staff'})
-                    </option>
-                  ))}
+                  {employees.length > 0 ? (
+                    employees.map((emp) => (
+                      <option key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
+                        {emp.firstName} {emp.lastName} ({emp.profile?.designation?.title || emp.designation?.name || emp.role || 'Staff'})
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">No Active Employees</option>
+                  )}
                 </select>
               </div>
 
@@ -1327,11 +1340,20 @@ const ATSPipeline = () => {
                       className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
                     >
                       <option value="Organization-Wide (All Employees)">Organization-Wide (All Employees)</option>
-                      <option value="Engineering & DevOps">Engineering & DevOps</option>
-                      <option value="Product & Design">Product & Design</option>
-                      <option value="People Operations & HR">People Operations & HR</option>
-                      <option value="Finance & Accounts">Finance & Accounts</option>
-                      <option value="Sales & Business Development">Sales & Business Development</option>
+                      {departments.length > 0 ? (
+                        departments.map((d) => (
+                          <option key={d.id} value={d.name}>
+                            {d.name}
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="Engineering & DevOps">Engineering & DevOps</option>
+                          <option value="Product & Design">Product & Design</option>
+                          <option value="People Operations & HR">People Operations & HR</option>
+                          <option value="Finance & Accounts">Finance & Accounts</option>
+                        </>
+                      )}
                     </select>
                   </div>
                 </div>

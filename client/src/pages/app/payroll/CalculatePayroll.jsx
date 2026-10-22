@@ -33,12 +33,12 @@ const CalculatePayroll = () => {
         const emps = res.data.employees;
         const calculated = emps.map((emp) => {
           const ss = emp.salaryStructure || {};
-          const base = Number(ss.basicSalary || 8500);
+          const base = Number(ss.basicSalary || 0);
           const allowances = Number(ss.housingAllowance || 0) + Number(ss.transportAllowance || 0) + Number(ss.otherAllowances || 0);
           const overtime = 0;
-          const tax = Number(ss.taxDeductions || (base * 0.15));
+          const tax = Number(ss.taxDeductions || (base > 0 ? base * 0.15 : 0));
           const otherDed = Number(ss.otherDeductions || 0);
-          const net = base + allowances + overtime - tax - otherDed;
+          const net = base > 0 ? Math.max(0, base + allowances + overtime - tax - otherDed) : 0;
 
           return {
             id: emp.employeeCode || `EMP-${emp.id.slice(0, 4)}`,

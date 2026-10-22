@@ -7,8 +7,7 @@ const JobCategory = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newCat, setNewCat] = useState({ name: '', code: '', lead: 'Department Lead' });
+  const [newCat, setNewCat] = useState({ name: '', code: '', lead: '' });
   const [toastMsg, setToastMsg] = useState('');
 
   const loadCategories = async () => {
@@ -64,7 +63,7 @@ const JobCategory = () => {
       setToastMsg(`Error: ${err.message || 'Failed to save category to database'}`);
     } finally {
       setIsAddOpen(false);
-      setNewCat({ name: '', code: '', lead: 'Department Head' });
+      setNewCat({ name: '', code: '', lead: '' });
       setTimeout(() => setToastMsg(''), 2500);
     }
   };

@@ -8,7 +8,7 @@ const JobType = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newType, setNewType] = useState({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
+  const [newType, setNewType] = useState({ name: '', code: '', hours: '', benefits: '' });
   const [toastMsg, setToastMsg] = useState('');
 
   const loadTypes = async () => {
@@ -64,7 +64,7 @@ const JobType = () => {
       setToastMsg(`Error: ${err.message || 'Failed to save job type to database'}`);
     } finally {
       setIsAddOpen(false);
-      setNewType({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Perks' });
+      setNewType({ name: '', code: '', hours: '', benefits: '' });
       setTimeout(() => setToastMsg(''), 2500);
     }
   };

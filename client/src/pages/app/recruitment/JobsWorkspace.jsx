@@ -50,11 +50,11 @@ const JobsWorkspace = () => {
   const [editingJob, setEditingJob] = useState(null);
   const [form, setForm] = useState({
     title: '',
-    dept: 'Engineering & DevOps',
-    location: 'Islamabad HQ / Hybrid',
+    dept: '',
+    location: '',
     type: 'Full-Time',
-    experience: '3 - 5 Years',
-    salary: '$100k - $130k',
+    experience: '',
+    salary: '',
     status: 'ACTIVE',
     description: '',
   });
@@ -81,7 +81,11 @@ const JobsWorkspace = () => {
       }
 
       if (deptRes.status === 'fulfilled' && deptRes.value?.success && deptRes.value.data?.departments) {
-        setDepartments(deptRes.value.data.departments);
+        const depts = deptRes.value.data.departments;
+        setDepartments(depts);
+        if (depts.length > 0 && !form.dept) {
+          setForm((prev) => ({ ...prev, dept: depts[0].name }));
+        }
       }
     } catch (err) {
       console.error('Failed to load recruitment jobs:', err);
@@ -113,11 +117,11 @@ const JobsWorkspace = () => {
     setEditingJob(null);
     setForm({
       title: '',
-      dept: departments.length > 0 ? departments[0].name : 'Engineering & DevOps',
-      location: 'Islamabad HQ / Hybrid',
+      dept: departments.length > 0 ? departments[0].name : '',
+      location: '',
       type: 'Full-Time',
-      experience: '3 - 5 Years',
-      salary: '$110k - $140k',
+      experience: '',
+      salary: '',
       status: 'ACTIVE',
       description: '',
     });
@@ -128,12 +132,12 @@ const JobsWorkspace = () => {
   const handleOpenEdit = (job) => {
     setEditingJob(job);
     setForm({
-      title: job.title,
-      dept: job.dept || job.department || 'Engineering & DevOps',
-      location: job.location,
+      title: job.title || '',
+      dept: job.dept || job.department || (departments.length > 0 ? departments[0].name : ''),
+      location: job.location || '',
       type: job.type || 'Full-Time',
-      experience: job.experience || '3 - 5 Years',
-      salary: job.salary || '$110k - $140k',
+      experience: job.experience || '',
+      salary: job.salary || '',
       status: job.status || 'ACTIVE',
       description: job.description || '',
     });
@@ -843,16 +847,21 @@ const JobsWorkspace = () => {
                         onChange={(e) => setForm({ ...form, dept: e.target.value })}
                         className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                       >
-                        <option value="Engineering & DevOps">Engineering & DevOps</option>
-                        <option value="Product & Design">Product & Design</option>
-                        <option value="People Operations & HR">People Operations & HR</option>
-                        <option value="Finance & Accounts">Finance & Accounts</option>
-                        <option value="Growth & Marketing">Growth & Marketing</option>
-                        {departments.map((d) => (
-                          <option key={d.id} value={d.name}>
-                            {d.name}
-                          </option>
-                        ))}
+                        {departments.length > 0 ? (
+                          departments.map((d) => (
+                            <option key={d.id} value={d.name}>
+                              {d.name}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="Engineering & DevOps">Engineering & DevOps</option>
+                            <option value="Product & Design">Product & Design</option>
+                            <option value="People Operations & HR">People Operations & HR</option>
+                            <option value="Finance & Accounts">Finance & Accounts</option>
+                            <option value="Growth & Marketing">Growth & Marketing</option>
+                          </>
+                        )}
                       </select>
                     </div>
 

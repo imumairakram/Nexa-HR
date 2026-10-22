@@ -23,6 +23,7 @@ import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
+import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -31,6 +32,7 @@ const MONTH_NAMES = [
 
 const Payroll = () => {
   const navigate = useNavigate();
+  const { formatCurrency, formatDate } = useRegionalSettings();
   const [payslips, setPayslips] = useState(() => api.getCached('/payroll/payslips')?.data?.payslips || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/payroll/payslips'));
   const [isRunModalOpen, setIsRunModalOpen] = useState(false);
@@ -81,7 +83,7 @@ const Payroll = () => {
         totalDeductions: 0,
         netPayable: 0,
         status: slip.status || 'PAID',
-        payDate: slip.generatedAt ? new Date(slip.generatedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'N/A',
+        payDate: slip.generatedAt ? formatDate(slip.generatedAt) : 'N/A',
       };
     }
     batchMap[key].employeesCount++;
@@ -182,7 +184,7 @@ const Payroll = () => {
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
               <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
                 <DollarSign className="w-3.5 h-3.5" />
-                <span>${(latestBatch?.netPayable || 0).toLocaleString()} Latest Batch Disbursed</span>
+                <span>{formatCurrency(latestBatch?.netPayable || 0)} Latest Batch Disbursed</span>
               </span>
               <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
                 <FileText className="w-3.5 h-3.5" />
@@ -244,7 +246,7 @@ const Payroll = () => {
         <SparkMetricCard
           variant="dark"
           title="Latest Batch Disbursed"
-          value={`$${(latestBatch?.netPayable || 0).toLocaleString()}`}
+          value={formatCurrency(latestBatch?.netPayable || 0)}
           badgeText="Disbursed"
           badgeType="positive"
           badgeIcon="up"
@@ -259,7 +261,7 @@ const Payroll = () => {
         <SparkMetricCard
           variant="light"
           title="Total Net All-Time"
-          value={`$${totalNetDisbursedAllTime.toLocaleString()}`}
+          value={formatCurrency(totalNetDisbursedAllTime)}
           badgeText="Cumulative Net"
           badgeType="positive"
           badgeIcon="up"
@@ -274,7 +276,7 @@ const Payroll = () => {
         <SparkMetricCard
           variant="light"
           title="Tax Withheld YTD"
-          value={`$${totalTaxWithheldAllTime.toLocaleString()}`}
+          value={formatCurrency(totalTaxWithheldAllTime)}
           badgeText="Statutory Filing"
           badgeType="positive"
           badgeIcon="dot"
@@ -409,10 +411,10 @@ const Payroll = () => {
                       </td>
                       <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{run.payDate}</td>
                       <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">{run.employeesCount} Staff</td>
-                      <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">${run.totalGross.toLocaleString()}</td>
-                      <td className="py-4 px-4 font-semibold text-rose-500">-${run.totalDeductions.toLocaleString()}</td>
+                      <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">{formatCurrency(run.totalGross)}</td>
+                      <td className="py-4 px-4 font-semibold text-rose-500">-{formatCurrency(run.totalDeductions)}</td>
                       <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                        ${run.netPayable.toLocaleString()}
+                        {formatCurrency(run.netPayable)}
                       </td>
                       <td className="py-4 px-4">
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">

@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 const {
   createInAppNotification,
   broadcastInAppNotification,
@@ -40,6 +41,8 @@ const createLeaveType = async (req, res) => {
       },
     });
 
+    cacheService.invalidateTags(['leaves', 'dashboard']);
+
     return res.status(201).json({
       success: true,
       message: 'Leave type policy created successfully.',
@@ -77,8 +80,15 @@ const getLeaveTypes = async (req, res) => {
 
 const applyLeave = async (req, res) => {
   try {
-    const userId = req.user.userId;
-    const { leaveTypeId, startDate, endDate, reason } = req.body;
+    let targetUserId = req.user.userId;
+    const { userId: bodyUserId, employeeId, leaveTypeId, startDate, endDate, reason } = req.body;
+
+    const isElevatedRole = ['ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN'].includes(req.user?.role);
+    const requestedTargetId = bodyUserId || employeeId;
+
+    if (isElevatedRole && requestedTargetId) {
+      targetUserId = requestedTargetId;
+    }
 
     if (!leaveTypeId || !startDate || !endDate || !reason) {
       return res.status(400).json({
@@ -86,6 +96,54 @@ const applyLeave = async (req, res) => {
         message: 'Required fields: leaveTypeId, startDate, endDate, reason.',
       });
     }
+
+    // Resolve target employee record
+    let targetUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        employeeCode: true,
+        isActive: true,
+      },
+    });
+
+    if (!targetUser) {
+      targetUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { employeeCode: targetUserId },
+            { profile: { id: targetUserId } },
+          ],
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          employeeCode: true,
+          isActive: true,
+        },
+      });
+    }
+
+    if (!targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'Specified employee not found.',
+      });
+    }
+
+    if (!targetUser.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot record leave for an inactive employee account.',
+      });
+    }
+
+    targetUserId = targetUser.id;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -120,7 +178,7 @@ const applyLeave = async (req, res) => {
 
     const overlapping = await prisma.leaveRequest.findFirst({
       where: {
-        userId,
+        userId: targetUserId,
         status: { in: ['PENDING', 'APPROVED'] },
         OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
       },
@@ -129,13 +187,15 @@ const applyLeave = async (req, res) => {
     if (overlapping) {
       return res.status(409).json({
         success: false,
-        message: 'You already have an active leave request overlapping with these dates.',
+        message: targetUserId === req.user.userId
+          ? 'You already have an active leave request overlapping with these dates.'
+          : `${targetUser.firstName} ${targetUser.lastName} already has an active leave request overlapping with these dates.`,
       });
     }
 
     const leaveRequest = await prisma.leaveRequest.create({
       data: {
-        userId,
+        userId: targetUserId,
         leaveTypeId,
         startDate: start,
         endDate: end,
@@ -144,52 +204,87 @@ const applyLeave = async (req, res) => {
         status: 'PENDING',
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
         leaveType: { select: { id: true, name: true, code: true, isPaid: true } },
       },
     });
 
-    // 1. Notify HR / Admins in-app about new leave request
-    const applicantName = req.user?.fullName || 'Employee';
-    await broadcastInAppNotification({
-      title: `Leave Request: ${applicantName}`,
-      message: `${leaveType.name} application for ${totalDays} day(s) (${startDate} to ${endDate}) submitted for review.`,
-      type: 'warning',
-      category: 'LEAVE',
-      link: '/app/leaves',
-      targetRoles: ['ADMIN', 'HR_MANAGER'],
-    });
+    // Invalidate caches so the updated requests reflect immediately across the app
+    cacheService.invalidateTags(['leaves', 'dashboard']);
 
-    // 2. Notify Employee in-app that application is recorded
-    await createInAppNotification({
-      userId,
-      title: `Leave Application Submitted`,
-      message: `Your ${leaveType.name} request for ${totalDays} day(s) has been submitted for management review.`,
-      type: 'info',
-      category: 'LEAVE',
-      link: '/employee/leaves',
-    });
+    const isSelf = targetUserId === req.user.userId;
+    const applicantName = `${targetUser.firstName} ${targetUser.lastName}`;
+    const creatorName = req.user?.fullName || 'HR Management';
 
-    // 3. Dispatch Email to HR administrators
-    const hrAdmins = await prisma.user.findMany({
-      where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true },
-      select: { email: true },
-    });
-    const adminEmails = hrAdmins.map((a) => a.email);
+    if (isSelf) {
+      // 1. Notify HR / Admins in-app about new leave request
+      await broadcastInAppNotification({
+        title: `Leave Request: ${applicantName}`,
+        message: `${leaveType.name} application for ${totalDays} day(s) (${startDate} to ${endDate}) submitted for review.`,
+        type: 'warning',
+        category: 'LEAVE',
+        link: '/app/leaves',
+        targetRoles: ['ADMIN', 'HR_MANAGER'],
+      });
 
-    await sendLeaveRequestSubmittedEmail({
-      adminEmails,
-      employeeName: applicantName,
-      employeeCode: req.user?.email,
-      leaveType: leaveType.name,
-      startDate: start,
-      endDate: end,
-      totalDays,
-      reason: reason.trim(),
-    });
+      // 2. Notify Employee in-app that application is recorded
+      await createInAppNotification({
+        userId: targetUserId,
+        title: `Leave Application Submitted`,
+        message: `Your ${leaveType.name} request for ${totalDays} day(s) has been submitted for management review.`,
+        type: 'info',
+        category: 'LEAVE',
+        link: '/employee/leaves',
+      });
+
+      // 3. Dispatch Email to HR administrators
+      const hrAdmins = await prisma.user.findMany({
+        where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true },
+        select: { email: true },
+      });
+      const adminEmails = hrAdmins.map((a) => a.email);
+
+      await sendLeaveRequestSubmittedEmail({
+        adminEmails,
+        employeeName: applicantName,
+        employeeCode: targetUser.email || targetUser.employeeCode,
+        leaveType: leaveType.name,
+        startDate: start,
+        endDate: end,
+        totalDays,
+        reason: reason.trim(),
+      });
+    } else {
+      // HR/Admin applied on behalf of employee
+      await broadcastInAppNotification({
+        title: `Leave Entry: ${applicantName}`,
+        message: `${creatorName} recorded a ${leaveType.name} request (${totalDays} day(s)) on behalf of ${applicantName}.`,
+        type: 'info',
+        category: 'LEAVE',
+        link: '/app/leaves',
+        targetRoles: ['ADMIN', 'HR_MANAGER'],
+      });
+
+      await createInAppNotification({
+        userId: targetUserId,
+        title: `Leave Application Submitted by HR`,
+        message: `A ${leaveType.name} request for ${totalDays} day(s) was entered on your behalf by ${creatorName}.`,
+        type: 'info',
+        category: 'LEAVE',
+        link: '/employee/leaves',
+      });
+    }
 
     return res.status(201).json({
       success: true,
-      message: `Leave application submitted for ${totalDays} day(s).`,
+      message: `Leave application submitted for ${applicantName} (${totalDays} day(s)).`,
       data: { leaveRequest },
     });
   } catch (error) {
@@ -342,6 +437,8 @@ const updateLeaveStatus = async (req, res) => {
         rejectionReason,
       });
     }
+
+    cacheService.invalidateTags(['leaves', 'dashboard']);
 
     return res.status(200).json({
       success: true,

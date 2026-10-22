@@ -27,6 +27,7 @@ import { api } from '../../services/api';
 const Announcement = () => {
   const { formatDate } = useRegionalSettings();
   const [announcements, setAnnouncements] = useState(() => api.getCached('/announcements')?.data?.announcements || []);
+  const [departments, setDepartments] = useState(() => api.getCached('/departments')?.data?.departments || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/announcements'));
   const [submitting, setSubmitting] = useState(false);
 
@@ -52,9 +53,15 @@ const Announcement = () => {
       setLoading(true);
     }
     try {
-      const res = await api.getAnnouncements();
-      if (res?.success && res.data?.announcements) {
-        setAnnouncements(res.data.announcements);
+      const [annRes, deptRes] = await Promise.allSettled([
+        api.getAnnouncements(),
+        api.getDepartments(),
+      ]);
+      if (annRes.status === 'fulfilled' && annRes.value?.success && annRes.value.data?.announcements) {
+        setAnnouncements(annRes.value.data.announcements);
+      }
+      if (deptRes.status === 'fulfilled' && deptRes.value?.data?.departments) {
+        setDepartments(deptRes.value.data.departments);
       }
     } catch (err) {
       console.error('Failed to load announcements:', err);
@@ -551,9 +558,19 @@ const Announcement = () => {
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
                   >
                     <option value="Company-Wide (All Offices)">Company-Wide (All Offices)</option>
-                    <option value="Engineering & Product">Engineering & Product</option>
-                    <option value="People & Operations">People & Operations</option>
-                    <option value="Sales & Marketing">Sales & Marketing</option>
+                    {departments.length > 0 ? (
+                      departments.map((d) => (
+                        <option key={d.id} value={d.name}>
+                          {d.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Engineering & Product">Engineering & Product</option>
+                        <option value="People & Operations">People & Operations</option>
+                        <option value="Sales & Marketing">Sales & Marketing</option>
+                      </>
+                    )}
                   </select>
                 </div>
               </div>

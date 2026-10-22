@@ -123,7 +123,7 @@ const formatSalary = (salaryStructure, rawSalary) => {
     if (typeof rawSalary === 'number') return `$${rawSalary.toLocaleString()} / mo`;
     return rawSalary;
   }
-  return '$120,000 / yr';
+  return 'Not Configured';
 };
 
 const EmploymentStatus = () => {
@@ -854,13 +854,13 @@ const EmploymentStatus = () => {
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
                 <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Location / Workplace</span>
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">
-                  {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'San Francisco HQ'}
+                  {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'Not Specified'}
                 </span>
               </div>
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
                 <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Onboarding Date</span>
                 <span className="font-extrabold text-slate-900 dark:text-white">
-                  {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : '2023-01-01'}
+                  {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : (selectedEmployee.createdAt ? selectedEmployee.createdAt.split('T')[0] : 'Active')}
                 </span>
               </div>
             </div>

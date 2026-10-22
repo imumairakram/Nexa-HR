@@ -287,15 +287,15 @@ const Dashboard = () => {
       return sparklines.leaves;
     }
     const base = pendingLeaves;
-    const progression = [
-      Math.max(0, base + 2),
-      Math.max(0, base + 1),
-      Math.max(0, base + 2),
-      Math.max(0, base + 1),
+    const progression = base > 0 ? [
+      Math.max(0, base - 2),
+      Math.max(0, base - 1),
+      Math.max(0, base - 1),
+      Math.max(0, base),
       Math.max(0, base),
       Math.max(0, base),
       base,
-    ];
+    ] : [0, 0, 0, 0, 0, 0, 0];
     return days.map((day, i) => ({
       value: progression[i],
       label: day,
@@ -308,15 +308,15 @@ const Dashboard = () => {
       return sparklines.absent;
     }
     const base = absentToday;
-    const progression = [
-      Math.max(0, base + 1),
-      Math.max(0, base + 1),
-      Math.max(0, base + 2),
-      Math.max(0, base + 1),
+    const progression = base > 0 ? [
+      Math.max(0, base - 1),
+      Math.max(0, base - 1),
+      Math.max(0, base),
+      Math.max(0, base),
       Math.max(0, base),
       Math.max(0, base),
       base,
-    ];
+    ] : [0, 0, 0, 0, 0, 0, 0];
     return days.map((day, i) => ({
       value: progression[i],
       label: day,
@@ -344,7 +344,7 @@ const Dashboard = () => {
         onRefresh={() => loadDashboardMetrics()}
         loading={loading}
         action={
-          !isHrPortal && mobileDashboardTitle === 'Admin Dashboard' ? (
+          mobileDashboardTitle === 'Admin Dashboard' || isHrPortal ? (
             <button
               onClick={() => setIsPunchModalOpen(true)}
               className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-2xl shadow-sm transition-all cursor-pointer"
@@ -811,7 +811,7 @@ const Dashboard = () => {
               <div className="h-44 flex flex-col items-center justify-center text-center p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                 <Clock className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-1" />
                 <p className="text-xs font-bold text-slate-600 dark:text-slate-300">No Logs Recorded Today</p>
-                {!isHrPortal && mobileDashboardTitle === 'Admin Dashboard' && (
+                {(mobileDashboardTitle === 'Admin Dashboard' || isHrPortal) && (
                   <button
                     onClick={() => setIsPunchModalOpen(true)}
                     className="mt-2 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"

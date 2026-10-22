@@ -27,10 +27,10 @@ const Jobs = () => {
 
   const [form, setForm] = useState({
     title: '',
-    dept: 'Engineering',
-    location: 'Islamabad HQ / Remote',
+    dept: '',
+    location: '',
     type: 'Full-Time',
-    salary: '$140k - $170k',
+    salary: '',
   });
 
   const loadJobsData = async () => {

@@ -96,8 +96,16 @@ const NewEmployee = () => {
 
         setOrgStats({
           totalEmployees: empCount,
-          totalDepartments: deptCount || deptNames.length || 7,
+          totalDepartments: deptCount || deptNames.length || 0,
         });
+
+        if (deptNames.length > 0 || desigTitles.length > 0) {
+          setForm((prev) => ({
+            ...prev,
+            department: prev.department || deptNames[0] || '',
+            designation: prev.designation || desigTitles[0] || '',
+          }));
+        }
       } catch (e) {
         console.warn('Live onboarding data fetch:', e.message);
       }
@@ -113,24 +121,24 @@ const NewEmployee = () => {
     lastName: '',
     email: '',
     phone: '',
-    dob: '1995-05-15',
+    dob: '',
     gender: 'Male',
-    address: '123 Market St, San Francisco, CA',
+    address: '',
     // Step 2
-    department: 'Engineering & DevOps',
-    designation: 'Senior Full-Stack Engineer',
-    employeeCode: 'EMP-108',
-    reportingManager: 'Alex Mercer',
+    department: '',
+    designation: '',
+    employeeCode: `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+    reportingManager: '',
     joiningDate: new Date().toISOString().split('T')[0],
     employmentType: 'FULL_TIME',
     // Step 3
-    baseSalary: '135000',
+    baseSalary: '',
     currency: 'USD',
-    taxBracket: 'Federal Standard W-4',
-    healthInsurance: 'Comprehensive Tier 1',
+    taxBracket: 'Standard Bracket',
+    healthInsurance: 'Comprehensive Corporate Plan',
     // Step 4
     systemRole: 'EMPLOYEE',
-    defaultPassword: 'TempPassword123!',
+    defaultPassword: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
   });
 
   const headcountSparkData = React.useMemo(() => {

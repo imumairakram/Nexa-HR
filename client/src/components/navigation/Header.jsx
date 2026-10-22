@@ -15,6 +15,17 @@ const Header = () => {
     }
   };
 
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('user')) || {};
+    } catch {
+      return {};
+    }
+  })();
+  const fullName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'User';
+  const roleName = user.role === 'ADMIN' ? 'System Admin' : user.role === 'HR_MANAGER' ? 'HR Manager' : 'Staff Member';
+  const initials = `${user.firstName?.[0] || 'U'}${user.lastName?.[0] || ''}`.toUpperCase();
+
   return (
     <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-3xl p-4 md:px-6 shadow-soft border border-slate-100">
       {/* Search Input & System Status */}
@@ -61,11 +72,11 @@ const Header = () => {
         {/* User Badge */}
         <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
           <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shadow-sm">
-            AD
+            {initials}
           </div>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-bold text-slate-800 leading-tight">Admin User</p>
-            <p className="text-[10px] text-slate-500">System Admin</p>
+            <p className="text-xs font-bold text-slate-800 leading-tight">{fullName}</p>
+            <p className="text-[10px] text-slate-500">{roleName}</p>
           </div>
         </div>
       </div>

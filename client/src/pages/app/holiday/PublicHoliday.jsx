@@ -103,7 +103,7 @@ const PublicHoliday = () => {
   const { timezone, dateFormat } = useRegionalSettings();
 
   const currentYearNow = new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState(2026);
+  const [selectedYear, setSelectedYear] = useState(currentYearNow);
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'calendar'
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -112,7 +112,7 @@ const PublicHoliday = () => {
   // Custom Holiday Form State
   const [form, setForm] = useState({
     name: '',
-    date: `${selectedYear}-08-26`,
+    date: `${currentYearNow}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
     type: 'Company Recognized',
     isLongWeekend: true,
     recurringYearly: false,
@@ -127,7 +127,7 @@ const PublicHoliday = () => {
   useEffect(() => {
     setForm((prev) => ({
       ...prev,
-      date: `${selectedYear}-08-26`,
+      date: `${selectedYear}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
     }));
   }, [selectedYear]);
 

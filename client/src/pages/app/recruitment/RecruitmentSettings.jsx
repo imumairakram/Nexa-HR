@@ -59,11 +59,11 @@ const RecruitmentSettings = () => {
   const [experiences, setExperiences] = useState([]);
 
   // Forms state
-  const [categoryForm, setCategoryForm] = useState({ name: '', code: '', lead: 'Department Lead', status: 'ACTIVE' });
-  const [typeForm, setTypeForm] = useState({ name: '', code: '', hours: '40 hrs / week', benefits: 'Standard Health & Leave' });
-  const [locationForm, setLocationForm] = useState({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)', status: 'BRANCH' });
-  const [skillForm, setSkillForm] = useState({ name: '', category: 'Frontend', proficiency: 'Advanced', weight: 'Mandatory' });
-  const [experienceForm, setExperienceForm] = useState({ label: '', code: '', minYears: 1, maxYears: 3, salaryRange: '$80k - $110k' });
+  const [categoryForm, setCategoryForm] = useState({ name: '', code: '', lead: '', status: 'ACTIVE' });
+  const [typeForm, setTypeForm] = useState({ name: '', code: '', hours: '', benefits: '' });
+  const [locationForm, setLocationForm] = useState({ name: '', city: '', country: '', timezone: '', status: 'BRANCH' });
+  const [skillForm, setSkillForm] = useState({ name: '', category: 'General', proficiency: 'Intermediate', weight: 'Mandatory' });
+  const [experienceForm, setExperienceForm] = useState({ label: '', code: '', minYears: 1, maxYears: 3, salaryRange: '' });
 
   // Initial load with Live Backend API Integration
   const loadMasterData = async () => {
@@ -158,11 +158,11 @@ const RecruitmentSettings = () => {
   // Open Add/Edit Modal
   const handleOpenAdd = () => {
     setEditingItem(null);
-    if (activeTab === 'categories') setCategoryForm({ name: '', code: '', lead: 'Department Lead', status: 'ACTIVE' });
-    if (activeTab === 'types') setTypeForm({ name: '', code: '', hours: '40 hrs / week', benefits: 'Full Health & Leave' });
-    if (activeTab === 'locations') setLocationForm({ name: '', city: '', country: 'Pakistan', timezone: 'PKT (UTC+5)', status: 'BRANCH' });
-    if (activeTab === 'skills') setSkillForm({ name: '', category: 'Frontend', proficiency: 'Advanced', weight: 'Mandatory' });
-    if (activeTab === 'experience') setExperienceForm({ label: '', code: '', minYears: 1, maxYears: 3, salaryRange: '$80k - $110k' });
+    if (activeTab === 'categories') setCategoryForm({ name: '', code: '', lead: '', status: 'ACTIVE' });
+    if (activeTab === 'types') setTypeForm({ name: '', code: '', hours: '', benefits: '' });
+    if (activeTab === 'locations') setLocationForm({ name: '', city: '', country: '', timezone: '', status: 'BRANCH' });
+    if (activeTab === 'skills') setSkillForm({ name: '', category: 'General', proficiency: 'Intermediate', weight: 'Mandatory' });
+    if (activeTab === 'experience') setExperienceForm({ label: '', code: '', minYears: 1, maxYears: 3, salaryRange: '' });
     setIsModalOpen(true);
   };
 

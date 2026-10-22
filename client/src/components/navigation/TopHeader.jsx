@@ -2,6 +2,17 @@ import React from 'react';
 import { Bell, Search, Cpu } from 'lucide-react';
 
 const TopHeader = () => {
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('user')) || {};
+    } catch {
+      return {};
+    }
+  })();
+  const fullName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'User';
+  const roleName = user.role === 'ADMIN' ? 'System Administrator' : user.role === 'HR_MANAGER' ? 'HR Manager' : 'Staff Member';
+  const initials = `${user.firstName?.[0] || 'U'}${user.lastName?.[0] || ''}`.toUpperCase();
+
   return (
     <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-3xl p-4 md:px-6 shadow-soft border border-slate-100">
       {/* Search Input */}
@@ -29,11 +40,11 @@ const TopHeader = () => {
         {/* User Profile Avatar & Badge */}
         <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
           <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shadow-sm">
-            AD
+            {initials}
           </div>
           <div className="text-left">
-            <p className="text-xs font-bold text-slate-900 leading-tight">Admin User</p>
-            <p className="text-[10px] font-semibold text-slate-500">System Administrator</p>
+            <p className="text-xs font-bold text-slate-900 leading-tight">{fullName}</p>
+            <p className="text-[10px] font-semibold text-slate-500">{roleName}</p>
           </div>
         </div>
       </div>

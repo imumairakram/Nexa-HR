@@ -63,13 +63,13 @@ const Leaves = () => {
       if (typesRes.status === 'fulfilled' && typesRes.value?.data?.leaveTypes) {
         setLeaveTypes(typesRes.value.data.leaveTypes);
         if (typesRes.value.data.leaveTypes.length > 0) {
-          setApplyForm((prev) => ({ ...prev, leaveTypeId: typesRes.value.data.leaveTypes[0].id }));
+          setApplyForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
         }
       }
       if (empRes.status === 'fulfilled' && empRes.value?.data?.employees) {
         setEmployees(empRes.value.data.employees);
         if (empRes.value.data.employees.length > 0) {
-          setApplyForm((prev) => ({ ...prev, userId: empRes.value.data.employees[0].id }));
+          setApplyForm((prev) => ({ ...prev, userId: prev.userId || empRes.value.data.employees[0].id }));
         }
       }
     } catch (err) {
@@ -85,6 +85,15 @@ const Leaves = () => {
     return () => window.removeEventListener('nexahr_leaves_updated', fetchLeaveData);
   }, []);
 
+  const handleOpenApplyModal = () => {
+    setApplyForm((prev) => ({
+      ...prev,
+      userId: prev.userId || (employees.length > 0 ? employees[0].id : ''),
+      leaveTypeId: prev.leaveTypeId || (leaveTypes.length > 0 ? leaveTypes[0].id : ''),
+    }));
+    setIsApplyOpen(true);
+  };
+
   const handleUpdateStatus = async (reqId, newStatus) => {
     try {
       setSubmitting(true);
@@ -93,6 +102,14 @@ const Leaves = () => {
         rejectionReason: remarksInput || (newStatus === 'REJECTED' ? 'Rejected by HR Management' : undefined),
       });
 
+      const currentUser = (() => {
+        try {
+          return JSON.parse(localStorage.getItem('user')) || {};
+        } catch {
+          return {};
+        }
+      })();
+
       setRequests((prev) =>
         prev.map((r) =>
           r.id === reqId
@@ -100,7 +117,10 @@ const Leaves = () => {
                 ...r,
                 status: newStatus,
                 rejectionReason: remarksInput,
-                approvedBy: { firstName: 'System', lastName: 'Administrator' },
+                approvedBy: {
+                  firstName: currentUser.firstName || 'HR',
+                  lastName: currentUser.lastName || 'Management',
+                },
               }
             : r
         )
@@ -120,15 +140,24 @@ const Leaves = () => {
 
   const handleCreateOnBehalf = async (e) => {
     e.preventDefault();
-    if (!applyForm.userId || !applyForm.leaveTypeId || !applyForm.reason) {
+    const effectiveUserId = applyForm.userId || (employees.length > 0 ? employees[0].id : '');
+    const effectiveLeaveTypeId = applyForm.leaveTypeId || (leaveTypes.length > 0 ? leaveTypes[0].id : '');
+
+    if (!effectiveUserId || !effectiveLeaveTypeId || !applyForm.reason.trim()) {
       showToast('Please complete all required fields.');
       return;
     }
 
     try {
       setSubmitting(true);
-      await api.createLeaveRequest(applyForm);
+      await api.createLeaveRequest({
+        ...applyForm,
+        userId: effectiveUserId,
+        leaveTypeId: effectiveLeaveTypeId,
+        reason: applyForm.reason.trim(),
+      });
       await fetchLeaveData();
+      window.dispatchEvent(new Event('nexahr_leaves_updated'));
       setIsApplyOpen(false);
       setApplyForm({
         userId: employees[0]?.id || '',
@@ -220,7 +249,7 @@ const Leaves = () => {
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Apply on behalf of staff</div>
             </div>
             <button
-              onClick={() => setIsApplyOpen(true)}
+              onClick={handleOpenApplyModal}
               className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -231,7 +260,7 @@ const Leaves = () => {
           {/* Mobile Quick Action Button */}
           <div className="sm:hidden pt-1">
             <button
-              onClick={() => setIsApplyOpen(true)}
+              onClick={handleOpenApplyModal}
               className="w-full py-3 px-4 rounded-2xl bg-emerald-600 active:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -337,7 +366,7 @@ const Leaves = () => {
           </div>
 
           <button
-            onClick={() => setIsApplyOpen(true)}
+            onClick={handleOpenApplyModal}
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer shrink-0 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4" />
@@ -557,7 +586,7 @@ const Leaves = () => {
                   <label className="block text-slate-800 dark:text-slate-200 font-bold">Select Employee *</label>
                   <select
                     required
-                    value={applyForm.userId}
+                    value={applyForm.userId || (employees[0]?.id || '')}
                     onChange={(e) => setApplyForm({ ...applyForm, userId: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   >
@@ -577,7 +606,7 @@ const Leaves = () => {
                   <label className="block text-slate-800 dark:text-slate-200 font-bold">Leave Policy / Type *</label>
                   <select
                     required
-                    value={applyForm.leaveTypeId}
+                    value={applyForm.leaveTypeId || (leaveTypes[0]?.id || '')}
                     onChange={(e) => setApplyForm({ ...applyForm, leaveTypeId: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   >

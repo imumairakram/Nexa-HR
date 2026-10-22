@@ -38,9 +38,9 @@ const PayslipList = () => {
         const mapped = res.data.payslips.map((p) => ({
           id: `PSL-${p.year}-${String(p.month).padStart(2, '0')}-${p.user?.employeeCode || p.userId.slice(0, 4)}`,
           rawId: p.id,
-          employee: `${p.user?.firstName || 'Staff'} ${p.user?.lastName || 'Member'}`,
-          code: p.user?.employeeCode || 'EMP-100',
-          dept: p.user?.profile?.department?.name || 'Operations',
+          employee: `${p.user?.firstName || 'Staff'} ${p.user?.lastName || ''}`.trim() || 'Employee',
+          code: p.user?.employeeCode || (p.userId ? `EMP-${p.userId.slice(0, 4).toUpperCase()}` : '-'),
+          dept: p.user?.profile?.department?.name || 'General',
           month: `${MONTH_NAMES[p.month - 1]} ${p.year}`,
           gross: Number(p.grossSalary || 0),
           deductions: Number(p.taxDeductions || 0) + Number(p.otherDeductions || 0) + Number(p.unpaidLeaveDeduction || 0),

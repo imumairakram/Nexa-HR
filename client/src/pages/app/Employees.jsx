@@ -138,7 +138,7 @@ const formatSalary = (salaryStructure, rawSalary) => {
     if (typeof rawSalary === 'number') return `$${rawSalary.toLocaleString()} / mo`;
     return rawSalary;
   }
-  return '$120,000 / yr';
+  return 'Not Configured';
 };
 
 const Employees = () => {
@@ -213,20 +213,20 @@ const Employees = () => {
     password: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
     phone: '',
     role: 'EMPLOYEE',
-    departmentName: 'Engineering',
-    designationTitle: 'Software Engineer',
-    location: 'San Francisco HQ (Floor 4)',
+    departmentName: '',
+    designationTitle: '',
+    location: '',
     joiningDate: new Date().toISOString().split('T')[0],
-    basicSalary: '8500',
-    housingAllowance: '1200',
-    transportAllowance: '500',
-    taxDeductions: '950',
+    basicSalary: '',
+    housingAllowance: '0',
+    transportAllowance: '0',
+    taxDeductions: '0',
     otherAllowances: '0',
     otherDeductions: '0',
     gender: 'Not Specified',
-    dateOfBirth: '1995-06-15',
-    address: '100 Market St, San Francisco, CA',
-    emergencyContact: 'Jane Doe (+1 555-0192)',
+    dateOfBirth: '',
+    address: '',
+    emergencyContact: '',
   };
   const [onboardForm, setOnboardForm] = useState(initialOnboardState);
 
@@ -391,20 +391,20 @@ NexaHR Workforce Systems`;
       phone: emp.phone || '',
       role: emp.role || 'EMPLOYEE',
       isActive: emp.isActive !== undefined ? emp.isActive : true,
-      departmentName: emp.profile?.department?.name || 'Engineering',
-      designationTitle: emp.profile?.designation?.title || 'Software Engineer',
-      location: emp.profile?.address || emp.profile?.location || 'San Francisco HQ',
-      joiningDate: emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : '2023-01-01',
-      basicSalary: emp.salaryStructure?.basicSalary?.toString() || '8500',
-      housingAllowance: emp.salaryStructure?.housingAllowance?.toString() || '1200',
-      transportAllowance: emp.salaryStructure?.transportAllowance?.toString() || '500',
-      taxDeductions: emp.salaryStructure?.taxDeductions?.toString() || '950',
+      departmentName: emp.profile?.department?.name || '',
+      designationTitle: emp.profile?.designation?.title || '',
+      location: emp.profile?.address || emp.profile?.location || '',
+      joiningDate: emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : (emp.createdAt ? emp.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+      basicSalary: emp.salaryStructure?.basicSalary?.toString() || '',
+      housingAllowance: emp.salaryStructure?.housingAllowance?.toString() || '0',
+      transportAllowance: emp.salaryStructure?.transportAllowance?.toString() || '0',
+      taxDeductions: emp.salaryStructure?.taxDeductions?.toString() || '0',
       otherAllowances: emp.salaryStructure?.otherAllowances?.toString() || '0',
       otherDeductions: emp.salaryStructure?.otherDeductions?.toString() || '0',
       gender: emp.profile?.gender || 'Not Specified',
-      dateOfBirth: emp.profile?.dateOfBirth ? emp.profile.dateOfBirth.split('T')[0] : '1995-06-15',
-      address: emp.profile?.address || '100 Market St, San Francisco, CA',
-      emergencyContact: emp.profile?.emergencyContact || 'Jane Doe (+1 555-0192)',
+      dateOfBirth: emp.profile?.dateOfBirth ? emp.profile.dateOfBirth.split('T')[0] : '',
+      address: emp.profile?.address || '',
+      emergencyContact: emp.profile?.emergencyContact || '',
     });
     setEditTab('basic');
     setIsEditOpen(true);
@@ -707,7 +707,11 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => {
-                setOnboardForm(initialOnboardState);
+                setOnboardForm({
+                  ...initialOnboardState,
+                  departmentName: departments[0]?.name || '',
+                  designationTitle: designations[0]?.title || '',
+                });
                 setOnboardTab('basic');
                 setIsOnboardOpen(true);
               }}
@@ -723,7 +727,11 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => {
-                setOnboardForm(initialOnboardState);
+                setOnboardForm({
+                  ...initialOnboardState,
+                  departmentName: departments[0]?.name || '',
+                  designationTitle: designations[0]?.title || '',
+                });
                 setOnboardTab('basic');
                 setIsOnboardOpen(true);
               }}
@@ -1967,13 +1975,13 @@ NexaHR Workforce Systems`;
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                 <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Location / Workplace</span>
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">
-                  {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'San Francisco HQ'}
+                  {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'Not Specified'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                 <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Onboarding Date</span>
                 <span className="font-extrabold text-slate-900 dark:text-white">
-                  {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : '2023-01-01'}
+                  {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : (selectedEmployee.createdAt ? selectedEmployee.createdAt.split('T')[0] : 'Active')}
                 </span>
               </div>
             </div>

@@ -60,13 +60,13 @@ const JobApplication = () => {
   // New Application Form State
   const [form, setForm] = useState({
     name: '',
-    role: 'Senior React & Node Engineer',
-    department: 'Engineering & DevOps',
+    role: '',
+    department: '',
     email: '',
     phone: '',
-    experience: '4 Years',
-    location: 'Islamabad HQ',
-    rating: '4.8',
+    experience: '',
+    location: '',
+    rating: '5.0',
     resumeSummary: '',
   });
 
@@ -127,13 +127,13 @@ const JobApplication = () => {
       setIsAddModalOpen(false);
       setForm({
         name: '',
-        role: 'Senior React & Node Engineer',
-        department: 'Engineering & DevOps',
+        role: '',
+        department: '',
         email: '',
         phone: '',
-        experience: '4 Years',
-        location: 'Islamabad HQ',
-        rating: '4.8',
+        experience: '',
+        location: '',
+        rating: '5.0',
         resumeSummary: '',
       });
       setTimeout(() => setToastMsg(''), 3000);

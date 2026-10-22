@@ -41,10 +41,10 @@ const JobBoard = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newCandidate, setNewCandidate] = useState({
     name: '',
-    role: 'Senior Software Engineer',
+    role: '',
     stage: 'APPLIED',
-    rating: '4.8',
-    exp: '4 Years',
+    rating: '5.0',
+    exp: '',
   });
 
   const loadPipeline = async () => {
@@ -139,10 +139,10 @@ const JobBoard = () => {
       setIsAddOpen(false);
       setNewCandidate({
         name: '',
-        role: 'Senior Software Engineer',
+        role: '',
         stage: 'APPLIED',
-        rating: '4.8',
-        exp: '4 Years',
+        rating: '5.0',
+        exp: '',
       });
       setTimeout(() => setToastMsg(''), 2500);
     }
