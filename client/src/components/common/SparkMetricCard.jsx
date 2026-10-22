@@ -1,32 +1,59 @@
 import React, { useState, useId, useMemo, useRef } from 'react';
 
 /**
+ * @typedef {Object} SparkDataPoint
+ * @property {number} value
+ * @property {string} [label]
+ * @property {string} [tooltip]
+ * @property {any} [raw]
+ */
+
+/**
  * SparkMetricCard
  * Fully dynamic, active, and interactive KPI Card with real-time vector SVG sparklines,
  * pulsing telemetry indicator, interactive hover crosshairs, active data points, live tooltips,
  * and automatic slope/trend calculation for value increases and decreases.
+ *
+ * @param {Object} props
+ * @param {'dark' | 'light'} [props.variant='light']
+ * @param {string} [props.title]
+ * @param {string | number} [props.value]
+ * @param {number} [props.previousValue]
+ * @param {string} [props.unit]
+ * @param {string} [props.subtext]
+ * @param {string} [props.badgeText]
+ * @param {'positive' | 'negative' | 'neutral' | 'warning'} [props.badgeType]
+ * @param {'up' | 'down' | 'dot' | 'none'} [props.badgeIcon]
+ * @param {string} [props.chartColor='purple']
+ * @param {'wave1' | 'wave2' | 'wave3' | 'wave4' | 'up' | 'down'} [props.presetWave='wave1']
+ * @param {'auto' | 'up' | 'down' | 'neutral'} [props.trend='auto']
+ * @param {Array<number | { value: number, label?: string, tooltip?: string }>} [props.dataPoints]
+ * @param {React.MouseEventHandler<HTMLDivElement>} [props.onClick]
+ * @param {string} [props.className]
+ * @param {boolean} [props.loading]
  */
 const SparkMetricCard = ({
-  variant = 'light', // 'dark' | 'light'
+  variant = 'light',
   title,
   value,
   previousValue,
   unit,
   subtext,
   badgeText,
-  badgeType, // 'positive' | 'negative' | 'neutral' | 'warning'
-  badgeIcon, // 'up' | 'down' | 'dot' | 'none'
-  chartColor = 'purple', // 'purple' | 'sky' | 'coral' | 'orange' | 'amber' | 'rose' | 'emerald' | 'blue' | 'indigo' | 'teal'
-  presetWave = 'wave1', // 'wave1' | 'wave2' | 'wave3' | 'wave4' | 'up' | 'down'
-  trend = 'auto', // 'auto' | 'up' | 'down' | 'neutral'
-  dataPoints = [], // Array of numbers or objects: { value: number, label?: string, tooltip?: string }
+  badgeType,
+  badgeIcon,
+  chartColor = 'purple',
+  presetWave = 'wave1',
+  trend = 'auto',
+  dataPoints = [],
   onClick,
   className = '',
   loading = false,
 }) => {
   const gradientId = useId().replace(/:/g, '_');
+  /** @type {React.RefObject<any>} */
   const svgRef = useRef(null);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
 
   // Extract numeric magnitude from value (handles numbers or strings like "3", "100%", "< 2")
   const numericVal = useMemo(() => {
@@ -39,6 +66,7 @@ const SparkMetricCard = ({
   }, [value]);
 
   // Color schemes for sparklines & interactive tooltips
+  /** @type {Record<string, { stroke: string; strokeSecondary: string; fillStart: string; fillEnd: string; filterGlow: string; dotColor: string; pulseColor: string; tooltipBg: string; tooltipText: string; }>} */
   const colorSchemes = {
     purple: {
       stroke: '#818CF8',
@@ -298,9 +326,10 @@ const SparkMetricCard = ({
   }, [normalizedPoints]);
 
   // Handle interactive hover over SVG sparkline
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (/** @type {any} */ e) => {
     if (!svgRef.current || !chartGeometry.points.length) return;
     const rect = svgRef.current.getBoundingClientRect();
+    if (!rect || rect.width <= 0) return;
     const relativeX = (e.clientX - rect.left) / rect.width;
     const index = Math.min(
       chartGeometry.points.length - 1,
@@ -310,12 +339,12 @@ const SparkMetricCard = ({
   };
 
   const handleMouseLeave = () => {
-    setHoveredIndex(null);
+    setHoveredIndex(-1);
   };
 
   const isDark = variant === 'dark';
   const isLongValue = typeof value === 'string' && value.length >= 7;
-  const activePoint = hoveredIndex !== null ? chartGeometry.points[hoveredIndex] : null;
+  const activePoint = hoveredIndex >= 0 && hoveredIndex < chartGeometry.points.length ? chartGeometry.points[hoveredIndex] : null;
   const latestPoint = chartGeometry.lastPoint;
 
   // Resolve Badge Text, Badge Icon, and Badge Type
@@ -426,13 +455,13 @@ const SparkMetricCard = ({
             </div>
           )}
 
-          <div className="w-16 sm:w-18 md:w-20 xl:w-24 h-8 sm:h-9 lg:h-10 overflow-visible relative">
+          <div className="w-16 sm:w-20 md:w-20 xl:w-24 h-8 sm:h-9 lg:h-10 overflow-visible relative">
             <svg
               ref={svgRef}
               viewBox="0 0 104 44"
               tabIndex={0}
               role="img"
-              aria-label={`${title} trend over ${normalizedPoints.length} data points. Starting at ${normalizedPoints[0]?.value ?? 0} ${unit || ''}, current value ${value} ${unit || ''} (${movement.isUp ? 'upward' : 'downward'} trend of ${movement.pct}%).`}
+              aria-label={`${title || 'Metric'} trend over ${normalizedPoints.length} data points. Starting at ${normalizedPoints[0]?.value ?? 0} ${unit || ''}, current value ${value ?? 0} ${unit || ''} (${movement.isUp ? 'upward' : 'downward'} trend of ${movement.pct}%).`}
               aria-describedby={activePoint ? `tooltip-${gradientId}` : undefined}
               className="w-full h-full overflow-visible cursor-crosshair group-hover:scale-105 focus:outline-none focus:ring-1 focus:ring-indigo-400 rounded-lg transition-transform duration-300"
               preserveAspectRatio="none"
@@ -457,23 +486,27 @@ const SparkMetricCard = ({
               </defs>
 
               {/* Gradient Filled Area */}
-              <path
-                d={chartGeometry.area}
-                fill={`url(#spark_grad_${gradientId})`}
-                className="transition-all duration-500 ease-out pointer-events-none"
-              />
+              {chartGeometry.area ? (
+                <path
+                  d={chartGeometry.area}
+                  fill={`url(#spark_grad_${gradientId})`}
+                  className="transition-all duration-500 ease-out pointer-events-none"
+                />
+              ) : null}
 
               {/* Glowing Line Stroke */}
-              <path
-                d={chartGeometry.line}
-                fill="none"
-                stroke={scheme.strokeSecondary || scheme.stroke}
-                strokeWidth={variant === 'dark' ? 2.4 : 2.2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transition-all duration-500 ease-out pointer-events-none"
-                style={{ filter: scheme.filterGlow }}
-              />
+              {chartGeometry.line ? (
+                <path
+                  d={chartGeometry.line}
+                  fill="none"
+                  stroke={scheme.strokeSecondary || scheme.stroke}
+                  strokeWidth={variant === 'dark' ? 2.4 : 2.2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="transition-all duration-500 ease-out pointer-events-none"
+                  style={{ filter: scheme.filterGlow }}
+                />
+              ) : null}
 
               {/* Data Point Markers (Visible reference dots along trajectory) */}
               {chartGeometry.points.map((pt, idx) => (
@@ -501,6 +534,9 @@ const SparkMetricCard = ({
                     stroke={scheme.strokeSecondary || scheme.stroke}
                     strokeWidth="1.2"
                     className="animate-ping opacity-60 origin-center"
+                    style={{
+                      transformOrigin: `${latestPoint.x}px ${latestPoint.y}px`,
+                    }}
                   />
                   {/* Outer Glow Circle */}
                   <circle
