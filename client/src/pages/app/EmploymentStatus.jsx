@@ -311,11 +311,11 @@ const EmploymentStatus = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC EMPLOYMENT STATUS HERO BANNER (AMBER-ORANGE LIGHT THEME) */}
+      {/* 1. DYNAMIC EMPLOYMENT STATUS HERO BANNER (SKY BLUE LIGHT THEME) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-50/60 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-amber-200/70 dark:border-amber-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/15 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-orange-300/20 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/20 dark:bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Employment Status Telemetry */}
@@ -329,11 +329,11 @@ const EmploymentStatus = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60">
+              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/70 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <Users className="w-3.5 h-3.5" />
                 <span>{stats.total} Total Active Personnel</span>
               </span>
-              <span className="flex items-center gap-1.5 text-orange-700 dark:text-orange-300 font-bold bg-orange-100/60 dark:bg-orange-950/60 px-3 py-1 rounded-xl border border-orange-200 dark:border-orange-800/60">
+              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
                 <Clock className="w-3.5 h-3.5" />
                 <span>{stats.probation} Contracts / Probation</span>
               </span>
@@ -341,15 +341,15 @@ const EmploymentStatus = () => {
           </div>
 
           {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-amber-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <Briefcase className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
               <div className="text-xs font-extrabold text-slate-900 dark:text-white">Status Overview</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{stats.fullTime} Permanent • {stats.remote} Remote</div>
             </div>
-            <div className="w-full text-center py-2 px-3 bg-amber-50 dark:bg-amber-950/50 rounded-2xl border border-amber-200/60 dark:border-amber-800/40 text-xs font-bold text-amber-700 dark:text-amber-300">
+            <div className="w-full text-center py-2 px-3 bg-sky-50 dark:bg-sky-950/50 rounded-2xl border border-sky-200/60 dark:border-sky-800/40 text-xs font-bold text-sky-700 dark:text-sky-300">
               100% Policy Compliant
             </div>
           </div>
@@ -370,7 +370,7 @@ const EmploymentStatus = () => {
           badgeType="positive"
           badgeIcon="up"
           subtext="Global Org"
-          chartColor="purple"
+          chartColor="sky"
           presetWave="wave1"
           loading={loading}
         />
@@ -400,7 +400,7 @@ const EmploymentStatus = () => {
           badgeType="positive"
           badgeIcon="dot"
           subtext="Distributed Hub"
-          chartColor="amber"
+          chartColor="blue"
           presetWave="wave3"
           loading={loading}
         />
@@ -432,7 +432,7 @@ const EmploymentStatus = () => {
             placeholder="Search by employee name, role, ID, or department..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
           />
         </div>
 
@@ -443,8 +443,8 @@ const EmploymentStatus = () => {
               onClick={() => setTypeFilter(type)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 typeFilter === type
-                  ? 'bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 text-white shadow-md shadow-amber-500/25'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300'
+                  ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 text-white shadow-md shadow-sky-500/25'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-700 dark:hover:text-sky-300'
               }`}
             >
               {type === 'ALL' ? 'All Personnel' : type.replace('_', ' ')}
@@ -460,7 +460,7 @@ const EmploymentStatus = () => {
         <EmployeeCardSkeleton count={6} />
       ) : filtered.length === 0 ? (
         <div className="bg-white dark:bg-[#1E293B] rounded-[32px] p-12 text-center border border-slate-100 dark:border-slate-800 shadow-soft">
-          <Users className="w-12 h-12 text-amber-300 dark:text-amber-600/50 mx-auto mb-3" />
+          <Users className="w-12 h-12 text-sky-300 dark:text-sky-600/50 mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-800 dark:text-white">No personnel found</h3>
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
             No active employee records match your search criteria or classification filter.
@@ -476,16 +476,16 @@ const EmploymentStatus = () => {
             return (
               <div
                 key={emp.id || idx}
-                className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] shadow-soft hover:shadow-xl hover:border-amber-300/80 dark:hover:border-amber-700/70 hover:-translate-y-1 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between"
+                className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] shadow-soft hover:shadow-xl hover:border-sky-300/80 dark:hover:border-sky-700/70 hover:-translate-y-1 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between"
               >
-                {/* Ambient Amber Glow */}
-                <div className="absolute top-0 right-0 w-36 h-36 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+                {/* Ambient Sky Glow */}
+                <div className="absolute top-0 right-0 w-36 h-36 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
 
                 <div className="p-6 pb-2 relative z-10">
                   {/* 1. Header: Avatar with Status Dot + Classification Pill */}
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="relative inline-block">
-                      <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl ring-4 ring-amber-100/70 dark:ring-amber-950/60 shadow-sm overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                      <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl ring-4 ring-sky-100/70 dark:ring-sky-950/60 shadow-sm overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                         <img
                           src={getAvatarUrl(emp)}
                           alt={`${emp.firstName} ${emp.lastName}`}
@@ -519,7 +519,7 @@ const EmploymentStatus = () => {
                   <div>
                     <h3
                       onClick={() => setSelectedEmployee(emp)}
-                      className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer transition-colors"
+                      className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors"
                     >
                       {emp.firstName || ''} {emp.lastName || ''}
                     </h3>
@@ -534,14 +534,14 @@ const EmploymentStatus = () => {
                       )}
                     </p>
 
-                    {/* 3. Shift Schedule Highlight Tile (Thematic Amber Feature) */}
-                    <div className="mt-4 p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 flex items-center justify-between gap-2.5">
+                    {/* 3. Shift Schedule Highlight Tile (Thematic Sky Blue Feature) */}
+                    <div className="mt-4 p-3 rounded-2xl bg-sky-50/70 dark:bg-sky-950/20 border border-sky-200/60 dark:border-sky-900/40 flex items-center justify-between gap-2.5">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 flex items-center justify-center shrink-0">
                           <Clock className="w-4 h-4 stroke-[2.2]" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-amber-800/70 dark:text-amber-400 tracking-wider block">
+                          <span className="text-[10px] uppercase font-bold text-sky-800/70 dark:text-sky-400 tracking-wider block">
                             Assigned Shift
                           </span>
                           <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block">
@@ -552,7 +552,7 @@ const EmploymentStatus = () => {
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(emp)}
-                        className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60 shrink-0 transition-colors cursor-pointer"
+                        className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 shrink-0 transition-colors cursor-pointer"
                       >
                         Change
                       </button>
@@ -561,7 +561,7 @@ const EmploymentStatus = () => {
                     {/* 4. Telemetry details (Location, Email, Phone) */}
                     <div className="space-y-2 mt-3.5 text-xs font-normal text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-2.5">
-                        <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                         <span className="truncate">
                           {emp.profile?.address || emp.profile?.location || emp.location || emp.address || '42 Silicon Avenue, Tech City'}
                         </span>
@@ -571,7 +571,7 @@ const EmploymentStatus = () => {
                         {emp.email ? (
                           <a
                             href={`mailto:${emp.email}`}
-                            className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors truncate"
+                            className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors truncate"
                           >
                             {emp.email}
                           </a>
@@ -584,7 +584,7 @@ const EmploymentStatus = () => {
                         {emp.phone || emp.profile?.phone ? (
                           <a
                             href={`tel:${emp.phone || emp.profile?.phone}`}
-                            className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors truncate"
+                            className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors truncate"
                           >
                             {emp.phone || emp.profile?.phone}
                           </a>
@@ -599,7 +599,7 @@ const EmploymentStatus = () => {
                 {/* 5. Footer: Joined Date & Rounded Action Icons */}
                 <div className="px-6 pb-6 pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium text-slate-400">
-                    <Calendar className="w-3.5 h-3.5 text-amber-500/70 shrink-0" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-500/70 shrink-0" />
                     <span>Joined {formatJoiningDate(emp.profile?.joiningDate || emp.joiningDate || emp.createdAt)}</span>
                   </div>
 
@@ -608,7 +608,7 @@ const EmploymentStatus = () => {
                     <button
                       type="button"
                       onClick={() => setSelectedEmployee(emp)}
-                      className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-amber-100 dark:bg-slate-800 dark:hover:bg-amber-950/60 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60 hover:scale-105"
+                      className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-sky-100 dark:bg-slate-800 dark:hover:bg-sky-950/60 text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60 hover:scale-105"
                       title="Full Profile Dossier"
                     >
                       <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
@@ -618,7 +618,7 @@ const EmploymentStatus = () => {
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(emp)}
-                      className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs shadow-md shadow-amber-500/20 flex items-center gap-1.5 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-1.5 cursor-pointer transition-all hover:scale-105 active:scale-95"
                       title="Update Shift & Status"
                     >
                       <Edit3 className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -647,14 +647,14 @@ const EmploymentStatus = () => {
       {/* ========================================================================= */}
       {selectedEmp && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full shadow-2xl border border-amber-200/60 dark:border-amber-800/60 overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-orange-300/20 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full shadow-2xl border border-sky-200/60 dark:border-sky-800/60 overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-amber-100/80 dark:border-amber-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-amber-50/90 via-orange-50/80 to-yellow-50/60 dark:from-amber-950/60 dark:via-orange-950/40 dark:to-[#1E293B] relative z-10">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-100/80 dark:border-sky-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/60 dark:via-sky-900/40 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-500/25 ring-4 ring-amber-500/15 shrink-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15 shrink-0">
                   <Briefcase className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -683,7 +683,7 @@ const EmploymentStatus = () => {
                 <select
                   value={selectedEmp.employmentType}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, employmentType: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer transition-all"
                 >
                   <option value="FULL_TIME">Full-Time Permanent</option>
                   <option value="REMOTE">Full-Time Remote</option>
@@ -699,7 +699,7 @@ const EmploymentStatus = () => {
                 <select
                   value={selectedEmp.shift}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, shift: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none cursor-pointer transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer transition-all"
                 >
                   <option value="General Morning (09:00 - 17:30)">General Shift (09:00 AM - 05:30 PM)</option>
                   <option value="Flexible Remote">Flexible Remote (Asynchronous)</option>
@@ -717,14 +717,14 @@ const EmploymentStatus = () => {
                   required
                   value={selectedEmp.location}
                   onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
                 />
               </div>
 
               {/* Live Preview Card */}
-              <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50/70 via-orange-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-amber-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-sky-50/70 via-cyan-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-sky-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-extrabold text-xs shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-extrabold text-xs shadow-sm">
                     {selectedEmp.employmentType === 'FULL_TIME'
                       ? 'FT'
                       : selectedEmp.employmentType === 'REMOTE'
@@ -770,7 +770,7 @@ const EmploymentStatus = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs shadow-md shadow-amber-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
                 >
                   {saving ? (
                     <>
@@ -795,14 +795,14 @@ const EmploymentStatus = () => {
       {/* ========================================================================= */}
       {selectedEmployee && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full p-6 sm:p-7 shadow-2xl border border-amber-200/60 dark:border-amber-800/60 space-y-4 animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full p-6 sm:p-7 shadow-2xl border border-sky-200/60 dark:border-sky-800/60 space-y-4 animate-in zoom-in-95 duration-200 relative">
             {/* Profile Header */}
-            <div className="flex items-start justify-between border-b border-amber-100/80 dark:border-amber-800/60 pb-5">
+            <div className="flex items-start justify-between border-b border-sky-100/80 dark:border-sky-800/60 pb-5">
               <div className="flex items-center gap-4">
                 <img
                   src={getAvatarUrl(selectedEmployee)}
                   alt=""
-                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-amber-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
+                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-sky-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
                   onError={(e) => {
                     e.target.src = DEFAULT_BLANK_AVATAR;
                   }}
@@ -816,7 +816,7 @@ const EmploymentStatus = () => {
                   <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     {selectedEmployee.firstName} {selectedEmployee.lastName}
                   </h3>
-                  <p className="text-xs font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">
+                  <p className="text-xs font-bold text-sky-600 dark:text-sky-400 whitespace-nowrap">
                     {selectedEmployee.profile?.designation?.title || 'Staff Member'} • {selectedEmployee.profile?.department?.name || 'Engineering'}
                   </p>
                 </div>
@@ -874,7 +874,7 @@ const EmploymentStatus = () => {
                     setSelectedEmployee(null);
                     handleOpenEdit(toEdit);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-extrabold hover:bg-amber-600 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
+                  className="px-4 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-extrabold hover:bg-sky-600 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit Profile</span>

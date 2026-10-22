@@ -16,7 +16,7 @@ const SparkMetricCard = ({
   badgeText,
   badgeType, // 'positive' | 'negative' | 'neutral' | 'warning'
   badgeIcon, // 'up' | 'down' | 'dot' | 'none'
-  chartColor = 'purple', // 'purple' | 'orange' | 'amber' | 'rose' | 'emerald' | 'blue' | 'indigo' | 'teal'
+  chartColor = 'purple', // 'purple' | 'sky' | 'coral' | 'orange' | 'amber' | 'rose' | 'emerald' | 'blue' | 'indigo' | 'teal'
   presetWave = 'wave1', // 'wave1' | 'wave2' | 'wave3' | 'wave4' | 'up' | 'down'
   trend = 'auto', // 'auto' | 'up' | 'down' | 'neutral'
   dataPoints = [], // Array of numbers or objects: { value: number, label?: string, tooltip?: string }
@@ -30,10 +30,10 @@ const SparkMetricCard = ({
 
   // Extract numeric magnitude from value (handles numbers or strings like "3", "100%", "< 2")
   const numericVal = useMemo(() => {
-    if (typeof value === 'number') return value;
+    if (typeof value === 'number') return isNaN(value) ? 0 : value;
     if (typeof value === 'string') {
       const match = value.match(/[-+]?[0-9]*\.?[0-9]+/);
-      return match ? parseFloat(match[0]) : 0;
+      return match ? (isNaN(parseFloat(match[0])) ? 0 : parseFloat(match[0])) : 0;
     }
     return 0;
   }, [value]);
@@ -50,6 +50,28 @@ const SparkMetricCard = ({
       pulseColor: 'rgba(129, 140, 248, 0.5)',
       tooltipBg: '#1E1B4B',
       tooltipText: '#E0E7FF',
+    },
+    sky: {
+      stroke: '#38BDF8',
+      strokeSecondary: '#0284C7',
+      fillStart: 'rgba(56, 189, 248, 0.35)',
+      fillEnd: 'rgba(56, 189, 248, 0.0)',
+      filterGlow: 'drop-shadow(0 2px 5px rgba(56, 189, 248, 0.35))',
+      dotColor: '#BAE6FD',
+      pulseColor: 'rgba(56, 189, 248, 0.5)',
+      tooltipBg: '#082F49',
+      tooltipText: '#E0F2FE',
+    },
+    coral: {
+      stroke: '#F43F5E',
+      strokeSecondary: '#E11D48',
+      fillStart: 'rgba(244, 63, 94, 0.35)',
+      fillEnd: 'rgba(244, 63, 94, 0.0)',
+      filterGlow: 'drop-shadow(0 2px 6px rgba(244, 63, 94, 0.4))',
+      dotColor: '#FDA4AF',
+      pulseColor: 'rgba(244, 63, 94, 0.5)',
+      tooltipBg: '#4C0519',
+      tooltipText: '#FFE4E6',
     },
     orange: {
       stroke: '#FB923C',
@@ -137,10 +159,12 @@ const SparkMetricCard = ({
     if (dataPoints && dataPoints.length >= 2) {
       return dataPoints.map((item, idx) => {
         if (typeof item === 'number') {
-          return { value: item, label: `Point ${idx + 1}`, raw: item };
+          const val = isNaN(item) ? 0 : item;
+          return { value: val, label: `Point ${idx + 1}`, raw: val };
         }
+        const val = typeof item?.value === 'number' && !isNaN(item.value) ? item.value : 0;
         return {
-          value: typeof item?.value === 'number' ? item.value : 0,
+          value: val,
           label: item?.label || `Point ${idx + 1}`,
           tooltip: item?.tooltip,
           raw: item,
@@ -149,14 +173,14 @@ const SparkMetricCard = ({
     }
 
     // Dynamic wave synthesis based on current numeric value & preset wave
-    const current = Math.max(0, numericVal);
+    const current = Math.max(0, isNaN(numericVal) ? 0 : numericVal);
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
 
     // Determine movement slope
     const isDownTrend =
       trend === 'down' ||
       presetWave === 'down' ||
-      (typeof previousValue === 'number' && previousValue > current);
+      (typeof previousValue === 'number' && !isNaN(previousValue) && previousValue > current);
 
     let multipliers;
     if (isDownTrend) {
@@ -175,25 +199,26 @@ const SparkMetricCard = ({
 
     return multipliers.map((mult, i) => {
       const pointVal = Math.round((current === 0 ? (isDownTrend ? 4 - i * 0.6 : i * 0.6) : current * mult) * 10) / 10;
+      const safePointVal = isNaN(pointVal) ? 0 : Math.max(0, pointVal);
       return {
-        value: Math.max(0, pointVal),
+        value: safePointVal,
         label: days[i],
-        tooltip: `${days[i]}: ${pointVal} ${unit || ''}`.trim(),
-        raw: pointVal,
+        tooltip: `${days[i]}: ${safePointVal} ${unit || ''}`.trim(),
+        raw: safePointVal,
       };
     });
   }, [dataPoints, numericVal, presetWave, trend, previousValue, unit]);
 
   // Determine computed movement: upward, downward, or steady
   const movement = useMemo(() => {
-    if (normalizedPoints.length < 2) return { isUp: true, pct: 0 };
-    const first = normalizedPoints[0].value;
-    const last = normalizedPoints[normalizedPoints.length - 1].value;
+    if (!normalizedPoints || normalizedPoints.length < 2) return { isUp: true, pct: 0, diff: 0 };
+    const first = typeof normalizedPoints[0]?.value === 'number' && !isNaN(normalizedPoints[0].value) ? normalizedPoints[0].value : 0;
+    const last = typeof normalizedPoints[normalizedPoints.length - 1]?.value === 'number' && !isNaN(normalizedPoints[normalizedPoints.length - 1].value) ? normalizedPoints[normalizedPoints.length - 1].value : 0;
     const diff = last - first;
     const pct = first > 0 ? Math.round((diff / first) * 100) : (last > 0 ? 100 : 0);
     return {
       isUp: diff >= 0,
-      pct: Math.abs(pct),
+      pct: isNaN(pct) ? 0 : Math.abs(pct),
       diff,
     };
   }, [normalizedPoints]);
@@ -206,7 +231,11 @@ const SparkMetricCard = ({
     const paddingTop = 6;
     const paddingBottom = 6;
 
-    const values = normalizedPoints.map((p) => p.value);
+    if (!normalizedPoints || normalizedPoints.length < 2) {
+      return { line: '', area: '', points: [], lastPoint: null };
+    }
+
+    const values = normalizedPoints.map((p) => (typeof p.value === 'number' && !isNaN(p.value) ? p.value : 0));
     const min = Math.min(...values);
     const max = Math.max(...values);
     const isFlat = max === min;
@@ -225,13 +254,16 @@ const SparkMetricCard = ({
         y = height - paddingBottom - normalizedH * (height - paddingTop - paddingBottom);
       } else {
         const range = max - min;
-        const normalizedY = (p.value - min) / range;
+        const normalizedY = range !== 0 ? (p.value - min) / range : 0.5;
         y = height - paddingBottom - normalizedY * (height - paddingTop - paddingBottom);
       }
 
+      const safeX = isNaN(x) ? paddingX : Math.round(x * 10) / 10;
+      const safeY = isNaN(y) ? height / 2 : Math.round(y * 10) / 10;
+
       return {
-        x: Math.round(x * 10) / 10,
-        y: Math.round(y * 10) / 10,
+        x: safeX,
+        y: safeY,
         value: p.value,
         label: p.label,
         tooltip: p.tooltip || `${p.label}: ${p.value}`,
@@ -286,7 +318,16 @@ const SparkMetricCard = ({
   const activePoint = hoveredIndex !== null ? chartGeometry.points[hoveredIndex] : null;
   const latestPoint = chartGeometry.lastPoint;
 
-
+  // Resolve Badge Text, Badge Icon, and Badge Type
+  const resolvedBadgeText = badgeText || (movement.isUp ? `+${movement.pct}%` : `-${movement.pct}%`);
+  const resolvedBadgeIcon =
+    badgeIcon !== undefined
+      ? badgeIcon
+      : movement.isUp
+      ? 'up'
+      : 'down';
+  const resolvedBadgeType =
+    badgeType || (movement.isUp ? 'positive' : 'negative');
 
   if (loading) {
     return (
@@ -304,8 +345,9 @@ const SparkMetricCard = ({
           </div>
           <div className="w-24 h-11 skeleton-shimmer animate-pulse rounded-lg" />
         </div>
-        <div className="pt-3 flex items-center border-t border-slate-100/50 dark:border-slate-800/40">
-          <div className="skeleton-shimmer animate-pulse h-3 w-28 rounded-lg" />
+        <div className="pt-3 flex items-center justify-between border-t border-slate-100/50 dark:border-slate-800/40">
+          <div className="skeleton-shimmer animate-pulse h-4 w-16 rounded-full" />
+          <div className="skeleton-shimmer animate-pulse h-3 w-16 rounded-md" />
         </div>
       </div>
     );
@@ -529,20 +571,49 @@ const SparkMetricCard = ({
         </div>
       </div>
 
-      {/* Bottom Section: Subtext */}
-      {subtext ? (
-        <div className="mt-auto pt-3 flex items-center border-t border-transparent">
+      {/* Bottom Section: Trend Pill Badge & Subtext */}
+      <div className="mt-auto pt-3 flex items-center justify-between gap-1.5 border-t border-transparent">
+        {resolvedBadgeText && (
           <span
-            className={`text-xs font-semibold truncate ${
+            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-tight shadow-2xs transition-colors shrink-0 ${
+              isDark
+                ? resolvedBadgeType === 'negative'
+                  ? 'bg-rose-950/70 text-rose-400 border border-rose-800/50'
+                  : resolvedBadgeType === 'warning'
+                  ? 'bg-amber-950/70 text-amber-400 border border-amber-800/50'
+                  : resolvedBadgeType === 'neutral'
+                  ? 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
+                  : 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50'
+                : resolvedBadgeType === 'negative'
+                ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/70 dark:border-rose-800/40'
+                : resolvedBadgeType === 'warning'
+                ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-800/40'
+                : resolvedBadgeType === 'neutral'
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
+                : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
+            }`}
+          >
+            {resolvedBadgeIcon === 'none' ? null : resolvedBadgeIcon === 'dot' ? (
+              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+            ) : resolvedBadgeType === 'negative' || resolvedBadgeIcon === 'down' ? (
+              <span className="text-xs leading-none">↘</span>
+            ) : (
+              <span className="text-xs leading-none">↗</span>
+            )}
+            <span>{resolvedBadgeText}</span>
+          </span>
+        )}
+
+        {subtext && (
+          <span
+            className={`text-xs font-semibold truncate text-right pl-1 ${
               isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
             }`}
           >
             {subtext}
           </span>
-        </div>
-      ) : (
-        <div className="mt-auto" />
-      )}
+        )}
+      </div>
     </div>
   );
 };
