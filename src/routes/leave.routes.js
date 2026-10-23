@@ -17,6 +17,15 @@ router.use(verifyToken, requireTenant);
 
 const canManageLeaves = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
 
+// Smart handler for requests: managers get full company leave requests; employees get their personal leave requests
+const handleGetLeaveRequests = (req, res, next) => {
+  const isElevatedRole = ['ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN'].includes(req.user?.role);
+  if (isElevatedRole && req.query.mine !== 'true') {
+    return getCompanyLeaveRequests(req, res, next);
+  }
+  return getMyLeaveRequests(req, res, next);
+};
+
 // Leave Types Configuration (Admin/HR)
 router.post('/types', canManageLeaves, createLeaveType);
 router.get('/types', cacheService.middleware({ ttlSeconds: 120, tags: ['leaves'] }), getLeaveTypes);
@@ -26,9 +35,9 @@ router.post('/apply', applyLeave);
 router.post('/request', applyLeave);
 router.get('/my-requests', cacheService.middleware({ ttlSeconds: 60, tags: ['leaves'] }), getMyLeaveRequests);
 
-// Admin/HR Leave Workflows
-router.get('/', canManageLeaves, cacheService.middleware({ ttlSeconds: 60, tags: ['leaves'] }), getCompanyLeaveRequests);
-router.get('/requests', canManageLeaves, cacheService.middleware({ ttlSeconds: 60, tags: ['leaves'] }), getCompanyLeaveRequests);
+// Dynamic Leave Workflows (Smart role dispatch)
+router.get('/', cacheService.middleware({ ttlSeconds: 60, tags: ['leaves'] }), handleGetLeaveRequests);
+router.get('/requests', cacheService.middleware({ ttlSeconds: 60, tags: ['leaves'] }), handleGetLeaveRequests);
 router.put('/:id/status', canManageLeaves, updateLeaveStatus);
 router.patch('/:id/status', canManageLeaves, updateLeaveStatus);
 router.patch('/requests/:id/status', canManageLeaves, updateLeaveStatus);

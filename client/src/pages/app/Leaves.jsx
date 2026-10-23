@@ -18,6 +18,7 @@ import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
+import { broadcastAppEvent, subscribeAppEvent } from '../../utils/crossTabSync';
 
 const Leaves = () => {
   const [requests, setRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
@@ -46,14 +47,17 @@ const Leaves = () => {
     setTimeout(() => setToastMsg(''), 3000);
   };
 
-  const fetchLeaveData = async () => {
-    if (!api.hasCached('/leaves/requests')) {
+  const fetchLeaveData = async (bypass = false) => {
+    if (bypass) {
+      api.invalidateLeavesCache();
+    } else if (!api.hasCached('/leaves/requests')) {
       setLoading(true);
     }
     try {
+      const opts = bypass ? { bypassCache: true } : {};
       const [reqRes, typesRes, empRes] = await Promise.allSettled([
-        api.getLeaveRequests(),
-        api.getLeaveTypes(),
+        api.getLeaveRequests({}, opts),
+        api.getLeaveTypes(opts),
         api.getEmployees(),
       ]);
 
@@ -81,8 +85,17 @@ const Leaves = () => {
 
   useEffect(() => {
     fetchLeaveData();
-    window.addEventListener('nexahr_leaves_updated', fetchLeaveData);
-    return () => window.removeEventListener('nexahr_leaves_updated', fetchLeaveData);
+    const unsub = subscribeAppEvent('nexahr_leaves_updated', () => {
+      fetchLeaveData(true);
+    });
+    const handleFocus = () => {
+      fetchLeaveData(true);
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      unsub();
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const handleOpenApplyModal = () => {
@@ -128,7 +141,8 @@ const Leaves = () => {
 
       setSelectedReq(null);
       setRemarksInput('');
-      window.dispatchEvent(new Event('nexahr_leaves_updated'));
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
       showToast(`Leave request marked as ${newStatus}!`);
     } catch (err) {
       console.error('Failed to update leave status:', err);
@@ -156,8 +170,9 @@ const Leaves = () => {
         leaveTypeId: effectiveLeaveTypeId,
         reason: applyForm.reason.trim(),
       });
-      await fetchLeaveData();
-      window.dispatchEvent(new Event('nexahr_leaves_updated'));
+      await fetchLeaveData(true);
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
       setIsApplyOpen(false);
       setApplyForm({
         userId: employees[0]?.id || '',

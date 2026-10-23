@@ -362,13 +362,18 @@ export const api = {
 
 
   // --- Leaves ---
-  getLeaveRequests: async (params = {}) => {
+  getMyLeaveRequests: async (params = {}, options = {}) => {
     const query = new URLSearchParams(params).toString();
-    return await fetchAPI(`/leaves/requests${query ? `?${query}` : ''}`);
+    return await fetchAPI(`/leaves/my-requests${query ? `?${query}` : ''}`, options);
   },
 
-  getLeaveTypes: async () => {
-    return await fetchAPI('/leaves/types');
+  getLeaveRequests: async (params = {}, options = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/leaves/requests${query ? `?${query}` : ''}`, options);
+  },
+
+  getLeaveTypes: async (options = {}) => {
+    return await fetchAPI('/leaves/types', options);
   },
 
   createLeaveType: async (leaveData) => {
@@ -390,6 +395,11 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify(statusData),
     });
+  },
+
+  invalidateLeavesCache: () => {
+    invalidateClientCache('/leaves');
+    invalidateClientCache('/dashboard');
   },
 
   // --- Payroll ---

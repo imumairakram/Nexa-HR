@@ -30,6 +30,7 @@ import { AnnouncementSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 import { getYearHolidays } from '../../utils/holidayEngine';
+import { subscribeAppEvent } from '../../utils/crossTabSync';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const EmployeeDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dashboardData, setDashboardData] = useState(() => api.getCached('/dashboard/employee')?.data || null);
   const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
-  const [leaveRequests, setLeaveRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
+  const [leaveRequests, setLeaveRequests] = useState(() => api.getCached('/leaves/my-requests')?.data?.leaveRequests || api.getCached('/leaves/requests')?.data?.leaveRequests || []);
   const [announcements, setAnnouncements] = useState(() => api.getCached('/announcements')?.data?.announcements || []);
   const [attendanceLogs, setAttendanceLogs] = useState(() => api.getCached('/attendance/my-logs?limit=14')?.data?.attendances || []);
   const [payslipHistory, setPayslipHistory] = useState(() => api.getCached('/payroll/my-payslips')?.data?.payslips || []);
@@ -54,18 +55,21 @@ const EmployeeDashboard = () => {
   }, []);
 
   // Fetch real database attendance, history & dashboard metrics
-  const fetchDashboard = async () => {
-    if (!api.hasCached('/dashboard/employee')) {
+  const fetchDashboard = async (bypass = false) => {
+    if (bypass) {
+      api.invalidateLeavesCache();
+    } else if (!api.hasCached('/dashboard/employee')) {
       setLoading(true);
     }
     try {
+      const opts = bypass ? { bypassCache: true } : {};
       const [dashRes, leaveRes, reqRes, annRes, logsRes, payRes] = await Promise.allSettled([
-        api.getEmployeeDashboard(),
-        api.getLeaveTypes(),
-        api.getLeaveRequests(),
-        api.getAnnouncements(),
-        api.getMyAttendanceLogs ? api.getMyAttendanceLogs({ limit: 14 }) : Promise.resolve(null),
-        api.getMyPayslips ? api.getMyPayslips() : Promise.resolve(null),
+        api.getEmployeeDashboard(opts),
+        api.getLeaveTypes(opts),
+        api.getMyLeaveRequests({}, opts),
+        api.getAnnouncements(opts),
+        api.getMyAttendanceLogs ? api.getMyAttendanceLogs({ limit: 14 }, opts) : Promise.resolve(null),
+        api.getMyPayslips ? api.getMyPayslips(opts) : Promise.resolve(null),
       ]);
 
       if (dashRes.status === 'fulfilled' && dashRes.value?.data) {
@@ -98,13 +102,19 @@ const EmployeeDashboard = () => {
     fetchDashboard();
 
     // Auto-listen to global updates for live synchronization
+    const unsubLeaves = subscribeAppEvent('nexahr_leaves_updated', () => fetchDashboard(true));
     window.addEventListener('nexahr_punch_updated', fetchDashboard);
     window.addEventListener('nexahr_notification_updated', fetchDashboard);
     window.addEventListener('user_profile_updated', fetchDashboard);
+    const handleFocus = () => fetchDashboard(true);
+    window.addEventListener('focus', handleFocus);
+
     return () => {
+      unsubLeaves();
       window.removeEventListener('nexahr_punch_updated', fetchDashboard);
       window.removeEventListener('nexahr_notification_updated', fetchDashboard);
       window.removeEventListener('user_profile_updated', fetchDashboard);
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 

@@ -15,16 +15,24 @@ import {
   Check,
   MessageSquare,
   Sparkles,
+  Search,
+  Filter,
+  Eye,
+  UserCheck,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
+import { broadcastAppEvent, subscribeAppEvent } from '../../utils/crossTabSync';
 
 const EmployeeLeaves = () => {
   const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
-  const [requests, setRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
-  const [loading, setLoading] = useState(() => !api.hasCached('/leaves/requests'));
+  const [requests, setRequests] = useState(() => api.getCached('/leaves/my-requests')?.data?.leaveRequests || api.getCached('/leaves/requests')?.data?.leaveRequests || []);
+  const [loading, setLoading] = useState(() => !api.hasCached('/leaves/my-requests') && !api.hasCached('/leaves/requests'));
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedReq, setSelectedReq] = useState(null);
   const [isApplyOpen, setIsApplyOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -40,23 +48,26 @@ const EmployeeLeaves = () => {
 
   const showToast = (msg) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3000);
+    setTimeout(() => setToastMsg(''), 3500);
   };
 
-  const fetchMyLeaves = async () => {
-    if (!api.hasCached('/leaves/requests')) {
+  const fetchMyLeaves = async (bypass = false) => {
+    if (bypass) {
+      api.invalidateLeavesCache();
+    } else if (!api.hasCached('/leaves/my-requests') && !api.hasCached('/leaves/requests')) {
       setLoading(true);
     }
     try {
+      const opts = bypass ? { bypassCache: true } : {};
       const [typesRes, reqRes] = await Promise.allSettled([
-        api.getLeaveTypes(),
-        api.getLeaveRequests(),
+        api.getLeaveTypes(opts),
+        api.getMyLeaveRequests({}, opts),
       ]);
 
       if (typesRes.status === 'fulfilled' && typesRes.value?.data?.leaveTypes) {
         setLeaveTypes(typesRes.value.data.leaveTypes);
         if (typesRes.value.data.leaveTypes.length > 0) {
-          setLeaveForm((prev) => ({ ...prev, leaveTypeId: typesRes.value.data.leaveTypes[0].id }));
+          setLeaveForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
         }
       }
       if (reqRes.status === 'fulfilled' && reqRes.value?.data?.leaveRequests) {
@@ -71,8 +82,28 @@ const EmployeeLeaves = () => {
 
   useEffect(() => {
     fetchMyLeaves();
-    window.addEventListener('nexahr_leaves_updated', fetchMyLeaves);
-    return () => window.removeEventListener('nexahr_leaves_updated', fetchMyLeaves);
+
+    // Cross-tab and local event sync
+    const unsub = subscribeAppEvent('nexahr_leaves_updated', () => {
+      fetchMyLeaves(true);
+    });
+
+    // Auto-refresh when tab gains focus
+    const handleFocus = () => {
+      fetchMyLeaves(true);
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // Periodic silent sync for live liveness
+    const interval = setInterval(() => {
+      fetchMyLeaves(false);
+    }, 20000);
+
+    return () => {
+      unsub();
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, []);
 
   const calculateDays = () => {
@@ -99,8 +130,9 @@ const EmployeeLeaves = () => {
         reason: leaveForm.reason.trim(),
       });
 
-      await fetchMyLeaves();
-      window.dispatchEvent(new Event('nexahr_leaves_updated'));
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
+      await fetchMyLeaves(true);
       setIsApplyOpen(false);
       setLeaveForm({
         leaveTypeId: leaveTypes[0]?.id || '',
@@ -119,57 +151,88 @@ const EmployeeLeaves = () => {
   };
 
   // Compute live quota balances
-  const quotaCards = leaveTypes.map((lt, idx) => {
-    const usedDays = requests
-      .filter((r) => r.leaveTypeId === lt.id && r.status === 'APPROVED')
-      .reduce((acc, r) => acc + (Number(r.totalDays) || 1), 0);
-    const pendingDays = requests
-      .filter((r) => r.leaveTypeId === lt.id && r.status === 'PENDING')
-      .reduce((acc, r) => acc + (Number(r.totalDays) || 1), 0);
-    const available = Math.max(0, lt.daysAllowed - usedDays);
-    const percent = Math.min(100, Math.max(0, Math.round((available / (lt.daysAllowed || 1)) * 100)));
+  const quotaCards = useMemo(() => {
+    return leaveTypes.map((lt, idx) => {
+      const usedDays = requests
+        .filter((r) => (r.leaveTypeId === lt.id || r.leaveType?.id === lt.id || r.leaveType?.name === lt.name || r.leaveType?.code === lt.code) && r.status === 'APPROVED')
+        .reduce((acc, r) => acc + (Number(r.totalDays) || 1), 0);
+      const pendingDays = requests
+        .filter((r) => (r.leaveTypeId === lt.id || r.leaveType?.id === lt.id || r.leaveType?.name === lt.name || r.leaveType?.code === lt.code) && r.status === 'PENDING')
+        .reduce((acc, r) => acc + (Number(r.totalDays) || 1), 0);
+      const available = Math.max(0, lt.daysAllowed - usedDays);
+      const percent = Math.min(100, Math.max(0, Math.round((available / (lt.daysAllowed || 1)) * 100)));
 
-    const themes = [
-      {
-        gradient: 'from-emerald-500 to-teal-600',
-        badgeBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60',
-        iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400',
-        accentBar: 'bg-emerald-500',
-      },
-      {
-        gradient: 'from-blue-500 to-indigo-600',
-        badgeBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border-blue-200/60',
-        iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-        accentBar: 'bg-blue-500',
-      },
-      {
-        gradient: 'from-amber-500 to-orange-600',
-        badgeBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60',
-        iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400',
-        accentBar: 'bg-amber-500',
-      },
-      {
-        gradient: 'from-purple-500 to-pink-600',
-        badgeBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 border-purple-200/60',
-        iconBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400',
-        accentBar: 'bg-purple-500',
-      },
-    ];
+      const themes = [
+        {
+          gradient: 'from-emerald-500 to-teal-600',
+          badgeBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60',
+          iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400',
+          accentBar: 'bg-emerald-500',
+        },
+        {
+          gradient: 'from-blue-500 to-indigo-600',
+          badgeBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border-blue-200/60',
+          iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
+          accentBar: 'bg-blue-500',
+        },
+        {
+          gradient: 'from-amber-500 to-orange-600',
+          badgeBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60',
+          iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400',
+          accentBar: 'bg-amber-500',
+        },
+        {
+          gradient: 'from-purple-500 to-pink-600',
+          badgeBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 border-purple-200/60',
+          iconBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400',
+          accentBar: 'bg-purple-500',
+        },
+      ];
 
-    return {
-      type: lt.name,
-      total: lt.daysAllowed,
-      used: usedDays,
-      pending: pendingDays,
-      available,
-      percent,
-      theme: themes[idx % themes.length],
-    };
-  });
+      return {
+        type: lt.name,
+        total: lt.daysAllowed,
+        used: usedDays,
+        pending: pendingDays,
+        available,
+        percent,
+        theme: themes[idx % themes.length],
+      };
+    });
+  }, [leaveTypes, requests]);
+
+  const stats = useMemo(() => ({
+    total: requests.length,
+    pending: requests.filter((r) => r.status === 'PENDING').length,
+    approved: requests.filter((r) => r.status === 'APPROVED').length,
+    rejected: requests.filter((r) => r.status === 'REJECTED').length,
+  }), [requests]);
+
+  const filteredRequests = useMemo(() => {
+    return requests.filter((r) => {
+      const type = (r.leaveType?.name || '').toLowerCase();
+      const reason = (r.reason || '').toLowerCase();
+      const remarks = (r.rejectionReason || '').toLowerCase();
+      const approver = `${r.approvedBy?.firstName || ''} ${r.approvedBy?.lastName || ''}`.toLowerCase();
+      const query = searchQuery.toLowerCase().trim();
+
+      const matchesSearch =
+        !query ||
+        type.includes(query) ||
+        reason.includes(query) ||
+        remarks.includes(query) ||
+        approver.includes(query) ||
+        (r.startDate && r.startDate.includes(query)) ||
+        (r.endDate && r.endDate.includes(query));
+
+      const matchesStatus = statusFilter === 'ALL' || r.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [requests, searchQuery, statusFilter]);
 
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
   const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
-  const totalPendingRequests = requests.filter((r) => r.status === 'PENDING').length;
+  const totalPendingRequests = stats.pending;
   const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || quotaCards[0] || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
   const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || quotaCards[1] || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
 
@@ -210,28 +273,25 @@ const EmployeeLeaves = () => {
   }, [sickCard]);
 
   const pendingSparkData = useMemo(() => {
-    const approved = requests.filter((r) => r.status === 'APPROVED').length;
-    const pending = requests.filter((r) => r.status === 'PENDING').length;
-    const rejected = requests.filter((r) => r.status === 'REJECTED').length;
     return [
-      { value: requests.length, label: 'Total', tooltip: `Total Submitted: ${requests.length} Requests` },
-      { value: approved, label: 'Approved', tooltip: `Approved: ${approved} Requests` },
-      { value: pending, label: 'Pending', tooltip: `Pending Review: ${pending} Requests` },
-      { value: rejected, label: 'Rejected', tooltip: `Rejected: ${rejected} Requests` },
+      { value: stats.total, label: 'Total', tooltip: `Total Submissions: ${stats.total} Requests` },
+      { value: stats.approved, label: 'Approved', tooltip: `Approved: ${stats.approved} Requests` },
+      { value: stats.pending, label: 'Pending', tooltip: `Pending Review: ${stats.pending} Requests` },
+      { value: stats.rejected, label: 'Rejected', tooltip: `Declined: ${stats.rejected} Requests` },
     ];
-  }, [requests]);
+  }, [stats]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
         title="My Leaves & Time-Off"
-        subtitle="Manage leave balances, submit vacation or sick leave, and track approvals."
-        onRefresh={fetchMyLeaves}
+        subtitle="Manage leave balances, submit vacation or sick leave, and track real-time approval status."
+        onRefresh={() => fetchMyLeaves(true)}
         loading={loading}
       />
 
       {toastMsg && (
-        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toastMsg}</span>
         </div>
@@ -252,18 +312,22 @@ const EmployeeLeaves = () => {
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
-              Track your remaining annual vacation, medical days, and casual leave quotas. Time-off requests are routed automatically for department supervisor approval.
+              Track your remaining annual vacation, medical days, and casual leave quotas. Applications are routed live for management review.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold pt-1">
+              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/70 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <CalendarDays className="w-3.5 h-3.5" />
                 <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves})</span>
               </span>
-              {totalPendingRequests > 0 && (
-                <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/60">
+              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/70 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{stats.approved} Leaves Approved</span>
+              </span>
+              {stats.pending > 0 && (
+                <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-bold bg-amber-100/70 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60 animate-pulse">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>{totalPendingRequests} Request{totalPendingRequests > 1 ? 's' : ''} Pending Review</span>
+                  <span>{stats.pending} Request{stats.pending > 1 ? 's' : ''} Pending Review</span>
                 </span>
               )}
             </div>
@@ -334,7 +398,7 @@ const EmployeeLeaves = () => {
           badgeText={`${sickCard.percent}% Available`}
           badgeType={sickCard.used === 0 ? 'positive' : 'neutral'}
           badgeIcon={sickCard.used === 0 ? 'up' : 'dot'}
-          subtext={sickCard.pending > 0 ? `${sickCard.pending}d Pending Approval` : 'Full Medical Allowance'}
+          subtext={sickCard.used > 0 ? `${sickCard.used}d Used • Medical Allowance` : 'Full Medical Allowance'}
           chartColor="amber"
           presetWave="wave3"
           dataPoints={sickSparkData}
@@ -347,10 +411,10 @@ const EmployeeLeaves = () => {
           title="Pending Requests"
           value={totalPendingRequests}
           unit={totalPendingRequests === 1 ? 'Request' : 'Requests'}
-          badgeText={totalPendingRequests > 0 ? `${totalPendingRequests} Under Review` : 'All Approved'}
+          badgeText={totalPendingRequests > 0 ? `${totalPendingRequests} Under Review` : `${stats.approved} Approved`}
           badgeType={totalPendingRequests > 0 ? 'warning' : 'positive'}
           badgeIcon={totalPendingRequests > 0 ? 'dot' : 'up'}
-          subtext={`${requests.length} Total Submissions`}
+          subtext={`${stats.total} Total Submissions (${stats.approved} Approved, ${stats.rejected} Declined)`}
           chartColor="rose"
           presetWave="wave4"
           dataPoints={pendingSparkData}
@@ -365,32 +429,87 @@ const EmployeeLeaves = () => {
         <TableSkeleton rows={6} cols={5} />
       ) : (
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          {/* Header Bar */}
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Leave History & Review Status</h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Review log of all time-off submissions and supervisor approval states
+                Review log of all time-off submissions and management approval states
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-              {requests.length} Total Requests
-            </span>
+
+            {/* Filter Pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { key: 'ALL', label: 'All', count: stats.total },
+                { key: 'PENDING', label: 'Pending', count: stats.pending },
+                { key: 'APPROVED', label: 'Approved', count: stats.approved },
+                { key: 'REJECTED', label: 'Declined', count: stats.rejected },
+              ].map((tab) => {
+                const isActive = statusFilter === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setStatusFilter(tab.key)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-slate-900 text-white dark:bg-emerald-600 dark:text-white shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {requests.length > 0 ? (
+          {/* Quick Search Toolbar */}
+          <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search leave requests by policy, reason, schedule, or approver..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {filteredRequests.length > 0 ? (
             <>
               {/* Mobile Responsive Grid View (Hidden on Desktop) */}
               <div className="block md:hidden p-3.5 sm:p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {requests.map((req) => (
+                  {filteredRequests.map((req) => (
                     <div
                       key={req.id}
-                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-blue-400/60 transition-all flex flex-col justify-between"
+                      onClick={() => setSelectedReq(req)}
+                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-emerald-400/60 transition-all flex flex-col justify-between cursor-pointer"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                               <Layers className="w-4 h-4" />
                             </div>
                             <div>
@@ -401,7 +520,7 @@ const EmployeeLeaves = () => {
                             </div>
                           </div>
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border shrink-0 ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border shrink-0 ${
                               req.status === 'APPROVED'
                                 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40'
                                 : req.status === 'REJECTED'
@@ -409,13 +528,16 @@ const EmployeeLeaves = () => {
                                 : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
                             }`}
                           >
-                            {req.status}
+                            {req.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3" />}
+                            {req.status === 'PENDING' && <Clock className="w-3 h-3" />}
+                            {req.status === 'REJECTED' && <XCircle className="w-3 h-3" />}
+                            <span>{req.status}</span>
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
                           <span className="text-slate-500 font-medium">Duration:</span>
-                          <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                          <span className="font-extrabold text-emerald-600 dark:text-emerald-400">
                             {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
                           </span>
                         </div>
@@ -428,9 +550,15 @@ const EmployeeLeaves = () => {
                         </div>
                       </div>
 
-                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                        <span className="font-bold text-slate-500">Remarks: </span>
-                        <span>{req.rejectionReason || (req.status === 'APPROVED' ? 'Approved by HR Lead' : 'Pending Supervisor Review')}</span>
+                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span className="font-bold text-slate-500">Remarks:</span>
+                        <span className="text-right truncate max-w-[180px] font-medium text-slate-600 dark:text-slate-300">
+                          {req.status === 'APPROVED'
+                            ? `Approved by ${req.approvedBy?.firstName || 'HR Lead'}`
+                            : req.status === 'REJECTED'
+                            ? req.rejectionReason || 'Declined by HR'
+                            : 'Pending Supervisor Review'}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -439,97 +567,235 @@ const EmployeeLeaves = () => {
 
               {/* Desktop Table View (Hidden on Mobile) */}
               <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-xs tracking-wider border-b border-slate-100 dark:border-slate-800">
-                  <tr>
-                    <th className="py-3.5 px-6">Leave Category</th>
-                    <th className="py-3.5 px-4">Duration & Schedule</th>
-                    <th className="py-3.5 px-4">Submission Reason</th>
-                    <th className="py-3.5 px-4">Status</th>
-                    <th className="py-3.5 px-6 text-right">Approval Remarks</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {requests.map((req) => (
-                    <tr key={req.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                      <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
-                            <Layers className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="font-extrabold text-slate-900 dark:text-white">
-                              {req.leaveType?.name || 'General Leave'}
-                            </div>
-                            <div className="text-xs text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="font-bold text-slate-900 dark:text-white">
-                          {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-0.5">
-                          {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate">
-                        {req.reason}
-                      </td>
-                      <td className="py-4 px-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
-                            req.status === 'APPROVED'
-                              ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40'
-                              : req.status === 'REJECTED'
-                              ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
-                              : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
-                          }`}
-                        >
-                          {req.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-right text-slate-400 text-xs">
-                        {req.rejectionReason || (req.status === 'APPROVED' ? 'Approved by HR Lead' : 'Pending Supervisor Review')}
-                      </td>
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-xs tracking-wider border-b border-slate-100 dark:border-slate-800">
+                    <tr>
+                      <th className="py-3.5 px-6">Leave Category</th>
+                      <th className="py-3.5 px-4">Duration & Schedule</th>
+                      <th className="py-3.5 px-4">Submission Reason</th>
+                      <th className="py-3.5 px-4">Review Status</th>
+                      <th className="py-3.5 px-6 text-right">Approval Remarks</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {filteredRequests.map((req) => (
+                      <tr
+                        key={req.id}
+                        onClick={() => setSelectedReq(req)}
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
+                      >
+                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                              <Layers className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="font-extrabold text-slate-900 dark:text-white">
+                                {req.leaveType?.name || 'General Leave'}
+                              </div>
+                              <div className="text-xs text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="font-bold text-slate-900 dark:text-white">
+                            {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5">
+                            {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate font-medium">
+                          {req.reason}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
+                              req.status === 'APPROVED'
+                                ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40'
+                                : req.status === 'REJECTED'
+                                ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
+                                : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
+                            }`}
+                          >
+                            {req.status === 'APPROVED' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                            {req.status === 'PENDING' && <Clock className="w-3.5 h-3.5" />}
+                            {req.status === 'REJECTED' && <XCircle className="w-3.5 h-3.5" />}
+                            <span>{req.status}</span>
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-right text-slate-500 dark:text-slate-400 text-xs font-medium">
+                          {req.status === 'APPROVED' ? (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-end gap-1">
+                              <UserCheck className="w-3.5 h-3.5" />
+                              <span>Approved by {req.approvedBy?.firstName || 'HR Lead'} {req.approvedBy?.lastName || ''}</span>
+                            </span>
+                          ) : req.status === 'REJECTED' ? (
+                            <span className="text-rose-600 dark:text-rose-400 font-semibold">
+                              {req.rejectionReason ? `Declined: ${req.rejectionReason}` : 'Declined by HR'}
+                            </span>
+                          ) : (
+                            <span className="text-amber-600 dark:text-amber-400 font-medium">
+                              Pending Supervisor Review
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           ) : (
             <div className="p-12 text-center flex flex-col items-center justify-center">
               <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-              <h4 className="text-base font-black text-slate-900 dark:text-white">No Leave Applications Found</h4>
+              <h4 className="text-base font-black text-slate-900 dark:text-white">
+                {statusFilter !== 'ALL' || searchQuery ? 'No Matching Leave Requests' : 'No Leave Applications Found'}
+              </h4>
               <p className="text-xs text-slate-400 mt-1 max-w-sm">
-                You haven't submitted any time-off requests yet. Use the "Apply for Leave" button above to get started.
+                {statusFilter !== 'ALL' || searchQuery
+                  ? 'No time-off requests matched your active filters or search criteria.'
+                  : 'You have not submitted any time-off requests yet. Use the "Apply for Leave" button above to get started.'}
               </p>
+              {(statusFilter !== 'ALL' || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setStatusFilter('ALL');
+                    setSearchQuery('');
+                  }}
+                  className="mt-3 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+                >
+                  Reset Filters
+                </button>
+              )}
             </div>
           )}
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* 3. APPLY MODAL (ULTRA PREMIUM THEMED DESIGN) */}
+      {/* 4. DETAIL INSPECTION MODAL */}
+      {/* ========================================================================= */}
+      {selectedReq && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                    {selectedReq.leaveType?.name || 'Leave Request'}
+                  </h4>
+                  <p className="text-[11px] text-slate-400 font-mono">REQ ID: {selectedReq.id}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedReq(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Status</div>
+                  <div className="mt-1">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${
+                        selectedReq.status === 'APPROVED'
+                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60'
+                          : selectedReq.status === 'REJECTED'
+                          ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-200/60'
+                          : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200/60'
+                      }`}
+                    >
+                      {selectedReq.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3" />}
+                      {selectedReq.status === 'PENDING' && <Clock className="w-3 h-3" />}
+                      {selectedReq.status === 'REJECTED' && <XCircle className="w-3 h-3" />}
+                      <span>{selectedReq.status}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Duration</div>
+                  <div className="font-black text-sm text-slate-900 dark:text-white mt-1">
+                    {selectedReq.totalDays || 1} {selectedReq.totalDays === 1 ? 'Day' : 'Days'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-700/60 space-y-1">
+                <div className="text-[10px] text-slate-400 font-bold uppercase">Schedule Window</div>
+                <div className="text-slate-900 dark:text-white font-semibold">
+                  {selectedReq.startDate ? selectedReq.startDate.split('T')[0] : ''} to{' '}
+                  {selectedReq.endDate ? selectedReq.endDate.split('T')[0] : ''}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-700/60 space-y-1">
+                <div className="text-[10px] text-slate-400 font-bold uppercase">Submission Reason</div>
+                <div className="text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
+                  {selectedReq.reason}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-700/60 space-y-1">
+                <div className="text-[10px] text-slate-400 font-bold uppercase">Audit & Supervisor Notes</div>
+                <div className="text-slate-700 dark:text-slate-200 font-medium">
+                  {selectedReq.status === 'APPROVED' ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Approved by {selectedReq.approvedBy?.firstName || 'HR Lead'} {selectedReq.approvedBy?.lastName || ''}</span>
+                    </span>
+                  ) : selectedReq.status === 'REJECTED' ? (
+                    <span className="text-rose-600 dark:text-rose-400 font-semibold">
+                      Declined: {selectedReq.rejectionReason || 'Declined by HR Management'}
+                    </span>
+                  ) : (
+                    <span className="text-amber-600 dark:text-amber-400 font-medium">
+                      Awaiting Supervisor Review & Quota Approval
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button
+                onClick={() => setSelectedReq(null)}
+                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold text-xs"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 5. APPLY MODAL (ULTRA PREMIUM THEMED DESIGN) */}
       {/* ========================================================================= */}
       {isApplyOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-emerald-950/15 dark:shadow-black/70 border border-emerald-200/70 dark:border-emerald-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-emerald-200/70 dark:border-emerald-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative max-h-[92vh]">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/70 dark:border-emerald-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 py-4 border-b border-emerald-200/70 dark:border-emerald-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-cyan-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/30 ring-3 ring-emerald-100/80 dark:ring-emerald-950/60">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/30">
                   <CalendarDays className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                     Apply for Time-Off
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
                     Submit leave request for supervisory evaluation and entitlement tracking.
                   </p>
                 </div>
@@ -537,14 +803,14 @@ const EmployeeLeaves = () => {
 
               <button
                 onClick={() => setIsApplyOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-emerald-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-emerald-200/60 dark:hover:border-slate-700 relative z-10"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-emerald-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleApplySubmit} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-emerald-50/15 to-teal-50/20 dark:from-transparent dark:via-emerald-950/10 dark:to-teal-950/10">
+            <form onSubmit={handleApplySubmit} className="overflow-y-auto flex-1 px-6 py-5 space-y-4 text-xs">
               {/* Leave Policy Classification Cards */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
@@ -599,7 +865,7 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.leaveTypeId}
                     onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all cursor-pointer"
                   >
                     <option value="">Select Leave Policy</option>
                   </select>
@@ -650,7 +916,7 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.startDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, startDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
                   />
                 </div>
 
@@ -664,7 +930,7 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.endDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, endDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
                   />
                 </div>
               </div>
@@ -683,14 +949,14 @@ const EmployeeLeaves = () => {
                   placeholder="State context, urgent coverage contacts, and handover arrangements during absence..."
                   value={leaveForm.reason}
                   onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all resize-none leading-relaxed shadow-xs text-xs"
+                  className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 outline-none transition-all resize-none leading-relaxed shadow-xs text-xs"
                 />
               </div>
 
               {/* Live Request Preview Card */}
-              <div className="px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-emerald-200/70 dark:border-emerald-800/60 flex items-center justify-between gap-3 shadow-xs">
+              <div className="px-4 py-2.5 rounded-xl bg-emerald-50/60 dark:bg-slate-900/60 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-xs border border-emerald-200/60 dark:border-emerald-800/60">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                     <CalendarDays className="w-4 h-4 stroke-[2.2]" />
                   </div>
                   <div className="min-w-0">
@@ -716,11 +982,11 @@ const EmployeeLeaves = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-emerald-100/80 dark:border-slate-800 gap-3">
+              <div className="flex items-center justify-end pt-3 border-t border-slate-100 dark:border-slate-800 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsApplyOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-emerald-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

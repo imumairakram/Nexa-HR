@@ -304,8 +304,32 @@ const getMyLeaveRequests = async (req, res) => {
     const requests = await prisma.leaveRequest.findMany({
       where: { userId },
       include: {
-        leaveType: { select: { name: true, code: true, isPaid: true } },
-        approvedBy: { select: { firstName: true, lastName: true } },
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            employeeCode: true,
+          },
+        },
+        leaveType: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            isPaid: true,
+            daysAllowed: true,
+          },
+        },
+        approvedBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
