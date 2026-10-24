@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getIssuedDocuments,
   issueDocument,
+  uploadEmployeeDocument,
   deleteIssuedDocument,
   getCompanyPolicies,
   publishCompanyPolicy,
@@ -16,10 +17,11 @@ router.use(verifyToken, requireTenant);
 
 const canManageDocuments = checkRole('ADMIN', 'HR_MANAGER');
 
-// Issued Documents Endpoints
+// Issued / Vault Documents Endpoints
 router.get('/issued', getIssuedDocuments);
 router.post('/issue', canManageDocuments, issueDocument);
-router.delete('/issued/:id', canManageDocuments, deleteIssuedDocument);
+router.post('/upload', uploadEmployeeDocument);
+router.delete('/issued/:id', deleteIssuedDocument);
 
 // Company Policies Endpoints
 router.get('/policies', getCompanyPolicies);

@@ -815,6 +815,15 @@ export const api = {
     return res;
   },
 
+  uploadEmployeeDocument: async (docData) => {
+    const res = await fetchAPI('/documents/upload', {
+      method: 'POST',
+      body: JSON.stringify(docData),
+    });
+    invalidateClientCache('/documents');
+    return res;
+  },
+
   deleteIssuedDocument: async (id) => {
     const res = await fetchAPI(`/documents/issued/${id}`, {
       method: 'DELETE',

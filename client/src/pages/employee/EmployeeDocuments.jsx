@@ -36,113 +36,52 @@ import { TableSkeleton, DocumentCardSkeleton } from '../../components/common/Ske
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 
-const COMPANY_POLICIES = [
-  {
-    id: 'POL-01',
-    title: 'Employee Code of Conduct & Ethics Charter',
-    category: 'GOVERNANCE',
-    categoryLabel: 'Corporate Governance',
-    version: 'v4.2 (2026)',
-    size: '1.8 MB',
-    updated: 'Jan 15, 2026',
-    issuer: 'NexaHR Executive Board',
-    description:
-      'Comprehensive guidelines on professional integrity, respectful workplace culture, anti-harassment, and compliance with local statutory laws.',
-  },
-  {
-    id: 'POL-02',
-    title: 'Global Health & Medical Benefits Guide',
-    category: 'BENEFITS',
-    categoryLabel: 'Benefits & Perks',
-    version: 'v2.0 (2026)',
-    size: '3.4 MB',
-    updated: 'Jul 01, 2026',
-    issuer: 'People Operations & HR',
-    description:
-      'Full breakdown of medical, dental, vision, hospitalization insurance limits, OPD coverage ceiling, and mental wellness resources.',
-  },
-  {
-    id: 'POL-03',
-    title: 'Remote Work & Travel Expense Policy',
-    category: 'FINANCE',
-    categoryLabel: 'Finance & Reimbursement',
-    version: 'v3.1 (2026)',
-    size: '1.2 MB',
-    updated: 'Mar 10, 2026',
-    issuer: 'Corporate Finance & Payroll',
-    description:
-      'Reimbursement thresholds, travel per diem allowances, hotel lodging ceilings, and home office equipment stipends.',
-  },
-  {
-    id: 'POL-04',
-    title: 'Information Security & Data Privacy (SOC-2 Type II)',
-    category: 'SECURITY',
-    categoryLabel: 'InfoSec & Compliance',
-    version: 'v5.0 (2026)',
-    size: '2.1 MB',
-    updated: 'Feb 28, 2026',
-    issuer: 'InfoSec & Compliance Dept',
-    description:
-      'Standards for credential management, mandatory 2FA protocols, disk encryption, and confidential customer data handling.',
-  },
-];
+// Cross-portal broadcast channel for instantaneous 2-way sync
+const syncChannel =
+  typeof window !== 'undefined' && 'BroadcastChannel' in window
+    ? new BroadcastChannel('nexahr_vault_sync')
+    : null;
 
-const DEFAULT_PERSONAL_DOCS = [
-  {
-    id: 'DOC-101',
-    title: 'Official Employment Agreement & Contract',
-    type: 'CONTRACT',
-    typeLabel: 'Employment Agreement',
-    issueDate: 'Mar 15, 2022',
-    size: '2.4 MB',
-    status: 'VERIFIED',
-    issuer: 'NexaHR People Operations',
-    description: 'Signed full-time indefinite employment agreement with job scope, confidentiality, and organizational charter.',
-  },
-  {
-    id: 'DOC-102',
-    title: 'Official Job Offer Letter & Appointment Order',
-    type: 'OFFER_LETTER',
-    typeLabel: 'Offer Letter',
-    issueDate: 'Oct 14, 2026',
-    size: '1.6 MB',
-    status: 'VERIFIED',
-    issuer: 'NexaHR Talent Acquisition & People Operations',
-    description: 'Official verified appointment letter with comprehensive breakdown of designation, annualized salary structure, equity vesting, joining benefits, and corporate terms.',
-  },
-];
+const notifyVaultSync = () => {
+  try {
+    if (syncChannel) {
+      syncChannel.postMessage({ type: 'DOCUMENTS_UPDATED', timestamp: Date.now() });
+    }
+    localStorage.setItem('nexahr_sync_pulse', Date.now().toString());
+  } catch {}
+};
 
 const EmployeeDocuments = () => {
   const { formatDate } = useRegionalSettings();
+
+  // Clean initial state - scrub legacy mock IDs
   const [personalDocs, setPersonalDocs] = useState(() => {
     try {
       const saved = localStorage.getItem('nexahr_personal_docs');
       if (saved) {
         const parsed = JSON.parse(saved);
-        const filtered = parsed.filter(
-          (d) =>
-            !['DOC-103', 'DOC-104', 'DOC-105'].includes(d.id) &&
-            !(d.id === 'DOC-102' && d.title?.includes('Compensation'))
+        return parsed.filter(
+          (d) => !['DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id)
         );
-        const hasOffer = filtered.some((d) => d.id === 'DOC-102' || d.type === 'OFFER_LETTER');
-        const offerDoc = DEFAULT_PERSONAL_DOCS.find((d) => d.id === 'DOC-102');
-        const updated = hasOffer ? filtered : [...filtered, offerDoc].filter(Boolean);
-        localStorage.setItem('nexahr_personal_docs', JSON.stringify(updated));
-        return updated;
       }
-      return DEFAULT_PERSONAL_DOCS;
+      return [];
     } catch {
-      return DEFAULT_PERSONAL_DOCS;
+      return [];
     }
   });
 
   const [policies, setPolicies] = useState(() => {
     try {
       const saved = localStorage.getItem('nexahr_company_policies');
-      if (saved) return JSON.parse(saved);
-      return COMPANY_POLICIES;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(
+          (p) => !['POL-01', 'POL-02', 'POL-03', 'POL-04'].includes(p.id)
+        );
+      }
+      return [];
     } catch {
-      return COMPANY_POLICIES;
+      return [];
     }
   });
 
@@ -153,7 +92,9 @@ const EmployeeDocuments = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
+  // Fetch live documents & policies from backend
   const fetchDocuments = async () => {
     setLoading(true);
     try {
@@ -162,31 +103,56 @@ const EmployeeDocuments = () => {
         api.getCompanyPolicies(),
       ]);
 
-      if (docRes.status === 'fulfilled' && docRes.value?.success && docRes.value.data?.documents?.length > 0) {
+      if (
+        docRes.status === 'fulfilled' &&
+        docRes.value?.success &&
+        Array.isArray(docRes.value.data?.documents)
+      ) {
         const backendDocs = docRes.value.data.documents.map((d) => ({
           id: d.id,
           title: d.title,
           type: d.type,
-          typeLabel: d.typeLabel,
+          typeLabel: d.typeLabel || d.type,
           issueDate: d.issueDate,
           size: d.size,
           status: d.status,
           issuer: d.issuer,
           description: d.description,
+          referenceNumber: d.referenceNumber,
+          fileUrl: d.fileUrl,
+          uploadedBy: d.uploadedBy,
         }));
         setPersonalDocs(backendDocs);
-        localStorage.setItem('nexahr_personal_docs', JSON.stringify(backendDocs));
+        try {
+          localStorage.setItem('nexahr_personal_docs', JSON.stringify(backendDocs));
+        } catch {}
       } else {
         const saved = localStorage.getItem('nexahr_personal_docs');
-        if (saved) setPersonalDocs(JSON.parse(saved));
+        if (saved) {
+          const parsed = JSON.parse(saved).filter(
+            (d) => !['DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id)
+          );
+          setPersonalDocs(parsed);
+        }
       }
 
-      if (polRes.status === 'fulfilled' && polRes.value?.success && polRes.value.data?.policies?.length > 0) {
+      if (
+        polRes.status === 'fulfilled' &&
+        polRes.value?.success &&
+        Array.isArray(polRes.value.data?.policies)
+      ) {
         setPolicies(polRes.value.data.policies);
-        localStorage.setItem('nexahr_company_policies', JSON.stringify(polRes.value.data.policies));
+        try {
+          localStorage.setItem('nexahr_company_policies', JSON.stringify(polRes.value.data.policies));
+        } catch {}
       } else {
         const savedPol = localStorage.getItem('nexahr_company_policies');
-        if (savedPol) setPolicies(JSON.parse(savedPol));
+        if (savedPol) {
+          const parsed = JSON.parse(savedPol).filter(
+            (p) => !['POL-01', 'POL-02', 'POL-03', 'POL-04'].includes(p.id)
+          );
+          setPolicies(parsed);
+        }
       }
     } catch (e) {
       console.warn('Document sync error:', e);
@@ -197,6 +163,30 @@ const EmployeeDocuments = () => {
 
   React.useEffect(() => {
     fetchDocuments();
+
+    const handleSyncMessage = (event) => {
+      if (event?.data?.type === 'DOCUMENTS_UPDATED') {
+        fetchDocuments();
+      }
+    };
+
+    const handleStorage = (e) => {
+      if (e.key === 'nexahr_sync_pulse') {
+        fetchDocuments();
+      }
+    };
+
+    if (syncChannel) {
+      syncChannel.addEventListener('message', handleSyncMessage);
+    }
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      if (syncChannel) {
+        syncChannel.removeEventListener('message', handleSyncMessage);
+      }
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   // Upload Form State
@@ -205,6 +195,9 @@ const EmployeeDocuments = () => {
     type: 'CERTIFICATE',
     issuer: 'Certifying Authority',
     file: null,
+    fileUrl: null,
+    fileName: '',
+    size: '',
   });
 
   const showToast = (msg) => {
@@ -212,60 +205,83 @@ const EmployeeDocuments = () => {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
-  const savePersonalDocs = (updated) => {
-    setPersonalDocs(updated);
+  const handleDeleteDoc = async (docId) => {
     try {
-      localStorage.setItem('nexahr_personal_docs', JSON.stringify(updated));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
+      await api.deleteIssuedDocument(docId);
+      const updated = personalDocs.filter((d) => d.id !== docId);
+      setPersonalDocs(updated);
+      try {
+        localStorage.setItem('nexahr_personal_docs', JSON.stringify(updated));
+      } catch {}
+      showToast('Document removed from personal vault');
+      notifyVaultSync();
+    } catch (err) {
+      console.error('Delete error:', err);
+      showToast(err.message || 'Could not delete document');
     }
   };
 
-  const handleDeleteDoc = (docId) => {
-    const updated = personalDocs.filter((d) => d.id !== docId);
-    savePersonalDocs(updated);
-    showToast('Document deleted from personal vault');
-  };
-
-  const handleUploadSubmit = (e) => {
+  const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (!uploadForm.title.trim()) {
       showToast('Please enter a valid document title');
       return;
     }
 
-    const docId = `DOC-${Math.floor(100 + Math.random() * 900)}`;
-    const newDoc = {
-      id: docId,
-      title: uploadForm.title.trim(),
-      type: uploadForm.type,
-      typeLabel:
-        uploadForm.type === 'OFFER_LETTER'
-          ? 'Offer Letter'
-          : uploadForm.type === 'CERTIFICATE'
-          ? 'Professional Certificate'
-          : uploadForm.type === 'IDENTIFICATION'
-          ? 'National ID / Passport'
-          : uploadForm.type === 'CONTRACT'
-          ? 'Employment Agreement'
-          : 'Official Document',
-      issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      size: uploadForm.file ? `${(uploadForm.file.size / (1024 * 1024)).toFixed(1)} MB` : '1.4 MB',
-      status: 'VERIFIED',
-      issuer: uploadForm.issuer.trim() || 'Verified Self-Submission',
-      description: 'Encrypted document stored securely in NexaHR Personal Compliance Vault.',
-    };
+    setSubmitting(true);
+    try {
+      const typeLabels = {
+        OFFER_LETTER: 'Offer Letter',
+        CERTIFICATE: 'Professional Certificate',
+        IDENTIFICATION: 'National ID / Passport',
+        CONTRACT: 'Employment Agreement',
+        ACADEMIC: 'Academic Degree & Diploma',
+        TAX_FORM: 'Tax Form',
+        CUSTOM: 'Official Document',
+      };
 
-    const updated = [newDoc, ...personalDocs];
-    savePersonalDocs(updated);
-    setIsUploadOpen(false);
-    setUploadForm({
-      title: '',
-      type: 'CERTIFICATE',
-      issuer: 'Certifying Authority',
-      file: null,
-    });
-    showToast(`Document "${newDoc.title}" successfully verified and stored in your vault!`);
+      const payload = {
+        title: uploadForm.title.trim(),
+        type: uploadForm.type,
+        typeLabel: typeLabels[uploadForm.type] || 'Professional Certificate',
+        issuer: uploadForm.issuer.trim() || 'Verified Self-Submission',
+        description: `Verified ${typeLabels[uploadForm.type] || 'certificate'} uploaded to personal compliance vault.`,
+        size: uploadForm.size || (uploadForm.file ? `${(uploadForm.file.size / (1024 * 1024)).toFixed(1)} MB` : '1.4 MB'),
+        fileUrl: uploadForm.fileUrl || null,
+      };
+
+      const res = await api.uploadEmployeeDocument(payload);
+      if (res?.success && res.data?.document) {
+        const newDoc = res.data.document;
+        setPersonalDocs((prev) => [newDoc, ...prev]);
+        try {
+          const existing = JSON.parse(localStorage.getItem('nexahr_personal_docs') || '[]');
+          localStorage.setItem('nexahr_personal_docs', JSON.stringify([newDoc, ...existing]));
+        } catch {}
+        showToast(`Document "${newDoc.title}" successfully verified & stored in vault!`);
+        notifyVaultSync();
+      } else {
+        await fetchDocuments();
+        showToast('Document uploaded successfully.');
+        notifyVaultSync();
+      }
+
+      setIsUploadOpen(false);
+      setUploadForm({
+        title: '',
+        type: 'CERTIFICATE',
+        issuer: 'Certifying Authority',
+        file: null,
+        fileUrl: null,
+        fileName: '',
+        size: '',
+      });
+    } catch (err) {
+      console.error('Upload error:', err);
+      showToast(err.message || 'Failed to upload document to vault.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleDownload = (doc) => {
@@ -368,25 +384,20 @@ const EmployeeDocuments = () => {
 
   // Dynamic Sparkline Data for Documents Hub
   const personalDocsSparkData = useMemo(() => {
-    const typeCount = {
-      CONTRACT: 0,
-      COMPENSATION: 0,
-      LEGAL: 0,
-      TAX_FORM: 0,
-      CERTIFICATE: 0,
-    };
+    if (!personalDocs.length) {
+      return [{ value: 0, label: 'Empty', tooltip: 'No personal files in vault' }];
+    }
+    const typeCount = {};
     personalDocs.forEach((d) => {
-      if (typeCount[d.type] !== undefined) typeCount[d.type]++;
-      else typeCount.CERTIFICATE++;
+      const label = d.typeLabel || d.type || 'Certificate';
+      typeCount[label] = (typeCount[label] || 0) + 1;
     });
 
-    return [
-      { value: typeCount.CONTRACT || 1, label: 'Contract', tooltip: `Contracts: ${typeCount.CONTRACT || 0} Files` },
-      { value: typeCount.COMPENSATION || 1, label: 'Comp', tooltip: `Compensation: ${typeCount.COMPENSATION || 0} Files` },
-      { value: typeCount.LEGAL || 1, label: 'Legal', tooltip: `Legal & NDA: ${typeCount.LEGAL || 0} Files` },
-      { value: typeCount.TAX_FORM || 1, label: 'Tax', tooltip: `Tax Forms: ${typeCount.TAX_FORM || 0} Files` },
-      { value: typeCount.CERTIFICATE || 1, label: 'Certs', tooltip: `Certificates: ${typeCount.CERTIFICATE || 0} Files` },
-    ];
+    return Object.entries(typeCount).map(([label, count]) => ({
+      value: count,
+      label: label.length > 8 ? label.substring(0, 7) + '..' : label,
+      tooltip: `${label}: ${count} ${count === 1 ? 'file' : 'files'}`,
+    }));
   }, [personalDocs]);
 
   const policiesSparkData = useMemo(() => {
@@ -413,18 +424,22 @@ const EmployeeDocuments = () => {
   }, [personalDocs, verifiedPersonalCount]);
 
   const complianceSparkData = useMemo(() => {
+    if (!personalDocs.length) {
+      return [{ value: 100, label: 'Audit', tooltip: 'Vault Clean & Compliant' }];
+    }
     return [
       { value: 95, label: 'Offer', tooltip: 'Offer & Contract Verified' },
       { value: 98, label: 'NDA', tooltip: 'Proprietary IP Assignment Verified' },
       { value: 100, label: 'Audit', tooltip: 'Statutory Verification Complete' },
     ];
-  }, []);
+  }, [personalDocs]);
 
   const totalVaultMB = useMemo(() => {
+    if (!personalDocs.length && !policies.length) return '0.0';
     const parseSize = (s) => {
-      if (!s || typeof s !== 'string') return 1.5;
+      if (!s || typeof s !== 'string') return 0;
       const m = s.match(/([\d.]+)\s*MB/i);
-      return m ? parseFloat(m[1]) : 1.5;
+      return m ? parseFloat(m[1]) : 0;
     };
     const pMB = personalDocs.reduce((acc, d) => acc + parseSize(d.size), 0);
     const polMB = policies.reduce((acc, p) => acc + parseSize(p.size), 0);
@@ -687,6 +702,31 @@ const EmployeeDocuments = () => {
                 )}
               </div>
             </>
+          ) : filteredPersonalDocs.length === 0 ? (
+            <div className="p-12 sm:p-16 text-center space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 shadow-sm">
+                <FolderOpen className="w-8 h-8 stroke-[1.8]" />
+              </div>
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  {searchQuery ? 'No documents matched your search' : 'Personal Vault is Empty'}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  {searchQuery
+                    ? 'Try clearing your search query or adjusting your keywords.'
+                    : 'No documents have been issued to you yet. Official contracts, offer letters, or certificates uploaded by you or HR will appear securely here.'}
+                </p>
+              </div>
+              {!searchQuery && (
+                <button
+                  onClick={() => setIsUploadOpen(true)}
+                  className="px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>Upload Certificate</span>
+                </button>
+              )}
+            </div>
           ) : (
             <>
               {viewMode === 'list' && (
@@ -717,7 +757,7 @@ const EmployeeDocuments = () => {
                             <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                               {doc.title}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono font-bold">#{doc.id}</span>
+                            <span className="text-[10px] text-slate-400 font-mono font-bold">{doc.referenceNumber || `#${doc.id}`}</span>
                           </div>
                         </div>
                       </td>
@@ -824,6 +864,22 @@ const EmployeeDocuments = () => {
       {activeTab === 'policies' && (
         loading ? (
           <DocumentCardSkeleton count={4} />
+        ) : filteredPolicies.length === 0 ? (
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 sm:p-16 text-center space-y-4 border border-slate-100 dark:border-slate-800 shadow-soft">
+            <div className="w-16 h-16 rounded-3xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 shadow-sm">
+              <BookOpen className="w-8 h-8 stroke-[1.8]" />
+            </div>
+            <div className="space-y-1.5 max-w-md mx-auto">
+              <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
+                {searchQuery ? 'No policies match your search' : 'No Company Policies Published Yet'}
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                {searchQuery
+                  ? 'Try adjusting your search keywords.'
+                  : 'Official organization handbooks, governance charters, and benefits guides published by HR/Admin will appear here.'}
+              </p>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredPolicies.map((pol) => (
@@ -1024,7 +1080,19 @@ const EmployeeDocuments = () => {
                       accept=".pdf,.docx,.doc,.png,.jpg,.jpeg"
                       onChange={(e) => {
                         if (e.target.files && e.target.files[0]) {
-                          setUploadForm({ ...uploadForm, file: e.target.files[0] });
+                          const selected = e.target.files[0];
+                          const sizeStr = `${(selected.size / (1024 * 1024)).toFixed(2)} MB`;
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setUploadForm((prev) => ({
+                              ...prev,
+                              file: selected,
+                              fileName: selected.name,
+                              fileUrl: reader.result,
+                              size: sizeStr,
+                            }));
+                          };
+                          reader.readAsDataURL(selected);
                         }
                       }}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
@@ -1045,10 +1113,10 @@ const EmployeeDocuments = () => {
                             </div>
                             <div className="text-left min-w-0">
                               <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
-                                {uploadForm.file.name}
+                                {uploadForm.fileName || uploadForm.file.name}
                               </div>
                               <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
-                                {(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB • Ready to Encrypt
+                                {uploadForm.size || `${(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB`} • Ready to Encrypt
                               </div>
                             </div>
                           </div>
@@ -1126,10 +1194,11 @@ const EmployeeDocuments = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all"
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                  <span>Save & Encrypt</span>
+                  <span>{submitting ? 'Saving...' : 'Save & Encrypt'}</span>
                 </button>
               </div>
             </form>

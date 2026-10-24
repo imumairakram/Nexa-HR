@@ -9,105 +9,11 @@ const {
 
 const VAULT_FILE_PATH = path.join(__dirname, '../data/documents_vault.json');
 
-// Default initial company policies
-const DEFAULT_COMPANY_POLICIES = [
-  {
-    id: 'POL-01',
-    title: 'Employee Code of Conduct & Ethics Charter',
-    category: 'GOVERNANCE',
-    categoryLabel: 'Corporate Governance',
-    version: 'v4.2 (2026)',
-    size: '1.8 MB',
-    updated: 'Jan 15, 2026',
-    issuer: 'NexaHR Executive Board',
-    department: 'Company-Wide (All Offices)',
-    description:
-      'Comprehensive guidelines on professional integrity, respectful workplace culture, anti-harassment, and compliance with statutory laws.',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'POL-02',
-    title: 'Global Health & Medical Benefits Guide',
-    category: 'BENEFITS',
-    categoryLabel: 'Benefits & Perks',
-    version: 'v2.0 (2026)',
-    size: '3.4 MB',
-    updated: 'Jul 01, 2026',
-    issuer: 'People Operations & HR',
-    department: 'Company-Wide (All Offices)',
-    description:
-      'Full breakdown of medical, dental, vision, hospitalization insurance limits, OPD coverage ceiling, and mental wellness resources.',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'POL-03',
-    title: 'Remote Work & Travel Expense Policy',
-    category: 'FINANCE',
-    categoryLabel: 'Finance & Reimbursement',
-    version: 'v3.1 (2026)',
-    size: '1.2 MB',
-    updated: 'Mar 10, 2026',
-    issuer: 'Corporate Finance & Payroll',
-    department: 'All Departments',
-    description:
-      'Reimbursement thresholds, travel per diem allowances, hotel lodging ceilings, and home office equipment stipends.',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'POL-04',
-    title: 'Information Security & Data Privacy (SOC-2 Type II)',
-    category: 'SECURITY',
-    categoryLabel: 'InfoSec & Compliance',
-    version: 'v5.0 (2026)',
-    size: '2.1 MB',
-    updated: 'Feb 28, 2026',
-    issuer: 'InfoSec & Compliance Dept',
-    department: 'Engineering & Operations',
-    description:
-      'Standards for credential management, mandatory 2FA protocols, disk encryption, and confidential customer data handling.',
-    status: 'ACTIVE',
-  },
-];
+// Default initial company policies (clean initial state)
+const DEFAULT_COMPANY_POLICIES = [];
 
-// Default initial issued documents
-const DEFAULT_ISSUED_DOCS = [
-  {
-    id: 'DOC-101',
-    title: 'Official Employment Agreement & Contract',
-    type: 'CONTRACT',
-    typeLabel: 'Employment Agreement',
-    referenceNumber: 'NEXA-CON-2026-101',
-    employeeId: 'all',
-    employeeName: 'All Active Employees',
-    employeeCode: 'GLOBAL',
-    department: 'Company-Wide',
-    designation: 'All Team Members',
-    issueDate: 'Mar 15, 2026',
-    expiryDate: null,
-    size: '2.4 MB',
-    status: 'VERIFIED',
-    issuer: 'NexaHR People Operations',
-    description: 'Signed full-time indefinite employment agreement with job scope, confidentiality, and organizational charter.',
-  },
-  {
-    id: 'DOC-102',
-    title: 'Official Job Offer Letter & Appointment Order',
-    type: 'OFFER_LETTER',
-    typeLabel: 'Offer Letter',
-    referenceNumber: 'NEXA-OFR-2026-902',
-    employeeId: 'all',
-    employeeName: 'Talent Acquisition Finalist',
-    employeeCode: 'EMP-FINAL',
-    department: 'Engineering & DevOps',
-    designation: 'Software Engineer',
-    issueDate: 'Oct 14, 2026',
-    expiryDate: null,
-    size: '1.6 MB',
-    status: 'VERIFIED',
-    issuer: 'NexaHR Talent Acquisition & People Operations',
-    description: 'Official verified appointment letter with comprehensive breakdown of designation, annualized salary structure, equity vesting, joining benefits, and corporate terms.',
-  },
-];
+// Default initial issued documents (clean initial state)
+const DEFAULT_ISSUED_DOCS = [];
 
 function readVaultData() {
   try {
@@ -115,8 +21,8 @@ function readVaultData() {
       const raw = fs.readFileSync(VAULT_FILE_PATH, 'utf8');
       const data = JSON.parse(raw);
       return {
-        documents: data.documents || DEFAULT_ISSUED_DOCS,
-        policies: data.policies || DEFAULT_COMPANY_POLICIES,
+        documents: Array.isArray(data.documents) ? data.documents : [],
+        policies: Array.isArray(data.policies) ? data.policies : [],
       };
     }
   } catch (err) {
@@ -130,16 +36,16 @@ function readVaultData() {
       fs.mkdirSync(dir, { recursive: true });
     }
     const initial = {
-      documents: DEFAULT_ISSUED_DOCS,
-      policies: DEFAULT_COMPANY_POLICIES,
+      documents: [],
+      policies: [],
     };
     fs.writeFileSync(VAULT_FILE_PATH, JSON.stringify(initial, null, 2), 'utf8');
     return initial;
   } catch (writeErr) {
     console.error('[DOC VAULT ERROR] Could not create vault file:', writeErr.message);
     return {
-      documents: DEFAULT_ISSUED_DOCS,
-      policies: DEFAULT_COMPANY_POLICIES,
+      documents: [],
+      policies: [],
     };
   }
 }
@@ -166,15 +72,19 @@ const getIssuedDocuments = async (req, res) => {
     const vault = readVaultData();
     let docs = vault.documents || [];
 
-    // If request is from normal employee, only return documents issued to them or global
+    // If request is from normal employee, only return documents issued to them or global, or uploaded by them
     if (req.user && req.user.role === 'EMPLOYEE') {
-      docs = docs.filter(
-        (d) =>
-          d.employeeId === 'all' ||
-          d.employeeId === req.user.id ||
-          d.employeeCode === req.user.employeeCode ||
-          (d.employeeEmail && d.employeeEmail.toLowerCase() === req.user.email.toLowerCase())
-      );
+      const userId = req.user.id || req.user.userId;
+      const userEmail = (req.user.email || '').toLowerCase();
+      const userEmpCode = (req.user.employeeCode || '').toLowerCase();
+
+      docs = docs.filter((d) => {
+        if (d.employeeId === 'all') return true;
+        if (d.employeeId && d.employeeId === userId) return true;
+        if (userEmpCode && d.employeeCode && d.employeeCode.toLowerCase() === userEmpCode) return true;
+        if (userEmail && d.employeeEmail && d.employeeEmail.toLowerCase() === userEmail) return true;
+        return false;
+      });
     } else if (employeeId && employeeId !== 'ALL') {
       docs = docs.filter((d) => d.employeeId === employeeId || d.employeeId === 'all');
     }
@@ -380,18 +290,153 @@ const deleteIssuedDocument = async (req, res) => {
       });
     }
 
+    // Role check: If EMPLOYEE, verify ownership
+    if (req.user && req.user.role === 'EMPLOYEE') {
+      const userId = req.user.id || req.user.userId;
+      const userEmail = (req.user.email || '').toLowerCase();
+      const userEmpCode = (req.user.employeeCode || '').toLowerCase();
+      const isOwner =
+        existing.employeeId === userId ||
+        (userEmpCode && existing.employeeCode && existing.employeeCode.toLowerCase() === userEmpCode) ||
+        (userEmail && existing.employeeEmail && existing.employeeEmail.toLowerCase() === userEmail);
+
+      if (!isOwner) {
+        return res.status(403).json({
+          success: false,
+          message: 'You only have permission to delete documents belonging to your personal vault.',
+        });
+      }
+    }
+
     vault.documents = vault.documents.filter((d) => d.id !== id);
     writeVaultData(vault);
 
     return res.status(200).json({
       success: true,
-      message: `Document "${existing.title}" successfully revoked and removed from vault.`,
+      message: `Document "${existing.title}" successfully removed from vault.`,
     });
   } catch (error) {
     console.error('Error deleting document:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to delete document.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Upload an employee certificate or document
+ * POST /api/documents/upload
+ */
+const uploadEmployeeDocument = async (req, res) => {
+  try {
+    const {
+      title,
+      type = 'CERTIFICATE',
+      typeLabel,
+      issuer,
+      description,
+      size,
+      fileUrl,
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Document title is required.',
+      });
+    }
+
+    const userId = req.user.id || req.user.userId;
+
+    let user = null;
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          profile: {
+            include: {
+              department: true,
+              designation: true,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      console.warn('Could not fetch user profile details for upload:', err.message);
+    }
+
+    const resolvedName = user
+      ? `${user.firstName} ${user.lastName}`.trim()
+      : req.user.fullName || 'Employee';
+    const resolvedCode = user?.employeeCode || req.user.employeeCode || 'EMP';
+    const resolvedDept = user?.profile?.department?.name || 'General';
+    const resolvedDesignation = user?.profile?.designation?.title || 'Team Member';
+    const resolvedEmail = user?.email || req.user.email || null;
+
+    const TYPE_LABELS = {
+      CERTIFICATE: 'Professional Certificate',
+      IDENTIFICATION: 'National ID / Passport',
+      CONTRACT: 'Employment Agreement',
+      OFFER_LETTER: 'Offer Letter',
+      ACADEMIC: 'Academic Degree & Diploma',
+      TAX_FORM: 'Tax Form',
+      CUSTOM: 'Official Document',
+    };
+
+    const resolvedTypeLabel = typeLabel || TYPE_LABELS[type] || 'Professional Certificate';
+    const prefix = (type || 'CRT').substring(0, 3).toUpperCase();
+    const refCode = `NEXA-${prefix}-${resolvedCode}-${Date.now().toString().slice(-4)}`;
+
+    const newDoc = {
+      id: `DOC-${Math.floor(1000 + Math.random() * 9000)}`,
+      title: title.trim(),
+      type: type || 'CERTIFICATE',
+      typeLabel: resolvedTypeLabel,
+      referenceNumber: refCode,
+      employeeId: userId,
+      employeeName: resolvedName,
+      employeeCode: resolvedCode,
+      employeeEmail: resolvedEmail,
+      department: resolvedDept,
+      designation: resolvedDesignation,
+      issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+      expiryDate: null,
+      size: size || '1.4 MB',
+      status: 'VERIFIED',
+      issuer: issuer ? issuer.trim() : 'Verified Self-Submission',
+      description: description ? description.trim() : `Verified ${resolvedTypeLabel} uploaded to NexaHR vault.`,
+      fileUrl: fileUrl || null,
+      uploadedBy: 'EMPLOYEE',
+      createdAt: new Date().toISOString(),
+    };
+
+    const vault = readVaultData();
+    vault.documents = [newDoc, ...(vault.documents || [])];
+    writeVaultData(vault);
+
+    // Notify HR & Admins
+    broadcastInAppNotification({
+      title: `Certificate Uploaded: ${newDoc.title}`,
+      message: `${resolvedName} (${resolvedCode}) uploaded a new ${resolvedTypeLabel}.`,
+      type: 'info',
+      category: 'GENERAL',
+      link: '/documents',
+    }).catch((e) => console.warn('Broadcast notification error:', e.message));
+
+    return res.status(201).json({
+      success: true,
+      message: `Document "${newDoc.title}" successfully uploaded and verified in vault.`,
+      data: {
+        document: newDoc,
+      },
+    });
+  } catch (error) {
+    console.error('Error uploading employee document:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to upload document.',
       error: error.message,
     });
   }
@@ -539,6 +584,7 @@ const deleteCompanyPolicy = async (req, res) => {
 module.exports = {
   getIssuedDocuments,
   issueDocument,
+  uploadEmployeeDocument,
   deleteIssuedDocument,
   getCompanyPolicies,
   publishCompanyPolicy,

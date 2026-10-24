@@ -169,11 +169,30 @@ const Documents = () => {
     return 'NexaHR People Operations & Talent Acquisition';
   }, [currentUser]);
 
+  // Cross-portal broadcast channel for instantaneous 2-way sync
+  const syncChannel =
+    typeof window !== 'undefined' && 'BroadcastChannel' in window
+      ? new BroadcastChannel('nexahr_vault_sync')
+      : null;
+
+  const notifyVaultSync = () => {
+    try {
+      if (syncChannel) {
+        syncChannel.postMessage({ type: 'DOCUMENTS_UPDATED', timestamp: Date.now() });
+      }
+      localStorage.setItem('nexahr_sync_pulse', Date.now().toString());
+    } catch {}
+  };
+
   // Primary Live States - Zero Hardcoded Data
   const [issuedDocs, setIssuedDocs] = useState(() => {
     try {
       const cached = localStorage.getItem('nexahr_issued_docs');
-      return cached ? JSON.parse(cached) : [];
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return parsed.filter((d) => !['DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id));
+      }
+      return [];
     } catch {
       return [];
     }
@@ -182,7 +201,11 @@ const Documents = () => {
   const [companyPolicies, setCompanyPolicies] = useState(() => {
     try {
       const cached = localStorage.getItem('nexahr_company_policies');
-      return cached ? JSON.parse(cached) : [];
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return parsed.filter((p) => !['POL-01', 'POL-02', 'POL-03', 'POL-04'].includes(p.id));
+      }
+      return [];
     } catch {
       return [];
     }
@@ -314,6 +337,30 @@ const Documents = () => {
 
   useEffect(() => {
     loadData();
+
+    const handleSyncMessage = (event) => {
+      if (event?.data?.type === 'DOCUMENTS_UPDATED') {
+        loadData(true);
+      }
+    };
+
+    const handleStorage = (e) => {
+      if (e.key === 'nexahr_sync_pulse') {
+        loadData(true);
+      }
+    };
+
+    if (syncChannel) {
+      syncChannel.addEventListener('message', handleSyncMessage);
+    }
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      if (syncChannel) {
+        syncChannel.removeEventListener('message', handleSyncMessage);
+      }
+      window.removeEventListener('storage', handleStorage);
+    };
   }, [loadData]);
 
   // Selected Employee object for active issue form
@@ -494,6 +541,7 @@ const Documents = () => {
 
       const updated = [createdDoc, ...issuedDocs];
       syncIssuedDocs(updated);
+      notifyVaultSync();
 
       showToast(
         `Document "${createdDoc.title}" successfully issued to ${createdDoc.employeeName}!${
@@ -574,6 +622,7 @@ const Documents = () => {
 
       const updated = [createdPolicy, ...companyPolicies];
       syncCompanyPolicies(updated);
+      notifyVaultSync();
 
       showToast(`Corporate Policy "${createdPolicy.title}" published successfully!`);
       setIsPolicyModalOpen(false);
@@ -604,6 +653,7 @@ const Documents = () => {
       await api.deleteIssuedDocument(id).catch(() => {});
       const updated = issuedDocs.filter((d) => d.id !== id);
       syncIssuedDocs(updated);
+      notifyVaultSync();
       showToast('Document revoked and removed from enterprise vault.');
     } catch (err) {
       console.error('Delete error:', err);
@@ -617,6 +667,7 @@ const Documents = () => {
       await api.deleteCompanyPolicy(id).catch(() => {});
       const updated = companyPolicies.filter((p) => p.id !== id);
       syncCompanyPolicies(updated);
+      notifyVaultSync();
       showToast('Company policy removed.');
     } catch (err) {
       console.error('Delete error:', err);
@@ -1305,9 +1356,16 @@ ${doc.description || 'This document serves as an official verified corporate rec
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                              {doc.typeLabel || doc.type}
-                            </span>
+                            <div className="flex flex-col gap-1 items-start">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                                {doc.typeLabel || doc.type}
+                              </span>
+                              {doc.uploadedBy === 'EMPLOYEE' && (
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/60">
+                                  Employee Upload
+                                </span>
+                              )}
+                            </div>
                           </td>
 
                           <td className="py-4 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
@@ -1373,10 +1431,17 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60">
                           <FileText className="w-5 h-5" />
                         </div>
-                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>{doc.typeLabel || doc.type}</span>
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>{doc.typeLabel || doc.type}</span>
+                          </span>
+                          {doc.uploadedBy === 'EMPLOYEE' && (
+                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200">
+                              Employee Upload
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <div>

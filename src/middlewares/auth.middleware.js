@@ -42,6 +42,7 @@ const verifyToken = async (req, res, next) => {
           lastName: true,
           role: true,
           isActive: true,
+          employeeCode: true,
         },
       });
       if (user && user.isActive) {
@@ -63,6 +64,7 @@ const verifyToken = async (req, res, next) => {
       email: user.email,
       role: user.role,
       fullName: `${user.firstName} ${user.lastName}`,
+      employeeCode: user.employeeCode || null,
     };
 
     return next();
