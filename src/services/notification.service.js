@@ -302,6 +302,302 @@ async function sendPayslipEmail({
 }
 
 /**
+ * Generate Professional HTML Template for Welcome Onboarding Email with Credentials
+ */
+function buildWelcomeEmailHtml({
+  name,
+  employeeCode,
+  email,
+  tempPassword,
+  role = 'EMPLOYEE',
+  designation = 'Team Member',
+  department = 'General',
+  workLocation = 'Headquarters',
+  loginUrl,
+}) {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to NexaHR</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f1f5f9; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+          
+          <!-- Header Banner -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%); padding: 38px 32px 32px; text-align: center;">
+              <div style="display: inline-block; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.22); padding: 6px 16px; border-radius: 20px; margin-bottom: 14px;">
+                <span style="color: #c7d2fe; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;">Employee Onboarding</span>
+              </div>
+              <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Welcome to NexaHR</h1>
+              <p style="color: #cbd5e1; margin: 6px 0 0; font-size: 13px; font-weight: 500;">Workforce Management & Self-Service Portal</p>
+            </td>
+          </tr>
+
+          <!-- Main Body Content -->
+          <tr>
+            <td style="padding: 34px 32px 28px;">
+              <p style="font-size: 16px; color: #0f172a; margin: 0 0 14px; font-weight: 700;">
+                Dear <strong>${name || 'Team Member'}</strong>,
+              </p>
+              <p style="font-size: 14px; color: #475569; line-height: 1.65; margin: 0 0 22px;">
+                Congratulations and welcome to our organization! Your official profile on the <strong>NexaHR Workforce Portal</strong> has been activated. You can now sign in to mark attendance, apply for leaves, access corporate payslips, submit helpdesk requests, and manage your employee profile.
+              </p>
+
+              <!-- Profile Details Summary Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 22px; padding: 14px 18px;">
+                <tr>
+                  <td width="50%" style="padding: 6px 4px; vertical-align: top;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">Employee ID</div>
+                    <div style="font-size: 14px; color: #4338ca; font-weight: 800; margin-top: 2px;">${employeeCode}</div>
+                  </td>
+                  <td width="50%" style="padding: 6px 4px; vertical-align: top;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">Role / Access</div>
+                    <div style="font-size: 14px; color: #0f172a; font-weight: 700; margin-top: 2px;">${role || 'EMPLOYEE'}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding: 8px 4px 4px; vertical-align: top;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">Department</div>
+                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-top: 2px;">${department || 'General'}</div>
+                  </td>
+                  <td width="50%" style="padding: 8px 4px 4px; vertical-align: top;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">Designation</div>
+                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-top: 2px;">${designation || 'Team Member'}</div>
+                  </td>
+                </tr>
+                ${workLocation ? `
+                <tr>
+                  <td colspan="2" style="padding: 8px 4px 4px; vertical-align: top;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">Office Location</div>
+                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-top: 2px;">${workLocation}</div>
+                  </td>
+                </tr>
+                ` : ''}
+              </table>
+
+              <!-- Credentials Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px solid #0284c7; border-radius: 14px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 20px 22px;">
+                    <div style="font-size: 12px; text-transform: uppercase; color: #0369a1; font-weight: 800; letter-spacing: 1px; margin-bottom: 12px;">
+                      🔑 YOUR PORTAL LOGIN CREDENTIALS
+                    </div>
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding: 6px 0; font-size: 13px; color: #334155; font-weight: 600; width: 140px;">Work Email:</td>
+                        <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700;">${email}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; font-size: 13px; color: #334155; font-weight: 600;">Temporary Password:</td>
+                        <td style="padding: 6px 0;">
+                          <span style="font-family: 'SFMono-Regular', Consolas, monospace; font-size: 15px; font-weight: 800; color: #1e1b4b; background-color: #fef3c7; border: 1px solid #fcd34d; padding: 4px 12px; border-radius: 6px; letter-spacing: 0.5px; display: inline-block;">
+                            ${tempPassword}
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Action Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 26px 0 20px;">
+                <tr>
+                  <td align="center">
+                    <a href="${loginUrl}" target="_blank" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: #ffffff; text-decoration: none; padding: 14px 34px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);">
+                      Log In to NexaHR Portal &rarr;
+                    </a>
+                    <div style="margin-top: 10px;">
+                      <a href="${loginUrl}" style="color: #6366f1; font-size: 12px; text-decoration: underline; word-break: break-all;">${loginUrl}</a>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Next Steps Notice -->
+              <div style="background-color: #f8fafc; border-left: 4px solid #6366f1; border-radius: 6px; padding: 14px 16px; margin: 22px 0;">
+                <div style="font-size: 13px; font-weight: 700; color: #1e1b4b; margin-bottom: 6px;">Next Steps:</div>
+                <ol style="margin: 0; padding-left: 18px; color: #475569; font-size: 13px; line-height: 1.6;">
+                  <li>Access the portal link and enter your email and temporary password.</li>
+                  <li>You will be prompted to choose a permanent, private password on your first sign-in.</li>
+                  <li>Complete any pending dossier fields and review your employee benefits.</li>
+                  <li>For any questions, contact your HR Operations team or submit a Helpdesk ticket.</li>
+                </ol>
+              </div>
+
+              <!-- Security Advisory -->
+              <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin: 18px 0 0; text-align: center;">
+                🔒 <strong>Security Notice:</strong> Please keep your login credentials strictly confidential. Never share your password with anyone.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 22px 32px; text-align: center;">
+              <p style="color: #475569; font-size: 13px; font-weight: 600; margin: 0 0 4px;">
+                NexaHR Enterprise Human Resource Management System
+              </p>
+              <p style="color: #94a3b8; font-size: 12px; margin: 0 0 4px;">
+                © ${new Date().getFullYear()} NexaHR Systems. All rights reserved.
+              </p>
+              <p style="color: #cbd5e1; font-size: 11px; margin: 0;">
+                This is an automated onboarding message. Please do not reply directly to this email.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Generate Plaintext Template for Welcome Onboarding Email
+ */
+function buildWelcomeEmailText({
+  name,
+  employeeCode,
+  email,
+  tempPassword,
+  role = 'EMPLOYEE',
+  designation = 'Team Member',
+  department = 'General',
+  workLocation = 'Headquarters',
+  loginUrl,
+}) {
+  return `Welcome to NexaHR!
+
+Hello ${name || 'Team Member'},
+
+Congratulations and welcome to our organization! Your official profile on the NexaHR Workforce Portal has been created.
+
+Your Profile Details:
+- Employee ID: ${employeeCode}
+- Role / Access: ${role || 'EMPLOYEE'}
+- Designation: ${designation || 'Team Member'}
+- Department: ${department || 'General'}
+- Office Location: ${workLocation || 'Headquarters'}
+
+Your Login Credentials:
+- Work Email: ${email}
+- Temporary Password: ${tempPassword}
+- Portal URL: ${loginUrl}
+
+Next Steps:
+1. Navigate to: ${loginUrl}
+2. Log in using your work email and temporary password provided above.
+3. You will be prompted to choose a permanent, private password upon first login.
+4. Review your dossier, attendance records, and company resources.
+
+Security Advisory:
+Please keep these credentials strictly confidential. If you did not expect this message, notify your HR Operations team immediately.
+
+Warm regards,
+NexaHR People Operations & HR Team`;
+}
+
+/**
+ * Send Welcome Email with Login Credentials to newly onboarded employee
+ */
+async function sendOnboardingWelcomeEmail({
+  email,
+  name = 'Team Member',
+  employeeCode = 'EMP-0000',
+  tempPassword,
+  role = 'EMPLOYEE',
+  designation = 'Team Member',
+  department = 'General',
+  workLocation = 'Headquarters',
+  loginUrl = null,
+}) {
+  const timestamp = new Date().toISOString();
+  const rawBaseUrl = loginUrl || process.env.FRONTEND_URL || 'http://localhost:5173';
+  const resolvedLoginUrl = rawBaseUrl.includes('/login')
+    ? rawBaseUrl
+    : `${rawBaseUrl.replace(/\/$/, '')}/login`;
+
+  console.log(`\n========================================================`);
+  console.log(`[NexaHR EMAIL DISPATCH: ONBOARDING WELCOME CREDENTIALS] -> ${email}`);
+  console.log(`Recipient: ${name} (${employeeCode})`);
+  console.log(`Role: ${role} | Designation: ${designation} | Department: ${department}`);
+  console.log(`Login URL: ${resolvedLoginUrl}`);
+  console.log(`Temp Password: ${tempPassword ? '[CONFIGURED]' : '[NONE]'}`);
+  console.log(`Timestamp: ${timestamp}`);
+  console.log(`========================================================\n`);
+
+  const transporter = getMailTransporter();
+  let messageId = null;
+
+  if (transporter && email) {
+    try {
+      const from = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('no-reply@nexahr.com')
+        ? process.env.EMAIL_FROM
+        : `"NexaHR People Operations" <${process.env.SMTP_USER}>`;
+
+      const subject = `Welcome to NexaHR! Your Account Credentials [${employeeCode}]`;
+      const text = buildWelcomeEmailText({
+        name,
+        employeeCode,
+        email,
+        tempPassword,
+        role,
+        designation,
+        department,
+        workLocation,
+        loginUrl: resolvedLoginUrl,
+      });
+      const html = buildWelcomeEmailHtml({
+        name,
+        employeeCode,
+        email,
+        tempPassword,
+        role,
+        designation,
+        department,
+        workLocation,
+        loginUrl: resolvedLoginUrl,
+      });
+
+      const info = await transporter.sendMail({
+        from,
+        to: email,
+        subject,
+        text,
+        html,
+      });
+
+      messageId = info.messageId;
+      console.log(`[EMAIL SUCCESS] Onboarding welcome email sent to ${email}. MessageId: ${messageId}`);
+    } catch (err) {
+      console.error(`[EMAIL ERROR] Failed to send onboarding welcome email to ${email}:`, err.message);
+    }
+  } else {
+    console.log(`[EMAIL INFO] Transporter or email not available. Simulating onboarding welcome email.`);
+  }
+
+  return {
+    success: true,
+    channel: 'EMAIL',
+    destination: maskEmail(email),
+    messageId,
+    dispatchedAt: timestamp,
+    message: `Welcome credentials email dispatched to ${maskEmail(email)}.`,
+  };
+}
+
+/**
  * Send Ephemeral Password Reset Link via Corporate Email
  */
 async function sendPasswordResetEmail({ email, name, resetUrl, expiresInHours = 1 }) {
@@ -612,6 +908,7 @@ module.exports = {
   sendLeaveStatusEmail,
   sendLeaveRequestSubmittedEmail,
   sendPayslipEmail,
+  sendOnboardingWelcomeEmail,
   sendPasswordResetEmail,
   sendEmailOTP,
   sendWhatsAppOTP,

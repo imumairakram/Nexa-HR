@@ -1,6 +1,7 @@
 const prisma = require('../config/prisma');
 const { hashPassword } = require('../utils/password');
 const { uploadToCloudinary } = require('../config/cloudinary');
+const { sendOnboardingWelcomeEmail } = require('../services/notification.service');
 
 const onboardEmployee = async (req, res) => {
   try {
@@ -167,9 +168,28 @@ const onboardEmployee = async (req, res) => {
       return { user: newUser, profile: newProfile, salaryStructure: newSalaryStructure };
     });
 
+    // Send Welcome Email with Login Credentials to the newly onboarded employee asynchronously
+    const empFullName = `${result.user.firstName} ${result.user.lastName}`.trim();
+    const deptName = result.profile?.department?.name || departmentName || 'General';
+    const desigTitle = result.profile?.designation?.title || designationTitle || 'Team Member';
+    const officeLocation = result.profile?.workLocation || workLocation || location || 'Headquarters';
+
+    sendOnboardingWelcomeEmail({
+      email: result.user.email,
+      name: empFullName,
+      employeeCode: result.user.employeeCode,
+      tempPassword: finalPassword,
+      role: result.user.role,
+      designation: desigTitle,
+      department: deptName,
+      workLocation: officeLocation,
+    }).catch((emailErr) => {
+      console.error('[ONBOARDING EMAIL FAILED] Could not dispatch credentials email:', emailErr.message);
+    });
+
     return res.status(201).json({
       success: true,
-      message: 'Employee onboarded successfully.',
+      message: 'Employee onboarded successfully. Login credentials have been emailed to the employee.',
       data: {
         employee: {
           id: result.user.id,

@@ -337,7 +337,7 @@ const Employees = () => {
         role: payload.role,
       });
 
-      showToast(`${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully!`);
+      showToast(res?.message || `${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully! Welcome email sent.`);
       await fetchEmployeesData();
 
       setIsOnboardOpen(false);
@@ -2130,7 +2130,7 @@ NexaHR Workforce Systems`;
                     Employee Credentials Generated
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
-                    Share these temporary access details with {createdCreds.name}.
+                    Welcome email with credentials has been sent to {createdCreds.name}.
                   </p>
                 </div>
               </div>
@@ -2142,6 +2142,14 @@ NexaHR Workforce Systems`;
               >
                 <X className="w-4 h-4" />
               </button>
+            </div>
+
+            {/* Automated Email Notice */}
+            <div className="p-3 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-2.5">
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 stroke-[2.5]" />
+              <span>
+                Automated NexaHR welcome email with login credentials was dispatched to <strong>{createdCreds.email}</strong>.
+              </span>
             </div>
 
             {/* Credentials details card */}
