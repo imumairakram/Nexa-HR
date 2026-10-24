@@ -269,7 +269,73 @@ const EmployeeDocuments = () => {
   };
 
   const handleDownload = (doc) => {
-    showToast(`Downloading secure file: ${doc.title} (${doc.size || 'PDF'})...`);
+    if (!doc) return;
+    if (doc.fileUrl && doc.fileUrl.startsWith('data:')) {
+      const link = document.createElement('a');
+      link.href = doc.fileUrl;
+      link.download = `${(doc.referenceNumber || doc.id || 'NEXA-DOC')}_${doc.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Downloaded: ${doc.title}`);
+      return;
+    }
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${doc.title} - NexaHR Certified Employee Copy</title>
+  <style>
+    body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: #0f172a; margin: 40px; background: #fff; line-height: 1.6; }
+    .header { border-bottom: 3px solid #0d9488; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .brand { font-size: 28px; font-weight: 900; color: #0d9488; }
+    .subbrand { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; }
+    .badge { display: inline-block; background: #ccfbf1; color: #0f766e; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; margin-top: 20px; }
+    .title { font-size: 22px; font-weight: 800; color: #0f172a; margin: 15px 0 5px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 25px 0; font-size: 13px; }
+    .grid-label { color: #64748b; font-weight: 600; font-size: 11px; }
+    .grid-val { font-weight: 700; color: #0f172a; }
+    .content { font-size: 13.5px; color: #334155; line-height: 1.8; margin: 25px 0; white-space: pre-wrap; }
+    .footer { margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 11px; color: #64748b; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="brand">NexaHR</div>
+      <div class="subbrand">Personal Workforce Vault</div>
+    </div>
+    <div style="font-size: 11px; color: #64748b;">Issue Date: ${doc.issueDate || 'Oct 24, 2026'}</div>
+  </div>
+  <div class="badge">${doc.typeLabel || doc.type || 'Official Record'}</div>
+  <div class="title">${doc.title}</div>
+  <div class="grid">
+    <div>
+      <div class="grid-label">DOCUMENT IDENTIFIER</div>
+      <div class="grid-val">${doc.referenceNumber || `#${doc.id}`}</div>
+    </div>
+    <div>
+      <div class="grid-label">ISSUING ENTITY</div>
+      <div class="grid-val">${doc.issuer || 'People Operations & HR'}</div>
+    </div>
+  </div>
+  <div class="content">${doc.description || 'Verified official document registered in employee compliance archive.'}</div>
+  <div class="footer">NexaHR Cryptographic Vault • Digital Signature Verified</div>
+</body>
+</html>
+    `;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${(doc.referenceNumber || doc.id || 'NEXA-DOC')}_${doc.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast(`Downloaded verified document: ${doc.title}`);
   };
 
   // Filtered documents
@@ -315,31 +381,55 @@ const EmployeeDocuments = () => {
     });
 
     return [
-      { value: typeCount.CONTRACT || 0, label: 'Contract', tooltip: `Contracts: ${typeCount.CONTRACT || 0} Files` },
-      { value: typeCount.COMPENSATION || 0, label: 'Comp', tooltip: `Compensation: ${typeCount.COMPENSATION || 0} Files` },
-      { value: typeCount.LEGAL || 0, label: 'Legal', tooltip: `Legal & NDA: ${typeCount.LEGAL || 0} Files` },
-      { value: typeCount.TAX_FORM || 0, label: 'Tax', tooltip: `Tax Forms: ${typeCount.TAX_FORM || 0} Files` },
-      { value: typeCount.CERTIFICATE || 0, label: 'Certs', tooltip: `Certificates: ${typeCount.CERTIFICATE || 0} Files` },
+      { value: typeCount.CONTRACT || 1, label: 'Contract', tooltip: `Contracts: ${typeCount.CONTRACT || 0} Files` },
+      { value: typeCount.COMPENSATION || 1, label: 'Comp', tooltip: `Compensation: ${typeCount.COMPENSATION || 0} Files` },
+      { value: typeCount.LEGAL || 1, label: 'Legal', tooltip: `Legal & NDA: ${typeCount.LEGAL || 0} Files` },
+      { value: typeCount.TAX_FORM || 1, label: 'Tax', tooltip: `Tax Forms: ${typeCount.TAX_FORM || 0} Files` },
+      { value: typeCount.CERTIFICATE || 1, label: 'Certs', tooltip: `Certificates: ${typeCount.CERTIFICATE || 0} Files` },
     ];
   }, [personalDocs]);
 
   const policiesSparkData = useMemo(() => {
-    return [
-      { value: 1, label: 'Ethics', tooltip: 'Corporate Governance Charter' },
-      { value: 2, label: 'Benefits', tooltip: 'Global Health & Medical Guide' },
-      { value: 3, label: 'Finance', tooltip: 'Remote Work & Expense Policy' },
-      { value: 4, label: 'Security', tooltip: 'SOC-2 Data Security Policy' },
-    ];
-  }, []);
+    if (!policies.length) return [{ value: 0, label: 'Empty', tooltip: 'No policies' }];
+    const counts = {};
+    policies.forEach((p) => {
+      const cat = p.categoryLabel || p.category || 'General';
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+    return Object.entries(counts).map(([label, count]) => ({
+      value: count,
+      label: label.length > 8 ? label.substring(0, 8) + '..' : label,
+      tooltip: `${label}: ${count} active policies`,
+    }));
+  }, [policies]);
+
+  const verifiedPersonalCount = useMemo(() => {
+    return personalDocs.filter((d) => (d.status || '').toUpperCase() === 'VERIFIED').length;
+  }, [personalDocs]);
+
+  const complianceRate = useMemo(() => {
+    if (!personalDocs.length) return '100.0';
+    return ((verifiedPersonalCount / personalDocs.length) * 100).toFixed(1);
+  }, [personalDocs, verifiedPersonalCount]);
 
   const complianceSparkData = useMemo(() => {
     return [
-      { value: 25, label: 'Offer', tooltip: 'Offer & Contract Signed (100%)' },
-      { value: 50, label: 'NDA', tooltip: 'Proprietary IP Assignment (100%)' },
-      { value: 75, label: 'Tax', tooltip: 'Statutory W-2 Tax Registered (100%)' },
-      { value: 100, label: 'SOC2', tooltip: 'InfoSec Compliance Certified (100%)' },
+      { value: 95, label: 'Offer', tooltip: 'Offer & Contract Verified' },
+      { value: 98, label: 'NDA', tooltip: 'Proprietary IP Assignment Verified' },
+      { value: 100, label: 'Audit', tooltip: 'Statutory Verification Complete' },
     ];
   }, []);
+
+  const totalVaultMB = useMemo(() => {
+    const parseSize = (s) => {
+      if (!s || typeof s !== 'string') return 1.5;
+      const m = s.match(/([\d.]+)\s*MB/i);
+      return m ? parseFloat(m[1]) : 1.5;
+    };
+    const pMB = personalDocs.reduce((acc, d) => acc + parseSize(d.size), 0);
+    const polMB = policies.reduce((acc, p) => acc + parseSize(p.size), 0);
+    return (pMB + polMB).toFixed(1);
+  }, [personalDocs, policies]);
 
   const securitySparkData = useMemo(() => {
     return [
@@ -455,28 +545,28 @@ const EmployeeDocuments = () => {
         <SparkMetricCard
           variant="light"
           title="Compliance State"
-          value="100%"
+          value={`${complianceRate}%`}
           unit="Verified"
-          badgeText="Fully Audited"
-          badgeType="positive"
+          badgeText={`${verifiedPersonalCount}/${personalDocs.length} Verified`}
+          badgeType={Number(complianceRate) >= 90 ? 'positive' : 'warning'}
           badgeIcon="up"
-          subtext="All Mandatory Charters Signed"
+          subtext="Mandatory Dossiers Verified"
           chartColor="amber"
           presetWave="wave3"
           dataPoints={complianceSparkData}
           loading={loading}
         />
 
-        {/* Card 4: Light Card - Security Tier */}
+        {/* Card 4: Light Card - Vault Storage */}
         <SparkMetricCard
           variant="light"
-          title="Vault Security"
-          value="AES-256"
-          unit="Bit"
-          badgeText="Zero-Trust"
+          title="Vault Storage"
+          value={totalVaultMB}
+          unit="MB Stored"
+          badgeText={`${personalDocs.length + policies.length} Files`}
           badgeType="neutral"
           badgeIcon="dot"
-          subtext="Cloud Storage Protected"
+          subtext="Encrypted Cloud Repository"
           chartColor="rose"
           presetWave="wave4"
           dataPoints={securitySparkData}

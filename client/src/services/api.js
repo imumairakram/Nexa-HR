@@ -800,6 +800,51 @@ export const api = {
     });
   },
 
+  // --- Documents & Corporate Policies Hub ---
+  getIssuedDocuments: async (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return await fetchAPI(`/documents/issued${qs ? `?${qs}` : ''}`);
+  },
+
+  issueDocument: async (docData) => {
+    const res = await fetchAPI('/documents/issue', {
+      method: 'POST',
+      body: JSON.stringify(docData),
+    });
+    invalidateClientCache('/documents');
+    return res;
+  },
+
+  deleteIssuedDocument: async (id) => {
+    const res = await fetchAPI(`/documents/issued/${id}`, {
+      method: 'DELETE',
+    });
+    invalidateClientCache('/documents');
+    return res;
+  },
+
+  getCompanyPolicies: async (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return await fetchAPI(`/documents/policies${qs ? `?${qs}` : ''}`);
+  },
+
+  publishCompanyPolicy: async (policyData) => {
+    const res = await fetchAPI('/documents/policies', {
+      method: 'POST',
+      body: JSON.stringify(policyData),
+    });
+    invalidateClientCache('/documents');
+    return res;
+  },
+
+  deleteCompanyPolicy: async (id) => {
+    const res = await fetchAPI(`/documents/policies/${id}`, {
+      method: 'DELETE',
+    });
+    invalidateClientCache('/documents');
+    return res;
+  },
+
   // --- Client Cache Utilities ---
   getCached: (endpoint) => {
     const entry = clientCache.get(endpoint);
