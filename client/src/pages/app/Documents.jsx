@@ -1549,7 +1549,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {isIssueModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-3xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Header */}
             <div className="px-6 sm:px-7 py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B]">
               <div className="flex items-center gap-3.5">
@@ -1837,7 +1837,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {isPolicyModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-2xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-3xl sm:max-w-4xl lg:max-w-5xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             <div className="px-6 sm:px-7 py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B]">
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30">
@@ -2009,7 +2009,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-3xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="px-6 py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B]">
               <div className="flex items-center gap-3">

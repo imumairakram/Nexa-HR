@@ -1096,7 +1096,7 @@ const Helpdesk = () => {
       {/* ========================================================================= */}
       {isNewTicketOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-2xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/70 border border-rose-200/70 dark:border-rose-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl sm:max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/70 border border-rose-200/70 dark:border-rose-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
             <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-rose-200/70 dark:border-rose-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-rose-50/90 via-pink-50/70 to-purple-50/60 dark:from-rose-950/40 dark:via-pink-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -1126,47 +1126,50 @@ const Helpdesk = () => {
 
             {/* Form Body */}
             <form onSubmit={handleCreateTicket} className="overflow-y-auto flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-rose-50/15 to-purple-50/15 dark:from-transparent dark:via-rose-950/10 dark:to-purple-950/10">
-              {/* Dynamic Employee Selector */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-rose-500" />
-                  Target Employee / Requester
-                </label>
-                <select
-                  value={newTicketForm.employeeId}
-                  onChange={(e) => setNewTicketForm((p) => ({ ...p, employeeId: e.target.value }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 cursor-pointer shadow-xs"
-                >
-                  <option value="">Logged by Me (HR Operations / Admin Desk)</option>
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.employeeCode} — {emp.firstName} {emp.lastName} ({emp.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Dynamic Employee Selector & Subject in 2-Column Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Dynamic Employee Selector */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-rose-500" />
+                    Target Employee / Requester
+                  </label>
+                  <select
+                    value={newTicketForm.employeeId}
+                    onChange={(e) => setNewTicketForm((p) => ({ ...p, employeeId: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 cursor-pointer shadow-xs"
+                  >
+                    <option value="">Logged by Me (HR Operations / Admin Desk)</option>
+                    {employees.map((emp) => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.employeeCode} — {emp.firstName} {emp.lastName} ({emp.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* Subject */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-rose-500" />
-                    Ticket Subject <span className="text-rose-500">*</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">
-                    {newTicketForm.subject.length}/100 chars
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Broken Laptop Screen / Overtime Calculation Inquiry"
-                  value={newTicketForm.subject}
-                  onChange={(e) =>
-                    setNewTicketForm((p) => ({ ...p, subject: e.target.value.slice(0, 100) }))
-                  }
-                  required
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all shadow-xs"
-                />
+                {/* Subject */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-rose-500" />
+                      Ticket Subject <span className="text-rose-500">*</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">
+                      {newTicketForm.subject.length}/100 chars
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Broken Laptop Screen / Overtime Calculation Inquiry"
+                    value={newTicketForm.subject}
+                    onChange={(e) =>
+                      setNewTicketForm((p) => ({ ...p, subject: e.target.value.slice(0, 100) }))
+                    }
+                    required
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all shadow-xs"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
