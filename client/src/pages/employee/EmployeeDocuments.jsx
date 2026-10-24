@@ -34,6 +34,7 @@ import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton, DocumentCardSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
+import { api } from '../../services/api';
 
 const COMPANY_POLICIES = [
   {
@@ -135,6 +136,16 @@ const EmployeeDocuments = () => {
     }
   });
 
+  const [policies, setPolicies] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexahr_company_policies');
+      if (saved) return JSON.parse(saved);
+      return COMPANY_POLICIES;
+    } catch {
+      return COMPANY_POLICIES;
+    }
+  });
+
   const [activeTab, setActiveTab] = useState('personal'); // 'personal' | 'policies'
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'grid'
   const [searchQuery, setSearchQuery] = useState('');
@@ -143,11 +154,45 @@ const EmployeeDocuments = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const fetchDocuments = () => {
+  const fetchDocuments = async () => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const [docRes, polRes] = await Promise.allSettled([
+        api.getIssuedDocuments(),
+        api.getCompanyPolicies(),
+      ]);
+
+      if (docRes.status === 'fulfilled' && docRes.value?.success && docRes.value.data?.documents?.length > 0) {
+        const backendDocs = docRes.value.data.documents.map((d) => ({
+          id: d.id,
+          title: d.title,
+          type: d.type,
+          typeLabel: d.typeLabel,
+          issueDate: d.issueDate,
+          size: d.size,
+          status: d.status,
+          issuer: d.issuer,
+          description: d.description,
+        }));
+        setPersonalDocs(backendDocs);
+        localStorage.setItem('nexahr_personal_docs', JSON.stringify(backendDocs));
+      } else {
+        const saved = localStorage.getItem('nexahr_personal_docs');
+        if (saved) setPersonalDocs(JSON.parse(saved));
+      }
+
+      if (polRes.status === 'fulfilled' && polRes.value?.success && polRes.value.data?.policies?.length > 0) {
+        setPolicies(polRes.value.data.policies);
+        localStorage.setItem('nexahr_company_policies', JSON.stringify(polRes.value.data.policies));
+      } else {
+        const savedPol = localStorage.getItem('nexahr_company_policies');
+        if (savedPol) setPolicies(JSON.parse(savedPol));
+      }
+    } catch (e) {
+      console.warn('Document sync error:', e);
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   React.useEffect(() => {
@@ -242,7 +287,7 @@ const EmployeeDocuments = () => {
   }, [personalDocs, searchQuery]);
 
   const filteredPolicies = useMemo(() => {
-    return COMPANY_POLICIES.filter((p) => {
+    return policies.filter((p) => {
       const q = searchQuery.toLowerCase().trim();
       if (!q) return true;
       return (
@@ -253,7 +298,7 @@ const EmployeeDocuments = () => {
         p.description.toLowerCase().includes(q)
       );
     });
-  }, [searchQuery]);
+  }, [policies, searchQuery]);
 
   // Dynamic Sparkline Data for Documents Hub
   const personalDocsSparkData = useMemo(() => {
@@ -345,7 +390,7 @@ const EmployeeDocuments = () => {
               </span>
               <span className="flex items-center gap-1.5 text-cyan-700 dark:text-cyan-300 font-bold bg-cyan-100/60 dark:bg-cyan-950/60 px-3 py-1 rounded-xl border border-cyan-200 dark:border-cyan-800/60">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{COMPANY_POLICIES.length} Official Handbooks</span>
+                <span>{policies.length} Official Handbooks</span>
               </span>
             </div>
           </div>
@@ -394,7 +439,7 @@ const EmployeeDocuments = () => {
         <SparkMetricCard
           variant="light"
           title="Company Handbooks"
-          value={COMPANY_POLICIES.length}
+          value={policies.length}
           unit="Policies"
           badgeText="FY26 Certified"
           badgeType="positive"
@@ -466,7 +511,7 @@ const EmployeeDocuments = () => {
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Company Policies ({COMPANY_POLICIES.length})</span>
+            <span>Company Policies ({policies.length})</span>
           </button>
         </div>
 

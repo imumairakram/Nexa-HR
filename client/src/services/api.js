@@ -564,6 +564,43 @@ export const api = {
     });
   },
 
+  // --- Documents & Corporate Policies ---
+  getIssuedDocuments: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/documents/issued${query ? `?${query}` : ''}`);
+  },
+
+  issueDocument: async (documentData) => {
+    return await fetchAPI('/documents/issue', {
+      method: 'POST',
+      body: JSON.stringify(documentData),
+    });
+  },
+
+  deleteIssuedDocument: async (id) => {
+    return await fetchAPI(`/documents/issued/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getCompanyPolicies: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await fetchAPI(`/documents/policies${query ? `?${query}` : ''}`);
+  },
+
+  publishCompanyPolicy: async (policyData) => {
+    return await fetchAPI('/documents/policies', {
+      method: 'POST',
+      body: JSON.stringify(policyData),
+    });
+  },
+
+  deleteCompanyPolicy: async (id) => {
+    return await fetchAPI(`/documents/policies/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   // --- Accounts & Financial Ledger Operations ---
   getAccountTransactions: async (params = {}) => {
     const query = new URLSearchParams(params).toString();

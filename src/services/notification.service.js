@@ -595,6 +595,106 @@ async function sendOnboardingWelcomeEmail({
 }
 
 /**
+ * Dispatches formal notification to employee when an official document is issued by HR
+ */
+async function sendDocumentIssuedEmail({
+  email,
+  name,
+  documentTitle,
+  documentType,
+  referenceNumber,
+  issuer = 'NexaHR People Operations',
+  portalUrl = 'https://nexa-hr-xi.vercel.app/employee/documents',
+}) {
+  const timestamp = new Date().toISOString();
+  console.log(`\n========================================================`);
+  console.log(`[NexaHR EMAIL DISPATCH: OFFICIAL DOCUMENT ISSUED] -> ${email}`);
+  console.log(`Recipient: ${name}`);
+  console.log(`Document: ${documentTitle} (${documentType})`);
+  console.log(`Reference No: ${referenceNumber}`);
+  console.log(`Issuer: ${issuer}`);
+  console.log(`Timestamp: ${timestamp}`);
+  console.log(`========================================================\n`);
+
+  const transporter = getMailTransporter();
+  let messageId = null;
+
+  if (transporter && email) {
+    try {
+      const from = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('no-reply@nexahr.com')
+        ? process.env.EMAIL_FROM
+        : `"NexaHR People Operations" <${process.env.SMTP_USER}>`;
+
+      const subject = `[Official Document Issued] ${documentTitle} - Ref: ${referenceNumber}`;
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;">
+          <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%); padding: 32px 24px; border-radius: 10px; text-align: center; margin-bottom: 24px;">
+            <div style="display: inline-block; background: rgba(255, 255, 255, 0.12); padding: 4px 14px; border-radius: 20px; color: #c7d2fe; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Official Document Notification</div>
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800;">NexaHR Document Vault</h1>
+            <p style="color: #94a3b8; margin: 6px 0 0; font-size: 13px;">People Operations & Compliance Repository</p>
+          </div>
+          <p style="font-size: 15px; color: #1e293b; margin-bottom: 14px;">Dear <strong>${name || 'Team Member'}</strong>,</p>
+          <p style="font-size: 14px; color: #475569; line-height: 1.6;">An official corporate document has been generated and issued to your employee profile by <strong>${issuer}</strong>.</p>
+          
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 13px;">
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 140px;">Document Title:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 800;">${documentTitle}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Classification:</td>
+                <td style="padding: 6px 0; color: #4338ca; font-weight: 700;">${documentType}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Reference Code:</td>
+                <td style="padding: 6px 0; font-family: monospace; font-weight: 700; color: #0f172a;">${referenceNumber}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Issuing Authority:</td>
+                <td style="padding: 6px 0; color: #334155; font-weight: 600;">${issuer}</td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="font-size: 13px; color: #475569; line-height: 1.5;">You can preview, review details, and download an encrypted certified copy directly from your <strong>Documents & Policies Hub</strong> on the NexaHR Portal.</p>
+          
+          <div style="text-align: center; margin: 28px 0 20px;">
+            <a href="${portalUrl}" style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: #ffffff; padding: 13px 30px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);">Access Documents Hub &rarr;</a>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px;" />
+          <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">NexaHR Enterprise Human Resource Management System • Confidential & Proprietary</p>
+        </div>
+      `;
+
+      const text = `Official Document Issued: ${documentTitle}\n\nDear ${name},\n\nAn official corporate document (${documentType}) has been issued to your profile by ${issuer}.\n\nReference: ${referenceNumber}\nAccess your document: ${portalUrl}\n\nNexaHR People Operations`;
+
+      const info = await transporter.sendMail({
+        from,
+        to: email,
+        subject,
+        text,
+        html,
+      });
+
+      messageId = info.messageId;
+      console.log(`[EMAIL SUCCESS] Document issued email sent to ${email}. MessageId: ${messageId}`);
+    } catch (err) {
+      console.error(`[EMAIL ERROR] Failed to send document issued email to ${email}:`, err.message);
+    }
+  }
+
+  return {
+    success: true,
+    channel: 'EMAIL',
+    destination: maskEmail(email),
+    messageId,
+    dispatchedAt: timestamp,
+  };
+}
+
+/**
  * Send Ephemeral Password Reset Link via Corporate Email
  */
 async function sendPasswordResetEmail({ email, name, resetUrl, expiresInHours = 1 }) {
@@ -906,6 +1006,7 @@ module.exports = {
   sendLeaveRequestSubmittedEmail,
   sendPayslipEmail,
   sendOnboardingWelcomeEmail,
+  sendDocumentIssuedEmail,
   sendPasswordResetEmail,
   sendEmailOTP,
   sendWhatsAppOTP,

@@ -23,6 +23,7 @@ const announcementRoutes = require('./routes/announcement.routes');
 const ticketRoutes = require('./routes/ticket.routes');
 const accountRoutes = require('./routes/account.routes');
 const recruitmentRoutes = require('./routes/recruitment.routes');
+const documentRoutes = require('./routes/document.routes');
 
 // Background Services
 const { startSelfPing, stopSelfPing } = require('./services/selfPing.service');
@@ -116,6 +117,7 @@ app.use('/api/announcements', announcementRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/accounts', accountRoutes);
 app.use('/api/recruitment', recruitmentRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {
