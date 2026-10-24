@@ -180,10 +180,10 @@ const createJobOpening = async (req, res) => {
       department,
       dept,
       location,
-      type = 'Full Time',
-      experience = '3+ Years',
-      salary = '$100k - $140k',
-      status = 'ACTIVE',
+      type,
+      experience,
+      salary,
+      status,
       description,
       requirements,
       skills = [],
@@ -191,12 +191,21 @@ const createJobOpening = async (req, res) => {
       closingDate,
     } = req.body;
 
-    if (!title || (!department && !dept) || !location) {
+    if (!title || !title.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Job Title, Department, and Location are mandatory.',
+        message: 'Job Title is required.',
       });
     }
+
+    const finalDepartment = (department || dept || '').trim() || 'Engineering & DevOps';
+    const finalLocation = (location || '').trim() || 'Islamabad HQ / Remote';
+    const finalType = (type || '').trim() || 'Full-Time';
+    const finalExperience = (experience || '').trim() || '3+ Years';
+    const finalSalary = salary && salary.trim() ? salary.trim() : '$100k - $140k';
+    const finalStatus = (status || 'ACTIVE').toUpperCase();
+    const finalDescription = description && description.trim() ? description.trim() : 'Role overview and key deliverables.';
+    const finalRequirements = requirements && requirements.trim() ? requirements.trim() : null;
 
     const count = await prisma.jobOpening.count();
     let jobCode = `JOB-${101 + count}`;
@@ -210,18 +219,18 @@ const createJobOpening = async (req, res) => {
       data: {
         jobCode,
         title: title.trim(),
-        department: (department || dept).trim(),
-        location: location.trim(),
-        type: type.trim(),
-        experience: experience.trim(),
-        salary: salary ? salary.trim() : null,
-        status: status.toUpperCase(),
-        description: description ? description.trim() : null,
-        requirements: requirements ? requirements.trim() : null,
+        department: finalDepartment,
+        location: finalLocation,
+        type: finalType,
+        experience: finalExperience,
+        salary: finalSalary,
+        status: finalStatus,
+        description: finalDescription,
+        requirements: finalRequirements,
         skills: Array.isArray(skills) ? skills : typeof skills === 'string' ? skills.split(',').map((s) => s.trim()) : [],
         urgent: Boolean(urgent),
         closingDate: closingDate ? new Date(closingDate) : null,
-        createdById: req.user?.id || null,
+        createdById: req.user?.id || req.user?.userId || null,
       },
     });
 
@@ -240,7 +249,7 @@ const createJobOpening = async (req, res) => {
     console.error('Error creating job opening:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to create job opening.',
+      message: error.message || 'Failed to create job opening.',
       error: error.message,
     });
   }

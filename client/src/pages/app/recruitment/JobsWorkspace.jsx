@@ -30,6 +30,8 @@ import {
   SlidersHorizontal,
   Building2,
   Share2,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 
 const INITIAL_JOBS = [];
@@ -48,13 +50,15 @@ const JobsWorkspace = () => {
   // Side-drawer state (Create / Edit)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   const [form, setForm] = useState({
     title: '',
-    dept: '',
-    location: '',
+    dept: 'Engineering & DevOps',
+    location: 'Islamabad HQ / Remote',
     type: 'Full-Time',
-    experience: '',
-    salary: '',
+    experience: '3 - 5 Years',
+    salary: '$120k - $150k',
     status: 'ACTIVE',
     description: '',
   });
@@ -115,13 +119,14 @@ const JobsWorkspace = () => {
   // Open Drawer for Create
   const handleOpenCreate = () => {
     setEditingJob(null);
+    setFormError('');
     setForm({
       title: '',
-      dept: departments.length > 0 ? departments[0].name : '',
-      location: '',
+      dept: departments.length > 0 ? departments[0].name : 'Engineering & DevOps',
+      location: 'Islamabad HQ / Remote',
       type: 'Full-Time',
-      experience: '',
-      salary: '',
+      experience: '3 - 5 Years',
+      salary: '$120k - $150k',
       status: 'ACTIVE',
       description: '',
     });
@@ -131,13 +136,14 @@ const JobsWorkspace = () => {
   // Open Drawer for Edit
   const handleOpenEdit = (job) => {
     setEditingJob(job);
+    setFormError('');
     setForm({
       title: job.title || '',
-      dept: job.dept || job.department || (departments.length > 0 ? departments[0].name : ''),
-      location: job.location || '',
+      dept: job.dept || job.department || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
+      location: job.location || 'Islamabad HQ / Remote',
       type: job.type || 'Full-Time',
-      experience: job.experience || '',
-      salary: job.salary || '',
+      experience: job.experience || '3+ Years',
+      salary: job.salary || '$120k - $150k',
       status: job.status || 'ACTIVE',
       description: job.description || '',
     });
@@ -147,22 +153,27 @@ const JobsWorkspace = () => {
   // Save handler (Create / Edit) with Live Backend Integration
   const handleSaveJob = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return;
+    setFormError('');
+    if (!form.title.trim()) {
+      setFormError('Please provide a Job Title.');
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
       if (editingJob) {
         const payload = {
           title: form.title.trim(),
-          department: form.dept,
-          location: form.location,
-          type: form.type,
-          experience: form.experience,
-          salary: form.salary,
-          status: form.status,
-          description: form.description.trim(),
+          department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
+          location: form.location.trim() || 'Islamabad HQ / Remote',
+          type: form.type || 'Full-Time',
+          experience: form.experience.trim() || '3+ Years',
+          salary: form.salary.trim() || '$100k - $140k',
+          status: form.status || 'ACTIVE',
+          description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
         };
 
-        const res = await api.updateJobOpening(editingJob.id, payload).catch(() => null);
+        const res = await api.updateJobOpening(editingJob.id, payload);
         if (res?.success && res.data?.job) {
           setJobs((prev) => prev.map((j) => (j.id === editingJob.id ? res.data.job : j)));
         } else {
@@ -171,33 +182,37 @@ const JobsWorkspace = () => {
           );
         }
         showToast(`Requisition "${form.title}" updated successfully!`);
+        setIsDrawerOpen(false);
       } else {
         const payload = {
           title: form.title.trim(),
-          department: form.dept,
-          location: form.location,
-          type: form.type,
-          experience: form.experience,
-          salary: form.salary,
-          status: form.status,
+          department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
+          location: form.location.trim() || 'Islamabad HQ / Remote',
+          type: form.type || 'Full-Time',
+          experience: form.experience.trim() || '3+ Years',
+          salary: form.salary.trim() || '$100k - $140k',
+          status: form.status || 'ACTIVE',
           description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
         };
 
         const res = await api.createJobOpening(payload);
         if (res?.success && res.data?.job) {
           setJobs((prev) => [res.data.job, ...prev]);
-          showToast(`Job requisition "${form.title}" saved to database!`);
+          showToast(`Job requisition "${form.title}" published successfully!`);
           // Silently refresh stats
           api.getRecruitmentStats().then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
+          setIsDrawerOpen(false);
         } else {
-          throw new Error(res?.message || 'Failed to save job to database');
+          throw new Error(res?.message || 'Failed to save job requisition to database');
         }
       }
     } catch (err) {
       console.error('Error saving job:', err);
-      showToast(`Error: ${err.message || 'Failed to save job requisition'}`);
+      const msg = err.message || 'Failed to save job requisition';
+      setFormError(msg);
+      showToast(`Error: ${msg}`);
     } finally {
-      setIsDrawerOpen(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -823,6 +838,14 @@ const JobsWorkspace = () => {
                   </button>
                 </div>
 
+                {/* Inline Error Alert */}
+                {formError && (
+                  <div className="mx-6 sm:mx-8 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-2xl flex items-center gap-2.5 text-xs text-rose-600 dark:text-rose-300 font-semibold animate-in fade-in">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                    <span>{formError}</span>
+                  </div>
+                )}
+
                 {/* Form Body with Smooth Scroll */}
                 <form id="job-drawer-form" onSubmit={handleSaveJob} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5 custom-scrollbar">
                   {/* Title */}
@@ -882,9 +905,10 @@ const JobsWorkspace = () => {
                   {/* Location & Contract Type */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Location Hub</label>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Location Hub *</label>
                       <input
                         type="text"
+                        required
                         placeholder="Islamabad HQ / Remote"
                         value={form.location}
                         onChange={(e) => setForm({ ...form, location: e.target.value })}
@@ -951,17 +975,20 @@ const JobsWorkspace = () => {
                 <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3 bg-slate-50/50 dark:bg-slate-800/40">
                   <button
                     type="button"
+                    disabled={isSubmitting}
                     onClick={() => setIsDrawerOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="px-5 py-2.5 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     form="job-drawer-form"
-                    className="px-6 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 transition-all cursor-pointer active:scale-95"
+                    disabled={isSubmitting}
+                    className="px-6 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-xs shadow-md shadow-indigo-600/25 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
                   >
-                    {editingJob ? 'Save Requisition' : 'Publish Job Opening'}
+                    {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{editingJob ? (isSubmitting ? 'Saving...' : 'Save Requisition') : (isSubmitting ? 'Publishing...' : 'Publish Job Opening')}</span>
                   </button>
                 </div>
               </motion.div>

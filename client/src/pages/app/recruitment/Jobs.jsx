@@ -72,10 +72,10 @@ const Jobs = () => {
     try {
       const payload = {
         title: form.title.trim(),
-        department: form.dept,
-        location: form.location,
-        type: form.type,
-        salary: form.salary,
+        department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
+        location: (form.location || '').trim() || 'Islamabad HQ / Remote',
+        type: form.type || 'Full-Time',
+        salary: (form.salary || '').trim() || '$100k - $140k',
         status: 'ACTIVE',
       };
 
@@ -96,6 +96,11 @@ const Jobs = () => {
           console.error(e);
         }
         setToastMsg(`Job requisition "${form.title}" saved to database!`);
+        setIsAddOpen(false);
+        setForm((prev) => ({
+          ...prev,
+          title: '',
+        }));
       } else {
         throw new Error(res?.message || 'Failed to save job to database');
       }
@@ -103,11 +108,6 @@ const Jobs = () => {
       console.error('Error saving job to database:', err);
       setToastMsg(`Error: ${err.message || 'Failed to save job requisition'}`);
     } finally {
-      setIsAddOpen(false);
-      setForm((prev) => ({
-        ...prev,
-        title: '',
-      }));
       setTimeout(() => setToastMsg(''), 3000);
     }
   };
