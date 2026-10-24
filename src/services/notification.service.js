@@ -523,10 +523,7 @@ async function sendOnboardingWelcomeEmail({
   loginUrl = null,
 }) {
   const timestamp = new Date().toISOString();
-  const rawBaseUrl = loginUrl || process.env.FRONTEND_URL || 'http://localhost:5173';
-  const resolvedLoginUrl = rawBaseUrl.includes('/login')
-    ? rawBaseUrl
-    : `${rawBaseUrl.replace(/\/$/, '')}/login`;
+  const resolvedLoginUrl = (loginUrl || (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost') ? process.env.FRONTEND_URL : 'https://nexa-hr-xi.vercel.app/')).trim();
 
   console.log(`\n========================================================`);
   console.log(`[NexaHR EMAIL DISPATCH: ONBOARDING WELCOME CREDENTIALS] -> ${email}`);

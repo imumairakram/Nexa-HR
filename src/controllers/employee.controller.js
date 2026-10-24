@@ -183,6 +183,7 @@ const onboardEmployee = async (req, res) => {
       designation: desigTitle,
       department: deptName,
       workLocation: officeLocation,
+      loginUrl: 'https://nexa-hr-xi.vercel.app/',
     }).catch((emailErr) => {
       console.error('[ONBOARDING EMAIL FAILED] Could not dispatch credentials email:', emailErr.message);
     });
