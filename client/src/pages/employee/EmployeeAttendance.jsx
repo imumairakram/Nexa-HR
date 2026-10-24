@@ -18,6 +18,7 @@ import {
   CalendarDays,
   Sparkles,
   ArrowUpRight,
+  Building2,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -35,6 +36,15 @@ const EmployeeAttendance = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [todayLog, setTodayLog] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  const officeLocation = useMemo(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      return u?.profile?.workLocation || u?.workLocation || 'Islamabad HQ & Innovation Lab';
+    } catch {
+      return 'Islamabad HQ & Innovation Lab';
+    }
+  }, []);
 
   // Live clock updating every second
   useEffect(() => {
@@ -282,15 +292,19 @@ const EmployeeAttendance = () => {
               Punches are captured in real-time from office biometric face-recognition and fingerprint gate terminals. Manual adjustments are managed by HR.
             </p>
 
-            {/* Live Clock & Shift Details */}
-            <div className="flex flex-wrap items-center gap-4 pt-1">
+            {/* Live Clock, Office Location & Shift Details */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-emerald-400" />
                 <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wider">
                   {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </span>
               </div>
-              <span className="text-xs text-slate-400 font-medium">
+              <div className="bg-emerald-500/15 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-emerald-500/30 flex items-center gap-2 text-xs font-bold text-emerald-200">
+                <Building2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>{officeLocation}</span>
+              </div>
+              <span className="text-xs text-slate-300 font-medium">
                 {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>

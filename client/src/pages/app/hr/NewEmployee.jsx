@@ -16,6 +16,7 @@ import {
   Clock,
   Lock,
   Briefcase,
+  Home,
 } from 'lucide-react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
@@ -129,6 +130,7 @@ const NewEmployee = () => {
     designation: '',
     employeeCode: `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
     reportingManager: '',
+    workLocation: 'Islamabad HQ & Innovation Lab',
     joiningDate: new Date().toISOString().split('T')[0],
     employmentType: 'FULL_TIME',
     // Step 3
@@ -191,7 +193,9 @@ const NewEmployee = () => {
         phone: form.phone,
         dateOfBirth: form.dob,
         gender: form.gender,
-        address: form.address,
+        address: form.address ? form.address.trim() : null,
+        workLocation: form.workLocation || 'Islamabad HQ & Innovation Lab',
+        location: form.workLocation || 'Islamabad HQ & Innovation Lab',
         departmentName: form.department,
         designationTitle: form.designation,
         employeeCode: form.employeeCode || `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -460,9 +464,13 @@ const NewEmployee = () => {
                 />
               </div>
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Residential Address</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
+                  <span>Residential Street Address (Home)</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Personal Residence</span>
+                </label>
                 <input
                   type="text"
+                  placeholder="e.g. House #14, Street 9, Sector F-7/2, Islamabad"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
@@ -535,6 +543,51 @@ const NewEmployee = () => {
                 </select>
               </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
+                  <span>Assigned Office Work Location *</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Physical Campus / Hub</span>
+                </label>
+                <select
+                  value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(form.workLocation) ? form.workLocation : 'CUSTOM'}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'CUSTOM') {
+                      setForm({ ...form, workLocation: '' });
+                    } else {
+                      setForm({ ...form, workLocation: val });
+                    }
+                  }}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                >
+                  <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
+                  <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
+                  <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
+                  <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
+                  <option value="CUSTOM">Custom Office Campus / Branch...</option>
+                </select>
+                {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(form.workLocation)) && (
+                  <input
+                    type="text"
+                    placeholder="Enter custom office campus or branch name"
+                    value={form.workLocation}
+                    onChange={(e) => setForm({ ...form, workLocation: e.target.value })}
+                    className="mt-2 w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Official Joining Date</label>
+                <input
+                  type="date"
+                  value={form.joiningDate}
+                  onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer"
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -602,6 +655,20 @@ const NewEmployee = () => {
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Designation Role:</span>
                 <span className="text-slate-900 dark:text-white">{form.designation}</span>
+              </div>
+              <div className="flex justify-between font-bold">
+                <span className="text-slate-400">Office Work Location:</span>
+                <span className="text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-blue-500" />
+                  {form.workLocation || 'Islamabad HQ & Innovation Lab'}
+                </span>
+              </div>
+              <div className="flex justify-between font-bold">
+                <span className="text-slate-400">Residential Address (Home):</span>
+                <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Home className="w-3.5 h-3.5 text-amber-500" />
+                  {form.address || 'Not Provided'}
+                </span>
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Annual Compensation:</span>

@@ -32,6 +32,7 @@ import {
   ShieldAlert,
   Trash2,
   UserX,
+  Home,
 } from 'lucide-react';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
@@ -215,7 +216,8 @@ const Employees = () => {
     role: 'EMPLOYEE',
     departmentName: '',
     designationTitle: '',
-    location: '',
+    workLocation: 'Islamabad HQ & Innovation Lab',
+    location: 'Islamabad HQ & Innovation Lab',
     joiningDate: new Date().toISOString().split('T')[0],
     basicSalary: '',
     housingAllowance: '0',
@@ -309,7 +311,8 @@ const Employees = () => {
         role: onboardForm.role || 'EMPLOYEE',
         departmentName: onboardForm.departmentName || 'Engineering & DevOps',
         designationTitle: onboardForm.designationTitle || 'Software Engineer',
-        address: onboardForm.location || onboardForm.address || 'Headquarters',
+        address: onboardForm.address ? onboardForm.address.trim() : null,
+        workLocation: (onboardForm.workLocation || onboardForm.location || 'Islamabad HQ & Innovation Lab').trim(),
         joiningDate: onboardForm.joiningDate || new Date().toISOString().split('T')[0],
         basicSalary: parseFloat(onboardForm.basicSalary || 0),
         housingAllowance: parseFloat(onboardForm.housingAllowance || 0),
@@ -381,6 +384,8 @@ NexaHR Workforce Systems`;
 
   // Open Edit Modal
   const handleOpenEdit = (emp) => {
+    const assignedOffice = emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ & Innovation Lab';
+    const residentialAddr = emp.profile?.address || emp.address || '';
     setEditingEmployee(emp);
     setEditForm({
       id: emp.id,
@@ -393,7 +398,8 @@ NexaHR Workforce Systems`;
       isActive: emp.isActive !== undefined ? emp.isActive : true,
       departmentName: emp.profile?.department?.name || '',
       designationTitle: emp.profile?.designation?.title || '',
-      location: emp.profile?.address || emp.profile?.location || '',
+      workLocation: assignedOffice,
+      location: assignedOffice,
       joiningDate: emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : (emp.createdAt ? emp.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
       basicSalary: emp.salaryStructure?.basicSalary?.toString() || '',
       housingAllowance: emp.salaryStructure?.housingAllowance?.toString() || '0',
@@ -403,7 +409,7 @@ NexaHR Workforce Systems`;
       otherDeductions: emp.salaryStructure?.otherDeductions?.toString() || '0',
       gender: emp.profile?.gender || 'Not Specified',
       dateOfBirth: emp.profile?.dateOfBirth ? emp.profile.dateOfBirth.split('T')[0] : '',
-      address: emp.profile?.address || '',
+      address: residentialAddr,
       emergencyContact: emp.profile?.emergencyContact || '',
     });
     setEditTab('basic');
@@ -430,7 +436,8 @@ NexaHR Workforce Systems`;
         isActive: editForm.isActive,
         departmentName: editForm.departmentName,
         designationTitle: editForm.designationTitle,
-        address: editForm.location || editForm.address,
+        address: editForm.address ? editForm.address.trim() : null,
+        workLocation: (editForm.workLocation || editForm.location || 'Islamabad HQ & Innovation Lab').trim(),
         joiningDate: editForm.joiningDate,
         basicSalary: parseFloat(editForm.basicSalary || 0),
         housingAllowance: parseFloat(editForm.housingAllowance || 0),
@@ -451,7 +458,8 @@ NexaHR Workforce Systems`;
           ...editingEmployee.profile,
           department: { name: editForm.departmentName },
           designation: { title: editForm.designationTitle },
-          address: editForm.location,
+          address: payload.address,
+          workLocation: payload.workLocation,
           joiningDate: editForm.joiningDate,
           gender: editForm.gender,
           dateOfBirth: editForm.dateOfBirth,
@@ -950,11 +958,17 @@ NexaHR Workforce Systems`;
                     )}
                   </p>
 
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-normal">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="truncate">
-                      {emp.profile?.address || emp.profile?.location || emp.location || emp.address || 'Remote / HQ'}
-                    </span>
+                  <div className="space-y-1 mt-2 text-xs font-normal">
+                    <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-semibold truncate" title="Assigned Office Work Location">
+                      <Building2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span className="truncate">{emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
+                    </div>
+                    {emp.profile?.address && (
+                      <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[11px] truncate" title="Residential Home Address">
+                        <Home className="w-3 h-3 text-amber-500/80 shrink-0" />
+                        <span className="truncate">{emp.profile.address}</span>
+                      </div>
+                    )}
                   </div>
 
                   <p className="text-xs sm:text-[12.5px] text-slate-600 dark:text-slate-300 leading-relaxed mt-3.5 font-normal line-clamp-4">
@@ -1086,8 +1100,19 @@ NexaHR Workforce Systems`;
                     <td className="py-4 px-4 font-bold text-emerald-600 dark:text-emerald-400">
                       {formatSalary(emp.salaryStructure, emp.profile?.salary)}
                     </td>
-                    <td className="py-4 px-4 font-medium text-slate-500 dark:text-slate-400">
-                      {emp.profile?.address || emp.profile?.location || 'HQ'}
+                    <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-bold text-xs flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+                          <Building2 className="w-3 h-3 text-sky-500 shrink-0" />
+                          <span>{emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ'}</span>
+                        </span>
+                        {emp.profile?.address && (
+                          <span className="text-[11px] text-slate-400 truncate max-w-[170px] flex items-center gap-1" title={`Residential: ${emp.profile.address}`}>
+                            <Home className="w-2.5 h-2.5 text-amber-500/70 shrink-0" />
+                            <span>{emp.profile.address}</span>
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -1346,16 +1371,37 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Workplace Location
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
+                          <span>Assigned Office Work Location</span>
+                          <span className="text-[11px] text-slate-400 font-normal">Physical Campus / Hub</span>
                         </label>
-                        <input
-                          type="text"
-                          placeholder="San Francisco HQ (Floor 4) or Remote"
-                          value={onboardForm.location}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, location: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
+                        <select
+                          value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(onboardForm.workLocation || onboardForm.location) ? (onboardForm.workLocation || onboardForm.location) : 'CUSTOM'}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === 'CUSTOM') {
+                              setOnboardForm({ ...onboardForm, workLocation: '', location: '' });
+                            } else {
+                              setOnboardForm({ ...onboardForm, workLocation: val, location: val });
+                            }
+                          }}
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs text-xs"
+                        >
+                          <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
+                          <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
+                          <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
+                          <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
+                          <option value="CUSTOM">Custom Office Campus / Branch...</option>
+                        </select>
+                        {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(onboardForm.workLocation || onboardForm.location)) && (
+                          <input
+                            type="text"
+                            placeholder="Enter custom office campus or branch name"
+                            value={onboardForm.workLocation || onboardForm.location}
+                            onChange={(e) => setOnboardForm({ ...onboardForm, workLocation: e.target.value, location: e.target.value })}
+                            className="mt-2 w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs text-xs"
+                          />
+                        )}
                       </div>
                       <div>
                         <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
@@ -1485,12 +1531,13 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Residential Address
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
+                          <span>Residential Street Address (Home)</span>
+                          <span className="text-[11px] text-slate-400 font-normal">Personal Residence</span>
                         </label>
                         <input
                           type="text"
-                          placeholder="100 Market St, San Francisco, CA"
+                          placeholder="e.g. House #14, Street 9, Sector F-7/2, Islamabad"
                           value={onboardForm.address}
                           onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
@@ -1741,13 +1788,37 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Workplace Location</label>
-                        <input
-                          type="text"
-                          value={editForm.location || ''}
-                          onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
+                          <span>Assigned Office Work Location</span>
+                          <span className="text-[11px] text-slate-400 font-normal">Physical Campus / Hub</span>
+                        </label>
+                        <select
+                          value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(editForm.workLocation || editForm.location) ? (editForm.workLocation || editForm.location) : 'CUSTOM'}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === 'CUSTOM') {
+                              setEditForm({ ...editForm, workLocation: '', location: '' });
+                            } else {
+                              setEditForm({ ...editForm, workLocation: val, location: val });
+                            }
+                          }}
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs text-xs"
+                        >
+                          <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
+                          <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
+                          <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
+                          <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
+                          <option value="CUSTOM">Custom Office Campus / Branch...</option>
+                        </select>
+                        {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(editForm.workLocation || editForm.location)) && (
+                          <input
+                            type="text"
+                            placeholder="Enter custom office campus or branch name"
+                            value={editForm.workLocation || editForm.location || ''}
+                            onChange={(e) => setEditForm({ ...editForm, workLocation: e.target.value, location: e.target.value })}
+                            className="mt-2 w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs text-xs"
+                          />
+                        )}
                       </div>
                       <div>
                         <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Joining Date</label>
@@ -1859,9 +1930,13 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Residential Address</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
+                          <span>Residential Street Address (Home)</span>
+                          <span className="text-[11px] text-slate-400 font-normal">Personal Residence</span>
+                        </label>
                         <input
                           type="text"
+                          placeholder="e.g. House #14, Street 9, Sector F-7/2, Islamabad"
                           value={editForm.address || ''}
                           onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
@@ -1973,9 +2048,21 @@ NexaHR Workforce Systems`;
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{selectedEmployee.email}</span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Location / Workplace</span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">
-                  {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'Not Specified'}
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider flex items-center gap-1.5 mb-1">
+                  <Building2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                  Office Work Location
+                </span>
+                <span className="font-extrabold text-slate-900 dark:text-white truncate block text-xs" title={selectedEmployee.profile?.workLocation || selectedEmployee.workLocation || selectedEmployee.profile?.location || 'Islamabad HQ & Innovation Lab'}>
+                  {selectedEmployee.profile?.workLocation || selectedEmployee.workLocation || selectedEmployee.profile?.location || 'Islamabad HQ & Innovation Lab'}
+                </span>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider flex items-center gap-1.5 mb-1">
+                  <Home className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  Residential Address (Home)
+                </span>
+                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block text-xs" title={selectedEmployee.profile?.address || selectedEmployee.address || 'Not Provided'}>
+                  {selectedEmployee.profile?.address || selectedEmployee.address || 'Not Provided'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">

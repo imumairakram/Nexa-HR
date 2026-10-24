@@ -27,6 +27,8 @@ import {
   Landmark,
   FileCheck,
   Trash2,
+  Building2,
+  Home,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { ProfileSkeleton } from '../../components/common/Skeleton';
@@ -118,7 +120,8 @@ const EmployeeProfile = () => {
     phone: '',
     designation: '',
     department: '',
-    location: '',
+    workLocation: 'Islamabad HQ & Innovation Lab',
+    location: 'Islamabad HQ & Innovation Lab',
     empCode: '',
     joinDate: '',
     employmentType: 'Full-Time / Permanent',
@@ -154,7 +157,8 @@ const EmployeeProfile = () => {
   };
 
   const populateUserData = (u) => {
-    const userAddr = u.profile?.address || u.address || u.location || '';
+    const residentialAddress = u.profile?.address || u.address || '';
+    const officeLocation = u.profile?.workLocation || u.workLocation || 'Islamabad HQ & Innovation Lab';
     const parsedEmergency = parseEmergencyInfo(
       u.profile?.emergencyContact || u.emergencyContact,
       u.emergencyName,
@@ -186,8 +190,9 @@ const EmployeeProfile = () => {
       phone: u.phone ?? prev.phone,
       designation: u.profile?.designation?.title || u.designation || prev.designation || '',
       department: u.profile?.department?.name || u.department || prev.department || '',
-      address: userAddr,
-      location: userAddr,
+      address: residentialAddress,
+      workLocation: officeLocation,
+      location: officeLocation,
       empCode: empCode || prev.empCode,
       joinDate: resolvedJoinDate ? formatDate(resolvedJoinDate) : prev.joinDate,
       employmentType: formatEmploymentType(rawEmpType),
@@ -385,7 +390,8 @@ const EmployeeProfile = () => {
         ...storedUser,
         ...formData,
         address: formData.address,
-        location: formData.address,
+        workLocation: formData.workLocation,
+        location: formData.workLocation,
         emergencyName: formData.emergencyName,
         emergencyRelation: formData.emergencyRelation,
         emergencyPhone: formData.emergencyPhone,
@@ -406,7 +412,8 @@ const EmployeeProfile = () => {
         ...storedUser,
         ...formData,
         address: formData.address,
-        location: formData.address,
+        workLocation: formData.workLocation,
+        location: formData.workLocation,
         emergencyName: formData.emergencyName,
         emergencyRelation: formData.emergencyRelation,
         emergencyPhone: formData.emergencyPhone,
@@ -574,9 +581,14 @@ const EmployeeProfile = () => {
                 <span>{formData.phone || 'Phone Not Added'}</span>
               </span>
               <span className="hidden sm:inline text-slate-600">•</span>
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                <span>{formData.address || formData.location || 'Address Not Added'}</span>
+              <span className="flex items-center gap-1.5 text-slate-300" title="Assigned Office Work Location">
+                <Building2 className="w-3.5 h-3.5 text-sky-400" />
+                <span>{formData.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
+              </span>
+              <span className="hidden sm:inline text-slate-600">•</span>
+              <span className="flex items-center gap-1.5 text-slate-300" title="Residential Home Address">
+                <Home className="w-3.5 h-3.5 text-amber-400" />
+                <span>{formData.address || 'Home Address Not Added'}</span>
               </span>
             </div>
           </div>
@@ -678,13 +690,16 @@ const EmployeeProfile = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Residential Street Address *</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
+                  <span>Residential Street Address *</span>
+                  <span className="text-[11px] text-slate-400 font-normal">Personal Home Address</span>
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Block-2, Gulshan-e-Iqbal, Karachi"
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value, location: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                 />
               </div>
@@ -899,6 +914,14 @@ const EmployeeProfile = () => {
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <span className="text-slate-400 font-semibold">Reporting Manager</span>
                 <span className="font-bold text-indigo-600 dark:text-indigo-400 text-right">{formData.reportingManager || 'HR Operations'}</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-slate-400 font-semibold flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                  <span>Office Work Location</span>
+                </span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">

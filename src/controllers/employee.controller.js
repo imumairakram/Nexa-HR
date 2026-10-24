@@ -16,6 +16,8 @@ const onboardEmployee = async (req, res) => {
       dateOfBirth,
       joiningDate,
       address,
+      workLocation,
+      location,
       emergencyContact,
       departmentId,
       departmentName,
@@ -123,7 +125,8 @@ const onboardEmployee = async (req, res) => {
         },
       });
 
-      // 4. Create Employee Profile
+      // 4. Create Employee Profile with separate residential address and office workLocation
+      const resolvedOffice = (workLocation || location || 'Islamabad HQ & Innovation Lab').trim();
       const newProfile = await tx.employeeProfile.create({
         data: {
           userId: newUser.id,
@@ -133,6 +136,7 @@ const onboardEmployee = async (req, res) => {
           employmentType: employmentType || 'FULL_TIME',
           shift: shift || 'General Morning (09:00 - 17:30)',
           address: address ? address.trim() : null,
+          workLocation: resolvedOffice,
           emergencyContact: emergencyContact ? emergencyContact.trim() : null,
           departmentId: resolvedDeptId,
           designationId: resolvedDesigId,
@@ -347,6 +351,8 @@ const updateEmployee = async (req, res) => {
       dateOfBirth,
       joiningDate,
       address,
+      workLocation,
+      location,
       emergencyContact,
       departmentId,
       departmentName,
@@ -430,7 +436,7 @@ const updateEmployee = async (req, res) => {
         data: userUpdates,
       });
 
-      // 4. Profile Updates
+      // 4. Profile Updates (Residential address and Office workLocation maintained separately)
       const profileUpdates = {};
       if (gender !== undefined) profileUpdates.gender = gender;
       if (dateOfBirth !== undefined) profileUpdates.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
@@ -438,6 +444,10 @@ const updateEmployee = async (req, res) => {
       if (employmentType !== undefined) profileUpdates.employmentType = employmentType;
       if (shift !== undefined) profileUpdates.shift = shift;
       if (address !== undefined) profileUpdates.address = address ? address.trim() : null;
+      const resolvedWorkLocation = workLocation !== undefined ? workLocation : location;
+      if (resolvedWorkLocation !== undefined) {
+        profileUpdates.workLocation = resolvedWorkLocation ? resolvedWorkLocation.trim() : 'Islamabad HQ & Innovation Lab';
+      }
       if (emergencyContact !== undefined) profileUpdates.emergencyContact = emergencyContact ? emergencyContact.trim() : null;
       if (resolvedDeptId !== undefined) profileUpdates.departmentId = resolvedDeptId || null;
       if (resolvedDesigId !== undefined) profileUpdates.designationId = resolvedDesigId || null;

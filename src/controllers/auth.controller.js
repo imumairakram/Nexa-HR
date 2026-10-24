@@ -895,6 +895,7 @@ const updateMyProfile = async (req, res) => {
       phone,
       email,
       address,
+      workLocation,
       emergencyContact,
       gender,
       dateOfBirth,
@@ -944,9 +945,10 @@ const updateMyProfile = async (req, res) => {
         data: userUpdates,
       });
 
-      // 2. Update or Create EmployeeProfile
+      // 2. Update or Create EmployeeProfile (separating residential address and office work location)
       const profileUpdates = {};
       if (address !== undefined) profileUpdates.address = address ? address.trim() : null;
+      if (workLocation !== undefined) profileUpdates.workLocation = workLocation ? workLocation.trim() : null;
       if (emergencyContact !== undefined) profileUpdates.emergencyContact = emergencyContact ? emergencyContact.trim() : null;
       if (gender !== undefined) profileUpdates.gender = gender ? gender.trim() : null;
       if (dateOfBirth !== undefined) profileUpdates.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;

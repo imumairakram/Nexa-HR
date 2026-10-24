@@ -20,6 +20,8 @@ import {
   Phone,
   AlertCircle,
   UserX,
+  Building2,
+  Home,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -181,7 +183,8 @@ const EmploymentStatus = () => {
       name: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
       employmentType: defaultType,
       shift: emp.profile?.shift || 'General Morning (09:00 - 17:30)',
-      location: emp.profile?.address || 'Anum State Building, Shahrah-e-Faisal, Karachi',
+      location: emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ & Innovation Lab',
+      address: emp.profile?.address || emp.address || '',
       raw: emp,
     });
   };
@@ -194,7 +197,7 @@ const EmploymentStatus = () => {
       const payload = {
         employmentType: selectedEmp.employmentType,
         shift: selectedEmp.shift,
-        address: selectedEmp.location,
+        workLocation: selectedEmp.location || 'Islamabad HQ & Innovation Lab',
       };
       const res = await api.updateEmployee(selectedEmp.id, payload);
       if (res?.success) {
@@ -558,12 +561,18 @@ const EmploymentStatus = () => {
                       </button>
                     </div>
 
-                    {/* 4. Telemetry details (Location, Email, Phone) */}
+                    {/* 4. Telemetry details (Office Location, Home Address, Email, Phone) */}
                     <div className="space-y-2 mt-3.5 text-xs font-normal text-slate-600 dark:text-slate-300">
-                      <div className="flex items-center gap-2.5">
-                        <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
-                        <span className="truncate">
-                          {emp.profile?.address || emp.profile?.location || emp.location || emp.address || '42 Silicon Avenue, Tech City'}
+                      <div className="flex items-center gap-2.5" title="Assigned Office Work Location">
+                        <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                        <span className="truncate font-semibold text-slate-800 dark:text-slate-200">
+                          {emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ & Innovation Lab'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2.5" title="Residential Home Address">
+                        <Home className="w-3.5 h-3.5 text-amber-500/80 shrink-0" />
+                        <span className="truncate text-slate-500 dark:text-slate-400">
+                          {emp.profile?.address || emp.address || 'Home Address Not Specified'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2.5">
@@ -711,16 +720,39 @@ const EmploymentStatus = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                  Office Location / Work Address *
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
+                  <span>Assigned Office Work Location *</span>
+                  <span className="text-[11px] text-slate-400 font-normal">Physical Campus / Hub</span>
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={selectedEmp.location}
-                  onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
-                />
+                <div className="space-y-2">
+                  <select
+                    value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(selectedEmp.location) ? selectedEmp.location : 'CUSTOM'}
+                    onChange={(e) => {
+                      if (e.target.value === 'CUSTOM') {
+                        setSelectedEmp({ ...selectedEmp, location: '' });
+                      } else {
+                        setSelectedEmp({ ...selectedEmp, location: e.target.value });
+                      }
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer transition-all text-xs"
+                  >
+                    <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
+                    <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
+                    <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
+                    <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
+                    <option value="CUSTOM">Custom Office Campus / Branch...</option>
+                  </select>
+                  {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(selectedEmp.location)) && (
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter custom office campus or branch address"
+                      value={selectedEmp.location}
+                      onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all text-xs"
+                    />
+                  )}
+                </div>
               </div>
 
               {/* Live Preview Card */}
@@ -855,9 +887,21 @@ const EmploymentStatus = () => {
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{selectedEmployee.email}</span>
               </div>
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Location / Workplace</span>
+                <span className="text-[10px] uppercase font-black text-sky-600 dark:text-sky-400 tracking-wider flex items-center gap-1 mb-0.5">
+                  <Building2 className="w-3 h-3" />
+                  <span>Office Work Location</span>
+                </span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">
+                  {selectedEmployee.profile?.workLocation || selectedEmployee.workLocation || 'Islamabad HQ & Innovation Lab'}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-black text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1 mb-0.5">
+                  <Home className="w-3 h-3" />
+                  <span>Residential Home Address</span>
+                </span>
                 <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">
-                  {selectedEmployee.profile?.address || selectedEmployee.profile?.location || 'Not Specified'}
+                  {selectedEmployee.profile?.address || selectedEmployee.address || 'Home Address Not Specified'}
                 </span>
               </div>
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">

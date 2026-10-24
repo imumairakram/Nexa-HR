@@ -139,6 +139,7 @@ model EmployeeProfile {
   employmentType   String?   @default("FULL_TIME")
   shift            String?   @default("General Morning (09:00 - 17:30)")
   address          String?
+  workLocation     String?   @default("Islamabad HQ & Innovation Lab")
   emergencyContact String?
   departmentId     String?
   designationId    String?

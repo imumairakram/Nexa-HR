@@ -23,6 +23,7 @@ import {
   X,
   Tag,
   User,
+  Building2,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -438,9 +439,15 @@ const EmployeeDashboard = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Column: Greeting & Digital Clock */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-400 text-xs font-bold border border-white/10">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>{employeeShift}</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-400 text-xs font-bold border border-white/10">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>{employeeShift}</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 backdrop-blur-md text-indigo-200 text-xs font-bold border border-indigo-400/30">
+                <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{currentUser?.profile?.workLocation || currentUser?.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
+              </div>
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight leading-tight whitespace-nowrap">
