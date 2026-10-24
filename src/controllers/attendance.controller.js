@@ -67,11 +67,31 @@ const hardwareSync = async (req, res) => {
     let attendance = null;
 
     if (eventType === 'IN') {
-      // Determine status (Late if after 9:30 AM)
-      const currentHour = eventTime.getHours();
-      const currentMinute = eventTime.getMinutes();
+      // Determine status (Late if after 09:15 AM - 15 Mins Grace Policy)
+      // Evaluate in company timezone (Asia/Karachi, UTC+5)
+      let currentHour = eventTime.getHours();
+      let currentMinute = eventTime.getMinutes();
+
+      try {
+        const timeFormatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Karachi',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: false,
+        });
+        const parts = timeFormatter.formatToParts(eventTime);
+        const parsedHour = parseInt(parts.find((p) => p.type === 'hour')?.value, 10);
+        const parsedMin = parseInt(parts.find((p) => p.type === 'minute')?.value, 10);
+        if (!isNaN(parsedHour) && !isNaN(parsedMin)) {
+          currentHour = parsedHour;
+          currentMinute = parsedMin;
+        }
+      } catch (e) {
+        // Fallback to server local time
+      }
+
       let status = 'PRESENT';
-      if (currentHour > 9 || (currentHour === 9 && currentMinute > 30)) {
+      if (currentHour > 9 || (currentHour === 9 && currentMinute > 15)) {
         status = 'LATE';
       }
 
@@ -134,6 +154,9 @@ const hardwareSync = async (req, res) => {
         });
       }
     }
+
+    // Invalidate caches so admin and employee screens update immediately
+    cacheService.invalidateTags(['attendance', 'dashboard']);
 
     return res.status(200).json({
       success: true,
