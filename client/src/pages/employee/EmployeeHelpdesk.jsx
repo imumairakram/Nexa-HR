@@ -256,66 +256,128 @@ const EmployeeHelpdesk = () => {
   }, [tickets, searchQuery, statusFilter, categoryFilter]);
 
   /**
-   * Telemetry KPI statistics
+   * Telemetry KPI statistics computed dynamically from real database records
    */
   const stats = useMemo(() => {
-    return {
-      total: tickets.length,
-      inProgress: tickets.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'OPEN').length,
-      resolved: tickets.filter((t) => t.status === 'RESOLVED').length,
-      avgSla: '< 3.8h',
-    };
-  }, [tickets]);
+    const total = tickets.length;
+    const inProgress = tickets.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'OPEN').length;
+    const resolved = tickets.filter((t) => t.status === 'RESOLVED').length;
 
-  // Dynamic Sparkline Data for Helpdesk
-  const totalTicketsSparkData = useMemo(() => {
-    const catMap = {
-      IT_HARDWARE: 0,
-      PAYROLL: 0,
-      BENEFITS: 0,
-      WORKPLACE: 0,
-      GENERAL_HR: 0,
-    };
+    // Real dynamic first-response SLA calculated from actual message timestamps
+    const responseDeltas = [];
     tickets.forEach((t) => {
-      if (catMap[t.category] !== undefined) catMap[t.category]++;
-      else catMap.GENERAL_HR++;
+      if (t.replies && t.replies.length > 1) {
+        const firstStaffReply = t.replies.find(
+          (r) => r.userId !== t.userId
+        );
+        if (firstStaffReply && t.createdDate) {
+          const created = new Date(t.createdDate).getTime();
+          const replied = new Date(firstStaffReply.time).getTime();
+          const diffMinutes = Math.max(0, (replied - created) / 60000);
+          if (!isNaN(diffMinutes)) responseDeltas.push(diffMinutes);
+        }
+      }
     });
 
-    return [
-      { value: catMap.IT_HARDWARE || 0, label: 'IT', tooltip: `IT & Equipment: ${catMap.IT_HARDWARE} Tickets` },
-      { value: catMap.PAYROLL || 0, label: 'Payroll', tooltip: `Payroll & Tax: ${catMap.PAYROLL} Tickets` },
-      { value: catMap.BENEFITS || 0, label: 'Benefits', tooltip: `Benefits: ${catMap.BENEFITS} Tickets` },
-      { value: catMap.WORKPLACE || 0, label: 'Admin', tooltip: `Workplace: ${catMap.WORKPLACE} Tickets` },
-      { value: catMap.GENERAL_HR || 0, label: 'HR', tooltip: `General HR: ${catMap.GENERAL_HR} Tickets` },
-    ];
+    let avgSlaText = 'Awaiting Logs';
+    if (responseDeltas.length > 0) {
+      const avgMin = responseDeltas.reduce((a, b) => a + b, 0) / responseDeltas.length;
+      if (avgMin < 60) {
+        avgSlaText = `${Math.max(1, Math.round(avgMin))}m Avg`;
+      } else {
+        avgSlaText = `${(avgMin / 60).toFixed(1)}h Avg`;
+      }
+    } else if (total > 0) {
+      avgSlaText = '< 2.4h Target';
+    }
+
+    return {
+      total,
+      inProgress,
+      resolved,
+      avgSla: avgSlaText,
+    };
   }, [tickets]);
 
-  const inProgressSparkData = useMemo(() => {
-    const openCount = tickets.filter((t) => t.status === 'OPEN').length;
-    const inProgCount = tickets.filter((t) => t.status === 'IN_PROGRESS').length;
-    return [
-      { value: openCount, label: 'Queued', tooltip: `Newly Queued: ${openCount} Tickets` },
-      { value: inProgCount, label: 'Review', tooltip: `Active Investigation: ${inProgCount} Tickets` },
-      { value: Math.max(0, openCount + inProgCount), label: 'Total', tooltip: `Total Pending: ${openCount + inProgCount} Active` },
-    ];
-  }, [tickets]);
-
-  const resolvedSparkData = useMemo(() => {
-    const resolved = tickets.filter((t) => t.status === 'RESOLVED').length;
-    return [
-      { value: 0, label: 'Start', tooltip: 'Initial Log: 0 Closed' },
-      { value: Math.round(resolved * 0.5), label: 'Mid', tooltip: `In Process: ${Math.round(resolved * 0.5)} Resolved` },
-      { value: resolved, label: 'Done', tooltip: `Verified Solved: ${resolved} Tickets` },
-    ];
-  }, [tickets]);
-
-  const slaSparkData = useMemo(() => {
-    return [
-      { value: 1.2, label: 'Triage', tooltip: 'Auto Dispatch: 1.2h' },
-      { value: 2.4, label: 'Assign', tooltip: 'Specialist Assigned: 2.4h' },
-      { value: 3.8, label: 'SLA', tooltip: 'Average First Response SLA: 3.8h' },
-    ];
+  // Rolling 7-day chronological calendar windows for real time-series
+  const last7Days = useMemo(() => {
+    const days = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(now.getDate() - i);
+      const dateKey = d.toISOString().split('T')[0];
+      const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+      days.push({ dateKey, dayLabel, dateObj: d });
+    }
+    return days;
   }, []);
+
+  // 1. Total Tickets Sparkline (Real daily volume over last 7 days)
+  const totalTicketsSparkData = useMemo(() => {
+    return last7Days.map(({ dateKey, dayLabel }) => {
+      const count = tickets.filter((t) => {
+        const raw = t.createdDate ? new Date(t.createdDate).toISOString().split('T')[0] : '';
+        return raw === dateKey;
+      }).length;
+      return {
+        value: count,
+        label: dayLabel,
+        tooltip: `${dayLabel} (${dateKey}): ${count} Tickets Logged`,
+      };
+    });
+  }, [tickets, last7Days]);
+
+  // 2. Pending In Progress Sparkline (Category breakdown of active issues)
+  const inProgressSparkData = useMemo(() => {
+    const categories = [
+      { id: 'IT_HARDWARE', label: 'IT' },
+      { id: 'PAYROLL', label: 'Pay' },
+      { id: 'BENEFITS', label: 'Ben' },
+      { id: 'WORKPLACE', label: 'Adm' },
+      { id: 'GENERAL_HR', label: 'HR' },
+    ];
+    return categories.map((cat) => {
+      const count = tickets.filter(
+        (t) => t.category === cat.id && (t.status === 'IN_PROGRESS' || t.status === 'OPEN')
+      ).length;
+      return {
+        value: count,
+        label: cat.label,
+        tooltip: `${cat.id.replace('_', ' ')}: ${count} Active Inquiries`,
+      };
+    });
+  }, [tickets]);
+
+  // 3. Resolved Inquiries Sparkline (Real daily verified closures over last 7 days)
+  const resolvedSparkData = useMemo(() => {
+    return last7Days.map(({ dateKey, dayLabel }) => {
+      const count = tickets.filter((t) => {
+        if (t.status !== 'RESOLVED') return false;
+        const raw = t.lastUpdated ? new Date(t.lastUpdated).toISOString().split('T')[0] : '';
+        return raw === dateKey;
+      }).length;
+      return {
+        value: count,
+        label: dayLabel,
+        tooltip: `${dayLabel}: ${count} Verified Solved`,
+      };
+    });
+  }, [tickets, last7Days]);
+
+  // 4. Priority breakdown sparkline
+  const slaSparkData = useMemo(() => {
+    const high = tickets.filter((t) => t.priority === 'HIGH').length;
+    const med = tickets.filter((t) => t.priority === 'MEDIUM').length;
+    const low = tickets.filter((t) => t.priority === 'LOW').length;
+    const closed = tickets.filter((t) => t.status === 'RESOLVED').length;
+    return [
+      { value: high, label: 'High', tooltip: `High Priority: ${high} Tickets` },
+      { value: med, label: 'Med', tooltip: `Medium Priority: ${med} Tickets` },
+      { value: low, label: 'Low', tooltip: `Routine Low: ${low} Tickets` },
+      { value: closed, label: 'Done', tooltip: `Total Solved: ${closed} Tickets` },
+    ];
+  }, [tickets]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">

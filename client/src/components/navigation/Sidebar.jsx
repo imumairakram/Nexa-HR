@@ -24,6 +24,7 @@ import {
   KeyRound,
   ShieldCheck,
   User,
+  LifeBuoy,
   X,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -160,6 +161,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     { type: 'link', label: 'Holiday', path: '/app/holiday/public', icon: Calendar },
     { type: 'link', label: 'Leave Policy', path: '/app/leave-policy', icon: FileText },
     { type: 'link', label: 'Announcement', path: '/app/announcement', icon: Megaphone },
+    { type: 'link', label: 'Helpdesk & Support', path: '/app/helpdesk', icon: LifeBuoy },
 
     {
       type: 'accordion',

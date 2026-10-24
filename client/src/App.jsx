@@ -33,6 +33,7 @@ import PayslipList from './pages/app/payroll/PayslipList';
 
 // Engagement & Operations
 import Announcement from './pages/app/Announcement';
+import Helpdesk from './pages/app/Helpdesk';
 
 // Unified Recruitment Module
 import JobsWorkspace from './pages/app/recruitment/JobsWorkspace';
@@ -120,6 +121,9 @@ function App() {
 
           {/* Engagement & Operations */}
           <Route path="announcement" element={<Announcement />} />
+          <Route path="helpdesk" element={<Helpdesk />} />
+          <Route path="tickets" element={<Navigate to="/app/helpdesk" replace />} />
+          <Route path="support" element={<Navigate to="/app/helpdesk" replace />} />
           <Route path="award" element={<Navigate to="/app/announcement" replace />} />
           <Route path="project" element={<Navigate to="/app/dashboard" replace />} />
 

@@ -557,10 +557,10 @@ export const api = {
     });
   },
 
-  updateTicketStatus: async (ticketId, status) => {
+  updateTicketStatus: async (ticketId, status, extra = {}) => {
     return await fetchAPI(`/tickets/${ticketId}/status`, {
       method: 'PATCH',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, ...extra }),
     });
   },
 

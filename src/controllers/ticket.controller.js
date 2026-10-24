@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 const { createInAppNotification } = require('../services/notification.service');
 
 const CATEGORY_LABELS = {
@@ -191,6 +192,9 @@ const getAllTickets = async (req, res) => {
         { subject: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
         { assignedTo: { contains: search, mode: 'insensitive' } },
+        { user: { firstName: { contains: search, mode: 'insensitive' } } },
+        { user: { lastName: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
       ];
     }
 
@@ -326,8 +330,8 @@ const getTicketById = async (req, res) => {
  */
 const createTicket = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const { subject, category, priority, description } = req.body;
+    const { userId, role } = req.user;
+    const { subject, category, priority, description, employeeId, assignedTo } = req.body;
 
     if (!subject || !subject.trim() || !description || !description.trim()) {
       return res.status(400).json({
@@ -336,17 +340,24 @@ const createTicket = async (req, res) => {
       });
     }
 
+    const targetUserId =
+      (role === 'ADMIN' || role === 'HR_MANAGER') && employeeId ? employeeId : userId;
+    const targetAssignee =
+      (role === 'ADMIN' || role === 'HR_MANAGER') && assignedTo && assignedTo.trim()
+        ? assignedTo.trim()
+        : 'NexaHR Support Team';
+
     const ticketNumber = await generateUniqueTicketNumber();
 
     const newTicket = await prisma.ticket.create({
       data: {
         ticketNumber,
-        userId,
+        userId: targetUserId,
         subject: subject.trim(),
         category: category || 'IT_HARDWARE',
         priority: priority || 'MEDIUM',
         status: 'IN_PROGRESS',
-        assignedTo: 'NexaHR Support Team',
+        assignedTo: targetAssignee,
         description: description.trim(),
         replies: {
           create: {
@@ -400,6 +411,8 @@ const createTicket = async (req, res) => {
     } catch (notifErr) {
       console.warn('Could not dispatch ticket notification:', notifErr.message);
     }
+
+    cacheService.invalidateTags(['tickets']);
 
     return res.status(201).json({
       success: true,
@@ -496,6 +509,8 @@ const addTicketReply = async (req, res) => {
       }
     }
 
+    cacheService.invalidateTags(['tickets']);
+
     const isMe = reply.userId === userId;
     const senderName = isMe
       ? `${reply.user.firstName} ${reply.user.lastName} (You)`
@@ -566,12 +581,20 @@ const updateTicketStatus = async (req, res) => {
       });
     }
 
+    const updateData = {
+      updatedAt: new Date(),
+    };
+    if (status) updateData.status = status;
+    if (req.body.assignedTo && (role === 'ADMIN' || role === 'HR_MANAGER')) {
+      updateData.assignedTo = req.body.assignedTo.trim();
+    }
+    if (req.body.priority && (role === 'ADMIN' || role === 'HR_MANAGER')) {
+      updateData.priority = req.body.priority;
+    }
+
     const updated = await prisma.ticket.update({
       where: { id: ticket.id },
-      data: {
-        status,
-        updatedAt: new Date(),
-      },
+      data: updateData,
       include: {
         user: {
           select: {
@@ -619,6 +642,8 @@ const updateTicketStatus = async (req, res) => {
         console.warn('Could not dispatch status change notification:', notifErr.message);
       }
     }
+
+    cacheService.invalidateTags(['tickets']);
 
     return res.status(200).json({
       success: true,
