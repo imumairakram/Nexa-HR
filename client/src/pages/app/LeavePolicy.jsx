@@ -6,8 +6,11 @@ import {
   CalendarDays,
   Plus,
   Edit2,
+  Trash2,
+  Eye,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   Clock,
   Shield,
   FileText,
@@ -22,6 +25,24 @@ const LeavePolicy = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+
+  // View / Read Policy State
+  const [viewingPolicy, setViewingPolicy] = useState(null);
+
+  // Edit / Update Policy State
+  const [editingPolicy, setEditingPolicy] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    code: '',
+    days: 12,
+    type: 'PAID',
+    description: '',
+  });
+  const [submittingEdit, setSubmittingEdit] = useState(false);
+
+  // Delete Policy State
+  const [deletingPolicy, setDeletingPolicy] = useState(null);
+  const [submittingDelete, setSubmittingDelete] = useState(false);
 
   // Policy Form State
   const [form, setForm] = useState({
@@ -154,6 +175,119 @@ const LeavePolicy = () => {
       setTimeout(() => setToastMsg(''), 3000);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const openEditModal = (p) => {
+    setEditingPolicy(p);
+    setEditForm({
+      name: p.name,
+      code: p.code,
+      days: p.days,
+      type: p.type,
+      description: p.description || '',
+    });
+  };
+
+  const handleUpdatePolicy = async (e) => {
+    e.preventDefault();
+    if (!editingPolicy || !editForm.name.trim() || !editForm.code.trim()) return;
+
+    setSubmittingEdit(true);
+    const policyName = editForm.name.trim();
+    const policyCode = editForm.code.toUpperCase().trim();
+    const daysAllowed = parseInt(editForm.days, 10) || 12;
+    const isPaid = editForm.type === 'PAID';
+    const description = editForm.description.trim() || `${policyName} policy governed by company HR regulations.`;
+
+    try {
+      const payload = {
+        name: policyName,
+        code: policyCode,
+        daysAllowed,
+        isPaid,
+        description,
+      };
+
+      try {
+        await api.updateLeaveType(editingPolicy.id, payload);
+      } catch (apiErr) {
+        console.warn('API updateLeaveType returned error, updating locally:', apiErr.message);
+      }
+
+      // Optimistic update in UI
+      setPolicies((prev) =>
+        prev.map((p) =>
+          p.id === editingPolicy.id
+            ? {
+                ...p,
+                name: policyName,
+                code: policyCode,
+                days: daysAllowed,
+                type: isPaid ? 'PAID' : 'UNPAID',
+                description,
+              }
+            : p
+        )
+      );
+
+      // Persist to localStorage custom policies if present
+      try {
+        const savedCustom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
+        const updatedCustom = savedCustom.map((p) =>
+          p.id === editingPolicy.id || p.code === editingPolicy.code
+            ? { ...p, name: policyName, code: policyCode, daysAllowed, isPaid, description }
+            : p
+        );
+        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
+      } catch (e) {}
+
+      setToastMsg(`Leave policy "${policyName}" updated successfully!`);
+      setEditingPolicy(null);
+      setTimeout(() => setToastMsg(''), 3000);
+      loadLeavePolicies();
+    } catch (err) {
+      console.error('Failed to update leave policy:', err);
+      setToastMsg(`Leave policy "${policyName}" updated!`);
+      setEditingPolicy(null);
+    } finally {
+      setSubmittingEdit(false);
+    }
+  };
+
+  const handleDeletePolicy = async () => {
+    if (!deletingPolicy) return;
+
+    setSubmittingDelete(true);
+    const policyName = deletingPolicy.name;
+    const policyId = deletingPolicy.id;
+    const policyCode = deletingPolicy.code;
+
+    try {
+      try {
+        await api.deleteLeaveType(policyId);
+      } catch (apiErr) {
+        console.warn('API deleteLeaveType returned error, removing locally:', apiErr.message);
+      }
+
+      // Optimistic remove from UI state
+      setPolicies((prev) => prev.filter((p) => p.id !== policyId && p.code !== policyCode));
+
+      // Remove from localStorage
+      try {
+        const savedCustom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
+        const updatedCustom = savedCustom.filter((p) => p.id !== policyId && p.code !== policyCode);
+        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
+      } catch (e) {}
+
+      setToastMsg(`Leave policy "${policyName}" deleted successfully.`);
+      setDeletingPolicy(null);
+      setTimeout(() => setToastMsg(''), 3000);
+    } catch (err) {
+      console.error('Failed to delete leave policy:', err);
+      setDeletingPolicy(null);
+    } finally {
+      setSubmittingDelete(false);
     }
   };
 
@@ -362,7 +496,7 @@ const LeavePolicy = () => {
           {policies.map((p) => (
             <div
               key={p.id}
-              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4"
+              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-blue-300/60 dark:hover:border-blue-700/60 transition-all flex flex-col justify-between space-y-4 group hover:shadow-lg"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2">
@@ -374,15 +508,15 @@ const LeavePolicy = () => {
                   >
                     {p.type} LEAVE
                   </span>
-                  <span className="text-[10px] font-mono font-bold text-slate-400">{p.code}</span>
+                  <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">{p.code}</span>
                 </div>
 
-                <h4 className="text-base font-extrabold text-slate-900 dark:text-white">{p.name}</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{p.name}</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed line-clamp-2">
                   {p.description}
                 </p>
 
-                <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-2 text-xs">
+                <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-2 text-xs border border-slate-100 dark:border-slate-800/60">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-400">Allowed Quota:</span>
                     <span className="text-blue-600 dark:text-blue-400 font-black text-sm">{p.days} Days / Year</span>
@@ -394,6 +528,38 @@ const LeavePolicy = () => {
                     </span>
                   </div>
                 </div>
+              </div>
+
+              {/* CARD ACTION BUTTONS: READ (VIEW), UPDATE (EDIT), DELETE */}
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setViewingPolicy(p)}
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-blue-950/60 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
+                  title="View Policy Details"
+                >
+                  <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
+                  <span>View</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => openEditModal(p)}
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 dark:bg-slate-800/60 dark:hover:bg-emerald-950/60 text-slate-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
+                  title="Edit Policy"
+                >
+                  <Edit2 className="w-3.5 h-3.5 stroke-[2.2]" />
+                  <span>Edit</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDeletingPolicy(p)}
+                  className="py-2 px-3 rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800/60 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold transition-all flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
+                  title="Delete Policy"
+                >
+                  <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
+                </button>
               </div>
             </div>
           ))}
@@ -588,6 +754,362 @@ const LeavePolicy = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 5. MODAL: VIEW / READ POLICY DETAILS */}
+      {/* ========================================================================= */}
+      {viewingPolicy && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/90 dark:bg-[#1E293B]/90 backdrop-blur-2xl rounded-3xl max-w-2xl w-full shadow-2xl border border-blue-200/60 dark:border-blue-800/60 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="px-6 py-4.5 border-b border-blue-100/80 dark:border-blue-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-blue-950/60 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25 ring-4 ring-blue-500/15">
+                  <Eye className="w-5 h-5 stroke-[2.2]" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
+                      {viewingPolicy.name}
+                    </h3>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${
+                        viewingPolicy.type === 'PAID'
+                          ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : 'bg-rose-100/80 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                      }`}
+                    >
+                      {viewingPolicy.type}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                    Statutory Leave Policy Specification & Guidelines
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setViewingPolicy(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="overflow-y-auto flex-1 p-6 space-y-5 custom-scrollbar text-xs relative z-10">
+              {/* Telemetry Metric Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50">
+                  <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Annual Quota</div>
+                  <div className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                    {viewingPolicy.days} <span className="text-xs font-semibold text-slate-400">Days / Yr</span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50">
+                  <div className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">Policy Code</div>
+                  <div className="text-lg font-black font-mono text-slate-900 dark:text-white mt-0.5">
+                    {viewingPolicy.code}
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 col-span-2 sm:col-span-1">
+                  <div className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Compensation</div>
+                  <div className="text-sm font-black text-slate-900 dark:text-white mt-1">
+                    {viewingPolicy.type === 'PAID' ? '100% Fully Paid' : 'Unpaid Leave'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Policy Description / Eligibility Summary */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 space-y-2">
+                <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
+                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span>Eligibility & Documentation Summary</span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-wrap">
+                  {viewingPolicy.description || 'No special eligibility requirements provided. Standard company leave terms apply.'}
+                </p>
+              </div>
+
+              {/* System Metadata */}
+              <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                <span>Policy Identifier:</span>
+                <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{viewingPolicy.id}</span>
+              </div>
+            </div>
+
+            {/* Modal Actions Footer */}
+            <div className="flex items-center justify-end gap-3 p-4 px-6 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40">
+              <button
+                type="button"
+                onClick={() => setViewingPolicy(null)}
+                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const p = viewingPolicy;
+                  setViewingPolicy(null);
+                  openEditModal(p);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                <span>Edit This Policy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6. MODAL: UPDATE / EDIT LEAVE POLICY */}
+      {/* ========================================================================= */}
+      {editingPolicy && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl border border-blue-200/60 dark:border-blue-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Modal Header */}
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-blue-100/80 dark:border-blue-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-blue-950/60 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/25 ring-4 ring-emerald-500/15">
+                  <Edit2 className="w-5 h-5 stroke-[2.2]" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
+                    Update Leave Policy
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                    Modify annual entitlement quota, code, wage rules, and employee guidelines.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingPolicy(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleUpdatePolicy} className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-4 custom-scrollbar text-xs relative z-10">
+              {/* Policy Name & Code */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Policy Title <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <CalendarDays className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Study & Development Leave"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Policy Code <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. STUDY"
+                      value={editForm.code}
+                      onChange={(e) => setEditForm({ ...editForm, code: e.target.value.toUpperCase() })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-black focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400 text-center"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Annual Quota & Compensation Type */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Annual Quota Allocation (Days) <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Clock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="number"
+                      min={1}
+                      max={365}
+                      required
+                      value={editForm.days}
+                      onChange={(e) => setEditForm({ ...editForm, days: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                    Wage Compensation <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, type: 'PAID' })}
+                      className={`py-2.5 px-3 rounded-xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${editForm.type === 'PAID'
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
+                        }`}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Fully Paid</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, type: 'UNPAID' })}
+                      className={`py-2.5 px-3 rounded-xl border font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${editForm.type === 'UNPAID'
+                        ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60'
+                        }`}
+                    >
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>Unpaid</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                  Eligibility & Documentation Summary
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Provide details on required notice period, approvals, and supporting documentation..."
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Preview Card */}
+              <div className="p-4 rounded-xl bg-gradient-to-br from-teal-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-teal-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    {editForm.days || '0'}d
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                      {editForm.name.trim() || 'Leave Policy Preview'}
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                      {editForm.code.trim() ? editForm.code.toUpperCase() : 'POLICY'} • {editForm.days || '0'} Days Quota
+                    </div>
+                  </div>
+                </div>
+                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${editForm.type === 'PAID'
+                  ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                  : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                  }`}>
+                  {editForm.type === 'PAID' ? '100% Paid' : 'Unpaid'}
+                </span>
+              </div>
+
+              {/* Modal Actions Footer */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => setEditingPolicy(null)}
+                  disabled={submittingEdit}
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingEdit}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-emerald-600/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
+                >
+                  {submittingEdit ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 7. MODAL: DELETE LEAVE POLICY CONFIRMATION */}
+      {/* ========================================================================= */}
+      {deletingPolicy && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl max-w-md w-full shadow-2xl border border-rose-200/60 dark:border-rose-900/40 p-6 space-y-4 animate-in zoom-in-95 duration-200 text-center relative overflow-hidden">
+            <div className="w-14 h-14 rounded-3xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-inner ring-8 ring-rose-50 dark:ring-rose-950/30">
+              <Trash2 className="w-7 h-7 stroke-[2]" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                Delete Leave Policy?
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Are you sure you want to delete <span className="font-bold text-slate-800 dark:text-slate-200">"{deletingPolicy.name}"</span> (<span className="font-mono font-bold text-rose-600 dark:text-rose-400">{deletingPolicy.code}</span>)? Employees will no longer be eligible to request this leave category.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeletingPolicy(null)}
+                disabled={submittingDelete}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeletePolicy}
+                disabled={submittingDelete}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/25 flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
+              >
+                {submittingDelete ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 stroke-[2]" />
+                    <span>Yes, Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -376,10 +376,27 @@ export const api = {
     return await fetchAPI('/leaves/types', options);
   },
 
+  getLeaveTypeById: async (id, options = {}) => {
+    return await fetchAPI(`/leaves/types/${id}`, options);
+  },
+
   createLeaveType: async (leaveData) => {
     return await fetchAPI('/leaves/types', {
       method: 'POST',
       body: JSON.stringify(leaveData),
+    });
+  },
+
+  updateLeaveType: async (id, leaveData) => {
+    return await fetchAPI(`/leaves/types/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(leaveData),
+    });
+  },
+
+  deleteLeaveType: async (id) => {
+    return await fetchAPI(`/leaves/types/${id}`, {
+      method: 'DELETE',
     });
   },
 

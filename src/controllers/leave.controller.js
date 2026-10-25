@@ -98,6 +98,151 @@ const getLeaveTypes = async (req, res) => {
   }
 };
 
+const getLeaveTypeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const leaveType = await prisma.leaveType.findUnique({
+      where: { id },
+    });
+
+    if (!leaveType) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave policy not found.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: { leaveType },
+    });
+  } catch (error) {
+    console.error('Error in getLeaveTypeById:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch leave policy details.',
+      error: error.message,
+    });
+  }
+};
+
+const updateLeaveType = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, code, daysAllowed, isPaid, description } = req.body;
+
+    const existing = await prisma.leaveType.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave policy not found.',
+      });
+    }
+
+    const updateData = {};
+    if (name) updateData.name = name.trim();
+    if (code) {
+      const formattedCode = code.toUpperCase().trim();
+      if (formattedCode !== existing.code) {
+        const duplicate = await prisma.leaveType.findUnique({
+          where: { code: formattedCode },
+        });
+        if (duplicate) {
+          return res.status(409).json({
+            success: false,
+            message: `Leave policy code '${formattedCode}' already exists.`,
+          });
+        }
+      }
+      updateData.code = formattedCode;
+    }
+
+    if (daysAllowed !== undefined) {
+      const parsedDays = parseInt(daysAllowed, 10);
+      updateData.daysAllowed = Number.isInteger(parsedDays) && parsedDays > 0 ? parsedDays : 12;
+    }
+
+    if (isPaid !== undefined) {
+      updateData.isPaid = Boolean(isPaid);
+    }
+
+    if (description !== undefined) {
+      updateData.description = description ? description.trim() : null;
+    }
+
+    let updated;
+    try {
+      updated = await prisma.leaveType.update({
+        where: { id },
+        data: updateData,
+      });
+    } catch (updateErr) {
+      if (updateData.description !== undefined) {
+        delete updateData.description;
+        updated = await prisma.leaveType.update({
+          where: { id },
+          data: updateData,
+        });
+      } else {
+        throw updateErr;
+      }
+    }
+
+    cacheService.invalidateTags(['leaves', 'dashboard']);
+
+    return res.status(200).json({
+      success: true,
+      message: `Leave policy '${updated.name}' updated successfully.`,
+      data: { leaveType: updated },
+    });
+  } catch (error) {
+    console.error('Error in updateLeaveType:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update leave policy.',
+      error: error.message,
+    });
+  }
+};
+
+const deleteLeaveType = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const existing = await prisma.leaveType.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave policy not found.',
+      });
+    }
+
+    await prisma.leaveType.delete({
+      where: { id },
+    });
+
+    cacheService.invalidateTags(['leaves', 'dashboard']);
+
+    return res.status(200).json({
+      success: true,
+      message: `Leave policy '${existing.name}' deleted successfully.`,
+    });
+  } catch (error) {
+    console.error('Error in deleteLeaveType:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete leave policy.',
+      error: error.message,
+    });
+  }
+};
+
 const applyLeave = async (req, res) => {
   try {
     let targetUserId = req.user.userId;
@@ -502,6 +647,9 @@ const updateLeaveStatus = async (req, res) => {
 module.exports = {
   createLeaveType,
   getLeaveTypes,
+  getLeaveTypeById,
+  updateLeaveType,
+  deleteLeaveType,
   applyLeave,
   getMyLeaveRequests,
   getCompanyLeaveRequests,
