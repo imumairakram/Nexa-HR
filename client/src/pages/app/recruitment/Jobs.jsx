@@ -79,24 +79,11 @@ const Jobs = () => {
         status: 'ACTIVE',
       };
 
-      let created = null;
-      try {
-        const res = await api.createJobOpening(payload);
-        if (res?.success && res.data?.job) {
-          created = res.data.job;
-        }
-      } catch (e) {
-        console.warn('API error in Jobs.jsx, saving locally:', e);
-        created = {
-          id: `job-${Date.now()}`,
-          jobCode: `JOB-${101 + jobs.length}`,
-          ...payload,
-          dept: payload.department,
-          applicants: 0,
-          postedDate: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-        };
+      const res = await api.createJobOpening(payload);
+      if (!res?.success || !res.data?.job) {
+        throw new Error(res?.message || 'Failed to save job to database');
       }
+      const created = res.data.job;
 
       if (created) {
         const formatted = {

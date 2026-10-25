@@ -65,21 +65,57 @@ const JobsWorkspace = () => {
 
   const [telemetry, setTelemetry] = useState(null);
 
-  const loadData = async () => {
+  const loadData = async (bypassCache = false) => {
     setLoading(true);
     try {
       const [jobsRes, statsRes, deptRes] = await Promise.allSettled([
-        api.getJobOpenings(),
-        api.getRecruitmentStats(),
+        api.getJobOpenings({}, { bypassCache }),
+        api.getRecruitmentStats({ bypassCache }),
         api.getDepartments(),
       ]);
 
-      if (jobsRes.status === 'fulfilled' && jobsRes.value?.success && Array.isArray(jobsRes.value.data?.jobs) && jobsRes.value.data.jobs.length > 0) {
-        setJobs(jobsRes.value.data.jobs);
+      if (jobsRes.status === 'fulfilled' && jobsRes.value?.success && Array.isArray(jobsRes.value.data?.jobs)) {
+        let dbJobs = jobsRes.value.data.jobs;
+
+        // Auto-heal: If user previously created jobs locally in localStorage (e.g. "Full-Stack Developer"),
+        // sync them to the live database so they persist and show across all devices!
         try {
-          localStorage.setItem('nexahr_recruitment_jobs', JSON.stringify(jobsRes.value.data.jobs));
+          const cached = JSON.parse(localStorage.getItem('nexahr_recruitment_jobs') || '[]');
+          if (Array.isArray(cached) && cached.length > 0) {
+            const unsynced = cached.filter(
+              (c) => c && typeof c.id === 'string' && c.id.startsWith('job-') &&
+                     !dbJobs.some((dj) => dj.title?.trim().toLowerCase() === c.title?.trim().toLowerCase())
+            );
+            if (unsynced.length > 0) {
+              for (const u of unsynced) {
+                try {
+                  const syncRes = await api.createJobOpening({
+                    title: u.title,
+                    department: u.department || u.dept || 'Engineering & DevOps',
+                    location: u.location || 'Islamabad HQ / Remote',
+                    type: u.type || 'Full-Time',
+                    experience: u.experience || '3+ Years',
+                    salary: u.salary || '$100k - $140k',
+                    status: u.status || 'ACTIVE',
+                    description: u.description || '',
+                  });
+                  if (syncRes?.success && syncRes.data?.job) {
+                    dbJobs = [syncRes.data.job, ...dbJobs];
+                  }
+                } catch (syncErr) {
+                  console.warn('Auto-sync legacy local job failed:', syncErr);
+                }
+              }
+            }
+          }
+        } catch (e) {}
+
+        setJobs(dbJobs);
+        try {
+          localStorage.setItem('nexahr_recruitment_jobs', JSON.stringify(dbJobs));
         } catch (e) {}
       } else {
+        // Fallback only if database API completely failed (e.g. offline)
         try {
           const cached = localStorage.getItem('nexahr_recruitment_jobs');
           if (cached) {
@@ -173,74 +209,59 @@ const JobsWorkspace = () => {
 
     setIsSubmitting(true);
     try {
+      const payload = {
+        title: form.title.trim(),
+        department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
+        location: form.location.trim() || 'Islamabad HQ / Remote',
+        type: form.type || 'Full-Time',
+        experience: form.experience.trim() || '3+ Years',
+        salary: form.salary.trim() || '$100k - $140k',
+        status: form.status || 'ACTIVE',
+        description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
+      };
+
       if (editingJob) {
-        const payload = {
-          title: form.title.trim(),
-          department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
-          location: form.location.trim() || 'Islamabad HQ / Remote',
-          type: form.type || 'Full-Time',
-          experience: form.experience.trim() || '3+ Years',
-          salary: form.salary.trim() || '$100k - $140k',
-          status: form.status || 'ACTIVE',
-          description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
-        };
-
-        try {
-          const res = await api.updateJobOpening(editingJob.id, payload);
-          if (res?.success && res.data?.job) {
-            persistJobs(jobs.map((j) => (j.id === editingJob.id ? res.data.job : j)));
-          } else {
-            persistJobs(jobs.map((j) => (j.id === editingJob.id ? { ...j, ...payload, title: payload.title } : j)));
-          }
-        } catch {
-          persistJobs(jobs.map((j) => (j.id === editingJob.id ? { ...j, ...payload, title: payload.title } : j)));
-        }
-        showToast(`Requisition "${form.title}" updated successfully!`);
-        setIsDrawerOpen(false);
-      } else {
-        const payload = {
-          title: form.title.trim(),
-          department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
-          location: form.location.trim() || 'Islamabad HQ / Remote',
-          type: form.type || 'Full-Time',
-          experience: form.experience.trim() || '3+ Years',
-          salary: form.salary.trim() || '$100k - $140k',
-          status: form.status || 'ACTIVE',
-          description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
-        };
-
-        let createdJob = null;
-        try {
+        let updated = null;
+        if (typeof editingJob.id === 'string' && editingJob.id.startsWith('job-')) {
           const res = await api.createJobOpening(payload);
           if (res?.success && res.data?.job) {
-            createdJob = res.data.job;
+            updated = res.data.job;
           }
-        } catch (apiErr) {
-          console.warn('Backend API returned error, activating local persistence fallback:', apiErr.message);
-          // If backend returns 404 Route Not Found or network issue, generate client record
-          createdJob = {
-            id: `job-${Date.now()}`,
-            jobCode: `JOB-${101 + jobs.length}`,
-            ...payload,
-            applicants: 0,
-            createdAt: new Date().toISOString(),
-            postedDate: new Date().toISOString(),
-          };
+        } else {
+          const res = await api.updateJobOpening(editingJob.id, payload);
+          if (res?.success && res.data?.job) {
+            updated = res.data.job;
+          }
         }
 
-        if (createdJob) {
-          const updated = [createdJob, ...jobs];
-          persistJobs(updated);
-          showToast(`Job requisition "${form.title}" published successfully!`);
-          api.getRecruitmentStats().then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
-          setIsDrawerOpen(false);
-        } else {
-          throw new Error('Failed to publish job opening.');
+        if (!updated) {
+          throw new Error('Failed to update job requisition in database.');
         }
+
+        const nextJobs = jobs.map((j) => (j.id === editingJob.id ? updated : j));
+        persistJobs(nextJobs);
+        showToast(`Requisition "${form.title}" updated and synced to database!`);
+        setIsDrawerOpen(false);
+
+        api.getRecruitmentStats({ bypassCache: true }).then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
+      } else {
+        const res = await api.createJobOpening(payload);
+        if (!res?.success || !res.data?.job) {
+          throw new Error(res?.message || 'Failed to publish job opening to database.');
+        }
+
+        const createdJob = res.data.job;
+        const nextJobs = [createdJob, ...jobs.filter((j) => j.id !== createdJob.id)];
+        persistJobs(nextJobs);
+        showToast(`Job requisition "${form.title}" published and saved to database!`);
+        setIsDrawerOpen(false);
+
+        // Instantly refresh telemetry metrics
+        api.getRecruitmentStats({ bypassCache: true }).then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
       }
     } catch (err) {
-      console.error('Error saving job:', err);
-      const msg = err.message || 'Failed to save job requisition';
+      console.error('Error saving job to database:', err);
+      const msg = err.message || 'Failed to save job requisition to database. Please check your network connection.';
       setFormError(msg);
       showToast(`Error: ${msg}`);
     } finally {
@@ -251,11 +272,16 @@ const JobsWorkspace = () => {
   // Delete Job with Live Backend Integration
   const handleDeleteJob = async (id) => {
     try {
-      await api.deleteJobOpening(id).catch(() => null);
-    } finally {
+      if (typeof id === 'string' && !id.startsWith('job-')) {
+        await api.deleteJobOpening(id);
+      }
       const updated = jobs.filter((j) => j.id !== id);
       persistJobs(updated);
       showToast('Job requisition deleted successfully');
+      api.getRecruitmentStats({ bypassCache: true }).then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
+    } catch (err) {
+      console.error('Failed to delete job:', err);
+      showToast(err.message || 'Failed to delete job requisition');
     }
   };
 
@@ -263,16 +289,23 @@ const JobsWorkspace = () => {
   const handleToggleStatus = async (job) => {
     const nextStatus = job.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
     try {
-      const res = await api.toggleJobOpeningStatus(job.id).catch(() => null);
-      if (res?.success && res.data?.job) {
-        setJobs((prev) => prev.map((j) => (j.id === job.id ? res.data.job : j)));
-      } else {
-        setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, status: nextStatus } : j)));
+      if (typeof job.id === 'string' && !job.id.startsWith('job-')) {
+        const res = await api.toggleJobOpeningStatus(job.id);
+        if (res?.success && res.data?.job) {
+          const next = jobs.map((j) => (j.id === job.id ? res.data.job : j));
+          persistJobs(next);
+          showToast(`Job status set to ${res.data.job.status}`);
+          api.getRecruitmentStats({ bypassCache: true }).then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
+          return;
+        }
       }
+      const next = jobs.map((j) => (j.id === job.id ? { ...j, status: nextStatus } : j));
+      persistJobs(next);
       showToast(`Job status set to ${nextStatus}`);
+      api.getRecruitmentStats({ bypassCache: true }).then((s) => s?.success && s.data && setTelemetry(s.data)).catch(() => {});
     } catch (err) {
-      setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, status: nextStatus } : j)));
-      showToast(`Job status set to ${nextStatus}`);
+      console.error('Failed to toggle status:', err);
+      showToast(err.message || 'Failed to toggle status');
     }
   };
 

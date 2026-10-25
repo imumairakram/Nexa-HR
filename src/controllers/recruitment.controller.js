@@ -229,7 +229,7 @@ const createJobOpening = async (req, res) => {
         requirements: finalRequirements,
         skills: Array.isArray(skills) ? skills : typeof skills === 'string' ? skills.split(',').map((s) => s.trim()) : [],
         urgent: Boolean(urgent),
-        closingDate: closingDate ? new Date(closingDate) : null,
+        closingDate: closingDate && !isNaN(new Date(closingDate).getTime()) ? new Date(closingDate) : null,
         createdById: req.user?.id || req.user?.userId || null,
       },
     });
@@ -301,7 +301,7 @@ const updateJobOpening = async (req, res) => {
           skills: Array.isArray(skills) ? skills : typeof skills === 'string' ? skills.split(',').map((s) => s.trim()) : [],
         }),
         ...(urgent !== undefined && { urgent: Boolean(urgent) }),
-        ...(closingDate !== undefined && { closingDate: closingDate ? new Date(closingDate) : null }),
+        ...(closingDate !== undefined && { closingDate: closingDate && !isNaN(new Date(closingDate).getTime()) ? new Date(closingDate) : null }),
       },
       include: {
         _count: {
@@ -380,7 +380,7 @@ const deleteJobOpening = async (req, res) => {
     const { id } = req.params;
     const existing = await prisma.jobOpening.findUnique({ where: { id } });
     if (!existing) {
-      return res.status(404).json({ success: false, message: 'Job opening not found.' });
+      return res.status(200).json({ success: true, message: 'Job opening already removed.' });
     }
 
     await prisma.jobOpening.delete({ where: { id } });

@@ -838,17 +838,17 @@ export const api = {
   },
 
   // --- Recruitment & ATS Enterprise Operations ---
-  getRecruitmentStats: async () => {
-    return await fetchAPI('/recruitment/stats');
+  getRecruitmentStats: async (options = {}) => {
+    return await fetchAPI('/recruitment/stats', options);
   },
 
-  getJobOpenings: async (params = {}) => {
+  getJobOpenings: async (params = {}, options = {}) => {
     const query = new URLSearchParams(params).toString();
-    return await fetchAPI(`/recruitment/jobs${query ? `?${query}` : ''}`);
+    return await fetchAPI(`/recruitment/jobs${query ? `?${query}` : ''}`, options);
   },
 
-  getJobOpeningById: async (id) => {
-    return await fetchAPI(`/recruitment/jobs/${id}`);
+  getJobOpeningById: async (id, options = {}) => {
+    return await fetchAPI(`/recruitment/jobs/${id}`, options);
   },
 
   createJobOpening: async (jobData) => {
