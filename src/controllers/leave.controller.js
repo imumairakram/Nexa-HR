@@ -31,15 +31,35 @@ const createLeaveType = async (req, res) => {
       });
     }
 
-    const leaveType = await prisma.leaveType.create({
-      data: {
-        name: name.trim(),
-        code: formattedCode,
-        daysAllowed: parseInt(daysAllowed),
-        isPaid: Boolean(isPaid),
-        description: description ? description.trim() : null,
-      },
-    });
+    let leaveType;
+    const parsedDays = parseInt(daysAllowed, 10);
+    const validDays = Number.isInteger(parsedDays) && parsedDays > 0 ? parsedDays : 12;
+
+    try {
+      leaveType = await prisma.leaveType.create({
+        data: {
+          name: name.trim(),
+          code: formattedCode,
+          daysAllowed: validDays,
+          isPaid: Boolean(isPaid),
+          description: description ? description.trim() : null,
+        },
+      });
+    } catch (createErr) {
+      if (description) {
+        console.warn('Retrying leaveType creation without description field:', createErr.message);
+        leaveType = await prisma.leaveType.create({
+          data: {
+            name: name.trim(),
+            code: formattedCode,
+            daysAllowed: validDays,
+            isPaid: Boolean(isPaid),
+          },
+        });
+      } else {
+        throw createErr;
+      }
+    }
 
     cacheService.invalidateTags(['leaves', 'dashboard']);
 

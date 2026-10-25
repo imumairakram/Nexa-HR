@@ -29,8 +29,6 @@ const LeavePolicy = () => {
     code: '',
     days: 12,
     type: 'PAID',
-    accrual: 'Monthly Accrual',
-    carryover: 'Max 3 Days',
     description: '',
   });
 
@@ -53,8 +51,6 @@ const LeavePolicy = () => {
             code: lt.code,
             days: lt.daysAllowed,
             type: lt.isPaid ? 'PAID' : 'UNPAID',
-            accrual: `${(lt.daysAllowed / 12).toFixed(1)} Days / Month`,
-            carryover: lt.isPaid ? 'Max 3-5 Days Carryover' : 'No Carryover',
             color: colors[idx % colors.length],
             description: lt.description || `${lt.name} entitlement governed by corporate human resources handbook.`,
           };
@@ -95,8 +91,6 @@ const LeavePolicy = () => {
           code: '',
           days: 12,
           type: 'PAID',
-          accrual: 'Monthly Accrual',
-          carryover: 'Max 3 Days',
           description: '',
         });
         await loadLeavePolicies();
@@ -119,10 +113,10 @@ const LeavePolicy = () => {
   const paidPoliciesCount = useMemo(() => {
     return policies.filter((p) => p.type === 'PAID').length;
   }, [policies]);
-  const avgMonthlyAccrual = useMemo(() => {
-    if (!policies.length) return '0.0';
+  const avgQuotaDays = useMemo(() => {
+    if (!policies.length) return '0';
     const totalDays = policies.reduce((sum, p) => sum + (p.days || 0), 0);
-    return (totalDays / (policies.length * 12)).toFixed(1);
+    return Math.round(totalDays / policies.length);
   }, [policies]);
 
   const policySparkData = useMemo(() => {
@@ -155,21 +149,21 @@ const LeavePolicy = () => {
     ];
   }, [paidPoliciesCount, totalPolicies]);
 
-  const accrualSparkData = useMemo(() => {
-    const val = parseFloat(avgMonthlyAccrual) || 1.5;
+  const quotaAvgSparkData = useMemo(() => {
+    const val = parseFloat(avgQuotaDays) || 12;
     return [
-      { value: +(val * 0.7).toFixed(1), label: 'Q1' },
-      { value: +(val * 0.85).toFixed(1), label: 'Q2' },
-      { value: +(val * 0.95).toFixed(1), label: 'Q3' },
-      { value: val, label: 'Current' },
+      { value: Math.round(val * 0.7), label: 'Min' },
+      { value: Math.round(val * 0.85), label: 'Q2' },
+      { value: Math.round(val * 0.95), label: 'Q3' },
+      { value: val, label: 'Avg' },
     ];
-  }, [avgMonthlyAccrual]);
+  }, [avgQuotaDays]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
         title="Leave Policy Configuration & Quota Rules"
-        subtitle="Establish company-wide paid time-off limits, parental allowances, accrual cycles, and carryover rules."
+        subtitle="Establish company-wide paid time-off limits, parental allowances, and statutory leave quota rules."
       />
 
       {toastMsg && (
@@ -190,11 +184,11 @@ const LeavePolicy = () => {
           {/* Left Side: Policy Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-              Corporate Leave Policies & Accrual Matrix
+              Corporate Leave Policies & Quotas
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
-              Configure organizational annual paid leave quotas, medical allowances, maternity entitlements, and rollover carryover ceilings.
+              Configure organizational annual paid leave quotas, medical allowances, and statutory employee entitlements.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
@@ -204,7 +198,7 @@ const LeavePolicy = () => {
               </span>
               <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
                 <Clock className="w-3.5 h-3.5" />
-                <span>Automatic Monthly Accrual</span>
+                <span>Annual Allocation</span>
               </span>
             </div>
           </div>
@@ -280,15 +274,15 @@ const LeavePolicy = () => {
         {/* Card 4 */}
         <SparkMetricCard
           variant="light"
-          title="Avg Monthly Accrual"
-          value={avgMonthlyAccrual}
-          unit="Days / Mo"
-          badgeText="Automated"
+          title="Avg Quota Per Tier"
+          value={avgQuotaDays}
+          unit="Days / Yr"
+          badgeText="Average"
           badgeType="positive"
           badgeIcon="up"
-          subtext="Per Employee Cycle"
+          subtext="Per Policy Allocation"
           chartColor="rose"
-          dataPoints={accrualSparkData}
+          dataPoints={quotaAvgSparkData}
           loading={loading}
         />
       </div>
@@ -340,15 +334,13 @@ const LeavePolicy = () => {
                 <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-2 text-xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-400">Allowed Quota:</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-black text-sm">{p.days} Days</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-black text-sm">{p.days} Days / Year</span>
                   </div>
                   <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
-                    <span className="text-slate-400">Accrual Cycle:</span>
-                    <span>{p.accrual}</span>
-                  </div>
-                  <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
-                    <span className="text-slate-400">Carryover Limit:</span>
-                    <span>{p.carryover}</span>
+                    <span className="text-slate-400">Wage Status:</span>
+                    <span className={p.type === 'PAID' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-amber-600 dark:text-amber-400 font-bold'}>
+                      {p.type === 'PAID' ? '100% Paid' : 'Unpaid'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -377,7 +369,7 @@ const LeavePolicy = () => {
                     Create Leave Policy
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
-                    Configure statutory leave quotas, accrual intervals, and payroll wage compensation rules.
+                    Configure statutory leave quotas and payroll wage compensation rules.
                   </p>
                 </div>
               </div>
@@ -479,40 +471,6 @@ const LeavePolicy = () => {
                 </div>
               </div>
 
-              {/* Accrual Rules */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                    Accrual Model
-                  </label>
-                  <select
-                    value={form.accrual}
-                    onChange={(e) => setForm({ ...form, accrual: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="Monthly Accrual">Monthly Pro-Rata Accrual</option>
-                    <option value="Frontloaded Annual">Frontloaded on Jan 1st</option>
-                    <option value="Post Probation">Unlocked Post-Probation</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                    Year-End Carryover
-                  </label>
-                  <select
-                    value={form.carryover}
-                    onChange={(e) => setForm({ ...form, carryover: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="Max 3 Days">Max 3 Days Rollover</option>
-                    <option value="Max 5 Days">Max 5 Days Rollover</option>
-                    <option value="No Carryover (Use or Lose)">No Carryover (Use or Lose)</option>
-                    <option value="Full Encashment">Full Encashment on Dec 31</option>
-                  </select>
-                </div>
-              </div>
-
               {/* Description */}
               <div className="space-y-1.5">
                 <label className="block text-slate-800 dark:text-slate-200 font-bold">
@@ -538,7 +496,7 @@ const LeavePolicy = () => {
                       {form.name.trim() || 'Leave Policy Preview'}
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                      {form.accrual} • {form.carryover}
+                      {form.code.trim() ? form.code.toUpperCase() : 'POLICY'} • {form.days || '0'} Days Quota
                     </div>
                   </div>
                 </div>
