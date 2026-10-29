@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { visibleApplicationsWhere } = require('../utils/recruitmentFilters');
 const { fetchApplicationEmails, isGmailConfigured } = require('../services/gmail.service');
 const {
   processEmailBatch,
@@ -22,18 +23,12 @@ const getRecruitmentStats = async (req, res) => {
         prisma.jobOpening.count({ where: { status: 'ACTIVE' } }),
         prisma.jobOpening.count({ where: { status: 'PAUSED' } }),
         prisma.jobApplication.count({
-          where: {
-            status: 'ACTIVE',
-            NOT: { aiStatus: 'SCREENED_OUT' },
-          },
+          where: visibleApplicationsWhere,
         }),
         prisma.jobApplication.groupBy({
           by: ['stage'],
           _count: { id: true },
-          where: {
-            status: 'ACTIVE',
-            NOT: { aiStatus: 'SCREENED_OUT' },
-          },
+          where: visibleApplicationsWhere,
         }),
         prisma.jobInterview.count({ where: { status: 'SCHEDULED' } }),
       ]);
@@ -111,7 +106,11 @@ const getJobOpenings = async (req, res) => {
       orderBy: { createdAt: 'desc' },
       include: {
         _count: {
-          select: { applications: true },
+          select: {
+            applications: {
+              where: visibleApplicationsWhere,
+            },
+          },
         },
       },
     });
@@ -150,6 +149,7 @@ const getJobOpeningById = async (req, res) => {
       where: { id },
       include: {
         applications: {
+          where: visibleApplicationsWhere,
           orderBy: { createdAt: 'desc' },
         },
         interviews: {
@@ -437,7 +437,7 @@ const getApplications = async (req, res) => {
     if (aiStatus && aiStatus !== 'ALL') {
       where.aiStatus = aiStatus;
     } else if (includeScreenedOut !== 'true') {
-      where.NOT = { aiStatus: 'SCREENED_OUT' };
+      where.NOT = { aiStatus: { in: ['SCREENED_OUT', 'UNMATCHED', 'ERROR'] } };
     }
     if (search && search.trim()) {
       const q = search.trim();

@@ -728,7 +728,7 @@ const JobsWorkspace = () => {
                         <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-500">
                           <Users className="w-3.5 h-3.5" />
                         </div>
-                        <span>{job.applicants} Applicants</span>
+                        <span>{job.applicants} {job.applicants === 1 ? 'Applicant' : 'Applicants'}</span>
                         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                       </button>
 
@@ -807,7 +807,7 @@ const JobsWorkspace = () => {
                               className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
                             >
                               <Users className="w-3.5 h-3.5" />
-                              <span>{job.applicants} candidates</span>
+                              <span>{job.applicants} {job.applicants === 1 ? 'candidate' : 'candidates'}</span>
                             </button>
                           </td>
                           <td className="py-4 px-6">

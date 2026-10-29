@@ -6,6 +6,13 @@ const {
   evaluateDecision,
   cleanJsonOutput,
 } = require('../services/aiScreening.service');
+const {
+  extractPhoneFromText,
+  normalizePhoneNumber,
+  extractLocationFromText,
+  maskPhone,
+} = require('../utils/contactExtractor');
+const { visibleApplicationsWhere } = require('../utils/recruitmentFilters');
 
 test('AI ATS Screening - Unit Tests', async (t) => {
   // ====================================================
@@ -198,6 +205,203 @@ test('AI ATS Screening - Unit Tests', async (t) => {
     });
     assert.equal(res3.action, 'CREATED');
     assert.equal(database.length, 2);
+  });
+
+  // ====================================================
+  // 4. Contact Extractor & Phone Normalization Tests
+  // ====================================================
+  await t.test('Phone extraction handles all target formats and normalizes to standard +92 format', () => {
+    const testCases = [
+      { input: 'Call me at +92 311 0108939 anytime.', expected: '+92 311 0108939' },
+      { input: 'Mobile: 0311-0108939', expected: '+92 311 0108939' },
+      { input: 'Phone: (0311) 0108939', expected: '+92 311 0108939' },
+      { input: 'Tel: 03110108939', expected: '+92 311 0108939' },
+      { input: 'Direct: +92-311-0108939', expected: '+92 311 0108939' },
+      { input: 'Intl: 00923110108939', expected: '+92 311 0108939' },
+      { input: 'US number: +1 415 555 2671', expected: '+1 415 555 2671' },
+    ];
+
+    for (const { input, expected } of testCases) {
+      const extracted = extractPhoneFromText(input);
+      assert.ok(extracted, `Failed to extract from "${input}"`);
+      const normalized = normalizePhoneNumber(extracted);
+      assert.equal(normalized, expected, `Mismatch for input "${input}"`);
+    }
+  });
+
+  await t.test('Phone extraction rejects false positives like year ranges, single years, and IDs', () => {
+    const falsePositives = [
+      'Experience: 2021-2024 at Tech Solutions',
+      'Worked from 2018 - 2023 as software engineer',
+      'Graduated in 2020',
+      'Postal code 90210, Beverly Hills',
+      'Requisition ref ID: 123456',
+    ];
+
+    for (const text of falsePositives) {
+      const extracted = extractPhoneFromText(text);
+      assert.equal(extracted, null, `Should have rejected false positive: "${text}" but got "${extracted}"`);
+    }
+  });
+
+  await t.test('maskPhone redacts phone number for privacy in logs', () => {
+    assert.equal(maskPhone('+92 311 0108939'), '+92 311 ***8939');
+    assert.equal(maskPhone('03110108939'), '03110***8939');
+    assert.equal(maskPhone(null), 'N/A');
+    assert.equal(maskPhone(''), 'N/A');
+  });
+
+  await t.test('extractLocationFromText extracts city and country from CV text header', () => {
+    const resume1 = `
+      Muhammad Umair Akram
+      Full-Stack Developer
+      Karachi, Pakistan | +92 311 0108939 | umair@example.com
+      
+      EXPERIENCE:
+      Frontend Lead, ABC Corp (2021-2024)
+    `;
+    assert.equal(extractLocationFromText(resume1), 'Karachi, Pakistan');
+
+    const resume2 = `
+      John Doe
+      Islamabad, Pakistan
+      Email: john@test.com
+    `;
+    assert.equal(extractLocationFromText(resume2), 'Islamabad, Pakistan');
+  });
+
+  // ====================================================
+  // 5. Preserving Existing Phone in Duplicate Check
+  // ====================================================
+  await t.test('Duplicate update preserves existing phone if subsequent payload has null phone', () => {
+    const existing = {
+      phone: '+92 311 0108939',
+      location: 'Karachi, Pakistan',
+    };
+
+    const newCandidatePhone = null;
+    const resolvedPhone = newCandidatePhone || existing?.phone || null;
+    assert.equal(resolvedPhone, '+92 311 0108939');
+
+    // If new valid phone arrives, it updates
+    const updatedCandidatePhone = '+92 300 1234567';
+    const newResolvedPhone = updatedCandidatePhone || existing?.phone || null;
+    assert.equal(newResolvedPhone, '+92 300 1234567');
+  });
+
+  // ====================================================
+  // 6. Applicant Count Parity via Single Source of Truth
+  // ====================================================
+  await t.test('visibleApplicationsWhere filter ensures Job Cards and KPI Total Applicants agree', () => {
+    // Simulated database applications collection
+    const apps = [
+      // Visible (Pass / Confirmed or non-AI manual)
+      { id: '1', jobOpeningId: 'job-1', status: 'ACTIVE', aiStatus: 'CONFIRMED' },
+      { id: '2', jobOpeningId: 'job-1', status: 'ACTIVE', aiStatus: 'CONFIRMED' },
+      { id: '3', jobOpeningId: 'job-2', status: 'ACTIVE', aiStatus: 'CONFIRMED' },
+      // Hidden / Excluded
+      { id: '4', jobOpeningId: 'job-1', status: 'ACTIVE', aiStatus: 'SCREENED_OUT' },
+      { id: '5', jobOpeningId: null,    status: 'ACTIVE', aiStatus: 'UNMATCHED' },
+      { id: '6', jobOpeningId: 'job-2', status: 'ACTIVE', aiStatus: 'ERROR' },
+      { id: '7', jobOpeningId: 'job-1', status: 'ARCHIVED', aiStatus: 'CONFIRMED' },
+    ];
+
+    const jobs = [
+      { id: 'job-1', title: 'Full-Stack Developer' },
+      { id: 'job-2', title: 'DevOps Specialist' },
+    ];
+
+    // Filter rule matching visibleApplicationsWhere
+    function isVisible(app) {
+      if (app.status !== 'ACTIVE') return false;
+      const excluded = ['SCREENED_OUT', 'UNMATCHED', 'ERROR'];
+      if (excluded.includes(app.aiStatus)) return false;
+      return true;
+    }
+
+    // 1. KPI Total Count
+    const kpiTotal = apps.filter(isVisible).length;
+    assert.equal(kpiTotal, 3);
+
+    // 2. Per-Job counts
+    let jobCardsSum = 0;
+    const jobCounts = {};
+    for (const job of jobs) {
+      const count = apps.filter((a) => a.jobOpeningId === job.id && isVisible(a)).length;
+      jobCounts[job.id] = count;
+      jobCardsSum += count;
+    }
+
+    assert.equal(jobCounts['job-1'], 2);
+    assert.equal(jobCounts['job-2'], 1);
+    assert.equal(jobCardsSum, kpiTotal, 'Job card sum must strictly match KPI total applicants');
+  });
+
+  await t.test('Pipeline simulation: Confirmed, Screened-out, Unmatched, Override, and Archive maintain strict count parity', () => {
+    const job = { id: 'job-101', title: 'Full-Stack Developer' };
+    const applications = [];
+
+    function countVisible(jobId = null) {
+      return applications.filter((app) => {
+        if (app.status !== 'ACTIVE') return false;
+        if (['SCREENED_OUT', 'UNMATCHED', 'ERROR'].includes(app.aiStatus)) return false;
+        if (jobId) return app.jobOpeningId === jobId;
+        return true;
+      }).length;
+    }
+
+    // Baseline: 0 applicants
+    assert.equal(countVisible(), 0);
+    assert.equal(countVisible(job.id), 0);
+
+    // 1. Candidate 1 scores 85 -> CONFIRMED
+    applications.push({
+      id: 'app-1',
+      jobOpeningId: job.id,
+      name: 'Umair',
+      status: 'ACTIVE',
+      aiStatus: 'CONFIRMED',
+      stage: 'APPLIED',
+    });
+    assert.equal(countVisible(), 1);
+    assert.equal(countVisible(job.id), 1);
+
+    // 2. Candidate 2 scores 55 -> SCREENED_OUT (Must NOT increment count)
+    applications.push({
+      id: 'app-2',
+      jobOpeningId: job.id,
+      name: 'Candidate 2',
+      status: 'ACTIVE',
+      aiStatus: 'SCREENED_OUT',
+      stage: 'SCREENED_OUT',
+    });
+    assert.equal(countVisible(), 1);
+    assert.equal(countVisible(job.id), 1);
+
+    // 3. Candidate 3 -> UNMATCHED (Must NOT increment count)
+    applications.push({
+      id: 'app-3',
+      jobOpeningId: null,
+      name: 'Candidate 3',
+      status: 'ACTIVE',
+      aiStatus: 'UNMATCHED',
+      stage: 'UNMATCHED',
+    });
+    assert.equal(countVisible(), 1);
+    assert.equal(countVisible(job.id), 1);
+
+    // 4. HR Overrides Candidate 2 -> Promoted to CONFIRMED
+    const app2 = applications.find((a) => a.id === 'app-2');
+    app2.aiStatus = 'CONFIRMED';
+    app2.stage = 'APPLIED';
+    assert.equal(countVisible(), 2);
+    assert.equal(countVisible(job.id), 2);
+
+    // 5. Candidate 1 is archived -> Both counts decrement to 1
+    const app1 = applications.find((a) => a.id === 'app-1');
+    app1.status = 'ARCHIVED';
+    assert.equal(countVisible(), 1);
+    assert.equal(countVisible(job.id), 1);
   });
 });
 

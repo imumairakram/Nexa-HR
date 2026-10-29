@@ -8,6 +8,12 @@ const {
   evaluateDecision,
 } = require('./aiScreening.service');
 const { markEmailAsProcessed } = require('./gmail.service');
+const {
+  extractPhoneFromText,
+  normalizePhoneNumber,
+  extractLocationFromText,
+  maskPhone,
+} = require('../utils/contactExtractor');
 
 // Sync Telemetry State
 const syncTelemetry = {
@@ -104,6 +110,9 @@ async function processEmailApplication(email) {
   if (!matchedJob) {
     console.log(`[ATS PIPELINE] No active job matched for "${subject}". Saving as UNMATCHED.`);
     const appId = await generateApplicationId();
+    const extractedPhone = extractPhoneFromText(`${bodyText}\n${parsed.text}`);
+    const extractedLoc = extractLocationFromText(parsed.text) || 'Islamabad HQ / Hybrid';
+    const cleanRole = subject.replace(/^(?:re|fwd|application\s*(?:for|:)?)\s*/i, '').trim().slice(0, 60) || 'General Requisition';
 
     const application = await prisma.jobApplication.create({
       data: {
@@ -111,10 +120,11 @@ async function processEmailApplication(email) {
         jobOpeningId: null,
         name: senderName || 'Unknown Applicant',
         email: senderEmail,
-        role: subject.slice(0, 50) || 'Unmatched Requisition',
+        phone: extractedPhone,
+        role: cleanRole,
         department: 'General Talent Pool',
-        location: 'HQ / Remote',
-        stage: 'APPLIED',
+        location: extractedLoc,
+        stage: 'UNMATCHED',
         status: 'ACTIVE',
         source: 'GMAIL',
         gmailMessageId: messageId,
@@ -139,6 +149,7 @@ async function processEmailApplication(email) {
   if (parsed.parseStatus === 'FAILED' && (!parsed.text || parsed.text.length < 50)) {
     console.warn(`[ATS PIPELINE] CV text empty or scanned PDF. Routing to manual review.`);
     const appId = await generateApplicationId();
+    const fallbackPhone = extractPhoneFromText(bodyText);
 
     const application = await prisma.jobApplication.create({
       data: {
@@ -146,10 +157,11 @@ async function processEmailApplication(email) {
         jobOpeningId: matchedJob.id,
         name: senderName || 'Unknown Applicant',
         email: senderEmail,
+        phone: fallbackPhone,
         role: matchedJob.title,
         department: matchedJob.department,
         location: matchedJob.location,
-        stage: 'APPLIED',
+        stage: 'ERROR',
         status: 'ACTIVE',
         source: 'GMAIL',
         gmailMessageId: messageId,
@@ -218,7 +230,19 @@ async function processEmailApplication(email) {
   const decision = evaluateDecision(screeningData.score);
   const candidateName = screeningData.candidate?.name || senderName || 'Candidate';
   const candidateEmail = (screeningData.candidate?.email || senderEmail || '').toLowerCase();
-  const candidatePhone = screeningData.candidate?.phone || null;
+  
+  // Deterministic phone extraction + normalization
+  const rawPhone = screeningData.candidate?.phone || extractPhoneFromText(`${bodyText}\n${parsed.text}`);
+  const candidatePhone = normalizePhoneNumber(rawPhone) || rawPhone || null;
+
+  // Location extraction with fallback
+  const candidateLocation =
+    (screeningData.candidate?.location &&
+     screeningData.candidate.location !== 'HQ / Remote' &&
+     screeningData.candidate.location.trim())
+      ? screeningData.candidate.location.trim()
+      : extractLocationFromText(parsed.text) || matchedJob.location;
+
   const candidateRole = matchedJob.title;
   const candidateExp = screeningData.candidate?.yearsExperience
     ? `${screeningData.candidate.yearsExperience} Years`
@@ -236,10 +260,10 @@ async function processEmailApplication(email) {
 
     const appData = {
       name: candidateName,
-      phone: candidatePhone,
+      phone: candidatePhone || existing?.phone || null,
       role: candidateRole,
       department: matchedJob.department,
-      location: matchedJob.location,
+      location: candidateLocation || existing?.location || matchedJob.location,
       experience: candidateExp,
       stage: decision.isPass ? 'APPLIED' : 'SCREENED_OUT',
       status: 'ACTIVE',
@@ -282,7 +306,7 @@ async function processEmailApplication(email) {
   if (decision.isPass) {
     syncTelemetry.confirmedCount++;
     console.log(
-      `[ATS PIPELINE] PASS -> Candidate ${candidateName} confirmed for "${matchedJob.title}" with score ${screeningData.score}/100`
+      `[ATS PIPELINE] PASS -> Candidate ${candidateName} (${maskPhone(candidatePhone)}) confirmed for "${matchedJob.title}" with score ${screeningData.score}/100`
     );
 
     // In-app notification to HR / Admin users
@@ -370,7 +394,7 @@ function getSyncStatus() {
  * Re-scan an existing application with AI
  */
 async function rescanApplication(applicationId) {
-  const application = await prisma.jobApplication.findUnique({
+  let application = await prisma.jobApplication.findUnique({
     where: { id: applicationId },
     include: { jobOpening: true },
   });
@@ -379,21 +403,55 @@ async function rescanApplication(applicationId) {
     throw new Error('Application not found');
   }
 
-  if (!application.jobOpening) {
-    throw new Error('Application does not have a linked job requisition to scan against');
+  let jobOpening = application.jobOpening;
+  if (!jobOpening) {
+    // If application was unmatched, try matching against active jobs
+    const activeJobs = await prisma.jobOpening.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
+    });
+    const matchResult = await matchJobOpening({
+      emailSubject: application.role || '',
+      emailBody: application.resumeSummary || '',
+      resumeText: application.resumeSummary || '',
+      activeJobs,
+    });
+    if (matchResult.matchedJob) {
+      jobOpening = matchResult.matchedJob;
+      await prisma.jobApplication.update({
+        where: { id: applicationId },
+        data: {
+          jobOpeningId: jobOpening.id,
+          role: jobOpening.title,
+          department: jobOpening.department,
+        },
+      });
+    } else {
+      throw new Error('Application does not have a linked job requisition to scan against');
+    }
   }
 
   const resumeText = application.resumeSummary || 'No resume text available.';
   const screeningData = await screenCandidate({
-    job: application.jobOpening,
+    job: jobOpening,
     resumeText,
   });
 
   const decision = evaluateDecision(screeningData.score);
+  const rawPhone = screeningData.candidate?.phone || extractPhoneFromText(resumeText);
+  const candidatePhone = normalizePhoneNumber(rawPhone) || rawPhone || application.phone;
+  const candidateLoc =
+    (screeningData.candidate?.location &&
+     screeningData.candidate.location !== 'HQ / Remote' &&
+     screeningData.candidate.location.trim())
+      ? screeningData.candidate.location.trim()
+      : extractLocationFromText(resumeText) || application.location;
 
   const updated = await prisma.jobApplication.update({
     where: { id: applicationId },
     data: {
+      phone: candidatePhone,
+      location: candidateLoc,
       aiScore: screeningData.score,
       aiBreakdown: screeningData.breakdown,
       aiSummary: screeningData.summary,
@@ -425,6 +483,41 @@ async function overrideApplication(applicationId, user) {
     throw new Error('Application not found');
   }
 
+  // If application doesn't have jobOpeningId, try to link it to the first matching or active job
+  let linkedJobOpeningId = application.jobOpeningId;
+  let linkedRole = application.role;
+  let linkedDept = application.department;
+
+  if (!linkedJobOpeningId) {
+    const activeJobs = await prisma.jobOpening.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
+    });
+    const matchResult = await matchJobOpening({
+      emailSubject: application.role || '',
+      emailBody: application.notes || '',
+      resumeText: application.resumeSummary || '',
+      activeJobs,
+    });
+    if (matchResult.matchedJob) {
+      linkedJobOpeningId = matchResult.matchedJob.id;
+      linkedRole = matchResult.matchedJob.title;
+      linkedDept = matchResult.matchedJob.department;
+    } else if (activeJobs.length > 0) {
+      linkedJobOpeningId = activeJobs[0].id;
+      linkedRole = activeJobs[0].title;
+      linkedDept = activeJobs[0].department;
+    }
+  }
+
+  // Extract phone/location if missing
+  const rawPhone = application.phone || extractPhoneFromText(`${application.notes || ''}\n${application.resumeSummary || ''}`);
+  const normalizedPhone = normalizePhoneNumber(rawPhone) || rawPhone || application.phone;
+  const extractedLoc =
+    (application.location && application.location !== 'HQ / Remote' && application.location !== 'Islamabad HQ / Hybrid')
+      ? application.location
+      : extractLocationFromText(application.resumeSummary || '') || application.location;
+
   const actorName = user?.name || user?.email || 'HR Administrator';
   const timestamp = new Date().toISOString();
   const overrideNote = `[HR OVERRIDE by ${actorName} at ${timestamp}] Manually promoted from ${application.aiStatus} to CONFIRMED in APPLIED stage.`;
@@ -432,6 +525,9 @@ async function overrideApplication(applicationId, user) {
   const updated = await prisma.jobApplication.update({
     where: { id: applicationId },
     data: {
+      ...(linkedJobOpeningId ? { jobOpeningId: linkedJobOpeningId, role: linkedRole, department: linkedDept } : {}),
+      phone: normalizedPhone,
+      location: extractedLoc,
       stage: 'APPLIED',
       status: 'ACTIVE',
       aiStatus: 'CONFIRMED',

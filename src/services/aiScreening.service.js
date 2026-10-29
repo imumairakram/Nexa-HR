@@ -8,6 +8,7 @@ const CandidateSchema = z.object({
   name: z.string().catch(''),
   email: z.string().catch(''),
   phone: z.string().catch(''),
+  location: z.string().catch(''),
   currentTitle: z.string().catch(''),
   yearsExperience: z.union([z.number(), z.string().transform(v => parseFloat(v) || 0)]).catch(0),
   topSkills: z.array(z.string()).catch([]),
@@ -57,10 +58,17 @@ function getAIConfig() {
 }
 
 /**
- * Call Gemini REST API
+ * Call Gemini REST API with automated fallback across supported model aliases
  */
 async function callGemini({ apiKey, model, systemPrompt, userPrompt, temperature = 0.1, inlineData = null }) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const modelsToTry = [
+    model,
+    'gemini-1.5-flash-latest',
+    'gemini-2.0-flash',
+    'gemini-1.5-pro',
+    'gemini-pro',
+  ].filter(Boolean);
+  const uniqueModels = [...new Set(modelsToTry)];
 
   const userParts = [{ text: userPrompt }];
   if (inlineData && inlineData.mimeType && inlineData.data) {
@@ -81,24 +89,42 @@ async function callGemini({ apiKey, model, systemPrompt, userPrompt, temperature
     },
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+  let lastError = null;
+  for (const m of uniqueModels) {
+    try {
+      const cleanModelName = m.replace(/^models\//, '');
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModelName}:generateContent?key=${apiKey}`;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API error (${response.status}): ${errorText}`);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Gemini API error (${response.status}) on model ${cleanModelName}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textContent) {
+        throw new Error(`Gemini returned an empty response on model ${cleanModelName}`);
+      }
+
+      return textContent;
+    } catch (err) {
+      lastError = err;
+      // If error is 404 (model not found), try next model alias
+      if (err.message && err.message.includes('404')) {
+        console.warn(`[GEMINI ADAPTER] Model "${m}" not found (404). Trying next fallback model...`);
+        continue;
+      }
+      throw err;
+    }
   }
 
-  const data = await response.json();
-  const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!textContent) {
-    throw new Error('Gemini returned an empty response.');
-  }
-
-  return textContent;
+  throw lastError;
 }
 
 /**
@@ -248,6 +274,15 @@ async function runAI({ systemPrompt, userPrompt, temperature = 0.1, inlineData =
 // 3. STEP A: JOB MATCHING LOGIC
 // ====================================================
 
+function normalizeText(str) {
+  return (str || '')
+    .toLowerCase()
+    .replace(/[-_/\\|–—]/g, ' ')
+    .replace(/[^\w\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /**
  * Matches an incoming application to an active job opening.
  * First inspects email subject/body for explicit title or requisition code.
@@ -269,17 +304,37 @@ async function matchJobOpening({ emailSubject = '', emailBody = '', resumeText =
     };
   }
 
-  const combinedSearchText = `${emailSubject} ${emailBody}`.toLowerCase();
+  const normEmail = normalizeText(`${emailSubject} ${emailBody}`);
+  const normSubject = normalizeText(emailSubject);
+  const normResumeHeader = normalizeText(resumeText.slice(0, 1500));
 
-  // 1. Direct heuristic match: Check jobCode (e.g. "JOB-101") or exact title match in subject/body
+  // 1. Direct heuristic match: check code, normalized title, and token overlap in subject/email/resume
   for (const job of activeJobs) {
-    const codeMatch = job.jobCode && combinedSearchText.includes(job.jobCode.toLowerCase());
-    const titleMatch = job.title && combinedSearchText.includes(job.title.toLowerCase());
-    if (codeMatch || titleMatch) {
+    const normJobCode = normalizeText(job.jobCode);
+    const normJobTitle = normalizeText(job.title);
+
+    const codeMatch = normJobCode && normEmail.includes(normJobCode);
+    const titleMatchInEmail = normJobTitle && normEmail.includes(normJobTitle);
+
+    // Token-based match: all significant words (length >= 3) of job title present in email subject
+    const titleTokens = normJobTitle.split(' ').filter((w) => w.length >= 3);
+    const allTokensInSubject =
+      titleTokens.length >= 2 && titleTokens.every((token) => normSubject.includes(token));
+
+    if (codeMatch || titleMatchInEmail || allTokensInSubject) {
       return {
         matchedJob: job,
         confidence: 0.95,
-        reasoning: `Direct reference found in email (${codeMatch ? job.jobCode : job.title}).`,
+        reasoning: `Direct reference found in application email (${codeMatch ? job.jobCode : job.title}).`,
+      };
+    }
+
+    const titleMatchInResume = normJobTitle && normResumeHeader.includes(normJobTitle);
+    if (titleMatchInResume) {
+      return {
+        matchedJob: job,
+        confidence: 0.85,
+        reasoning: `Direct role title match found in candidate resume header (${job.title}).`,
       };
     }
   }
@@ -399,9 +454,10 @@ JSON Schema:
     "keywordsRelevance": 0-100 (domain terminology & tools)
   },
   "candidate": {
-    "name": "Candidate full name extracted from CV/email, or Unknown",
-    "email": "Candidate email address extracted from CV/email",
-    "phone": "Candidate phone number extracted from CV/email, or empty string",
+    "name": "Candidate full name extracted from CV header or email, or Unknown",
+    "email": "Candidate clean lowercase email address extracted from CV or email",
+    "phone": "Candidate phone number extracted from CV header, text, or email signature (e.g. +92 311 0108939). Do not leave blank if present anywhere in the CV text.",
+    "location": "Candidate city and country if mentioned in CV header (e.g. Karachi, Pakistan), or empty string",
     "currentTitle": "Most recent job title, or candidate stated title",
     "yearsExperience": 0 (total estimated years of professional experience as a number),
     "topSkills": ["array of 3-6 top technical/domain skills identified"]

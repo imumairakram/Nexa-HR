@@ -1056,7 +1056,7 @@ const ATSPipeline = () => {
                       <Phone className="w-4 h-4 text-slate-400 shrink-0" />
                       <div className="truncate">
                         <p className="text-[10px] text-slate-400 font-semibold">Phone</p>
-                        <p className="font-bold text-slate-800 dark:text-slate-200 truncate">{selectedCandidate.phone}</p>
+                        <p className="font-bold text-slate-800 dark:text-slate-200 truncate">{selectedCandidate.phone || '—'}</p>
                       </div>
                     </div>
                   </div>
@@ -1067,7 +1067,7 @@ const ATSPipeline = () => {
                       <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
                       <div>
                         <p className="text-[10px] text-slate-400 font-semibold">Location</p>
-                        <p className="font-bold text-slate-800 dark:text-slate-200">{selectedCandidate.location}</p>
+                        <p className="font-bold text-slate-800 dark:text-slate-200">{selectedCandidate.location || '—'}</p>
                       </div>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center gap-2.5">
