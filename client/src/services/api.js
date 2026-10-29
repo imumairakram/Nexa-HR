@@ -907,6 +907,33 @@ export const api = {
     });
   },
 
+  // --- AI ATS Auto-Screening & Gmail Sync ---
+  syncAiScreeningGmail: async () => {
+    return await fetchAPI('/recruitment/ai-screening/sync', {
+      method: 'POST',
+    });
+  },
+
+  getAiScreeningStatus: async () => {
+    return await fetchAPI('/recruitment/ai-screening/status');
+  },
+
+  getAiScreenedOutApplications: async () => {
+    return await fetchAPI('/recruitment/ai-screening/screened-out');
+  },
+
+  overrideAiApplication: async (id) => {
+    return await fetchAPI(`/recruitment/applications/${id}/ai-override`, {
+      method: 'POST',
+    });
+  },
+
+  rescanAiApplication: async (id) => {
+    return await fetchAPI(`/recruitment/applications/${id}/rescan`, {
+      method: 'POST',
+    });
+  },
+
   deleteJobApplication: async (id) => {
     return await fetchAPI(`/recruitment/applications/${id}`, {
       method: 'DELETE',

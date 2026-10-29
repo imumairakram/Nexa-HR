@@ -425,6 +425,112 @@ npm run dev
 
 ---
 
+## 🤖 AI-Powered ATS Auto-Screening from HR Gmail
+
+NexaHR includes an automated, AI-driven Applicant Tracking System (ATS) pipeline that synchronizes candidate applications received in the HR Gmail inbox into the active recruitment workflow.
+
+### Feature Workflow
+
+1. **Email Ingestion**: Candidates send application emails with CV attachments (PDF/DOCX, up to 10 MB) to HR's inbox.
+2. **Background Cron Polling**: A background daemon (`gmail.service.js`) polls every 5 minutes (configurable via `GMAIL_POLL_CRON`) using `node-cron`.
+3. **Resume Parsing & Cloud Storage**:
+   - `pdf-parse` and `mammoth` extract text from PDF and DOCX attachments without writing to disk.
+   - Original resumes are uploaded directly to Cloudinary via memory streams.
+4. **Step A - Job Requisition Matching**:
+   - Scans email subject and body for requisition codes (e.g. `JOB-101`) or job titles.
+   - If not explicitly found, matches candidate CV semantically against active job openings.
+   - Candidates without a clear match (confidence < 0.5) are routed to manual review (`aiStatus = 'UNMATCHED'`).
+5. **Step B - Objective ATS Scoring (0–100)**:
+   - Provider-agnostic engine (`gemini`, `openai`, `anthropic`).
+   - Anti-injection defense (`<untrusted_candidate_resume>` tags).
+   - Strict fairness constraint: name, gender, age, nationality, religion, race, and marital status are strictly excluded from evaluation.
+   - Validated strictly via `zod` schema (breakdown: skills, experience, education, keywords; recruiter summary, strengths, gaps).
+6. **Pipeline Routing & Audit**:
+   - **Score ≥ 70 (`CONFIRMED`)**: Candidate is confirmed in the database, placed into the **"Sourced & Applied" (`APPLIED`)** Kanban column, counted in requisition metrics, and HR receives an in-app notification.
+   - **Score < 70 (`SCREENED_OUT`)**: Candidate is preserved in the audit database with scores and gap analysis, viewable in the **"AI Screened-Out"** drawer, with a one-click **"Override & Add to Pipeline"** action for HR.
+   - **Processed Marking**: Email receives the Gmail label `NexaHR-Processed` and is marked read to guarantee idempotency.
+
+---
+
+### Google Cloud OAuth 2.0 Setup Guide
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create or select a project and enable the **Gmail API** under **APIs & Services > Library**.
+3. Configure the **OAuth Consent Screen**:
+   - User Type: **External** (or Internal for Google Workspace).
+   - Add scopes: `https://www.googleapis.com/auth/gmail.readonly` and `https://www.googleapis.com/auth/gmail.modify`.
+   - Add your HR email as a **Test User** (if in testing mode).
+4. Create Credentials:
+   - Go to **APIs & Services > Credentials > Create Credentials > OAuth client ID**.
+   - Application Type: **Web Application**.
+   - Authorized redirect URIs: `http://localhost:5000/oauth2callback`.
+   - Copy the generated **Client ID** and **Client Secret** into `.env`:
+     ```env
+     GOOGLE_CLIENT_ID="your_google_client_id.apps.googleusercontent.com"
+     GOOGLE_CLIENT_SECRET="your_google_client_secret"
+     GOOGLE_REDIRECT_URI="http://localhost:5000/oauth2callback"
+     GMAIL_HR_ADDRESS="hr@yourcompany.com"
+     ```
+5. Generate the Refresh Token:
+   - Run the helper script:
+     ```bash
+     node scripts/gmail-auth.js
+     ```
+   - Open the generated authorization URL in your browser, log in with the HR email, and authorize.
+   - Copy the `code` parameter from the redirected URL, paste it into the console prompt, and press Enter.
+   - Copy the printed `GMAIL_REFRESH_TOKEN` into `.env`:
+     ```env
+     GMAIL_REFRESH_TOKEN="1//04..."
+     ```
+
+---
+
+### AI Provider Configuration
+
+Select your preferred AI provider in `.env`:
+
+```env
+# Gemini (Recommended)
+AI_PROVIDER="gemini"
+AI_API_KEY="your_gemini_api_key"
+AI_MODEL="gemini-1.5-flash"
+ATS_PASS_THRESHOLD=70
+
+# Or OpenAI
+# AI_PROVIDER="openai"
+# AI_API_KEY="sk-..."
+# AI_MODEL="gpt-4o-mini"
+
+# Or Anthropic Claude
+# AI_PROVIDER="anthropic"
+# AI_API_KEY="sk-ant-..."
+# AI_MODEL="claude-3-5-sonnet-20241022"
+```
+
+---
+
+### End-to-End Testing
+
+1. Ensure an **ACTIVE** job requisition exists (e.g., *Full-Stack Developer* or *Cloud Engineer*) under `/recruitment/jobs`.
+2. Send an email from a test candidate email address to your configured HR Gmail address:
+   - **Subject**: `Application: Full-Stack Developer - Sarah Connor`
+   - **Body**: `Please find attached my CV for the Full-Stack Developer position.`
+   - **Attachment**: Attach a PDF or DOCX resume.
+3. Trigger a manual sync or wait for cron:
+   - In the frontend ATS Kanban pipeline, click **Sync Gmail ATS** (or call `POST /api/recruitment/ai-screening/sync`).
+4. **Expected Outcome**:
+   - Candidate is scored by the AI.
+   - If score ≥ 70: candidate appears in the **1. Sourced & Applied (`APPLIED`)** Kanban column with the **AI Score** badge. Clicking their card displays the recruiter summary, strengths, and gap analysis.
+   - If score < 70: candidate appears in the **AI Screened-Out** drawer with the option for HR to override.
+   - Email in Gmail receives the `NexaHR-Processed` label and is marked read.
+
+To run automated unit tests:
+```bash
+npm test
+```
+
+---
+
 ## 🌐 Deployment Guide
 
 ### Deploy Frontend (Vercel)
@@ -556,6 +662,11 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | `PUT` | `/api/recruitment/applications/:id`| Update candidate profile & resume summary | Admin / HR |
 | `PATCH` | `/api/recruitment/applications/:id/stage`| Advance candidate pipeline stage (`APPLIED` ➔ `HIRED`) | Admin / HR |
 | `DELETE` | `/api/recruitment/applications/:id`| Delete candidate application | Admin / HR |
+| `POST` | `/api/recruitment/ai-screening/sync` | Manually trigger Gmail fetch and AI ATS screening scan | Admin / HR |
+| `GET` | `/api/recruitment/ai-screening/status` | Get sync telemetry, error logs, and pass threshold | Admin / HR |
+| `GET` | `/api/recruitment/ai-screening/screened-out` | List low-score, unmatched, or parse-error applications | Admin / HR |
+| `POST` | `/api/recruitment/applications/:id/ai-override` | HR manual override: promote candidate to APPLIED stage | Admin / HR |
+| `POST` | `/api/recruitment/applications/:id/rescan` | Re-run AI scan for an application | Admin / HR |
 | `GET` | `/api/recruitment/interviews` | List scheduled interviews with round & date filters | Yes |
 | `POST` | `/api/recruitment/interviews` | Schedule new interview round with Google Meet link | Admin / HR |
 | `PUT` | `/api/recruitment/interviews/:id` | Update interview schedule, status, feedback & score | Admin / HR |

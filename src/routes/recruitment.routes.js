@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middlewares/auth.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
+const { validateRequest } = require('../middlewares/validator.middleware');
+const { param } = require('express-validator');
 const cacheService = require('../services/cache.service');
 
 const {
@@ -18,6 +20,11 @@ const {
   updateApplication,
   updateApplicationStage,
   deleteApplication,
+  syncGmailScreening,
+  getAiScreeningStatus,
+  getScreenedOutApplications,
+  aiOverrideApplication,
+  aiRescanApplication,
   getInterviews,
   createInterview,
   updateInterview,
@@ -56,6 +63,25 @@ router.post('/applications', canManageRecruitment, createApplication);
 router.put('/applications/:id', canManageRecruitment, updateApplication);
 router.patch('/applications/:id/stage', canManageRecruitment, updateApplicationStage);
 router.delete('/applications/:id', canManageRecruitment, deleteApplication);
+
+// --- AI ATS Auto-Screening & Gmail Sync ---
+router.post('/ai-screening/sync', canManageRecruitment, syncGmailScreening);
+router.get('/ai-screening/status', canManageRecruitment, getAiScreeningStatus);
+router.get('/ai-screening/screened-out', canManageRecruitment, getScreenedOutApplications);
+router.post(
+  '/applications/:id/ai-override',
+  canManageRecruitment,
+  param('id').notEmpty().withMessage('Valid application ID is required'),
+  validateRequest,
+  aiOverrideApplication
+);
+router.post(
+  '/applications/:id/rescan',
+  canManageRecruitment,
+  param('id').notEmpty().withMessage('Valid application ID is required'),
+  validateRequest,
+  aiRescanApplication
+);
 
 // --- Interviews ---
 router.get('/interviews', getInterviews);

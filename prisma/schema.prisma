@@ -41,6 +41,22 @@ enum PayslipStatus {
   PAID
 }
 
+enum ApplicationSource {
+  MANUAL
+  GMAIL
+  CAREER_PORTAL
+  LINKEDIN
+  OTHER
+}
+
+enum AiScreeningStatus {
+  PENDING
+  CONFIRMED
+  SCREENED_OUT
+  UNMATCHED
+  ERROR
+}
+
 // ====================================================
 // CORE SINGLE-COMPANY USER & AUTH MODELS
 // ====================================================
@@ -449,8 +465,8 @@ model JobOpening {
 }
 
 model JobApplication {
-  id            String         @id @default(uuid())
-  applicationId String         @unique // e.g. "APP-9901"
+  id            String            @id @default(uuid())
+  applicationId String            @unique // e.g. "APP-9901"
   jobOpeningId  String?
   name          String
   email         String
@@ -458,24 +474,35 @@ model JobApplication {
   role          String
   department    String
   location      String
-  experience    String         @default("3 Years")
-  rating        Float          @default(5.0)
-  stage         String         @default("APPLIED") // "APPLIED" | "SCREENING" | "INTERVIEW" | "OFFER" | "HIRED" | "REJECTED"
-  status        String         @default("ACTIVE") // "ACTIVE" | "ARCHIVED"
+  experience    String            @default("3 Years")
+  rating        Float             @default(5.0)
+  stage         String            @default("APPLIED") // "APPLIED" | "SCREENING" | "INTERVIEW" | "OFFER" | "HIRED" | "REJECTED"
+  status        String            @default("ACTIVE") // "ACTIVE" | "ARCHIVED"
   resumeSummary String?
   notes         String?
-  tags          String[]       @default([])
-  source        String?        @default("Career Portal")
-  appliedDate   DateTime       @default(now())
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  tags          String[]          @default([])
+  source        ApplicationSource @default(MANUAL)
+  gmailMessageId String?          @unique
+  aiScore       Int?
+  aiBreakdown   Json?
+  aiSummary     String?
+  aiStrengths   Json?
+  aiGaps        Json?
+  aiStatus      AiScreeningStatus? @default(PENDING)
+  aiScreenedAt  DateTime?
+  resumeUrl     String?
+  appliedDate   DateTime          @default(now())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
-  jobOpening    JobOpening?    @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
+  jobOpening    JobOpening?       @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
   interviews    JobInterview[]
 
   @@index([stage])
   @@index([jobOpeningId])
   @@index([email])
+  @@index([aiStatus])
+  @@index([jobOpeningId, email])
   @@index([createdAt])
   @@map("job_applications")
 }

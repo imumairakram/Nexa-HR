@@ -27,6 +27,8 @@ const documentRoutes = require('./routes/document.routes');
 
 // Background Services
 const { startSelfPing, stopSelfPing } = require('./services/selfPing.service');
+const { startGmailPolling, stopGmailPolling } = require('./services/gmail.service');
+const { processEmailBatch } = require('./services/atsPipeline.service');
 const cacheService = require('./services/cache.service');
 
 const app = express();
@@ -182,12 +184,14 @@ const server = app.listen(PORT, () => {
 
   // Start background self-ping service (for Render free tier spindown prevention)
   startSelfPing();
+  startGmailPolling(processEmailBatch);
 });
 
 // Graceful Shutdown
 const handleShutdown = async (signal) => {
   console.log(`[${signal}] Shutting down server gracefully...`);
   stopSelfPing();
+  stopGmailPolling();
   try {
     await prisma.$disconnect();
   } catch (err) {

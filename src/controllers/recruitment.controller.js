@@ -1,4 +1,11 @@
 const prisma = require('../config/prisma');
+const { fetchApplicationEmails, isGmailConfigured } = require('../services/gmail.service');
+const {
+  processEmailBatch,
+  getSyncStatus,
+  overrideApplication: atsOverrideApplication,
+  rescanApplication: atsRescanApplication,
+} = require('../services/atsPipeline.service');
 
 // =========================================================================
 // 1. RECRUITMENT OVERALL TELEMETRY & STATS
@@ -14,11 +21,19 @@ const getRecruitmentStats = async (req, res) => {
         prisma.jobOpening.count(),
         prisma.jobOpening.count({ where: { status: 'ACTIVE' } }),
         prisma.jobOpening.count({ where: { status: 'PAUSED' } }),
-        prisma.jobApplication.count({ where: { status: 'ACTIVE' } }),
+        prisma.jobApplication.count({
+          where: {
+            status: 'ACTIVE',
+            NOT: { aiStatus: 'SCREENED_OUT' },
+          },
+        }),
         prisma.jobApplication.groupBy({
           by: ['stage'],
           _count: { id: true },
-          where: { status: 'ACTIVE' },
+          where: {
+            status: 'ACTIVE',
+            NOT: { aiStatus: 'SCREENED_OUT' },
+          },
         }),
         prisma.jobInterview.count({ where: { status: 'SCHEDULED' } }),
       ]);
@@ -407,7 +422,7 @@ const deleteJobOpening = async (req, res) => {
  */
 const getApplications = async (req, res) => {
   try {
-    const { stage, jobOpeningId, search, status = 'ACTIVE' } = req.query;
+    const { stage, jobOpeningId, search, status = 'ACTIVE', aiStatus, includeScreenedOut } = req.query;
 
     const where = {};
     if (status && status !== 'ALL') {
@@ -418,6 +433,11 @@ const getApplications = async (req, res) => {
     }
     if (jobOpeningId && jobOpeningId !== 'ALL') {
       where.jobOpeningId = jobOpeningId;
+    }
+    if (aiStatus && aiStatus !== 'ALL') {
+      where.aiStatus = aiStatus;
+    } else if (includeScreenedOut !== 'true') {
+      where.NOT = { aiStatus: 'SCREENED_OUT' };
     }
     if (search && search.trim()) {
       const q = search.trim();
@@ -1516,6 +1536,152 @@ const clearAllRecruitmentData = async (req, res) => {
   }
 };
 
+// =========================================================================
+// 8. AI-POWERED ATS GMAIL AUTO-SCREENING CONTROLLERS
+// =========================================================================
+
+/**
+ * Manually trigger a Gmail fetch and AI ATS screening batch
+ */
+const syncGmailScreening = async (req, res) => {
+  try {
+    if (!isGmailConfigured()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Gmail credentials not configured. Please set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GMAIL_REFRESH_TOKEN.',
+      });
+    }
+
+    console.log('[AI ATS CONTROLLER] Manual Gmail sync requested by user:', req.user?.email || req.user?.id);
+    const emails = await fetchApplicationEmails({ maxResults: 15 });
+
+    if (emails.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No new unread candidate applications found in HR Gmail.',
+        data: {
+          syncedCount: 0,
+          status: getSyncStatus(),
+        },
+      });
+    }
+
+    const batchSummary = await processEmailBatch(emails);
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully processed ${batchSummary.processed} application email(s).`,
+      data: batchSummary,
+    });
+  } catch (error) {
+    console.error('[AI ATS CONTROLLER] Error during manual Gmail sync:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to complete Gmail ATS sync.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Get AI screening telemetry status (last sync time, counts, pass threshold)
+ */
+const getAiScreeningStatus = async (req, res) => {
+  try {
+    const status = getSyncStatus();
+    return res.status(200).json({
+      success: true,
+      data: status,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch AI screening status.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * List all low-score, unmatched, or error applications stored for audit & manual review
+ */
+const getScreenedOutApplications = async (req, res) => {
+  try {
+    const applications = await prisma.jobApplication.findMany({
+      where: {
+        aiStatus: { in: ['SCREENED_OUT', 'UNMATCHED', 'ERROR'] },
+      },
+      include: {
+        jobOpening: {
+          select: { id: true, title: true, jobCode: true, department: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        applications,
+        total: applications.length,
+      },
+    });
+  } catch (error) {
+    console.error('[AI ATS CONTROLLER] Error fetching screened-out applications:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch screened-out applications.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * HR manual override: Promotes a screened-out/unmatched/error candidate into the APPLIED stage
+ */
+const aiOverrideApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await atsOverrideApplication(id, req.user);
+
+    return res.status(200).json({
+      success: true,
+      message: `Candidate ${updated.name} successfully promoted to Sourced & Applied stage.`,
+      data: { application: updated },
+    });
+  } catch (error) {
+    console.error('[AI ATS CONTROLLER] Error overriding application:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to override application.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Re-scan candidate CV with AI
+ */
+const aiRescanApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await atsRescanApplication(id);
+
+    return res.status(200).json({
+      success: true,
+      message: `Candidate ${updated.name} successfully rescanned with AI.`,
+      data: { application: updated },
+    });
+  } catch (error) {
+    console.error('[AI ATS CONTROLLER] Error rescanning application:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to rescan application.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getRecruitmentStats,
   // Jobs
@@ -1532,6 +1698,12 @@ module.exports = {
   updateApplication,
   updateApplicationStage,
   deleteApplication,
+  // AI ATS Screening
+  syncGmailScreening,
+  getAiScreeningStatus,
+  getScreenedOutApplications,
+  aiOverrideApplication,
+  aiRescanApplication,
   // Interviews
   getInterviews,
   createInterview,
