@@ -60,7 +60,7 @@ async function main() {
         console.log('Copy this refresh token and save it into your .env file:');
         console.log(`\nGMAIL_REFRESH_TOKEN="${tokens.refresh_token}"\n`);
         console.log('Also ensure your HR email is configured:');
-        console.log('GMAIL_HR_ADDRESS="hr@yourcompany.com" (or "me")\n');
+        console.log('GMAIL_HR_ADDRESS="umairdevelop@gmail.com"\n');
       } else {
         console.warn('WARNING: No refresh token returned. This happens if consent was already granted without prompt=consent.');
         console.log('Access token:', tokens.access_token);
