@@ -17,7 +17,7 @@
 <br/>
 
 <p align="center">
-  <b>NexaHR</b> is an enterprise-grade, full-stack Human Resource Management System (HRMS) and Employee Self-Service (ESS) platform. Designed with world-class glassmorphic UI aesthetics, zero-layout-shift shimmer skeleton loading, fine-grained Role-Based Access Control (RBAC), real-time biometric synchronization, automated payroll tax engines, full-lifecycle recruitment ATS, multi-channel OTP recovery, Cloudinary media pipeline, and multi-currency regional settings.
+  <b>NexaHR</b> is an enterprise-grade, full-stack Human Resource Management System (HRMS) and Employee Self-Service (ESS) platform. Designed with world-class glassmorphic UI aesthetics, zero-layout-shift shimmer skeleton loading, mobile-first 2x2 telemetry grids, fine-grained Role-Based Access Control (RBAC), real-time biometric synchronization, automated payroll tax engines, full-lifecycle recruitment ATS, centralized document vault & policy center, IT helpdesk triage, multi-channel OTP recovery, Cloudinary media pipeline, and multi-currency regional settings.
 </p>
 
 <p align="center">
@@ -69,13 +69,15 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 * **Personnel Information Management (PIM)**: Complete employee directory with 6-tab dossiers (Personal, Professional, Financial, Documents, Assets, Emergency Contact), search, department filtering, and status management.
 * **Multi-Step Onboarding Engine**: Guided employee onboarding wizard with profile picture upload, salary structure configuration, and automated account credential generation.
 * **Biometric & Geo Attendance Control**: Live biometric hardware gateway integration (`/api/attendance/hardware-sync`), daily punch logs, batch punch-in for active personnel (`/api/attendance/punch-all-today`), overtime records, and shift tracking (Present, Late, Half-Day, Absent, On Leave).
-* **Leave Management & Policy Engine**: Global leave quota rules, paid/unpaid policies, multi-tier approval workflows, and audit history.
+* **Leave Management & Dynamic Policy Engine**: Global leave quota rules, paid/unpaid classifications, full dynamic policy CRUD (Create, Read, Update, Delete) with live database persistence, multi-tier approval workflows, and audit history.
 * **Automated Payroll & Tax Computation**: Dynamic allowances (HRA, transport, custom), tax deductions, unpaid leave penalties, and one-click monthly batch payslip generation.
 * **Full-Lifecycle Recruitment & Applicant Tracking System (ATS)**:
-  - **Requisition Command & Workspace**: Live sparkline KPI telemetry cards (`Published Openings` [Dark Navy/Purple], `Total Applicants` [Light/Orange], `Paused / On Hold` [Light/Amber], and `Offer Acceptance` [Light/Rose]) with interactive vector sparklines, dual Grid and Table view modes, department and status filters, and instant requisition create/edit slide drawer.
+  - **Requisition Command & Workspace**: Live sparkline KPI telemetry cards (`Published Openings` [Dark Navy/Purple], `Total Applicants` [Light/Orange], `Paused / On Hold` [Light/Amber], and `Offer Acceptance` [Light/Rose]) with interactive vector sparklines, dual Grid and Table view modes, department and status filters, cross-device database persistence, and instant requisition create/edit slide drawer.
   - **Interactive Kanban Candidate Funnel**: 5-stage drag-and-drop / progression pipeline (`APPLIED` ➔ `SCREENING` ➔ `INTERVIEWING` ➔ `OFFER` ➔ `HIRED`), candidate scorecard ratings, full resume review drawer, and fast-track candidate creation modal.
   - **Candidate Interview Desk**: Multi-round interview coordination (Technical, System Design, Leadership Fit), interviewer assignment, Google Meet room link generation, and real-time pass/reschedule status.
   - **Unified Master Taxonomy & Settings**: 5-in-1 centralized management for Job Categories, Contract Types, Hiring Locations, Skill Competency Taxonomy, and Seniority Career Bands with database persistence and zero dummy-data fallbacks.
+* **Document Vault & Policy Governance Hub (`/app/documents`)**: Issue official contracts, NDAs, offer letters, and salary certificates directly to employees, oversee employee personal document uploads, publish company handbooks and compliance policies, with dynamic search and instant file downloads.
+* **IT Helpdesk & Support Desk Management (`/app/helpdesk`)**: Company-wide support ticket queue management, category and priority triage (HR, IT, Payroll, Facilities), status advancement (`OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`), and threaded resolution conversations.
 * **Organization Hierarchy & Designations**: Dynamic department creation, designation hierarchy mapping, and team reporting structure.
 * **User Access Control & Security**: Fine-grained Role-Based Access Control (RBAC) permission matrices, user status activation/deactivation, and security audit logs.
 * **Accounts, Ledgers & Financial Audits**: Departmental cost tracking, payroll disbursement logs, expense accounts, batch operations, and exportable financial summaries.
@@ -96,6 +98,10 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
 
 ## 💎 Design System & Component Engineering
 
+* **Mobile-First 2x2 Metric Grid Architecture**:
+  - Responsive metric and KPI cards formatted in balanced 2x2 grids on mobile viewports (`grid-cols-2 lg:grid-cols-4`) across 27+ admin and employee views.
+  - Eliminates single-column vertical stacking on smartphones, maximizing glanceable data density and quick actions.
+
 * **Zero-Layout-Shift Shimmer Skeleton Loading**:
   - Implemented via a comprehensive [`Skeleton.jsx`](client/src/components/common/Skeleton.jsx) module.
   - Tailored skeleton primitives for Employee Cards, Department Cards, Data Tables (custom rows/cols), KPI Metric Grids, Announcement Bulletins, Support Tickets, Leave Policies, Document Cards, and RBAC Split-Screen Rosters.
@@ -107,6 +113,8 @@ NexaHR delivers two distinct, role-tailored application environments sharing uni
   - Intercepting security modal ([`FirstLoginPasswordModal.jsx`](client/src/components/common/FirstLoginPasswordModal.jsx)) that compels newly onboarded staff to set a private password before accessing their dashboard.
 * **Regional & Currency Settings Engine**:
   - Global context ([`RegionalSettingsContext.jsx`](client/src/context/RegionalSettingsContext.jsx)) providing real-time currency formatting (USD, EUR, GBP, PKR, INR, AED, CAD), regional date styles, and time displays.
+* **Cross-Device Persistence & Resilient Fallbacks**:
+  - Full relational PostgreSQL database persistence for jobs, candidate pipelines, dynamic leave policies, and company documents, complemented by smart local caching fallback for uninterrupted offline work.
 
 ---
 
@@ -193,13 +201,14 @@ flowchart TB
         T[IT Helpdesk & Tickets Controller]
         U[Accounts & Ledger Controller]
         X[Recruitment & ATS Controller]
+        Y[Document Vault & Policies Controller]
         V[Tag-Based In-Memory Cache Service]
         W[Anti-Spindown Self-Ping Daemon]
     end
 
     subgraph Storage["Persistence & External Cloud Services"]
         O[(PostgreSQL Database via Prisma ORM)]
-        P[Cloudinary CDN Media Stream]
+        P[Cloudinary CDN Media & Vault Docs]
         Q[Corporate SMTP Nodemailer]
         R[WhatsApp Gateway Twilio / Meta API]
         S[Biometric Hardware Gateway]
@@ -207,10 +216,10 @@ flowchart TB
 
     A & B & C & D --> F
     F --> G
-    G --> H & I & J & K & L & M & N & T & U & X
-    H & I & J & K & L & M & N & T & U & X <--> V
-    H & I & J & K & L & M & N & T & U & X --> O
-    I --> P
+    G --> H & I & J & K & L & M & N & T & U & X & Y
+    H & I & J & K & L & M & N & T & U & X & Y <--> V
+    H & I & J & K & L & M & N & T & U & X & Y --> O
+    I & Y --> P
     H & N --> Q & R
     J <--> S
     W -.->|14-min keepalive ping| F
@@ -237,13 +246,17 @@ NexaHR/
 │   │   │   │   ├── Employees.jsx           # Directory, Table, and 6-Tab Dossier Modal
 │   │   │   │   ├── Attendance.jsx          # Biometric Hardware Sync, Daily Logs & Batch Punch
 │   │   │   │   ├── Leaves.jsx              # Company-wide Leave Approvals
-│   │   │   │   ├── LeavePolicy.jsx         # Quota Rules & Policy Configuration
+│   │   │   │   ├── LeavePolicy.jsx         # Quota Rules & Dynamic Policy Configuration (CRUD)
 │   │   │   │   ├── Payroll.jsx             # Payroll Ledger & Structure Management
 │   │   │   │   ├── Departments.jsx         # Organizational Units
 │   │   │   │   ├── EmploymentStatus.jsx    # Employment Types & Status Classifications
 │   │   │   │   ├── UserAccessControl.jsx   # Split-Screen RBAC Governance & Preset Matrix
 │   │   │   │   ├── Accounts.jsx            # Company Accounts & Ledger Management
 │   │   │   │   ├── Announcement.jsx        # Admin Circulars & Bulletins
+│   │   │   │   ├── Documents.jsx           # Document Vault, Policy Center & Employee Submissions
+│   │   │   │   ├── Helpdesk.jsx            # IT & HR Support Ticket Queue & Triage Desk
+│   │   │   │   ├── Profile.jsx             # Admin/HR Personal Profile & Security
+│   │   │   │   ├── Settings.jsx            # System, Theme & Regional Preferences
 │   │   │   │   ├── holiday/                # Public Holidays Planner
 │   │   │   │   ├── hr/                     # New Employee Onboarding Wizard
 │   │   │   │   ├── payroll/                # Calculate Payroll & Payslip List
@@ -287,9 +300,9 @@ NexaHR/
 │
 ├── src/                                    # Backend Express.js REST API
 │   ├── config/                             # Prisma Client & Cloudinary Configuration
-│   ├── controllers/                        # Dedicated Controllers (Auth, Employee, Leaves, Tickets, Accounts, etc.)
+│   ├── controllers/                        # Dedicated Controllers (Auth, Employee, Leaves, Tickets, Documents, Accounts, etc.)
 │   ├── middlewares/                        # JWT Auth, RBAC, Rate Limiters, Upload, Tenant, Validators
-│   ├── routes/                             # Express REST API Endpoints (Auth, Attendance, Tickets, Accounts, etc.)
+│   ├── routes/                             # Express REST API Endpoints (Auth, Attendance, Documents, Tickets, Accounts, etc.)
 │   ├── services/                           # In-Memory Cache, Self-Ping, Notification Dispatch & Tax Services
 │   ├── utils/                              # Password Hashing & JWT Helpers
 │   └── index.js                            # Express Server Entrypoint (Port 5000)
@@ -494,10 +507,13 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/leaves/types` | List leave policies & allowed quotas | Yes |
-| `POST` | `/api/leaves/types` | Create/update company leave type | Admin / HR |
+| `POST` | `/api/leaves/types` | Create new leave type policy | Admin / HR |
+| `GET` | `/api/leaves/types/:id` | Fetch specific leave type policy details | Admin / HR |
+| `PUT` | `/api/leaves/types/:id` | Update leave type policy, days quota & description | Admin / HR |
+| `DELETE` | `/api/leaves/types/:id` | Delete leave type policy | Admin / HR |
 | `POST` | `/api/leaves/apply` | Submit new leave application | Yes |
 | `GET` | `/api/leaves/my-requests` | Get employee's personal leave requests | Yes |
-| `GET` | `/api/leaves` | List all company leave requests | Admin / HR |
+| `GET` | `/api/leaves` | List leave requests (Smart dispatch: company-wide for Admin/HR, personal for Employee) | Yes |
 | `PUT` | `/api/leaves/:id/status` | Approve or reject leave application | Admin / HR |
 
 ### 💰 Payroll & Compensation
@@ -559,6 +575,17 @@ All REST API endpoints are mounted under `/api` with sanitized JSON responses:
 | `POST` | `/api/tickets` | Create new support ticket inquiry | Yes |
 | `POST` | `/api/tickets/:id/replies` | Submit reply to support ticket thread | Yes |
 | `PATCH` | `/api/tickets/:id/status` | Update ticket status (`OPEN`, `RESOLVED`, etc.) | Admin / HR |
+
+### 📄 Document Vault & Company Policies
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/documents/issued` | Fetch issued documents & employee personal vault uploads | Yes |
+| `POST` | `/api/documents/issue` | Issue official company document / letter to employee | Admin / HR |
+| `POST` | `/api/documents/upload` | Employee upload personal document to private vault | Yes |
+| `DELETE` | `/api/documents/issued/:id` | Delete / revoke issued document or personal submission | Admin / HR or Owner |
+| `GET` | `/api/documents/policies` | List all published company policy handbooks | Yes |
+| `POST` | `/api/documents/policies` | Publish new company policy handbook & guidelines | Admin / HR |
+| `DELETE` | `/api/documents/policies/:id` | Delete / unpublish company policy handbook | Admin / HR |
 
 ### 💳 Financial Accounts & Ledgers
 | Method | Endpoint | Description | Auth Required |
