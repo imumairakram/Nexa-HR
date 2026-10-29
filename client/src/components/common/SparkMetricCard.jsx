@@ -361,7 +361,7 @@ const SparkMetricCard = ({
   if (loading) {
     return (
       <div
-        className={`relative overflow-hidden rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
+        className={`relative overflow-hidden rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
           isDark
             ? 'bg-[#0B132B] dark:bg-[#0A1024] border border-slate-800/90'
             : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
@@ -385,7 +385,7 @@ const SparkMetricCard = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
+      className={`relative overflow-hidden rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
         isDark
           ? 'bg-[#0B132B] dark:bg-[#0A1024] text-white border border-slate-800/90 shadow-lg shadow-black/20 hover:border-indigo-500/50 hover:shadow-indigo-500/10'
           : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-xl hover:border-slate-200 dark:hover:border-slate-700'
@@ -596,7 +596,7 @@ const SparkMetricCard = ({
           {/* Start / End Boundary Labels */}
           {normalizedPoints.length >= 2 && (
             <div
-              className={`w-full flex justify-between items-center text-xs font-medium tracking-tight px-0.5 mt-0.5 select-none ${
+              className={`w-full flex justify-between items-center text-[9px] sm:text-xs font-medium tracking-tight px-0.5 mt-0.5 select-none ${
                 isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
               }`}
             >

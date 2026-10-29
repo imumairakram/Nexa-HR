@@ -1028,7 +1028,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {/* 2. SPARKLINE KPI METRIC CARDS (100% LIVE DYNAMIC TELEMETRY) */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         <SparkMetricCard
           variant="dark"
           title="Issued Documents"

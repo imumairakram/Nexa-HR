@@ -204,7 +204,7 @@ export const TableSkeleton = ({ rows = 6, cols = 5 }) => {
  */
 export const MetricGridSkeleton = ({ count = 4 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
       {Array.from({ length: count }).map((_, idx) => (
         <div
           key={idx}
@@ -312,7 +312,7 @@ export const AnnouncementSkeleton = ({ count = 3 }) => {
  */
 export const LeaveCardSkeleton = ({ count = 4 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
       {Array.from({ length: count }).map((_, idx) => (
         <div
           key={idx}
