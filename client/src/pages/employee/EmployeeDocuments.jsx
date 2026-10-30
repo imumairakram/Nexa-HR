@@ -473,9 +473,9 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC DOCUMENTS HERO BANNER (AQUA-TEAL LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-teal-200/70 dark:border-teal-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-300/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Vault Telemetry */}
@@ -489,11 +489,11 @@ const EmployeeDocuments = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
+              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <FolderOpen className="w-3.5 h-3.5" />
                 <span>{personalDocs.length} Verified Personal Files</span>
               </span>
-              <span className="flex items-center gap-1.5 text-cyan-700 dark:text-cyan-300 font-bold bg-cyan-100/60 dark:bg-cyan-950/60 px-3 py-1 rounded-xl border border-cyan-200 dark:border-cyan-800/60">
+              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>{policies.length} Official Handbooks</span>
               </span>
@@ -890,17 +890,17 @@ const EmployeeDocuments = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60">
+                    <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60">
                       <BookOpen className="w-4 h-4" />
                     </div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                       {pol.categoryLabel}
                     </span>
                   </div>
                   <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
                 </div>
 
-                <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                   {pol.title}
                 </h4>
 
@@ -916,7 +916,7 @@ const EmployeeDocuments = () => {
 
                 <button
                   onClick={() => handleDownload(pol)}
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download Handbook</span>
@@ -935,7 +935,7 @@ const EmployeeDocuments = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -1213,7 +1213,7 @@ const EmployeeDocuments = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 

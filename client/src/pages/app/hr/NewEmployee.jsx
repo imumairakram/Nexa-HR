@@ -245,8 +245,8 @@ const NewEmployee = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC ONBOARDING HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -261,7 +261,7 @@ const NewEmployee = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>{orgStats.totalEmployees} Active Staff Registered</span>
               </span>
@@ -273,8 +273,8 @@ const NewEmployee = () => {
           </div>
 
           {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-indigo-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -375,7 +375,7 @@ const NewEmployee = () => {
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                     isDone
-                      ? 'bg-emerald-500 text-white'
+                      ? 'bg-sky-500 text-white'
                       : isCurrent
                       ? 'bg-blue-600 text-white'
                       : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
@@ -709,7 +709,7 @@ const NewEmployee = () => {
             <button
               type="button"
               onClick={handleComplete}
-              className="px-7 py-2.5 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center gap-2 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 cursor-pointer hover:scale-105"
+              className="px-7 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-black text-xs flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer hover:scale-105"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Confirm & Onboard</span>

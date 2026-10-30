@@ -23,7 +23,7 @@ const MobileBottomNav = () => {
               className={({ isActive }) =>
                 `flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-pastelOrange-DEFAULT text-slate-900 font-bold scale-105 shadow-sm'
+                    ? 'bg-sky-400 text-slate-950 font-bold scale-105 shadow-md shadow-sky-400/25'
                     : 'text-slate-400 hover:text-white'
                 }`
               }

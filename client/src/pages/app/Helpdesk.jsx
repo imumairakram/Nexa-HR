@@ -702,7 +702,7 @@ const Helpdesk = () => {
                 onClick={() => setCategoryFilter(cat.id)}
                 className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   categoryFilter === cat.id
-                    ? 'bg-slate-900 text-white dark:bg-indigo-600 dark:text-white shadow-xs scale-102'
+                    ? 'bg-sky-500 text-white dark:bg-sky-500 dark:text-white shadow-xs scale-102'
                     : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                 }`}
               >
@@ -858,7 +858,7 @@ const Helpdesk = () => {
                   setCategoryFilter('ALL');
                   setPriorityFilter('ALL');
                 }}
-                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold cursor-pointer transition-all shadow-sm shadow-sky-500/20"
               >
                 Reset Filters
               </button>
@@ -1052,7 +1052,7 @@ const Helpdesk = () => {
                     <button
                       onClick={() => handleSaveMetaChanges(selectedTicket.id)}
                       disabled={isUpdatingMeta}
-                      className="px-3 py-1 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-bold text-[11px] cursor-pointer hover:opacity-90 transition-opacity"
+                      className="px-3 py-1 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] cursor-pointer transition-all shadow-xs"
                     >
                       {isUpdatingMeta ? 'Saving...' : 'Save Changes'}
                     </button>

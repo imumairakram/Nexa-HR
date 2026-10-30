@@ -84,9 +84,9 @@ const EmployeeHolidays = () => {
       {/* 1. DYNAMIC HERO SPOTLIGHT (LIGHT BLUE & SKY CYAN GRADIENT AESTHETIC) */}
       {/* ========================================================================= */}
       {featuredHoliday && (
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0a2e54] via-[#0b4375] to-[#071f38] text-white p-6 sm:p-8 shadow-2xl border border-sky-400/40">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-cyan-300/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-emerald-500/30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-3 flex-1 min-w-0">
@@ -94,26 +94,26 @@ const EmployeeHolidays = () => {
                 {featuredHoliday.name}
               </h2>
 
-              <p className="text-xs sm:text-sm text-sky-100/90 leading-relaxed max-w-lg font-medium">
+              <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed max-w-lg font-medium">
                 {featuredHoliday.description ||
                   'Official paid public holiday observed across all company offices and duty stations. Attendance engines resume normal operations on the next working morning.'}
               </p>
 
-              <div className="flex flex-wrap items-center gap-2 text-xs text-sky-200/70 font-medium pt-1">
-                <span className="flex items-center gap-1.5 text-sky-100 font-semibold">
-                  <Calendar className="w-3.5 h-3.5 text-sky-300" />
+              <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-200/70 font-medium pt-1">
+                <span className="flex items-center gap-1.5 text-emerald-100 font-semibold">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-300" />
                   <span>{featuredHoliday.displayDate} ({featuredHoliday.day})</span>
                 </span>
                 <span>•</span>
-                <span className="text-sky-300 font-bold">Paid Non-Working Day</span>
+                <span className="text-emerald-300 font-bold">Paid Non-Working Day</span>
                 <span>•</span>
-                <span className="text-sky-200/60 font-mono">Timezone: {timezone}</span>
+                <span className="text-emerald-200/60 font-mono">Timezone: {timezone}</span>
               </div>
             </div>
 
             {/* Right Spotlight Countdown Badge */}
-            <div className="bg-sky-950/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-sky-400/30 dark:border-sky-700/60 shadow-2xl flex flex-col items-center text-center min-w-[200px] shrink-0">
-              <div className="text-xs font-bold text-sky-200 uppercase tracking-wider mb-1">
+            <div className="bg-emerald-950/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/30 dark:border-emerald-700/60 shadow-2xl flex flex-col items-center text-center min-w-[200px] shrink-0">
+              <div className="text-xs font-bold text-emerald-200 uppercase tracking-wider mb-1">
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Status' : 'Countdown'}
               </div>
               <div
@@ -129,7 +129,7 @@ const EmployeeHolidays = () => {
                 className={`text-[11px] font-semibold mt-1 px-3 py-0.5 rounded-full border ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                    : 'bg-sky-500/25 text-sky-100 border-sky-400/40'
+                    : 'bg-emerald-500/25 text-emerald-100 border-emerald-400/40'
                 }`}
               >
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Active Holiday' : 'Upcoming Observance'}
@@ -151,7 +151,7 @@ const EmployeeHolidays = () => {
               onClick={() => setSelectedYear(yr)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 selectedYear === yr
-                  ? 'bg-sky-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -172,7 +172,7 @@ const EmployeeHolidays = () => {
               title="Schedule Table View"
               className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -183,7 +183,7 @@ const EmployeeHolidays = () => {
               title="Calendar Grid View"
               className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'calendar'
-                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -263,7 +263,7 @@ const EmployeeHolidays = () => {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-3">
                             <div className="w-11 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs">
-                              <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
+                              <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
                                 {h.monthShort}
                               </span>
                               <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
@@ -298,7 +298,7 @@ const EmployeeHolidays = () => {
 
                       <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         <span className="text-[10px] uppercase font-bold text-slate-400">{h.statusText}</span>
-                        <span className="text-xs font-extrabold text-sky-600 dark:text-sky-400">{h.countdown || 'Observed'}</span>
+                        <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">{h.countdown || 'Observed'}</span>
                       </div>
                     </div>
                   ))}
@@ -329,7 +329,7 @@ const EmployeeHolidays = () => {
                       <td className="py-4 px-6 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="w-11 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                            <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
+                            <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
                               {h.monthShort}
                             </span>
                             <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
@@ -347,7 +347,7 @@ const EmployeeHolidays = () => {
                       <td className="py-4 px-6">
                         <div className="space-y-1 max-w-md">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                            <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                               {h.name}
                             </span>
                             {h.isCustom && (

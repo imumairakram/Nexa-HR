@@ -81,6 +81,43 @@
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
 }
 
+/* ========================================================
+   PORTAL THEMES: HR (LIGHT SKY BLUE) & EMPLOYEE (LIGHT GREEN)
+   ======================================================== */
+.theme-hr {
+  --portal-primary: #0ea5e9;
+  --portal-primary-hover: #0284c7;
+  --portal-primary-light: #e0f2fe;
+  --portal-primary-border: #bae6fd;
+}
+
+.theme-hr .soft-card:hover {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.08);
+}
+
+html.dark .theme-hr .soft-card:hover {
+  border-color: rgba(14, 165, 233, 0.4) !important;
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.12);
+}
+
+.theme-employee {
+  --portal-primary: #10b981;
+  --portal-primary-hover: #059669;
+  --portal-primary-light: #d1fae5;
+  --portal-primary-border: #a7f3d0;
+}
+
+.theme-employee .soft-card:hover {
+  border-color: rgba(52, 211, 153, 0.4) !important;
+  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.08);
+}
+
+html.dark .theme-employee .soft-card:hover {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.12);
+}
+
 /* Dark mode generic component overrides */
 html.dark .soft-card {
   background-color: #1E293B;

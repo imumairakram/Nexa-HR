@@ -320,7 +320,7 @@ const EmployeeLeaves = () => {
                 <CalendarDays className="w-3.5 h-3.5" />
                 <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves})</span>
               </span>
-              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/70 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
+              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/70 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>{stats.approved} Leaves Approved</span>
               </span>

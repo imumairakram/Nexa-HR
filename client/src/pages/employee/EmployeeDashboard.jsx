@@ -432,9 +432,9 @@ const EmployeeDashboard = () => {
       />
 
       {/* HERO BIOMETRIC HARDWARE STATUS BANNER */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white p-6 sm:p-8 shadow-2xl border border-slate-700/50">
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white p-6 sm:p-8 shadow-2xl border border-slate-700/50">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Column: Greeting & Digital Clock */}
@@ -444,8 +444,8 @@ const EmployeeDashboard = () => {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                 <span>{employeeShift}</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 backdrop-blur-md text-indigo-200 text-xs font-bold border border-indigo-400/30">
-                <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-emerald-200 text-xs font-bold border border-emerald-400/30">
+                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{currentUser?.profile?.workLocation || currentUser?.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
               </div>
             </div>
@@ -503,11 +503,11 @@ const EmployeeDashboard = () => {
 
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-blue-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-emerald-400 mt-0.5">
                   {formatDbTime(todayStatus?.checkOutTime)}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-blue-400" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
                   {todayStatus?.checkOutTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
@@ -619,56 +619,56 @@ const EmployeeDashboard = () => {
 
         <button
           onClick={() => navigate('/employee/payslips')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-blue-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-emerald-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <CreditCard className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               Download Payslip
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               View monthly salary slips, tax breakdown & benefits
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
 
         <button
           onClick={() => navigate('/employee/helpdesk')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-indigo-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-emerald-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <LifeBuoy className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               Helpdesk & Support
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               Raise a support ticket for IT equipment, HR or ops
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
 
         <button
           onClick={() => navigate('/employee/documents')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-purple-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-emerald-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <BookOpen className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               Policies & Handbook
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               Access company code of conduct & employee perks
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
       </div>
 
@@ -807,7 +807,7 @@ const EmployeeDashboard = () => {
           </div>
 
           {/* Assigned Shift Schedule Card */}
-          <div className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-3xl p-6 shadow-soft text-white border border-slate-800 space-y-4">
+          <div className="bg-gradient-to-br from-slate-900 to-emerald-950 rounded-3xl p-6 shadow-soft text-white border border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -849,7 +849,7 @@ const EmployeeDashboard = () => {
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-slate-50 via-slate-100/60 to-slate-50 dark:from-slate-900/80 dark:via-slate-800/60 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute -bottom-6 left-10 w-36 h-36 bg-blue-400/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-6 left-10 w-36 h-36 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
 
               <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 relative z-10">
                 {selectedAnnouncement.category || 'NOTICE'}

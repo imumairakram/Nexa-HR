@@ -387,13 +387,13 @@ const SparkMetricCard = ({
       onClick={onClick}
       className={`relative overflow-hidden rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
         isDark
-          ? 'bg-[#0B132B] dark:bg-[#0A1024] text-white border border-slate-800/90 shadow-lg shadow-black/20 hover:border-indigo-500/50 hover:shadow-indigo-500/10'
+          ? 'bg-[#0B132B] dark:bg-[#0A1024] text-white border border-slate-800/90 shadow-lg shadow-black/20 hover:border-sky-500/50 hover:shadow-sky-500/10'
           : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-xl hover:border-slate-200 dark:hover:border-slate-700'
       } ${onClick ? 'cursor-pointer hover:-translate-y-1' : ''} ${className}`}
     >
       {/* Background ambient glow for dark card */}
       {isDark && (
-        <div className="absolute -right-8 -top-8 w-28 h-28 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/25 transition-all" />
+        <div className="absolute -right-8 -top-8 w-28 h-28 bg-sky-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-sky-500/25 transition-all" />
       )}
 
       {/* Top Section: Title, Value & Dynamic Interactive Sparkline */}

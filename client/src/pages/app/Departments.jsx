@@ -260,8 +260,8 @@ const Departments = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC DEPARTMENTS HERO BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
@@ -276,11 +276,11 @@ const Departments = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <Building2 className="w-3.5 h-3.5" />
                 <span>{departments.length} Operating Divisions</span>
               </span>
-              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
+              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <Users className="w-3.5 h-3.5" />
                 <span>{totalAssignedStaff} Allocated Team Members</span>
               </span>
@@ -288,8 +288,8 @@ const Departments = () => {
           </div>
 
           {/* Right Side: Action Glassmorphic Card (Desktop / Tablet) */}
-          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-indigo-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -301,7 +301,7 @@ const Departments = () => {
                 setForm({ name: '', code: '', description: '' });
                 setIsAddOpen(true);
               }}
-              className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>New Department</span>
@@ -315,7 +315,7 @@ const Departments = () => {
                 setForm({ name: '', code: '', description: '' });
                 setIsAddOpen(true);
               }}
-              className="w-full py-3 px-4 rounded-2xl bg-indigo-600 active:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Department</span>
@@ -448,8 +448,8 @@ const Departments = () => {
               };
             } else if (deptText.includes('PROD') || deptText.includes('DESIGN') || deptText.includes('UX')) {
               colorTheme = {
-                gradient: 'from-indigo-600 via-purple-600 to-indigo-500',
-                accentText: 'hover:text-indigo-600 dark:hover:text-indigo-400',
+                gradient: 'from-sky-500 to-blue-600',
+                accentText: 'hover:text-sky-600 dark:hover:text-sky-400',
               };
             }
 
@@ -595,9 +595,9 @@ const Departments = () => {
       {/* ========================================================================= */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-blue-50/70 to-purple-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-slate-900/80 dark:via-sky-950/30 dark:to-slate-900/80 relative overflow-hidden">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
                   <Building2 className="w-5 h-5 stroke-[2.2]" />
@@ -723,9 +723,9 @@ const Departments = () => {
       {/* ========================================================================= */}
       {isEditOpen && editingDept && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-blue-50/70 to-purple-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-slate-900/80 dark:via-sky-950/30 dark:to-slate-900/80 relative overflow-hidden">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100/70 dark:ring-blue-950/60">
                   <Edit2 className="w-5 h-5 stroke-[2.2]" />
@@ -875,7 +875,7 @@ const Departments = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-2xl w-full shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-indigo-50/90 via-blue-50/70 to-purple-50/60 dark:from-slate-900/80 dark:via-indigo-950/30 dark:to-slate-900/80 relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-slate-900/80 dark:via-sky-950/30 dark:to-slate-900/80 relative overflow-hidden">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/25 uppercase shrink-0 ring-4 ring-indigo-100/70 dark:ring-indigo-950/60">
                   {selectedDept.code ? (selectedDept.code.length > 4 ? selectedDept.code.slice(0, 4) : selectedDept.code) : 'DEP'}
@@ -885,7 +885,7 @@ const Departments = () => {
                     <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight truncate">
                       {selectedDept.name}
                     </h3>
-                    <span className="text-[10px] font-mono font-bold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800">
+                    <span className="text-[10px] font-mono font-bold bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded-md border border-sky-200 dark:border-sky-800">
                       {selectedDept.code || 'UNIT'}
                     </span>
                   </div>

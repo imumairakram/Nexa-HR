@@ -212,7 +212,7 @@ const Settings = () => {
                 onClick={() => setTheme('light')}
                 className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
                   theme === 'light'
-                    ? 'border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/40 ring-2 ring-indigo-500/20 shadow-sm'
+                    ? 'border-sky-500 bg-sky-50/40 dark:bg-sky-950/40 ring-2 ring-sky-500/20 shadow-sm'
                     : 'border-slate-200/80 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800'
                 }`}
               >
@@ -239,7 +239,7 @@ const Settings = () => {
                     <div className="text-xs font-bold text-slate-900 dark:text-white">Light Mode</div>
                     <div className="text-[11px] text-slate-400 mt-0.5">Crisp high-contrast look</div>
                   </div>
-                  {theme === 'light' && <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
+                  {theme === 'light' && <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />}
                 </div>
               </div>
 
@@ -248,14 +248,14 @@ const Settings = () => {
                 onClick={() => setTheme('dark')}
                 className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
                   theme === 'dark'
-                    ? 'border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/40 ring-2 ring-indigo-500/20 shadow-sm'
+                    ? 'border-sky-500 bg-sky-50/40 dark:bg-sky-950/40 ring-2 ring-sky-500/20 shadow-sm'
                     : 'border-slate-200/80 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800'
                 }`}
               >
                 {/* Mini Wireframe Preview */}
                 <div className="h-24 w-full rounded-xl bg-slate-900 border border-slate-800 p-2.5 flex gap-2 shadow-inner">
                   <div className="w-5 h-full rounded-md bg-slate-800 flex flex-col gap-1.5 p-1">
-                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-sky-400" />
                     <div className="w-full h-1 rounded bg-slate-700" />
                     <div className="w-full h-1 rounded bg-slate-700" />
                   </div>
@@ -275,7 +275,7 @@ const Settings = () => {
                     <div className="text-xs font-bold text-slate-900 dark:text-white">Dark Mode</div>
                     <div className="text-[11px] text-slate-400 mt-0.5">Sleek, low-light aesthetic</div>
                   </div>
-                  {theme === 'dark' && <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
+                  {theme === 'dark' && <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />}
                 </div>
               </div>
 
@@ -284,7 +284,7 @@ const Settings = () => {
                 onClick={() => setTheme('system')}
                 className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
                   theme === 'system'
-                    ? 'border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/40 ring-2 ring-indigo-500/20 shadow-sm'
+                    ? 'border-sky-500 bg-sky-50/40 dark:bg-sky-950/40 ring-2 ring-sky-500/20 shadow-sm'
                     : 'border-slate-200/80 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800'
                 }`}
               >
@@ -298,7 +298,7 @@ const Settings = () => {
                     <div className="text-xs font-bold text-slate-900 dark:text-white">System Auto</div>
                     <div className="text-[11px] text-slate-400 mt-0.5">Matches OS preferences</div>
                   </div>
-                  {theme === 'system' && <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
+                  {theme === 'system' && <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />}
                 </div>
               </div>
             </div>
@@ -361,7 +361,7 @@ const Settings = () => {
                       }
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-slate-900 dark:peer-checked:bg-emerald-600"></div>
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-slate-900 dark:peer-checked:bg-sky-500"></div>
                   </label>
                 </div>
               ))}
@@ -374,7 +374,7 @@ const Settings = () => {
           <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
@@ -399,7 +399,7 @@ const Settings = () => {
                 <select
                   value={formState.timezone}
                   onChange={(e) => setFormState({ ...formState, timezone: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
                 >
                   {TIMEZONE_OPTIONS.map((tz) => (
                     <option key={tz.id} value={tz.id}>
@@ -414,7 +414,7 @@ const Settings = () => {
                 <select
                   value={formState.dateFormat}
                   onChange={(e) => setFormState({ ...formState, dateFormat: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
                 >
                   {DATE_FORMAT_OPTIONS.map((df) => (
                     <option key={df.id} value={df.id}>
@@ -429,7 +429,7 @@ const Settings = () => {
                 <select
                   value={formState.timeFormat}
                   onChange={(e) => setFormState({ ...formState, timeFormat: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
                 >
                   <option value="12h">12-Hour Format (e.g. 09:30 AM / 05:30 PM)</option>
                   <option value="24h">24-Hour Format (e.g. 09:30 / 17:30)</option>
@@ -441,7 +441,7 @@ const Settings = () => {
                 <select
                   value={formState.currency}
                   onChange={(e) => setFormState({ ...formState, currency: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
                 >
                   {CURRENCY_OPTIONS.map((curr) => (
                     <option key={curr.code} value={curr.code}>
@@ -503,7 +503,7 @@ const Settings = () => {
                       value={formState.companyName}
                       onChange={(e) => setFormState({ ...formState, companyName: e.target.value })}
                       placeholder="e.g. NexaHR Enterprise Inc."
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                     />
                   </div>
 
@@ -514,7 +514,7 @@ const Settings = () => {
                       value={formState.domain}
                       onChange={(e) => setFormState({ ...formState, domain: e.target.value })}
                       placeholder="e.g. nexahr.pk"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                     />
                   </div>
 
@@ -525,7 +525,7 @@ const Settings = () => {
                       value={formState.workWeek}
                       onChange={(e) => setFormState({ ...formState, workWeek: e.target.value })}
                       placeholder="e.g. Monday - Friday (Sat/Sun Off)"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                     />
                   </div>
 
@@ -540,7 +540,7 @@ const Settings = () => {
                           autoClockoutHours: e.target.value.replace(/\D/g, '') || '12',
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                     />
                   </div>
                 </div>
@@ -572,7 +572,7 @@ const Settings = () => {
                       value={formState.biometricPort}
                       onChange={(e) => setFormState({ ...formState, biometricPort: e.target.value })}
                       placeholder="8080"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                     />
                   </div>
 
@@ -594,7 +594,7 @@ const Settings = () => {
                         value={formState.biometricSecret}
                         onChange={(e) => setFormState({ ...formState, biometricSecret: e.target.value })}
                         placeholder="Secret Key"
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                       />
                     </div>
                   </div>
@@ -611,7 +611,7 @@ const Settings = () => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold transition-all hover:scale-105 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-600 active:scale-95 text-white text-xs font-bold transition-all hover:scale-105 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               <span>Save Preferences</span>

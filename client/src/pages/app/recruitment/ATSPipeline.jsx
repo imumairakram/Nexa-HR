@@ -44,7 +44,7 @@ const STAGES = [
   { key: 'APPLIED', label: '1. Sourced & Applied', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300', dot: 'bg-blue-500', border: 'border-blue-200 dark:border-blue-900/60' },
   { key: 'SCREENING', label: '2. Screening Call', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300', dot: 'bg-amber-500', border: 'border-amber-200 dark:border-amber-900/60' },
   { key: 'INTERVIEWING', label: '3. Technical Interview', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300', dot: 'bg-purple-500', border: 'border-purple-200 dark:border-purple-900/60' },
-  { key: 'OFFER', label: '4. Offer Extended', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300', dot: 'bg-indigo-500', border: 'border-indigo-200 dark:border-indigo-900/60' },
+  { key: 'OFFER', label: '4. Offer Extended', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300', dot: 'bg-indigo-500', border: 'border-sky-200 dark:border-indigo-900/60' },
   { key: 'HIRED', label: '5. Signed & Hired', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300', dot: 'bg-emerald-500', border: 'border-emerald-200 dark:border-emerald-900/60' },
 ];
 
@@ -438,8 +438,8 @@ const ATSPipeline = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC ATS HERO BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -452,7 +452,7 @@ const ATSPipeline = () => {
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Users className="w-3.5 h-3.5 text-indigo-500" />
+                <Users className="w-3.5 h-3.5 text-sky-500" />
                 <span>{candidates.length} Total Applicants</span>
               </span>
               <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
@@ -469,7 +469,7 @@ const ATSPipeline = () => {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
             <button
               onClick={() => setIsAddCandidateOpen(true)}
-              className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-5 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Add Candidate</span>
@@ -477,10 +477,10 @@ const ATSPipeline = () => {
             <button
               onClick={handleSyncGmail}
               disabled={isSyncingGmail}
-              className="px-4 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200/80 dark:border-indigo-800/80 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-60"
+              className="px-4 py-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold text-xs border border-sky-200/80 dark:border-sky-800/80 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-60"
               title="Poll HR Gmail inbox and run AI ATS screening now"
             >
-              <Sparkles className={`w-3.5 h-3.5 ${isSyncingGmail ? 'animate-spin' : 'text-indigo-600 dark:text-indigo-400'}`} />
+              <Sparkles className={`w-3.5 h-3.5 ${isSyncingGmail ? 'animate-spin' : 'text-sky-600 dark:text-sky-400'}`} />
               <span>{isSyncingGmail ? 'Screening Gmail...' : 'Sync Gmail ATS'}</span>
             </button>
             <button
@@ -505,7 +505,7 @@ const ATSPipeline = () => {
             placeholder="Search candidates by name, role, tech stack..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-xs"
+            className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all shadow-xs"
           />
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           {searchQuery && (
@@ -539,7 +539,7 @@ const ATSPipeline = () => {
             <button
               onClick={() => setCurrentView('kanban')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                currentView === 'kanban' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
+                currentView === 'kanban' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -548,7 +548,7 @@ const ATSPipeline = () => {
             <button
               onClick={() => setCurrentView('interviews')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                currentView === 'interviews' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
+                currentView === 'interviews' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               <CalendarDays className="w-3.5 h-3.5" />
@@ -557,7 +557,7 @@ const ATSPipeline = () => {
             <button
               onClick={() => setCurrentView('table')}
               className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                currentView === 'table' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
+                currentView === 'table' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               <List className="w-3.5 h-3.5" />
@@ -597,7 +597,7 @@ const ATSPipeline = () => {
                     onDrop={(e) => handleDrop(e, stage.key)}
                     className={`rounded-[28px] p-4 bg-slate-50/70 dark:bg-slate-900/50 border transition-all duration-200 flex flex-col min-h-[500px] ${
                       isOver
-                        ? 'border-indigo-500 dark:border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-950/20'
+                        ? 'border-sky-500 dark:border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/40 dark:bg-sky-950/20'
                         : `${stage.border}`
                     }`}
                   >
@@ -627,7 +627,7 @@ const ATSPipeline = () => {
                               setIsDetailDrawerOpen(true);
                             }}
                             className={`group bg-white dark:bg-[#1E293B] rounded-2xl p-4 shadow-sm hover:shadow-md border border-slate-200/70 dark:border-slate-800 transition-all cursor-grab active:cursor-grabbing space-y-2.5 ${
-                              draggedCandidateId === c.id ? 'opacity-40 scale-95 border-indigo-500' : ''
+                              draggedCandidateId === c.id ? 'opacity-40 scale-95 border-sky-500' : ''
                             }`}
                           >
                             {/* Card Header: Avatar / Code & Rating */}
@@ -660,7 +660,7 @@ const ATSPipeline = () => {
 
                             {/* Name & Role */}
                             <div>
-                              <h5 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-tight">
+                              <h5 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-tight">
                                 {c.name}
                               </h5>
                               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
@@ -690,7 +690,7 @@ const ATSPipeline = () => {
                               <button
                                 disabled={sIdx === 0}
                                 onClick={() => moveCandidateStage(c.id, STAGES[sIdx - 1].key)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                                className="p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
                                 title="Move Previous Stage"
                               >
                                 <ChevronLeft className="w-3.5 h-3.5" />
@@ -698,7 +698,7 @@ const ATSPipeline = () => {
 
                               <button
                                 onClick={() => handleOpenSchedule(c)}
-                                className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                                className="text-[10px] font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
                               >
                                 <Calendar className="w-3 h-3" />
                                 <span>Interview</span>
@@ -707,7 +707,7 @@ const ATSPipeline = () => {
                               <button
                                 disabled={sIdx === STAGES.length - 1}
                                 onClick={() => moveCandidateStage(c.id, STAGES[sIdx + 1].key)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                                className="p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
                                 title="Advance Stage"
                               >
                                 <ChevronRight className="w-3.5 h-3.5" />
@@ -777,7 +777,7 @@ const ATSPipeline = () => {
                           href={iv.link}
                           target="_blank"
                           rel="noreferrer"
-                          className="w-full py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1.5 text-xs"
+                          className="w-full py-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-100 transition-colors flex items-center justify-center gap-1.5 text-xs"
                         >
                           <Video className="w-3.5 h-3.5" />
                           <span>Join Meet</span>
@@ -849,7 +849,7 @@ const ATSPipeline = () => {
                               href={iv.link}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-100 transition-colors"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-100 transition-colors"
                             >
                               <Video className="w-3.5 h-3.5" />
                               <span>Join Meet</span>
@@ -893,7 +893,7 @@ const ATSPipeline = () => {
                           <tr key={c.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
                             <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-xs shrink-0">
                                   {c.name.charAt(0)}
                                 </div>
                                 <div>
@@ -938,7 +938,7 @@ const ATSPipeline = () => {
                                   setSelectedCandidate(c);
                                   setIsDetailDrawerOpen(true);
                                 }}
-                                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-700 dark:text-slate-300 hover:text-indigo-600 font-bold text-[11px] transition-colors"
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-sky-950/50 text-slate-700 dark:text-slate-300 hover:text-sky-600 font-bold text-[11px] transition-colors"
                               >
                                 View Profile
                               </button>
@@ -986,7 +986,7 @@ const ATSPipeline = () => {
                 {/* Header */}
                 <div className="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-lg">
+                    <div className="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-black text-lg">
                       {selectedCandidate.name.charAt(0)}
                     </div>
                     <div>
@@ -1013,7 +1013,7 @@ const ATSPipeline = () => {
                       <select
                         value={selectedCandidate.stage}
                         onChange={(e) => moveCandidateStage(selectedCandidate.id, e.target.value)}
-                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none"
+                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-sky-600 dark:text-sky-400 focus:outline-none"
                       >
                         {STAGES.map((s) => (
                           <option key={s.key} value={s.key}>
@@ -1028,7 +1028,7 @@ const ATSPipeline = () => {
                         onClick={() => {
                           handleOpenSchedule(selectedCandidate);
                         }}
-                        className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                        className="flex-1 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm shadow-sky-500/20"
                       >
                         <Calendar className="w-3.5 h-3.5" />
                         <span>Schedule Interview</span>
@@ -1118,7 +1118,7 @@ const ATSPipeline = () => {
 
                   {/* AI ATS Screening Analysis if available */}
                   {(selectedCandidate.source === 'GMAIL' || selectedCandidate.aiScore || selectedCandidate.aiSummary) && (
-                    <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 space-y-3">
+                    <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-sky-200/80 dark:border-indigo-800/80 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -1350,7 +1350,7 @@ const ATSPipeline = () => {
 
                           <button
                             onClick={() => handleOverrideCandidate(app.id)}
-                            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                            className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                           >
                             <UserCheck className="w-3.5 h-3.5" />
                             <span>Override & Add to Pipeline</span>
@@ -1490,7 +1490,7 @@ const ATSPipeline = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 active:scale-95 transition-all"
+                  className="px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 active:scale-95 transition-all"
                 >
                   Confirm & Send Calendar Invite
                 </button>
@@ -1513,9 +1513,9 @@ const ATSPipeline = () => {
             <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-100 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-indigo-50/80 to-emerald-50/60 dark:from-slate-900/90 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-100 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20 ring-4 ring-sky-500/15">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20 ring-4 ring-sky-500/15">
                   <UserPlus className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -1617,7 +1617,7 @@ const ATSPipeline = () => {
                       title: '4. Offer Extended',
                       desc: 'Formal compensation package discussion',
                       icon: ShieldCheck,
-                      activeClass: 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 ring-2 ring-indigo-500/20 text-indigo-900 dark:text-indigo-100',
+                      activeClass: 'bg-indigo-50/80 dark:bg-indigo-950/50 border-sky-500 ring-2 ring-indigo-500/20 text-indigo-900 dark:text-indigo-100',
                       iconClass: 'text-indigo-600 dark:text-indigo-400',
                     },
                     {
@@ -1861,7 +1861,7 @@ const ATSPipeline = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 hover:from-emerald-700 hover:to-sky-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
                   <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
                   <span>Add Candidate</span>

@@ -202,8 +202,8 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
             <Logo collapsed={isCollapsed} />
             {!isCollapsed && (
               <div className="flex items-center gap-1.5 mt-1.5 pl-1">
-                <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                <span className="inline-block w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-sky-500 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
                   {isAdmin ? 'System Admin' : 'HR Portal'}
                 </span>
               </div>
@@ -249,7 +249,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                       ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
                       : 'gap-3 px-3 py-2 rounded-2xl text-xs font-semibold'
                     } ${isActive
-                      ? 'bg-[#E6F4EA] dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-400 font-bold shadow-xs'
+                      ? 'bg-[#E0F2FE] dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 font-bold shadow-xs border border-sky-200/60 dark:border-sky-800/50'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                     }`
                   }
@@ -258,7 +258,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                     <>
                       <Icon
                         className={`w-4 h-4 shrink-0 stroke-[2] ${isActive
-                          ? 'text-emerald-600 dark:text-emerald-400'
+                          ? 'text-sky-600 dark:text-sky-400'
                           : 'text-slate-500 dark:text-slate-400'
                           }`}
                       />
@@ -283,14 +283,14 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                       ? 'w-11 h-11 rounded-2xl justify-center mx-auto my-1'
                       : 'px-3 py-2 rounded-2xl text-xs font-semibold'
                       } ${isChildActive
-                        ? 'text-emerald-800 dark:text-emerald-400 font-bold bg-emerald-50/50 dark:bg-emerald-950/30'
+                        ? 'text-sky-800 dark:text-sky-300 font-bold bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/50 dark:border-sky-800/40'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                       }`}
                   >
                     <div className="flex items-center gap-3 truncate">
                       <Icon
                         className={`w-4 h-4 shrink-0 stroke-[2] ${isChildActive
-                          ? 'text-emerald-600 dark:text-emerald-400'
+                          ? 'text-sky-600 dark:text-sky-400'
                           : 'text-slate-500 dark:text-slate-400'
                           }`}
                       />
@@ -317,7 +317,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                           to={child.path}
                           className={({ isActive }) =>
                             `block px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all ${isActive
-                              ? 'bg-emerald-100/70 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-300 font-bold'
+                              ? 'bg-sky-100/80 dark:bg-sky-900/60 text-sky-900 dark:text-sky-200 font-bold'
                               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/40'
                             }`
                           }
@@ -393,8 +393,8 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
               <div className="flex flex-col">
                 <Logo collapsed={false} />
                 <div className="flex items-center gap-1.5 mt-1.5 pl-1">
-                  <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                  <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                  <span className="inline-block w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                  <span className="text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-sky-500 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
                     {isAdmin ? 'System Admin' : 'HR Portal'}
                   </span>
                 </div>
@@ -423,7 +423,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
                           isActive
-                            ? 'bg-[#E6F4EA] dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-400 font-bold shadow-xs'
+                            ? 'bg-[#E0F2FE] dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 font-bold shadow-xs border border-sky-200/60 dark:border-sky-800/50'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                         }`
                       }
@@ -433,7 +433,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                           <Icon
                             className={`w-4 h-4 shrink-0 stroke-[2] ${
                               isActive
-                                ? 'text-emerald-600 dark:text-emerald-400'
+                                ? 'text-sky-600 dark:text-sky-400'
                                 : 'text-slate-500 dark:text-slate-400'
                             }`}
                           />
@@ -456,7 +456,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                         onClick={() => toggleMenu(item.key)}
                         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
                           isChildActive
-                            ? 'text-emerald-800 dark:text-emerald-400 font-bold bg-emerald-50/50 dark:bg-emerald-950/30'
+                            ? 'text-sky-800 dark:text-sky-300 font-bold bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/50 dark:border-sky-800/40'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
@@ -464,7 +464,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                           <Icon
                             className={`w-4 h-4 shrink-0 stroke-[2] ${
                               isChildActive
-                                ? 'text-emerald-600 dark:text-emerald-400'
+                                ? 'text-sky-600 dark:text-sky-400'
                                 : 'text-slate-500 dark:text-slate-400'
                             }`}
                           />
@@ -489,7 +489,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
                               className={({ isActive }) =>
                                 `block px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                                   isActive
-                                    ? 'bg-emerald-100/70 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-300 font-bold'
+                                    ? 'bg-sky-100/80 dark:bg-sky-900/60 text-sky-900 dark:text-sky-200 font-bold'
                                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/40'
                                 }`
                               }

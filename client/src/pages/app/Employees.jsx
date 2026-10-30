@@ -676,8 +676,8 @@ NexaHR Workforce Systems`;
       {/* ========================================================================= */}
       {/* 1. DYNAMIC EMPLOYEES HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
@@ -692,7 +692,7 @@ NexaHR Workforce Systems`;
             </p>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <Users className="w-3.5 h-3.5" />
                 <span>{stats.total} Total Headcount</span>
               </span>
@@ -704,8 +704,8 @@ NexaHR Workforce Systems`;
           </div>
 
           {/* Right Side: Action Glassmorphic Card (Desktop / Tablet) */}
-          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-indigo-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <UserPlus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -723,7 +723,7 @@ NexaHR Workforce Systems`;
                 setOnboardTab('basic');
                 setIsOnboardOpen(true);
               }}
-              className="w-full px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -743,7 +743,7 @@ NexaHR Workforce Systems`;
                 setOnboardTab('basic');
                 setIsOnboardOpen(true);
               }}
-              className="w-full py-3 px-4 rounded-2xl bg-indigo-600 active:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -875,7 +875,7 @@ NexaHR Workforce Systems`;
               onClick={() => setSelectedDept(dept)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedDept === dept
-                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                  ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
@@ -1118,7 +1118,7 @@ NexaHR Workforce Systems`;
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleOpenEdit(emp)}
-                          className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer transition-all"
+                          className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 hover:bg-sky-500 hover:text-white cursor-pointer transition-all"
                           title="Edit Profile"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -1159,9 +1159,9 @@ NexaHR Workforce Systems`;
             <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
 
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/80 to-blue-50/60 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
                   <UserPlus className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -1197,7 +1197,7 @@ NexaHR Workforce Systems`;
                     onClick={() => setOnboardTab(tab.id)}
                     className={`flex-1 py-2 px-3 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
                       onboardTab === tab.id
-                        ? 'bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white shadow-md shadow-indigo-600/25 font-bold'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 font-bold'
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium hover:bg-white/50 dark:hover:bg-slate-800/50'
                     }`}
                   >
@@ -1300,10 +1300,10 @@ NexaHR Workforce Systems`;
                     </div>
 
                     {/* Tech Security Password Key Card */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 space-y-2.5 relative overflow-hidden">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-sky-50/70 via-blue-50/30 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-sky-100 dark:border-slate-700 space-y-2.5 relative overflow-hidden">
                       <div className="flex items-center justify-between">
                         <label className="block text-slate-900 dark:text-white font-bold text-xs flex items-center gap-2">
-                          <KeyRound className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                          <KeyRound className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>Enterprise Access Key / Default Password</span>
                         </label>
                         <button
@@ -1312,7 +1312,7 @@ NexaHR Workforce Systems`;
                             const rand = `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
                             setOnboardForm({ ...onboardForm, password: rand });
                           }}
-                          className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                          className="px-3 py-1 rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>Generate Key</span>
@@ -1583,7 +1583,7 @@ NexaHR Workforce Systems`;
                           const idx = tabs.indexOf(onboardTab);
                           if (idx < tabs.length - 1) setOnboardTab(tabs[idx + 1]);
                         }}
-                        className="px-5 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 cursor-pointer transition-all border border-indigo-200/60 dark:border-indigo-800/60 text-xs"
+                        className="px-5 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 cursor-pointer transition-all border border-sky-200/60 dark:border-sky-800/60 text-xs"
                       >
                         Next Step →
                       </button>
@@ -1601,7 +1601,7 @@ NexaHR Workforce Systems`;
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
                     >
                       {submitting ? (
                         <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1629,9 +1629,9 @@ NexaHR Workforce Systems`;
             <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
 
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/80 to-blue-50/60 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-4 ring-indigo-500/15">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
                   <Edit3 className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -1667,7 +1667,7 @@ NexaHR Workforce Systems`;
                     onClick={() => setEditTab(tab.id)}
                     className={`flex-1 py-2 px-3 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
                       editTab === tab.id
-                        ? 'bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white shadow-md shadow-indigo-600/25 font-bold'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 font-bold'
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium hover:bg-white/50 dark:hover:bg-slate-800/50'
                     }`}
                   >
@@ -1969,7 +1969,7 @@ NexaHR Workforce Systems`;
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
                     >
                       {submitting ? (
                         <RefreshCw className="w-4 h-4 animate-spin" />
@@ -2082,7 +2082,7 @@ NexaHR Workforce Systems`;
                     setSelectedEmployee(null);
                     handleOpenEdit(toEdit);
                   }}
-                  className="px-5 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
+                  className="px-5 py-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-extrabold hover:bg-sky-500 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit Profile</span>

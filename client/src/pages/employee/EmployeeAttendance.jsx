@@ -345,11 +345,11 @@ const EmployeeAttendance = () => {
 
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-blue-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-emerald-400 mt-0.5">
                   {todayLog?.checkOut || '--:--'}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-blue-400" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
                   <span>{todayLog?.checkOut && todayLog.checkOut !== '--:--' ? 'Recorded' : 'Pending'}</span>
                 </div>
               </div>
@@ -488,7 +488,7 @@ const EmployeeAttendance = () => {
                 {filteredLogs.map((log) => (
                   <div
                     key={log.id}
-                    className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-indigo-400/60 transition-all"
+                    className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-emerald-400/60 transition-all"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2.5">
@@ -520,7 +520,7 @@ const EmployeeAttendance = () => {
                       </div>
                       <div className="border-x border-slate-100 dark:border-slate-800">
                         <div className="text-[9px] uppercase font-bold text-slate-400">Punch Out</div>
-                        <div className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                        <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                           {log.checkOut}
                         </div>
                       </div>
@@ -563,7 +563,7 @@ const EmployeeAttendance = () => {
                   <tr key={log.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
                     <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/60 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                           <CalendarDays className="w-4 h-4" />
                         </div>
                         <div>

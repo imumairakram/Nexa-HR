@@ -347,7 +347,7 @@ const Dashboard = () => {
           mobileDashboardTitle === 'Admin Dashboard' || isHrPortal ? (
             <button
               onClick={() => setIsPunchModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-2xl shadow-sm transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-2xl shadow-sm shadow-sky-500/20 transition-all cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5" />
               <span>Simulate Punch</span>
@@ -368,7 +368,7 @@ const Dashboard = () => {
           badgeType="positive"
           badgeIcon="up"
           subtext="Active Company Roster"
-          chartColor="purple"
+          chartColor="sky"
           presetWave="wave1"
           dataPoints={headcountSparkData}
           loading={loading}
@@ -440,7 +440,7 @@ const Dashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Workforce Presence</p>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
                   Live Metric
                 </span>
               </div>
@@ -512,7 +512,7 @@ const Dashboard = () => {
                   </button>
                 ))}
               </div>
-              {loading && <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />}
+              {loading && <Loader2 className="w-4 h-4 text-sky-500 animate-spin" />}
             </div>
           </div>
 
@@ -520,9 +520,9 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={lineChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.45} />
-                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.0} />
+                  <linearGradient id="skyGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0EA5E9" stopOpacity={0.45} />
+                    <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
@@ -540,7 +540,7 @@ const Dashboard = () => {
                       return (
                         <div className="bg-slate-900 text-white p-3 rounded-2xl shadow-xl border border-slate-700 text-xs space-y-1 min-w-[140px]">
                           <div className="font-extrabold text-white text-xs border-b border-slate-800 pb-1">{data.date}</div>
-                          <div className="text-[11px] text-purple-300 font-semibold flex items-center justify-between gap-3">
+                          <div className="text-[11px] text-sky-300 font-semibold flex items-center justify-between gap-3">
                             <span>Total Attendance:</span>
                             <span className="font-bold font-mono">{data.attendance}</span>
                           </div>
@@ -561,10 +561,10 @@ const Dashboard = () => {
                 <Area
                   type="monotone"
                   dataKey="attendance"
-                  stroke="#8B5CF6"
+                  stroke="#0EA5E9"
                   strokeWidth={3}
                   fillOpacity={1}
-                  fill="url(#purpleGradient)"
+                  fill="url(#skyGradient)"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -903,7 +903,7 @@ const Dashboard = () => {
                 <button
                   type="submit"
                   disabled={punchLoading}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-blue-600/25 transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-sky-500/25 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {punchLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
                   <span>Record Biometric Punch</span>

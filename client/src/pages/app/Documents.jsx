@@ -953,15 +953,15 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {/* 1. DYNAMIC HERO BANNER (AQUA-TEAL LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-teal-200/70 dark:border-teal-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-300/20 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Vault Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-100/80 dark:bg-teal-950/80 text-teal-800 dark:text-teal-200 text-xs font-extrabold border border-teal-200/80 dark:border-teal-800/60">
-              <ShieldCheck className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100/80 dark:bg-sky-950/80 text-sky-800 dark:text-sky-200 text-xs font-extrabold border border-sky-200/80 dark:border-sky-800/60">
+              <ShieldCheck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
               <span>HR Document Issuance & Governance Vault</span>
             </div>
 
@@ -975,11 +975,11 @@ ${doc.description || 'This document serves as an official verified corporate rec
 
             {/* Dynamic Telemetry Badges */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
+              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <FileCheck className="w-3.5 h-3.5" />
                 <span>{issuedDocs.length} Issued Records</span>
               </span>
-              <span className="flex items-center gap-1.5 text-cyan-700 dark:text-cyan-300 font-bold bg-cyan-100/60 dark:bg-cyan-950/60 px-3 py-1 rounded-xl border border-cyan-200 dark:border-cyan-800/60">
+              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>{companyPolicies.length} Active Policies</span>
               </span>
@@ -995,8 +995,8 @@ ${doc.description || 'This document serves as an official verified corporate rec
           </div>
 
           {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-teal-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[240px] sm:min-w-[280px] shrink-0 space-y-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-teal-100 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[240px] sm:min-w-[280px] shrink-0 space-y-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <Upload className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -1007,7 +1007,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             <div className="w-full flex flex-col gap-2">
               <button
                 onClick={() => setIsIssueModalOpen(true)}
-                className="w-full px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Issue Document to Employee</span>
@@ -1017,7 +1017,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 onClick={() => setIsPolicyModalOpen(true)}
                 className="w-full px-5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <BookOpen className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <BookOpen className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 <span>Publish Company Policy</span>
               </button>
             </div>
@@ -1134,7 +1134,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             title="Refresh Live Data"
             className="p-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-all"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-teal-600' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
           </button>
 
           {activeTab === 'issued' && (
@@ -1143,7 +1143,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium outline-none focus:ring-2 focus:ring-sky-500/20"
               >
                 <option value="ALL">All Classifications ({issuedDocs.length})</option>
                 {CLASSIFICATION_OPTIONS.map((cat) => {
@@ -1161,7 +1161,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium outline-none focus:ring-2 focus:ring-teal-500/20 hidden sm:block"
+                  className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium outline-none focus:ring-2 focus:ring-sky-500/20 hidden sm:block"
                 >
                   <option value="ALL">All Departments</option>
                   {departments.map((dept) => {
@@ -1183,7 +1183,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             <select
               value={policyCategoryFilter}
               onChange={(e) => setPolicyCategoryFilter(e.target.value)}
-              className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium outline-none focus:ring-2 focus:ring-sky-500/20"
             >
               <option value="ALL">All Policy Categories ({companyPolicies.length})</option>
               {POLICY_CATEGORIES.map((cat) => {
@@ -1209,7 +1209,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-10 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none"
+              className="w-full pl-11 pr-10 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
             />
             {searchQuery && (
               <button
@@ -1228,7 +1228,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               title="Table List View"
               className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -1239,7 +1239,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               title="Card Grid View"
               className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -1269,7 +1269,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               </span>
               <button
                 onClick={() => setIsIssueModalOpen(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                className="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Issue Document</span>
@@ -1283,7 +1283,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             </div>
           ) : filteredIssuedDocs.length === 0 ? (
             <div className="p-12 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center">
                 <FolderOpen className="w-6 h-6" />
               </div>
               <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">No documents matched your criteria</h4>
@@ -1294,7 +1294,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               </p>
               <button
                 onClick={() => setIsIssueModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-sky-500 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Issue New Document</span>
@@ -1325,11 +1325,11 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         >
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/60 dark:border-teal-800/50">
+                              <div className="w-9 h-9 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200/60 dark:border-sky-800/50">
                                 <FileText className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
-                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate max-w-xs">
+                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate max-w-xs">
                                   {doc.title}
                                 </span>
                                 <span className="text-[10px] text-slate-400 font-mono font-bold">
@@ -1361,7 +1361,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                                 {doc.typeLabel || doc.type}
                               </span>
                               {doc.uploadedBy === 'EMPLOYEE' && (
-                                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/60">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60">
                                   Employee Upload
                                 </span>
                               )}
@@ -1387,14 +1387,14 @@ ${doc.description || 'This document serves as an official verified corporate rec
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => setSelectedDoc(doc)}
-                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-600 transition-colors cursor-pointer"
+                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 transition-colors cursor-pointer"
                                 title="Preview Document Dossier"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDownload(doc)}
-                                className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                                className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
                               >
                                 <Download className="w-3 h-3" />
                                 <span>Download</span>
@@ -1428,7 +1428,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60">
+                        <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/60">
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -1437,7 +1437,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                             <span>{doc.typeLabel || doc.type}</span>
                           </span>
                           {doc.uploadedBy === 'EMPLOYEE' && (
-                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200">
+                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200">
                               Employee Upload
                             </span>
                           )}
@@ -1445,7 +1445,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 group-hover:text-teal-600 transition-colors">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 group-hover:text-sky-600 transition-colors">
                           {doc.title}
                         </h4>
                         <p className="text-[10px] text-slate-400 font-mono mt-0.5 font-bold">
@@ -1455,7 +1455,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
 
                       {/* Recipient Details */}
                       <div className="p-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 font-bold text-xs flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold text-xs flex items-center justify-center shrink-0">
                           {doc.employeeName ? doc.employeeName.charAt(0).toUpperCase() : 'E'}
                         </div>
                         <div className="min-w-0">
@@ -1474,7 +1474,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedDoc(doc)}
-                          className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-teal-600 cursor-pointer"
+                          className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 cursor-pointer"
                           title="Preview"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -1488,7 +1488,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         </button>
                         <button
                           onClick={() => handleDownload(doc)}
-                          className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
+                          className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>PDF</span>
@@ -1519,7 +1519,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             </div>
             <button
               onClick={() => setIsPolicyModalOpen(true)}
-              className="px-4 py-2 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+              className="px-4 py-2 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Publish Policy</span>
@@ -1534,7 +1534,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             </div>
           ) : filteredPolicies.length === 0 ? (
             <div className="p-12 text-center space-y-3 bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-100 dark:border-slate-800">
-              <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center">
                 <BookOpen className="w-6 h-6" />
               </div>
               <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">No policies found</h4>
@@ -1545,7 +1545,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               </p>
               <button
                 onClick={() => setIsPolicyModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-sky-500 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Publish New Policy</span>
@@ -1561,17 +1561,17 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60">
+                        <div className="w-9 h-9 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/60">
                           <BookOpen className="w-4 h-4" />
                         </div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
                           {pol.categoryLabel || pol.category}
                         </span>
                       </div>
                       <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
                     </div>
 
-                    <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                    <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                       {pol.title}
                     </h4>
 
@@ -1595,7 +1595,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       </button>
                       <button
                         onClick={() => handleDownload(pol)}
-                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download</span>
@@ -1614,11 +1614,11 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {isIssueModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Header */}
-            <div className="px-6 sm:px-7 py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B]">
+            <div className="px-6 sm:px-7 py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B]">
               <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-teal-950/60">
                   <FileText className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -1651,7 +1651,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     required
                     value={issueForm.employeeId}
                     onChange={(e) => handleEmployeeChange(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                   >
                     <option value="">Select Employee...</option>
                     {employees.map((emp) => (
@@ -1670,15 +1670,15 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     type="text"
                     value={issueForm.referenceNumber}
                     onChange={(e) => setIssueForm({ ...issueForm, referenceNumber: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-teal-500/25 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-sky-500/20 outline-none"
                   />
                 </div>
               </div>
 
               {/* Dynamic Employee Details Card when Selected */}
               {selectedEmployeeObj && (
-                <div className="p-3.5 rounded-2xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200/70 dark:border-teal-800/50 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-teal-600 text-white font-extrabold text-sm flex items-center justify-center shrink-0">
+                <div className="p-3.5 rounded-2xl bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-800/50 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-sky-500 text-white font-extrabold text-sm flex items-center justify-center shrink-0">
                     {selectedEmployeeObj.firstName?.[0] || 'E'}
                   </div>
                   <div className="min-w-0 flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
@@ -1726,17 +1726,17 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         onClick={() => handleTypeSelect(cat.id)}
                         className={`p-3 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                           isSelected
-                            ? 'bg-teal-50/80 dark:bg-teal-950/60 border-teal-500 text-teal-950 dark:text-white ring-2 ring-teal-500/20 shadow-xs'
+                            ? 'bg-sky-50/80 dark:bg-sky-950/60 border-teal-500 text-teal-950 dark:text-white ring-2 ring-sky-500/20 shadow-xs'
                             : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <CatIcon
                             className={`w-4 h-4 ${
-                              isSelected ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400'
+                              isSelected ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'
                             }`}
                           />
-                          {isSelected && <span className="w-2 h-2 rounded-full bg-teal-500" />}
+                          {isSelected && <span className="w-2 h-2 rounded-full bg-sky-500" />}
                         </div>
                         <div>
                           <div className="font-bold text-[11px] leading-tight">{cat.label}</div>
@@ -1759,7 +1759,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     required
                     value={issueForm.title}
                     onChange={(e) => setIssueForm({ ...issueForm, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
                   />
                 </div>
 
@@ -1771,7 +1771,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     type="text"
                     value={issueForm.issuer}
                     onChange={(e) => setIssueForm({ ...issueForm, issuer: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
                   />
                 </div>
               </div>
@@ -1786,7 +1786,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     type="date"
                     value={issueForm.issueDate}
                     onChange={(e) => setIssueForm({ ...issueForm, issueDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
                   />
                 </div>
 
@@ -1798,7 +1798,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     type="date"
                     value={issueForm.expiryDate}
                     onChange={(e) => setIssueForm({ ...issueForm, expiryDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
                   />
                 </div>
               </div>
@@ -1813,7 +1813,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   value={issueForm.description}
                   onChange={(e) => setIssueForm({ ...issueForm, description: e.target.value })}
                   placeholder="Enter key terms, compensation details, designation scope, or special covenants..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 outline-none leading-relaxed"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none leading-relaxed"
                 />
               </div>
 
@@ -1831,16 +1831,16 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 />
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-3.5 rounded-2xl border-2 border-dashed border-teal-300 dark:border-teal-700/60 bg-teal-50/40 dark:bg-teal-950/20 hover:bg-teal-50/70 transition-all cursor-pointer flex items-center justify-between"
+                  className="p-3.5 rounded-2xl border-2 border-dashed border-sky-300 dark:border-sky-700/60 bg-sky-50/40 dark:bg-sky-950/20 hover:bg-sky-50/70 transition-all cursor-pointer flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Upload className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                    <Upload className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
                       {issueForm.fileName ? issueForm.fileName : 'Click to upload certified PDF or agreement file'}
                     </span>
                   </div>
                   {issueForm.fileName ? (
-                    <span className="text-[11px] font-mono text-teal-700 dark:text-teal-300 font-bold">
+                    <span className="text-[11px] font-mono text-sky-700 dark:text-sky-300 font-bold">
                       {issueForm.size}
                     </span>
                   ) : (
@@ -1850,9 +1850,9 @@ ${doc.description || 'This document serves as an official verified corporate rec
               </div>
 
               {/* Automated Email Notification Callout */}
-              <div className="p-3.5 rounded-2xl bg-teal-50/80 dark:bg-teal-950/40 border border-teal-200/80 dark:border-teal-800/60 flex items-center justify-between gap-3">
+              <div className="p-3.5 rounded-2xl bg-sky-50/80 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <Mail className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
                   <div>
                     <span className="font-bold text-slate-900 dark:text-white block">
                       Dispatch Automated Email to Employee
@@ -1870,7 +1870,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     onChange={(e) => setIssueForm({ ...issueForm, notifyEmployee: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
+                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-500"></div>
                 </label>
               </div>
 
@@ -1886,7 +1886,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-sky-500/30 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                   <span>{submitting ? 'Issuing Document...' : 'Issue & Dispatch Document'}</span>
@@ -1902,10 +1902,10 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {isPolicyModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-3xl sm:max-w-4xl lg:max-w-5xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="px-6 sm:px-7 py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B]">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-3xl sm:max-w-4xl lg:max-w-5xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="px-6 sm:px-7 py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B]">
               <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30">
                   <BookOpen className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -1937,7 +1937,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   placeholder="e.g. Artificial Intelligence & Data Governance Charter"
                   value={policyForm.title}
                   onChange={(e) => setPolicyForm({ ...policyForm, title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
                 />
               </div>
 
@@ -1949,7 +1949,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   <select
                     value={policyForm.category}
                     onChange={(e) => setPolicyForm({ ...policyForm, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none focus:ring-2 focus:ring-teal-500/25"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none focus:ring-2 focus:ring-sky-500/20"
                   >
                     {POLICY_CATEGORIES.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -2032,16 +2032,16 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 />
                 <div
                   onClick={() => policyFileInputRef.current?.click()}
-                  className="p-3.5 rounded-2xl border-2 border-dashed border-teal-300 dark:border-teal-700/60 bg-teal-50/40 dark:bg-teal-950/20 hover:bg-teal-50/70 transition-all cursor-pointer flex items-center justify-between"
+                  className="p-3.5 rounded-2xl border-2 border-dashed border-sky-300 dark:border-sky-700/60 bg-sky-50/40 dark:bg-sky-950/20 hover:bg-sky-50/70 transition-all cursor-pointer flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Upload className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                    <Upload className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
                       {policyForm.fileName ? policyForm.fileName : 'Click to attach handbook or PDF policy'}
                     </span>
                   </div>
                   {policyForm.fileName && (
-                    <span className="text-[11px] font-mono text-teal-700 dark:text-teal-300 font-bold">
+                    <span className="text-[11px] font-mono text-sky-700 dark:text-sky-300 font-bold">
                       {policyForm.size}
                     </span>
                   )}
@@ -2059,7 +2059,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-black shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-black shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Publishing...' : 'Publish Corporate Policy'}
                 </button>
@@ -2074,11 +2074,11 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="px-6 py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 bg-gradient-to-br from-cyan-50/90 via-teal-50/80 to-blue-50/60 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-[#1E293B]">
+            <div className="px-6 py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-md">
                   <FileText className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -2116,7 +2116,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 font-medium">Issuing Body</span>
-                  <span className="font-bold text-teal-700 dark:text-teal-300">
+                  <span className="font-bold text-sky-700 dark:text-sky-300">
                     {selectedDoc.issuer}
                   </span>
                 </div>
@@ -2164,7 +2164,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     handleDownload(selectedDoc);
                     setSelectedDoc(null);
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download Certified Copy</span>

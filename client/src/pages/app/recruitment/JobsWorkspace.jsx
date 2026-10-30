@@ -429,8 +429,8 @@ const JobsWorkspace = () => {
       {/* ========================================================================= */}
       {/* 1. HERO COMMAND BANNER (INTEGRATING JOB DESK TELEMETRY) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-50/90 via-blue-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-indigo-200/70 dark:border-indigo-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -443,7 +443,7 @@ const JobsWorkspace = () => {
             </p>
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Briefcase className="w-3.5 h-3.5 text-indigo-500" />
+                <Briefcase className="w-3.5 h-3.5 text-sky-500" />
                 <span>{totalOpenings} Active Requisitions</span>
               </span>
               <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
@@ -461,7 +461,7 @@ const JobsWorkspace = () => {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
             <button
               onClick={handleOpenCreate}
-              className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-5 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Create Job Opening</span>
@@ -561,7 +561,7 @@ const JobsWorkspace = () => {
             placeholder="Search job requisitions, skills, locations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-xs"
+            className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all shadow-xs"
           />
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           {searchQuery && (
@@ -615,7 +615,7 @@ const JobsWorkspace = () => {
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'grid' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                viewMode === 'grid' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
               }`}
               title="Grid Cards View"
             >
@@ -624,7 +624,7 @@ const JobsWorkspace = () => {
             <button
               onClick={() => setViewMode('table')}
               className={`hidden md:block p-1.5 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'table' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                viewMode === 'table' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
               }`}
               title="Table View"
             >
@@ -635,7 +635,7 @@ const JobsWorkspace = () => {
           {/* Add Job Button */}
           <button
             onClick={handleOpenCreate}
-            className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
+            className="px-4 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>New Opening</span>
@@ -673,7 +673,7 @@ const JobsWorkspace = () => {
                     <div className="space-y-3">
                       {/* Top Header: Dept & Status */}
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full">
                           {job.dept}
                         </span>
                         <div className="flex items-center gap-1.5">
@@ -691,7 +691,7 @@ const JobsWorkspace = () => {
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
                         {job.title}
                       </h3>
 
@@ -723,9 +723,9 @@ const JobsWorkspace = () => {
                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                       <button
                         onClick={() => navigate('/app/recruitment/pipeline')}
-                        className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                        className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
                       >
-                        <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-500">
+                        <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sky-500">
                           <Users className="w-3.5 h-3.5" />
                         </div>
                         <span>{job.applicants} {job.applicants === 1 ? 'Applicant' : 'Applicants'}</span>
@@ -784,7 +784,7 @@ const JobsWorkspace = () => {
                         <tr key={job.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
                           <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                              <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
                                 <Briefcase className="w-4 h-4" />
                               </div>
                               <div>
@@ -804,7 +804,7 @@ const JobsWorkspace = () => {
                           <td className="py-4 px-6">
                             <button
                               onClick={() => navigate('/app/recruitment/pipeline')}
-                              className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                              className="font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
                             >
                               <Users className="w-3.5 h-3.5" />
                               <span>{job.applicants} {job.applicants === 1 ? 'candidate' : 'candidates'}</span>
@@ -881,7 +881,7 @@ const JobsWorkspace = () => {
                 {/* Header */}
                 <div className="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
                       <Briefcase className="w-5 h-5 stroke-[2]" />
                     </div>
                     <div>
@@ -1048,7 +1048,7 @@ const JobsWorkspace = () => {
                     type="submit"
                     form="job-drawer-form"
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-bold text-xs shadow-md shadow-indigo-600/25 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
+                    className="px-6 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 disabled:opacity-60 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
                   >
                     {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     <span>{editingJob ? (isSubmitting ? 'Saving...' : 'Save Requisition') : (isSubmitting ? 'Publishing...' : 'Publish Job Opening')}</span>
