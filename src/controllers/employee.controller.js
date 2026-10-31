@@ -245,7 +245,7 @@ const getEmployees = async (req, res) => {
       ];
     }
 
-    const [total, users] = await prisma.$transaction([
+    const [total, users] = await Promise.all([
       prisma.user.count({ where: whereClause }),
       prisma.user.findMany({
         where: whereClause,

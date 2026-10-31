@@ -60,12 +60,14 @@ async function uploadResumeToCloudinary(buffer, filename, mimetype) {
     const uploadResult = await uploadToCloudinary(buffer, {
       folder: 'nexahr/resumes',
       resource_type: 'raw',
+      type: 'authenticated', // Authenticated access: requires signed URLs for secure access
       transformation: [],
       public_id: publicId,
       mimetype: mimetype || 'application/pdf',
     });
 
-    return uploadResult.secure_url || uploadResult.url || null;
+    // In Cloudinary mode, store the authenticated public_id or url; in local mode, store the relative path
+    return uploadResult.public_id || uploadResult.secure_url || uploadResult.url || null;
   } catch (error) {
     console.error('[RESUME PARSER] Cloudinary upload failed:', error.message);
     return null;

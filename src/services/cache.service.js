@@ -15,7 +15,7 @@ class CacheService {
    * Generate cache key from request
    */
   generateKey(req) {
-    const userId = req.user?.userId || 'anon';
+    const userId = req.user?.userId || req.user?.id || 'anon';
     const role = req.user?.role || 'ALL';
     const url = req.originalUrl || req.url;
     return `${role}:${userId}:${url}`;

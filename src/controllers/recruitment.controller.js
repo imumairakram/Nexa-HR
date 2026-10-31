@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
 const { visibleApplicationsWhere } = require('../utils/recruitmentFilters');
@@ -542,6 +544,130 @@ const getApplicationById = async (req, res) => {
 /**
  * Create a new candidate application
  */
+
+/**
+ * Securely stream or provide signed access to candidate CV / resume
+ * Protected by verifyToken + RBAC (checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN'))
+ */
+const getApplicationResume = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const application = await prisma.jobApplication.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        applicationId: true,
+        name: true,
+        resumeUrl: true,
+      },
+    });
+
+    if (!application || !application.resumeUrl) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume document not found for this candidate.',
+      });
+    }
+
+    const rawPath = application.resumeUrl.trim();
+    const sanitizedCandidateName = (application.name || 'Candidate').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const safeFilename = `${application.applicationId || 'APP'}_${sanitizedCandidateName}_CV.pdf`;
+
+    // 1. Check for local disk storage (dev fallback / local uploads)
+    if (
+      rawPath.startsWith('/uploads/') ||
+      rawPath.startsWith('uploads/') ||
+      rawPath.startsWith('file_') ||
+      rawPath.startsWith('resume_')
+    ) {
+      const filename = path.basename(rawPath);
+      const filePath = path.resolve(process.cwd(), 'uploads', filename);
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({
+          success: false,
+          message: 'Resume file does not exist on disk.',
+        });
+      }
+
+      const ext = path.extname(filePath).toLowerCase();
+      const contentType =
+        ext === '.pdf'
+          ? 'application/pdf'
+          : ext === '.docx'
+          ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          : ext === '.png'
+          ? 'image/png'
+          : ext === '.jpg' || ext === '.jpeg'
+          ? 'image/jpeg'
+          : 'application/octet-stream';
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${safeFilename}"`);
+      return res.sendFile(filePath);
+    }
+
+    // 2. Cloudinary authenticated storage
+    const { getSignedDownloadUrl, isCloudinaryConfigured } = require('../config/cloudinary');
+
+    if (isCloudinaryConfigured()) {
+      const signedUrl = getSignedDownloadUrl(rawPath, {
+        format: 'pdf',
+        resource_type: 'raw',
+        attachment: false,
+      });
+
+      if (!signedUrl) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to generate signed download URL for resume.',
+        });
+      }
+
+      // If client explicitly requests JSON
+      if (req.query.json === 'true' || req.headers.accept?.includes('application/json')) {
+        return res.status(200).json({
+          success: true,
+          url: signedUrl,
+          expiresInSeconds: 900,
+        });
+      }
+
+      // Stream the authenticated Cloudinary file directly to keep auth and headers intact
+      try {
+        const response = await fetch(signedUrl);
+        if (!response.ok) {
+          throw new Error(`Cloudinary returned ${response.status}`);
+        }
+        res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${safeFilename}"`);
+        const { Readable } = require('stream');
+        return Readable.fromWeb(response.body).pipe(res);
+      } catch (streamError) {
+        console.warn('[RESUME FETCH]: Direct stream fallback redirecting to signed URL:', streamError.message);
+        return res.redirect(signedUrl);
+      }
+    }
+
+    // 3. If rawPath is an external URL and Cloudinary is not configured
+    if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) {
+      return res.redirect(rawPath);
+    }
+
+    return res.status(404).json({
+      success: false,
+      message: 'Unable to locate or resolve candidate resume.',
+    });
+  } catch (error) {
+    console.error('Error serving application resume:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve resume document.',
+      error: error.message,
+    });
+  }
+};
+
 const createApplication = async (req, res) => {
   try {
     const {
@@ -1756,6 +1882,7 @@ module.exports = {
   // Applications
   getApplications,
   getApplicationById,
+  getApplicationResume,
   createApplication,
   updateApplication,
   updateApplicationStage,

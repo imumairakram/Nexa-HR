@@ -68,15 +68,13 @@ const getDepartments = async (req, res) => {
         { name: 'Customer Support & Operations', code: 'OPS', description: 'Client Success & Operational Support' },
       ];
 
-      for (const dept of baselineDepts) {
-        const existing = departments.find((d) => d.code === dept.code || d.name === dept.name);
-        if (!existing) {
-          try {
-            await prisma.department.create({ data: dept });
-          } catch (e) {
-            // Ignore if concurrently created
-          }
-        }
+      try {
+        await prisma.department.createMany({
+          data: baselineDepts,
+          skipDuplicates: true,
+        });
+      } catch (e) {
+        // Ignore duplicate key collision
       }
 
       departments = await prisma.department.findMany({

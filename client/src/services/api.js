@@ -885,6 +885,24 @@ export const api = {
   getJobApplicationById: async (id) => {
     return await fetchAPI(`/recruitment/applications/${id}`);
   },
+  viewApplicationResume: async (id) => {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(`${BASE_URL}/recruitment/applications/${id}/resume`, {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Failed to load resume' }));
+      throw new Error(err.message || 'Failed to download candidate resume');
+    }
+    const blob = await res.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+    window.open(objectUrl, '_blank');
+    setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+    return true;
+  },
 
   createJobApplication: async (appData) => {
     return await fetchAPI('/recruitment/applications', {

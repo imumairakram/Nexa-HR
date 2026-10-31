@@ -556,6 +556,15 @@ const ATSPipeline = () => {
   };
 
   // Re-scan candidate CV with AI
+const handleViewResume = async (candidateId) => {
+    try {
+      showToast('Opening candidate CV...');
+      await api.viewApplicationResume(candidateId);
+    } catch (err) {
+      showToast(`Error opening CV: ${err.message}`);
+    }
+  };
+
   const handleRescanCandidate = async (candidateId) => {
     try {
       const res = await api.rescanAiApplication(candidateId);
@@ -1279,15 +1288,14 @@ const ATSPipeline = () => {
                       {/* CV Link & Rescan Action */}
                       <div className="flex items-center justify-between pt-2 border-t border-indigo-100 dark:border-indigo-900/60 text-xs font-bold">
                         {selectedCandidate.resumeUrl ? (
-                          <a
-                            href={selectedCandidate.resumeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5"
+                          <button
+                            type="button"
+                            onClick={() => handleViewResume(selectedCandidate.id)}
+                            className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0 text-xs font-bold"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                             <span>Download / View Original CV</span>
-                          </a>
+                          </button>
                         ) : (
                           <span className="text-slate-400 font-normal">CV direct upload</span>
                         )}
@@ -1429,15 +1437,14 @@ const ATSPipeline = () => {
 
                         <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                           {app.resumeUrl ? (
-                            <a
-                              href={app.resumeUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                            <button
+                              type="button"
+                              onClick={() => handleViewResume(app.id)}
+                              className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                               <span>View CV</span>
-                            </a>
+                            </button>
                           ) : (
                             <span className="text-[11px] text-slate-400">No CV link</span>
                           )}

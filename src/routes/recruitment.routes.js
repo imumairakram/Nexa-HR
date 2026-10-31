@@ -16,6 +16,7 @@ const {
   deleteJobOpening,
   getApplications,
   getApplicationById,
+  getApplicationResume,
   createApplication,
   updateApplication,
   updateApplicationStage,
@@ -59,6 +60,8 @@ router.delete('/jobs/:id', canManageRecruitment, deleteJobOpening);
 // --- Candidate Applications & Pipeline ---
 router.get('/applications', cacheService.middleware({ ttlSeconds: 30, tags: ['recruitment', 'recruitment-apps'] }), getApplications);
 router.get('/applications/:id', getApplicationById);
+const canViewResumes = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+router.get('/applications/:id/resume', canViewResumes, getApplicationResume);
 router.post('/applications', canManageRecruitment, createApplication);
 router.put('/applications/:id', canManageRecruitment, updateApplication);
 router.patch('/applications/:id/stage', canManageRecruitment, updateApplicationStage);
