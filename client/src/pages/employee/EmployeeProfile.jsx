@@ -431,7 +431,7 @@ const EmployeeProfile = () => {
 
   const isGuest =
     formData.email?.toLowerCase() === 'hr@nexahr.com' ||
-    formData.email?.toLowerCase() === 'user@nexahr.com' ||
+    formData.email?.toLowerCase() === 'umaaiirakram@gmail.com' ||
     formData.email?.toLowerCase() === 'admin@nexahr.com' ||
     localStorage.getItem('isGuest') === 'true';
 

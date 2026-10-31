@@ -187,7 +187,7 @@ const Login = () => {
           return;
         }
 
-        const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(formData.email.trim().toLowerCase());
+        const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(formData.email.trim().toLowerCase());
         if (isDemoEmail) {
           localStorage.setItem('isGuest', 'true');
         } else {
@@ -211,7 +211,7 @@ const Login = () => {
 
     const guestCredentials = targetRole === 'hr'
       ? { email: 'hr@nexahr.com', password: 'HrPassword123!', portalRole: 'hr' }
-      : { email: 'user@nexahr.com', password: 'UserPassword123!', portalRole: 'employee' };
+      : { email: 'umaaiirakram@gmail.com', password: 'UserPassword123!', portalRole: 'employee' };
 
     localStorage.setItem('isGuest', 'true');
 

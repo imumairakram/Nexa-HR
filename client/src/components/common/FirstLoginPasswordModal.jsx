@@ -23,7 +23,7 @@ const FirstLoginPasswordModal = () => {
       if (stored) {
         const u = JSON.parse(stored);
         setUser(u);
-        const isDemo = isGuestFlag || u.isGuest || ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(u.email?.toLowerCase());
+        const isDemo = isGuestFlag || u.isGuest || ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(u.email?.toLowerCase());
         if (!isDemo && u && u.mustChangePassword === true) {
           setShowModal(true);
         } else {

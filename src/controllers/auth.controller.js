@@ -276,7 +276,7 @@ const login = async (req, res) => {
     // Attach HttpOnly, Secure, SameSite Cookie
     res.cookie('token', token, getCookieOptions());
 
-    const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
+    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
 
     return res.status(200).json({
       success: true,
@@ -1094,7 +1094,7 @@ const changeMyPassword = async (req, res) => {
       });
     }
 
-    const isDemoEmail = ['hr@nexahr.com', 'user@nexahr.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
+    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
     if (isDemoEmail) {
       return res.status(403).json({
         success: false,
