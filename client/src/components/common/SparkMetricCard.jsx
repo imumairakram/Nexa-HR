@@ -639,16 +639,6 @@ const SparkMetricCard = ({
             <span>{resolvedBadgeText}</span>
           </span>
         )}
-
-        {subtext && (
-          <span
-            className={`text-xs font-semibold truncate text-right pl-1 ${
-              isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
-            }`}
-          >
-            {subtext}
-          </span>
-        )}
       </div>
     </div>
   );
