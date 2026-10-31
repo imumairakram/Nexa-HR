@@ -1820,7 +1820,7 @@ const ATSPipeline = () => {
                       type="button"
                       onClick={() => setNewCandidateForm({ ...newCandidateForm, autoAssessment: !newCandidateForm.autoAssessment })}
                       className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                        newCandidateForm.autoAssessment ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                        newCandidateForm.autoAssessment ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div

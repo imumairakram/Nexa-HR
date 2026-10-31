@@ -405,7 +405,7 @@ const Departments = () => {
             setForm({ name: '', code: '', description: '' });
             setIsAddOpen(true);
           }}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer shrink-0 transition-all hover:scale-105"
+          className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
         >
           <Plus className="w-4 h-4" />
           <span>New Department</span>
@@ -583,7 +583,7 @@ const Departments = () => {
               setForm({ name: '', code: '', description: '' });
               setIsAddOpen(true);
             }}
-            className="mt-4 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl shadow-md cursor-pointer transition-all"
+            className="mt-4 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl shadow-md cursor-pointer transition-all"
           >
             + Create Department
           </button>
@@ -674,7 +674,7 @@ const Departments = () => {
               {/* Preview Badge Card */}
               <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-blue-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-black text-xs shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-mono font-black text-xs shadow-sm">
                     {form.code.trim() || 'DEV'}
                   </div>
                   <div>
@@ -1014,7 +1014,7 @@ const Departments = () => {
                   setSelectedDept(null);
                   openEditModal(d);
                 }}
-                className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/25 flex items-center gap-1.5 cursor-pointer transition-all"
+                className="px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-1.5 cursor-pointer transition-all"
               >
                 <Edit3 className="w-3.5 h-3.5 stroke-[2.2]" />
                 <span>Edit Department</span>

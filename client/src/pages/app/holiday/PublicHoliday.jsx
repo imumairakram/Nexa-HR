@@ -391,7 +391,7 @@ const PublicHoliday = () => {
           badgeType="positive"
           badgeIcon="up"
           subtext="Statutory Schedule"
-          chartColor="purple"
+          chartColor="sky"
           dataPoints={totalHolidaysSparkData}
         />
 
@@ -510,7 +510,7 @@ const PublicHoliday = () => {
                 onClick={() => setSelectedYear(yr)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
                   selectedYear === yr
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-sky-500 text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -802,7 +802,7 @@ const PublicHoliday = () => {
                               hasHoliday
                                 ? matchingHolidays.some((h) => h.isIslamic)
                                 ? 'bg-emerald-600 text-white shadow-xs font-black'
-                                : 'bg-blue-600 text-white shadow-xs font-black'
+                                : 'bg-sky-500 text-white shadow-xs font-black'
                               : isWeekend
                               ? 'text-slate-400 dark:text-slate-500 font-medium'
                               : 'text-slate-700 dark:text-slate-300'
@@ -1074,7 +1074,7 @@ const PublicHoliday = () => {
                       type="button"
                       onClick={() => setForm({ ...form, autoWaivePenalty: !form.autoWaivePenalty })}
                       className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                        form.autoWaivePenalty ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                        form.autoWaivePenalty ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div

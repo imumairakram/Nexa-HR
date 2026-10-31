@@ -382,7 +382,7 @@ const Leaves = () => {
 
           <button
             onClick={handleOpenApplyModal}
-            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer shrink-0 transition-all hover:scale-105"
+            className="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4" />
             <span>Apply on Behalf</span>

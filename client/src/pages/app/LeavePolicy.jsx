@@ -620,7 +620,7 @@ const LeavePolicy = () => {
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer transition-all hover:scale-105"
+          className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-sky-500/20 cursor-pointer transition-all hover:scale-105"
         >
           <Plus className="w-4 h-4" />
           <span>Add Leave Policy</span>
@@ -1002,7 +1002,7 @@ const LeavePolicy = () => {
                   setViewingPolicy(null);
                   openEditModal(p);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
               >
                 <Edit2 className="w-3.5 h-3.5" />
                 <span>Edit This Policy</span>

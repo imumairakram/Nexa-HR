@@ -484,7 +484,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Side: Main Purple Area Chart with Multi-Timeframe */}
+        {/* Right Side: Main Sky Blue Area Chart with Multi-Timeframe */}
         <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -656,7 +656,7 @@ const Dashboard = () => {
                           <div className="bg-slate-900 text-white p-3 rounded-2xl shadow-xl border border-slate-700 text-xs space-y-1.5 min-w-[170px]">
                             <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1">
                               <span className="font-extrabold text-white text-xs">{data.name}</span>
-                              <span className="px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 font-mono text-[9px] font-bold">
+                              <span className="px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 font-mono text-[9px] font-bold">
                                 {data.code}
                               </span>
                             </div>
@@ -678,7 +678,7 @@ const Dashboard = () => {
                               <span>Assigned Staff:</span>
                               <span className="font-bold text-slate-200">{data.totalStaff || 0} Members</span>
                             </div>
-                            <div className="text-[10px] text-indigo-300 font-semibold flex items-center justify-between">
+                            <div className="text-[10px] text-sky-400 font-semibold flex items-center justify-between">
                               <span>Punctuality:</span>
                               <span className="font-bold font-mono">{data.punctualityRate ?? 100}%</span>
                             </div>
@@ -709,7 +709,7 @@ const Dashboard = () => {
               <h3 className="font-black text-sm text-slate-900 dark:text-white">Organization Operations Health</h3>
               <p className="text-[11px] text-slate-400">Punctuality, presence & capacity index</p>
             </div>
-            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
               Health Index
             </span>
           </div>
@@ -727,7 +727,7 @@ const Dashboard = () => {
                         const item = payload[0].payload;
                         return (
                           <div className="bg-slate-900 text-white px-3 py-2 rounded-xl shadow-xl border border-slate-700 text-xs">
-                            <span className="font-extrabold text-indigo-300">{item.subject}: </span>
+                            <span className="font-extrabold text-sky-400">{item.subject}: </span>
                             <span className="font-mono font-black">{item.scoreA}%</span>
                             <span className="text-slate-400 text-[10px]"> (Target: 100%)</span>
                           </div>
@@ -737,7 +737,7 @@ const Dashboard = () => {
                     }}
                   />
                   <Radar name="Target" dataKey="scoreB" stroke="#94A3B8" strokeDasharray="3 3" fill="#94A3B8" fillOpacity={0.05} />
-                  <Radar name="Current" dataKey="scoreA" stroke="#8B5CF6" strokeWidth={2} fill="#8B5CF6" fillOpacity={0.35} />
+                  <Radar name="Current" dataKey="scoreA" stroke="#0EA5E9" strokeWidth={2} fill="#0EA5E9" fillOpacity={0.35} />
                 </RadarChart>
               </ResponsiveContainer>
             ) : (
@@ -777,7 +777,7 @@ const Dashboard = () => {
                     className="p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 flex items-center justify-between gap-2 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white text-[10px] font-black flex items-center justify-center shrink-0 uppercase shadow-xs">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white text-[10px] font-black flex items-center justify-center shrink-0 uppercase shadow-xs">
                         {log.employeeName?.slice(0, 2) || 'EM'}
                       </div>
                       <div className="min-w-0">
@@ -830,12 +830,12 @@ const Dashboard = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-md p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-md w-full shadow-2xl border border-blue-200/60 dark:border-blue-800/60 overflow-hidden animate-in zoom-in-95 duration-200 relative">
             <div className="absolute top-0 right-0 w-48 h-48 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-blue-100/80 dark:border-blue-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-blue-950/60 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
+            <div className="px-6 py-4 border-b border-sky-100/80 dark:border-sky-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/60 dark:via-sky-900/40 dark:to-[#1E293B] relative z-10">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25 ring-4 ring-blue-500/15">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
                   <Fingerprint className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">

@@ -24,7 +24,7 @@ import React, { useState, useId, useMemo, useRef } from 'react';
  * @param {string} [props.badgeText]
  * @param {'positive' | 'negative' | 'neutral' | 'warning'} [props.badgeType]
  * @param {'up' | 'down' | 'dot' | 'none'} [props.badgeIcon]
- * @param {string} [props.chartColor='purple']
+ * @param {string} [props.chartColor='sky']
  * @param {'wave1' | 'wave2' | 'wave3' | 'wave4' | 'up' | 'down'} [props.presetWave='wave1']
  * @param {'auto' | 'up' | 'down' | 'neutral'} [props.trend='auto']
  * @param {Array<number | { value: number, label?: string, tooltip?: string }>} [props.dataPoints]
@@ -42,7 +42,7 @@ const SparkMetricCard = ({
   badgeText,
   badgeType,
   badgeIcon,
-  chartColor = 'purple',
+  chartColor = 'sky',
   presetWave = 'wave1',
   trend = 'auto',
   dataPoints = [],

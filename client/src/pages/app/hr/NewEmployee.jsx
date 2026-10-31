@@ -305,7 +305,7 @@ const NewEmployee = () => {
           badgeType="positive"
           badgeIcon="up"
           subtext="Live PostgreSQL DB"
-          chartColor="purple"
+          chartColor="sky"
           dataPoints={headcountSparkData}
         />
 
@@ -377,7 +377,7 @@ const NewEmployee = () => {
                     isDone
                       ? 'bg-sky-500 text-white'
                       : isCurrent
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-sky-500 text-white'
                       : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                   }`}
                 >
@@ -700,7 +700,7 @@ const NewEmployee = () => {
             <button
               type="button"
               onClick={handleNext}
-              className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center gap-2 hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-sky-500 text-white font-bold text-xs flex items-center gap-2 hover:bg-sky-600 shadow-md shadow-sky-500/20 cursor-pointer"
             >
               <span>Next Step</span>
               <ArrowRight className="w-4 h-4" />

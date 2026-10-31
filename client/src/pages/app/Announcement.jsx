@@ -353,7 +353,7 @@ const Announcement = () => {
                 onClick={() => setCategoryFilter(cat)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   categoryFilter === cat
-                    ? 'bg-blue-600 text-white shadow-xs'
+                    ? 'bg-sky-500 text-white shadow-xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
@@ -364,7 +364,7 @@ const Announcement = () => {
 
           <button
             onClick={() => setIsPostModalOpen(true)}
-            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer shrink-0 transition-all hover:scale-105"
+            className="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4" />
             <span>Post Circular</span>

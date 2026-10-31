@@ -181,7 +181,7 @@ const PayslipList = () => {
           badgeType="positive"
           badgeIcon="up"
           subtext="All Departments"
-          chartColor="purple"
+          chartColor="sky"
           presetWave="wave1"
           dataPoints={vouchersSparkData}
           loading={loading}
@@ -291,7 +291,7 @@ const PayslipList = () => {
 
                 <button
                   onClick={() => setSelectedSlip(p)}
-                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Inspect Slip</span>
@@ -341,7 +341,7 @@ const PayslipList = () => {
                   <td className="py-4 px-6 text-right">
                     <button
                       onClick={() => setSelectedSlip(p)}
-                      className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ml-auto"
+                      className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ml-auto"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>Inspect Slip</span>

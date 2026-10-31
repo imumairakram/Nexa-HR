@@ -335,21 +335,21 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
         <div className="px-6 sm:px-7 py-3 border-b border-slate-200/60 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/40 flex items-center justify-between gap-2 text-xs relative z-10">
           <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto py-0.5">
             <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 1 ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 1 ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                 1
               </span>
               <span>Recovery Channel</span>
             </div>
             <div className="w-4 h-px bg-slate-200 dark:bg-slate-700 shrink-0" />
             <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 2 ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 2 ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                 2
               </span>
               <span>6-Digit OTP</span>
             </div>
             <div className="w-4 h-px bg-slate-200 dark:bg-slate-700 shrink-0" />
             <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 3 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 3 ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 3 ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                 3
               </span>
               <span>New Password</span>
@@ -415,7 +415,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                   /* HR / Admin View: Strictly Corporate Email (WhatsApp option is hidden) */
                   <div className="p-3.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/80 dark:border-blue-500/80 shadow-xs ring-1 ring-blue-600/30 flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <div className="w-9 h-9 rounded-lg bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs">
                         <Mail className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
@@ -449,7 +449,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                         <div
                           className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             channel === 'EMAIL'
-                              ? 'bg-blue-600 text-white shadow-xs'
+                              ? 'bg-sky-500 text-white shadow-xs'
                               : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                           }`}
                         >

@@ -492,7 +492,7 @@ const JobsWorkspace = () => {
           badgeType="positive"
           badgeIcon="up"
           subtext="Active Requisitions"
-          chartColor="purple"
+          chartColor="sky"
           presetWave="wave1"
           dataPoints={openingsSparkData}
           loading={loading}
