@@ -165,7 +165,11 @@ class CacheService {
         const originalSend = res.send.bind(res);
         res.send = (...args) => {
           if (res.statusCode >= 200 && res.statusCode < 400) {
-            this.invalidateByRoute(req.originalUrl || req.url);
+            const url = req.originalUrl || req.url;
+            // Never invalidate on /ai-screening/sync here; sync invalidates only when new candidate items are actually added
+            if (!url.includes('/ai-screening/sync')) {
+              this.invalidateByRoute(url);
+            }
           }
           return originalSend(...args);
         };

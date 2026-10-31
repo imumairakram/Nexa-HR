@@ -498,6 +498,7 @@ model JobApplication {
   jobOpening    JobOpening?       @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
   interviews    JobInterview[]
 
+  @@index([status, aiStatus])
   @@index([stage])
   @@index([jobOpeningId])
   @@index([email])

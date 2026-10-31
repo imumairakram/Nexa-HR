@@ -44,7 +44,7 @@ const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / G
     };
   }
 
-  // Matches formatted string: "Muhammad Akram (Parent / Guardian) - +92 300 2983659" or "Elena Mercer (Spouse) - 03001234567"
+  // Matches formatted string: "John (Parent / Guardian) - +92 300 1234567"
   const fullMatch = rawStr.match(/^(.+?)\s*\((.+?)\)\s*[-:]\s*(.+)$/);
   if (fullMatch) {
     return {
@@ -54,7 +54,7 @@ const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / G
     };
   }
 
-  // Check if rawStr is just phone number (e.g. "+92 300 2983659" or "03001234567")
+  // Check if rawStr is just phone number (e.g. "+92 300 1234567")
   const isPurePhone = /^[+\d\s()-]+$/.test(rawStr.trim());
   if (isPurePhone) {
     return {
@@ -743,7 +743,7 @@ const Profile = () => {
                     <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Contact Person Name</label>
                     <input
                       type="text"
-                      placeholder="e.g. Muhammad Akram"
+                      placeholder="e.g. John"
                       value={formData.emergencyName}
                       onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
@@ -770,7 +770,7 @@ const Profile = () => {
                     <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Emergency Phone Number</label>
                     <input
                       type="tel"
-                      placeholder="e.g. +92 300 2983659"
+                      placeholder="e.g. +92 300 1234567"
                       value={formData.emergencyPhone}
                       onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"

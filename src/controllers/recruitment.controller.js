@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 const { visibleApplicationsWhere } = require('../utils/recruitmentFilters');
 const { fetchApplicationEmails, isGmailConfigured } = require('../services/gmail.service');
 const {
@@ -17,13 +18,11 @@ const {
  */
 const getRecruitmentStats = async (req, res) => {
   try {
-    const [totalOpenings, activeOpenings, pausedOpenings, totalApplicants, applicationsByStage, totalInterviews] =
+    const [openingsByStatus, applicationsByStage, totalInterviews] =
       await Promise.all([
-        prisma.jobOpening.count(),
-        prisma.jobOpening.count({ where: { status: 'ACTIVE' } }),
-        prisma.jobOpening.count({ where: { status: 'PAUSED' } }),
-        prisma.jobApplication.count({
-          where: visibleApplicationsWhere,
+        prisma.jobOpening.groupBy({
+          by: ['status'],
+          _count: { id: true },
         }),
         prisma.jobApplication.groupBy({
           by: ['stage'],
@@ -32,6 +31,15 @@ const getRecruitmentStats = async (req, res) => {
         }),
         prisma.jobInterview.count({ where: { status: 'SCHEDULED' } }),
       ]);
+
+    let totalOpenings = 0;
+    let activeOpenings = 0;
+    let pausedOpenings = 0;
+    openingsByStatus.forEach((g) => {
+      totalOpenings += g._count.id;
+      if (g.status === 'ACTIVE') activeOpenings = g._count.id;
+      if (g.status === 'PAUSED') pausedOpenings = g._count.id;
+    });
 
     const stageCounts = {
       APPLIED: 0,
@@ -42,8 +50,10 @@ const getRecruitmentStats = async (req, res) => {
       REJECTED: 0,
     };
 
+    let totalApplicants = 0;
     applicationsByStage.forEach((group) => {
       stageCounts[group.stage] = group._count.id;
+      totalApplicants += group._count.id;
     });
 
     const offered = stageCounts.OFFER || 0;
@@ -454,12 +464,28 @@ const getApplications = async (req, res) => {
     const applications = await prisma.jobApplication.findMany({
       where,
       orderBy: { createdAt: 'desc' },
-      include: {
+      select: {
+        id: true,
+        applicationId: true,
+        jobOpeningId: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        department: true,
+        location: true,
+        experience: true,
+        rating: true,
+        stage: true,
+        status: true,
+        source: true,
+        aiScore: true,
+        aiStatus: true,
+        appliedDate: true,
+        createdAt: true,
+        updatedAt: true,
         jobOpening: {
           select: { id: true, title: true, jobCode: true },
-        },
-        interviews: {
-          orderBy: { date: 'asc' },
         },
       },
     });
@@ -1543,6 +1569,8 @@ const clearAllRecruitmentData = async (req, res) => {
 /**
  * Manually trigger a Gmail fetch and AI ATS screening batch
  */
+let isSyncInProgress = false;
+
 const syncGmailScreening = async (req, res) => {
   try {
     if (!isGmailConfigured()) {
@@ -1552,26 +1580,44 @@ const syncGmailScreening = async (req, res) => {
       });
     }
 
-    console.log('[AI ATS CONTROLLER] Manual Gmail sync requested by user:', req.user?.email || req.user?.id);
-    const emails = await fetchApplicationEmails({ maxResults: 15 });
-
-    if (emails.length === 0) {
+    if (isSyncInProgress) {
       return res.status(200).json({
         success: true,
-        message: 'No new unread candidate applications found in HR Gmail.',
+        message: 'Sync is already running in background.',
         data: {
-          syncedCount: 0,
-          status: getSyncStatus(),
+          status: { ...getSyncStatus(), isSyncing: true },
         },
       });
     }
 
-    const batchSummary = await processEmailBatch(emails);
+    isSyncInProgress = true;
+    console.log('[AI ATS CONTROLLER] Non-blocking Gmail sync initiated by user:', req.user?.email || req.user?.id);
 
-    return res.status(200).json({
+    // Non-blocking background worker
+    setImmediate(async () => {
+      try {
+        const emails = await fetchApplicationEmails({ maxResults: 15 });
+        if (emails.length > 0) {
+          const batchSummary = await processEmailBatch(emails);
+          if (batchSummary && batchSummary.processed > 0) {
+            console.log(`[AI ATS CONTROLLER] Background sync processed ${batchSummary.processed} candidates. Invalidating caches.`);
+            cacheService.invalidateTags(['recruitment', 'recruitment-apps', 'recruitment-stats', 'dashboard']);
+          }
+        }
+      } catch (bgErr) {
+        console.error('[AI ATS CONTROLLER BG ERROR] Background Gmail sync error:', bgErr.message);
+      } finally {
+        isSyncInProgress = false;
+      }
+    });
+
+    // Return 202 Accepted immediately so the frontend skeleton or button does not hang
+    return res.status(202).json({
       success: true,
-      message: `Successfully processed ${batchSummary.processed} application email(s).`,
-      data: batchSummary,
+      message: 'Gmail ATS background sync started successfully.',
+      data: {
+        status: { ...getSyncStatus(), isSyncing: true },
+      },
     });
   } catch (error) {
     console.error('[AI ATS CONTROLLER] Error during manual Gmail sync:', error);
@@ -1611,7 +1657,23 @@ const getScreenedOutApplications = async (req, res) => {
       where: {
         aiStatus: { in: ['SCREENED_OUT', 'UNMATCHED', 'ERROR'] },
       },
-      include: {
+      select: {
+        id: true,
+        applicationId: true,
+        jobOpeningId: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        department: true,
+        location: true,
+        stage: true,
+        status: true,
+        source: true,
+        aiScore: true,
+        aiStatus: true,
+        aiSummary: true,
+        createdAt: true,
         jobOpening: {
           select: { id: true, title: true, jobCode: true, department: true },
         },

@@ -1221,7 +1221,7 @@ NexaHR Workforce Systems`;
                         <input
                           type="text"
                           required
-                          placeholder="e.g. Jordan"
+                          placeholder="e.g. John"
                           value={onboardForm.firstName}
                           onChange={(e) => setOnboardForm({ ...onboardForm, firstName: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
@@ -1277,7 +1277,7 @@ NexaHR Workforce Systems`;
                         </label>
                         <input
                           type="text"
-                          placeholder="+1 (555) 019-2831"
+                          placeholder="+92 300 1234567"
                           value={onboardForm.phone}
                           onChange={(e) => setOnboardForm({ ...onboardForm, phone: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
@@ -1549,7 +1549,7 @@ NexaHR Workforce Systems`;
                         </label>
                         <input
                           type="text"
-                          placeholder="Jane Doe (+1 555-0192)"
+                          placeholder="John (+92 300 1234567)"
                           value={onboardForm.emergencyContact}
                           onChange={(e) => setOnboardForm({ ...onboardForm, emergencyContact: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"

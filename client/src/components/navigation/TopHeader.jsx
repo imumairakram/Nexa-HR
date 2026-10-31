@@ -14,7 +14,7 @@ const TopHeader = () => {
   const initials = `${user.firstName?.[0] || 'U'}${user.lastName?.[0] || ''}`.toUpperCase();
 
   return (
-    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-3xl p-4 md:px-6 shadow-soft border border-slate-100">
+    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-[14px] p-4 md:px-6 shadow-soft border border-[#E2E1DC]">
       {/* Search Input */}
       <div className="flex items-center gap-3">
 

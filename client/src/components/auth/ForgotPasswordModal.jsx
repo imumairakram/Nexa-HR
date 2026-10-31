@@ -286,7 +286,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
 
     if (score === 1) return { score: 25, label: 'Weak', color: 'bg-rose-500' };
     if (score === 2) return { score: 50, label: 'Fair', color: 'bg-amber-500' };
-    if (score === 3) return { score: 75, label: 'Good', color: 'bg-blue-500' };
+    if (score === 3) return { score: 75, label: 'Good', color: 'bg-teal-700' };
     return { score: 100, label: 'Strong & Secure', color: 'bg-emerald-500' };
   };
 
@@ -300,15 +300,15 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       {/* Container Modal Card matching Apply for Time-Off style & max-w-5xl width */}
-      <div className="bg-white/90 dark:bg-[#1E293B]/90 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/70 border border-blue-200/70 dark:border-blue-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+      <div className="bg-white/90 dark:bg-[#16211E]/90 backdrop-blur-2xl rounded-[14px] max-w-5xl w-full shadow-2xl shadow-blue-950/15 dark:shadow-black/70 border border-blue-200/70 dark:border-blue-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
         {/* Glow ambient background decoration */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-teal-700/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 left-10 w-48 h-48 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
 
         {/* Modal Header */}
         <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-blue-200/70 dark:border-blue-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/80 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
           <div className="flex items-center gap-3.5 relative z-10">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/30 ring-3 ring-sky-100/80 dark:ring-sky-950/60">
+            <div className="w-11 h-11 rounded-[8px] bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/30 ring-3 ring-sky-100/80 dark:ring-sky-950/60">
               <KeyRound className="w-5 h-5 stroke-[2.2]" />
             </div>
             <div>
@@ -324,7 +324,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-blue-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-blue-200/60 dark:hover:border-slate-700 relative z-10"
+            className="p-1.5 rounded-[8px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-blue-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-blue-200/60 dark:hover:border-slate-700 relative z-10"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -332,23 +332,23 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
         </div>
 
         {/* Step Indicator Navigation Sub-bar */}
-        <div className="px-6 sm:px-7 py-3 border-b border-slate-200/60 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/40 flex items-center justify-between gap-2 text-xs relative z-10">
+        <div className="px-6 sm:px-7 py-3 border-b border-[#E2E1DC]/60 dark:border-[#273834]/80 bg-slate-50/70 dark:bg-[#16211E]/40 flex items-center justify-between gap-2 text-xs relative z-10">
           <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto py-0.5">
-            <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+            <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 1 ? 'text-teal-700 dark:text-teal-400' : 'text-slate-400'}`}>
               <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 1 ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                 1
               </span>
               <span>Recovery Channel</span>
             </div>
             <div className="w-4 h-px bg-slate-200 dark:bg-slate-700 shrink-0" />
-            <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+            <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 2 ? 'text-teal-700 dark:text-teal-400' : 'text-slate-400'}`}>
               <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 2 ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                 2
               </span>
               <span>6-Digit OTP</span>
             </div>
             <div className="w-4 h-px bg-slate-200 dark:bg-slate-700 shrink-0" />
-            <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 3 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+            <div className={`flex items-center gap-2 font-bold shrink-0 transition-colors ${step >= 3 ? 'text-teal-700 dark:text-teal-400' : 'text-slate-400'}`}>
               <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${step >= 3 ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                 3
               </span>
@@ -364,7 +364,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
         <div className="overflow-y-auto max-h-[85vh] flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-blue-50/15 to-indigo-50/20 dark:from-transparent dark:via-blue-950/10 dark:to-indigo-950/10 relative z-10">
           {/* Global Error Banner */}
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-start gap-2 border border-rose-200 dark:border-rose-800/50">
+            <div className="p-3 rounded-[8px] bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-start gap-2 border border-rose-200 dark:border-rose-800/50">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -379,11 +379,11 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <Mail className="w-3.5 h-3.5 text-teal-700 dark:text-teal-400" />
                     <span>Corporate Work Email Address <span className="text-rose-500">*</span></span>
                   </label>
                   {checkingUser && (
-                    <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1 animate-pulse">
+                    <span className="text-[11px] text-teal-700 dark:text-teal-400 font-semibold flex items-center gap-1 animate-pulse">
                       <RefreshCw className="w-3 h-3 animate-spin" />
                       Reading database...
                     </span>
@@ -395,8 +395,8 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="e.g. employee@company.com or alex.mercer@acme.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all shadow-xs text-xs sm:text-sm"
+                    placeholder="e.g. employee@company.com or john@company.com"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-[8px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-[#E2E1DC]/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 outline-none transition-all shadow-xs text-xs sm:text-sm"
                     required
                   />
                 </div>
@@ -413,7 +413,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
 
                 {isHrOrAdmin ? (
                   /* HR / Admin View: Strictly Corporate Email (WhatsApp option is hidden) */
-                  <div className="p-3.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/80 dark:border-blue-500/80 shadow-xs ring-1 ring-blue-600/30 flex items-center justify-between">
+                  <div className="p-3.5 rounded-[8px] bg-teal-50/80 dark:bg-blue-950/40 border border-blue-500/80 dark:border-blue-500/80 shadow-xs ring-1 ring-blue-600/30 flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-lg bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs">
                         <Mail className="w-4 h-4" />
@@ -430,7 +430,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                         </div>
                       </div>
                     </div>
-                    <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-teal-700 dark:text-teal-400 shrink-0" />
                   </div>
                 ) : (
                   /* Employee View: Shows Corporate Email AND Registered WhatsApp from DB */
@@ -439,10 +439,10 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     <button
                       type="button"
                       onClick={() => setChannel('EMAIL')}
-                      className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${
+                      className={`p-3.5 rounded-[8px] text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${
                         channel === 'EMAIL'
-                          ? 'bg-blue-50/90 dark:bg-blue-950/50 border-blue-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-blue-500/30'
-                          : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-blue-50/50 dark:hover:bg-slate-800 hover:border-blue-300/80'
+                          ? 'bg-teal-50/90 dark:bg-blue-950/50 border-blue-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-blue-500/30'
+                          : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-[#E2E1DC]/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-teal-50/50 dark:hover:bg-slate-800 hover:border-blue-300/80'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -450,7 +450,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                           className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             channel === 'EMAIL'
                               ? 'bg-sky-500 text-white shadow-xs'
-                              : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
+                              : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-[#E2E1DC]/60 dark:border-slate-600'
                           }`}
                         >
                           <Mail className="w-4 h-4" />
@@ -465,7 +465,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                         </div>
                       </div>
                       {channel === 'EMAIL' && (
-                        <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <CheckCircle2 className="w-5 h-5 text-teal-700 dark:text-teal-400 shrink-0" />
                       )}
                     </button>
 
@@ -474,12 +474,12 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       type="button"
                       disabled={!registeredWhatsAppNumber && !userInfo?.hasPhone}
                       onClick={() => setChannel('WHATSAPP')}
-                      className={`p-3.5 rounded-xl text-left border transition-all flex items-center justify-between gap-3 relative overflow-hidden ${
+                      className={`p-3.5 rounded-[8px] text-left border transition-all flex items-center justify-between gap-3 relative overflow-hidden ${
                         !registeredWhatsAppNumber && !userInfo?.hasPhone
-                          ? 'opacity-50 cursor-not-allowed bg-slate-100/80 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700'
+                          ? 'opacity-50 cursor-not-allowed bg-slate-100/80 dark:bg-slate-800/40 border-[#E2E1DC] dark:border-slate-700'
                           : channel === 'WHATSAPP'
                           ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-emerald-500/30 cursor-pointer'
-                          : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-emerald-50/50 dark:hover:bg-slate-800 hover:border-emerald-300/80 cursor-pointer'
+                          : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-[#E2E1DC]/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-emerald-50/50 dark:hover:bg-slate-800 hover:border-emerald-300/80 cursor-pointer'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -487,7 +487,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                           className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             channel === 'WHATSAPP'
                               ? 'bg-emerald-600 text-white shadow-xs'
-                              : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
+                              : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-[#E2E1DC]/60 dark:border-slate-600'
                           }`}
                         >
                           <Smartphone className="w-4 h-4" />
@@ -514,12 +514,12 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
               </div>
 
               {/* Dynamic Real-Time Delivery Hint Card */}
-              <div className="px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-blue-200/70 dark:border-blue-800/60 flex items-center justify-between gap-3 shadow-xs">
+              <div className="px-4 py-2.5 rounded-[8px] bg-white/80 dark:bg-[#16211E]/60 backdrop-blur-xl border border-blue-200/70 dark:border-blue-800/60 flex items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-xs border ${
                     channel === 'WHATSAPP' && !isHrOrAdmin
                       ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/60'
-                      : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200/60 dark:border-blue-800/60'
+                      : 'bg-teal-50 dark:bg-blue-950/60 text-teal-700 dark:text-teal-400 border-blue-200/60 dark:border-blue-800/60'
                   }`}>
                     <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
                   </div>
@@ -529,33 +529,33 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                       {channel === 'WHATSAPP' && !isHrOrAdmin
-                        ? `OTP will be sent to your registered WhatsApp mobile: ${registeredWhatsAppNumber || '+1 (555) 415-8882'}`
+                        ? `OTP will be sent to your registered WhatsApp mobile: ${registeredWhatsAppNumber || '+92 300 1234567'}`
                         : `OTP will be sent to your corporate email: ${userInfo?.email || email || 'registered email'}`}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-700 animate-pulse" />
                     Active Route
                   </span>
                 </div>
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-blue-100/80 dark:border-slate-800 gap-3">
+              <div className="flex items-center justify-end pt-3 border-t border-blue-100/80 dark:border-[#273834] gap-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-teal-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || checkingUser || !email}
-                  className={`px-5 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`px-5 py-2.5 rounded-[8px] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                     channel === 'WHATSAPP' && !isHrOrAdmin
                       ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
                       : 'bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 shadow-sky-500/25'
@@ -590,10 +590,10 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
             <form onSubmit={handleVerifyOtp} className="space-y-5 max-w-xl mx-auto py-3">
               <div className="text-center">
                 <div
-                  className={`inline-flex p-3 rounded-2xl mb-2 ${
+                  className={`inline-flex p-3 rounded-[14px] mb-2 ${
                     channel === 'WHATSAPP'
                       ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                      : 'bg-teal-50 dark:bg-blue-950/60 text-teal-700 dark:text-teal-400'
                   }`}
                 >
                   {channel === 'WHATSAPP' ? <Smartphone className="w-6 h-6" /> : <Send className="w-6 h-6" />}
@@ -621,10 +621,10 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                    className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-extrabold rounded-xl border transition-all ${
+                    className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-extrabold rounded-[8px] border transition-all ${
                       digit
-                        ? 'bg-blue-50/50 dark:bg-blue-950/40 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm'
-                        : 'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                        ? 'bg-teal-50/50 dark:bg-blue-950/40 border-blue-600 dark:border-blue-500 text-teal-700 dark:text-teal-400 shadow-sm'
+                        : 'bg-white/80 dark:bg-slate-800/80 border-[#E2E1DC] dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
                     }`}
                     required
                   />
@@ -647,7 +647,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     <button
                       type="button"
                       onClick={handleInitiateOtp}
-                      className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      className="font-bold text-teal-700 dark:text-teal-400 hover:underline cursor-pointer"
                     >
                       Resend Code
                     </button>
@@ -660,18 +660,18 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-blue-100/80 dark:border-slate-800 gap-3">
+              <div className="flex items-center justify-end pt-3 border-t border-blue-100/80 dark:border-[#273834] gap-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-teal-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || otpDigits.join('').length !== 6}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 rounded-[8px] bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -698,7 +698,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                 {/* New Password */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <Lock className="w-3.5 h-3.5 text-teal-700 dark:text-teal-400" />
                     <span>New Secure Password <span className="text-rose-500">*</span></span>
                   </label>
                   <div className="relative">
@@ -708,7 +708,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter minimum 6 characters"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all shadow-xs text-xs sm:text-sm"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-[8px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-[#E2E1DC]/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 outline-none transition-all shadow-xs text-xs sm:text-sm"
                       required
                     />
                     <button
@@ -740,7 +740,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                 {/* Confirm Password */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <Lock className="w-3.5 h-3.5 text-teal-700 dark:text-teal-400" />
                     <span>Confirm New Password <span className="text-rose-500">*</span></span>
                   </label>
                   <div className="relative">
@@ -750,7 +750,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Re-type your new password"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 outline-none transition-all shadow-xs text-xs sm:text-sm"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-[8px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-[#E2E1DC]/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 outline-none transition-all shadow-xs text-xs sm:text-sm"
                       required
                     />
                     <button
@@ -772,18 +772,18 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-blue-100/80 dark:border-slate-800 gap-3">
+              <div className="flex items-center justify-end pt-3 border-t border-blue-100/80 dark:border-[#273834] gap-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-teal-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !newPassword || newPassword !== confirmPassword}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 rounded-[8px] bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -822,7 +822,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer"
+                className="w-full py-3 rounded-[8px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer"
               >
                 Return to Sign In
               </button>

@@ -29,18 +29,32 @@ const isCloudinaryConfigured = () => {
 const uploadToCloudinary = (buffer, options = {}) => {
   return new Promise((resolve, reject) => {
     if (!isCloudinaryConfigured()) {
-      // Fallback for local development if Cloudinary credentials are not yet set in .env
-      console.warn(
-        '[CLOUDINARY WARNING] Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) not fully configured. Using optimized base64 data URI fallback for local dev persistence.'
-      );
-      const mimeType = options.mimetype || 'image/jpeg';
-      const base64Data = `data:${mimeType};base64,${buffer.toString('base64')}`;
+      // Fallback for local development: Save file to local uploads directory instead of storing heavy base64 data URIs
+      const fs = require('fs');
+      const path = require('path');
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const mimeType = options.mimetype || 'application/octet-stream';
+      let ext = 'bin';
+      if (mimeType.includes('pdf')) ext = 'pdf';
+      else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
+      else if (mimeType.includes('png')) ext = 'png';
+      else if (mimeType.includes('word') || mimeType.includes('docx')) ext = 'docx';
+
+      const filename = `file_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
+      const filePath = path.join(uploadsDir, filename);
+      fs.writeFileSync(filePath, buffer);
+
+      const fileUrl = `/uploads/${filename}`;
       return resolve({
-        secure_url: base64Data,
-        url: base64Data,
-        public_id: `local_fallback_${Date.now()}`,
+        secure_url: fileUrl,
+        url: fileUrl,
+        public_id: filename,
         bytes: buffer.length,
-        format: mimeType.split('/')[1] || 'jpeg',
+        format: ext,
       });
     }
 

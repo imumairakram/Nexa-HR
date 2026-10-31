@@ -410,7 +410,7 @@ const NewEmployee = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Jordan"
+                  placeholder="e.g. John"
                   value={form.firstName}
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
@@ -445,7 +445,7 @@ const NewEmployee = () => {
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Mobile Phone *</label>
                 <input
                   type="text"
-                  placeholder="+1 (555) 019-4820"
+                  placeholder="+92 300 1234567"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"

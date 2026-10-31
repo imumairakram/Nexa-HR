@@ -27,7 +27,7 @@ const Header = () => {
   const initials = `${user.firstName?.[0] || 'U'}${user.lastName?.[0] || ''}`.toUpperCase();
 
   return (
-    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-3xl p-4 md:px-6 shadow-soft border border-slate-100">
+    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-[14px] p-4 md:px-6 shadow-soft border border-[#E2E1DC]">
       {/* Search Input & System Status */}
       <div className="flex items-center gap-3">
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-pastelGreen-light text-pastelGreen-dark text-xs font-semibold">
@@ -50,9 +50,9 @@ const Header = () => {
         {/* Quick Web Clock Widget */}
         <button
           onClick={toggleClock}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all shadow-sm ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-xs font-semibold transition-all shadow-sm ${
             clockedIn
-              ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+              ? 'bg-teal-700 text-white hover:bg-teal-800'
               : 'bg-pastelOrange-DEFAULT text-slate-900 hover:bg-orange-200'
           }`}
         >

@@ -13,7 +13,7 @@ const MobileBottomNav = () => {
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-gradient-to-t from-[#F4F4F7] via-[#F4F4F7]/90 dark:from-[#0B0F19] dark:via-[#0B0F19]/90 to-transparent">
-      <nav className="bg-slate-900/95 backdrop-blur-md rounded-3xl p-2.5 shadow-2xl flex items-center justify-around border border-slate-800">
+      <nav className="bg-slate-900/95 backdrop-blur-md rounded-[14px] p-2.5 shadow-2xl flex items-center justify-around border border-slate-800">
         {mobileNavItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -21,9 +21,9 @@ const MobileBottomNav = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 ${
+                `flex flex-col items-center gap-1 px-4 py-2 rounded-[8px] transition-all duration-200 ${
                   isActive
-                    ? 'bg-sky-400 text-slate-950 font-bold scale-105 shadow-md shadow-sky-400/25'
+                    ? 'bg-teal-700 text-white font-bold shadow-xs'
                     : 'text-slate-400 hover:text-white'
                 }`
               }

@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
+const path = require('path');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -83,8 +85,10 @@ app.use(
 );
 
 // =========================================================================
-// 3. BODY & COOKIE PARSERS
+// 3. COMPRESSION, STATIC ASSETS, BODY & COOKIE PARSERS
 // =========================================================================
+app.use(compression());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
@@ -120,6 +124,9 @@ app.use('/api/tickets', ticketRoutes);
 app.use('/api/accounts', accountRoutes);
 app.use('/api/recruitment', recruitmentRoutes);
 app.use('/api/documents', documentRoutes);
+
+// Lightweight Keep-Alive Health Endpoint
+app.get('/health', (req, res) => res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() }));
 
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {

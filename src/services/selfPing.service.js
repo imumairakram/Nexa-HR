@@ -70,12 +70,13 @@ function startSelfPing() {
 
   // Sanitize trailing slash and build health endpoint
   const baseUrl = rawBackendUrl.trim().replace(/\/+$/, '');
-  const healthEndpoint = `${baseUrl}/api/health`;
+  const healthEndpoint = `${baseUrl}/health`;
 
   // 14 minutes = 14 * 60 * 1000 ms (before Render's 15-minute inactivity timeout)
-  const PING_INTERVAL_MS = 14 * 60 * 1000;
+  // 10 minutes (safely below Render's 15-minute inactivity timeout)
+  const PING_INTERVAL_MS = 10 * 60 * 1000;
 
-  console.log(`[SELF-PING] Service active. Scheduling self-ping every 14 minutes to: ${healthEndpoint}`);
+  console.log(`[SELF-PING] Service active. Scheduling self-ping every 10 minutes to: ${healthEndpoint}`);
 
   // Schedule periodic ping
   pingTimer = setInterval(() => {

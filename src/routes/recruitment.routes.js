@@ -44,12 +44,12 @@ router.use(verifyToken);
 const canManageRecruitment = checkRole('ADMIN', 'HR_MANAGER', 'EMPLOYEE', 'SUPER_ADMIN', 'COMPANY_ADMIN');
 
 // --- Telemetry, Seeding & Wiping ---
-router.get('/stats', getRecruitmentStats);
+router.get('/stats', cacheService.middleware({ ttlSeconds: 60, tags: ['recruitment', 'recruitment-stats'] }), getRecruitmentStats);
 router.post('/seed', canManageRecruitment, seedRecruitmentData);
 router.delete('/clear-all', canManageRecruitment, clearAllRecruitmentData);
 
 // --- Job Openings ---
-router.get('/jobs', getJobOpenings);
+router.get('/jobs', cacheService.middleware({ ttlSeconds: 60, tags: ['recruitment', 'recruitment-jobs'] }), getJobOpenings);
 router.get('/jobs/:id', getJobOpeningById);
 router.post('/jobs', canManageRecruitment, createJobOpening);
 router.put('/jobs/:id', canManageRecruitment, updateJobOpening);
@@ -57,7 +57,7 @@ router.patch('/jobs/:id/status', canManageRecruitment, toggleJobStatus);
 router.delete('/jobs/:id', canManageRecruitment, deleteJobOpening);
 
 // --- Candidate Applications & Pipeline ---
-router.get('/applications', getApplications);
+router.get('/applications', cacheService.middleware({ ttlSeconds: 30, tags: ['recruitment', 'recruitment-apps'] }), getApplications);
 router.get('/applications/:id', getApplicationById);
 router.post('/applications', canManageRecruitment, createApplication);
 router.put('/applications/:id', canManageRecruitment, updateApplication);
@@ -67,7 +67,7 @@ router.delete('/applications/:id', canManageRecruitment, deleteApplication);
 // --- AI ATS Auto-Screening & Gmail Sync ---
 router.post('/ai-screening/sync', canManageRecruitment, syncGmailScreening);
 router.get('/ai-screening/status', canManageRecruitment, getAiScreeningStatus);
-router.get('/ai-screening/screened-out', canManageRecruitment, getScreenedOutApplications);
+router.get('/ai-screening/screened-out', canManageRecruitment, cacheService.middleware({ ttlSeconds: 30, tags: ['recruitment', 'recruitment-screened-out'] }), getScreenedOutApplications);
 router.post(
   '/applications/:id/ai-override',
   canManageRecruitment,
@@ -84,7 +84,7 @@ router.post(
 );
 
 // --- Interviews ---
-router.get('/interviews', getInterviews);
+router.get('/interviews', cacheService.middleware({ ttlSeconds: 30, tags: ['recruitment', 'recruitment-interviews'] }), getInterviews);
 router.post('/interviews', canManageRecruitment, createInterview);
 router.put('/interviews/:id', canManageRecruitment, updateInterview);
 router.delete('/interviews/:id', canManageRecruitment, deleteInterview);

@@ -73,110 +73,100 @@ const SparkMetricCard = ({
       strokeSecondary: '#6366F1',
       fillStart: 'rgba(99, 102, 241, 0.45)',
       fillEnd: 'rgba(99, 102, 241, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 6px rgba(99, 102, 241, 0.45))',
-      dotColor: '#A5B4FC',
+            dotColor: '#A5B4FC',
       pulseColor: 'rgba(129, 140, 248, 0.5)',
-      tooltipBg: '#1E1B4B',
-      tooltipText: '#E0E7FF',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     sky: {
       stroke: '#38BDF8',
       strokeSecondary: '#0284C7',
       fillStart: 'rgba(56, 189, 248, 0.35)',
       fillEnd: 'rgba(56, 189, 248, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 5px rgba(56, 189, 248, 0.35))',
-      dotColor: '#BAE6FD',
+            dotColor: '#BAE6FD',
       pulseColor: 'rgba(56, 189, 248, 0.5)',
-      tooltipBg: '#082F49',
-      tooltipText: '#E0F2FE',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     coral: {
       stroke: '#F43F5E',
       strokeSecondary: '#E11D48',
       fillStart: 'rgba(244, 63, 94, 0.35)',
       fillEnd: 'rgba(244, 63, 94, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 6px rgba(244, 63, 94, 0.4))',
-      dotColor: '#FDA4AF',
+            dotColor: '#FDA4AF',
       pulseColor: 'rgba(244, 63, 94, 0.5)',
-      tooltipBg: '#4C0519',
-      tooltipText: '#FFE4E6',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     orange: {
       stroke: '#FB923C',
       strokeSecondary: '#F97316',
       fillStart: 'rgba(249, 115, 22, 0.35)',
       fillEnd: 'rgba(249, 115, 22, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 5px rgba(249, 115, 22, 0.35))',
-      dotColor: '#FDBA74',
+            dotColor: '#FDBA74',
       pulseColor: 'rgba(249, 115, 22, 0.5)',
-      tooltipBg: '#431407',
-      tooltipText: '#FFEDD5',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     amber: {
       stroke: '#FBBF24',
       strokeSecondary: '#F59E0B',
       fillStart: 'rgba(245, 158, 11, 0.35)',
       fillEnd: 'rgba(245, 158, 11, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 5px rgba(245, 158, 11, 0.35))',
-      dotColor: '#FDE68A',
+            dotColor: '#FDE68A',
       pulseColor: 'rgba(245, 158, 11, 0.5)',
-      tooltipBg: '#451A03',
-      tooltipText: '#FEF3C7',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     rose: {
       stroke: '#FB7185',
       strokeSecondary: '#F43F5E',
       fillStart: 'rgba(244, 63, 94, 0.35)',
       fillEnd: 'rgba(244, 63, 94, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 6px rgba(244, 63, 94, 0.4))',
-      dotColor: '#FDA4AF',
+            dotColor: '#FDA4AF',
       pulseColor: 'rgba(244, 63, 94, 0.5)',
-      tooltipBg: '#4C0519',
-      tooltipText: '#FFE4E6',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     emerald: {
       stroke: '#34D399',
       strokeSecondary: '#10B981',
       fillStart: 'rgba(16, 185, 129, 0.35)',
       fillEnd: 'rgba(16, 185, 129, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 5px rgba(16, 185, 129, 0.35))',
-      dotColor: '#6EE7B7',
+            dotColor: '#6EE7B7',
       pulseColor: 'rgba(16, 185, 129, 0.5)',
-      tooltipBg: '#064E3B',
-      tooltipText: '#D1FAE5',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     blue: {
       stroke: '#60A5FA',
       strokeSecondary: '#3B82F6',
       fillStart: 'rgba(59, 130, 246, 0.35)',
       fillEnd: 'rgba(59, 130, 246, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 5px rgba(59, 130, 246, 0.35))',
-      dotColor: '#93C5FD',
+            dotColor: '#93C5FD',
       pulseColor: 'rgba(59, 130, 246, 0.5)',
-      tooltipBg: '#1E3A8A',
-      tooltipText: '#DBEAFE',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     indigo: {
       stroke: '#818CF8',
       strokeSecondary: '#4F46E5',
       fillStart: 'rgba(79, 70, 229, 0.35)',
       fillEnd: 'rgba(79, 70, 229, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 6px rgba(79, 70, 229, 0.4))',
-      dotColor: '#C7D2FE',
+            dotColor: '#C7D2FE',
       pulseColor: 'rgba(79, 70, 229, 0.5)',
-      tooltipBg: '#1E1B4B',
-      tooltipText: '#EEF2FF',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
     teal: {
       stroke: '#2DD4BF',
       strokeSecondary: '#0D9488',
       fillStart: 'rgba(13, 148, 136, 0.35)',
       fillEnd: 'rgba(13, 148, 136, 0.0)',
-      filterGlow: 'drop-shadow(0 2px 5px rgba(13, 148, 136, 0.35))',
-      dotColor: '#99F6E4',
+            dotColor: '#99F6E4',
       pulseColor: 'rgba(13, 148, 136, 0.5)',
-      tooltipBg: '#042F2E',
-      tooltipText: '#CCFBF1',
+      tooltipBg: '#16211E',
+      tooltipText: '#F1F5F4',
     },
   };
 
@@ -361,10 +351,10 @@ const SparkMetricCard = ({
   if (loading) {
     return (
       <div
-        className={`relative overflow-hidden rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
+        className={`relative overflow-hidden rounded-[14px] p-4 sm:p-5 flex flex-col justify-between h-full min-h-[142px] select-none ${
           isDark
-            ? 'bg-[#0B132B] dark:bg-[#0A1024] border border-slate-800/90'
-            : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
+            ? 'bg-[#16211E] dark:bg-[#16211E] border border-[#273834]'
+            : 'bg-white dark:bg-[#16211E] border border-[#E2E1DC] dark:border-[#273834] shadow-subtle'
         } ${className}`}
       >
         <div className="flex items-start justify-between gap-2">
@@ -385,16 +375,13 @@ const SparkMetricCard = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-300 select-none group ${
+      className={`relative overflow-hidden rounded-[14px] p-4 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] select-none group ${
         isDark
-          ? 'bg-[#0B132B] dark:bg-[#0A1024] text-white border border-slate-800/90 shadow-lg shadow-black/20 hover:border-sky-500/50 hover:shadow-sky-500/10'
-          : 'bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-xl hover:border-slate-200 dark:hover:border-slate-700'
-      } ${onClick ? 'cursor-pointer hover:-translate-y-1' : ''} ${className}`}
+          ? 'bg-[#16211E] dark:bg-[#16211E] text-[#F1F5F4] border border-[#273834] shadow-subtle hover:border-[#384E48] hover:shadow-elevated'
+          : 'bg-white dark:bg-[#16211E] text-[#1C2321] dark:text-[#F1F5F4] border border-[#E2E1DC] dark:border-[#273834] shadow-subtle hover:border-[#C7C5BB] dark:hover:border-[#384E48] hover:shadow-elevated'
+      } ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
-      {/* Background ambient glow for dark card */}
-      {isDark && (
-        <div className="absolute -right-8 -top-8 w-28 h-28 bg-sky-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-sky-500/25 transition-all" />
-      )}
+
 
       {/* Top Section: Title, Value & Dynamic Interactive Sparkline */}
       <div className="flex items-start justify-between gap-1.5">
@@ -415,7 +402,7 @@ const SparkMetricCard = ({
                 isLongValue
                   ? 'text-lg sm:text-xl xl:text-2xl'
                   : 'text-xl sm:text-2xl xl:text-3xl'
-              } font-black tracking-tight font-sans leading-tight transition-all duration-300 ${
+              } font-bold tracking-tight font-heading tabular-nums leading-tight transition-all duration-150 ${
                 isDark ? 'text-white' : 'text-slate-900 dark:text-white'
               }`}
             >
@@ -504,7 +491,7 @@ const SparkMetricCard = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="transition-all duration-500 ease-out pointer-events-none"
-                  style={{ filter: scheme.filterGlow }}
+                  
                 />
               ) : null}
 
@@ -611,7 +598,7 @@ const SparkMetricCard = ({
       <div className="mt-auto pt-3 flex items-center justify-between gap-1.5 border-t border-transparent">
         {resolvedBadgeText && (
           <span
-            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-tight shadow-2xs transition-colors shrink-0 ${
+            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[8px] text-xs font-semibold tracking-tight shadow-2xs transition-colors shrink-0 ${
               isDark
                 ? resolvedBadgeType === 'negative'
                   ? 'bg-rose-950/70 text-rose-400 border border-rose-800/50'

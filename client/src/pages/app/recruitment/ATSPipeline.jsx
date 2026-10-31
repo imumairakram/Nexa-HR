@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { TableSkeleton } from '../../../components/common/Skeleton';
@@ -52,6 +52,113 @@ const DEFAULT_APPLICATIONS = [];
 
 const DEFAULT_INTERVIEWS = [];
 
+
+// Memoized Candidate Card to eliminate unnecessary Kanban rerenders during drag-drop
+const CandidateCard = React.memo(({
+  c,
+  sIdx,
+  draggedCandidateId,
+  onDragStart,
+  onClick,
+  onMoveStage,
+  onOpenSchedule,
+}) => {
+  return (
+    <div
+      draggable
+      onDragStart={(e) => onDragStart(e, c.id)}
+      onClick={() => onClick(c)}
+      className={`group bg-white dark:bg-[#1E293B] rounded-2xl p-4 shadow-sm hover:shadow-md border border-slate-200/70 dark:border-slate-800 transition-all cursor-grab active:cursor-grabbing space-y-2.5 ${
+        draggedCandidateId === c.id ? 'opacity-40 scale-95 border-sky-500' : ''
+      }`}
+    >
+      {/* Card Header: Avatar / Code & Rating */}
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] font-bold text-slate-400">
+          {c.applicationId || c.id}
+        </span>
+        <div className="flex items-center gap-1.5">
+          {(c.source === 'GMAIL' || typeof c.aiScore === 'number') && (
+            <span
+              className={`px-2 py-0.5 rounded-[8px] text-[10px] font-bold tabular-nums flex items-center gap-1 ${
+                (c.aiScore || 0) >= 85
+                  ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
+                  : (c.aiScore || 0) >= 70
+                  ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
+                  : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
+              }`}
+              title={`AI Score: ${c.aiScore || 0}/100`}
+            >
+              <Sparkles className="w-2.5 h-2.5" />
+              <span>{c.aiScore || 0} AI</span>
+            </span>
+          )}
+          <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md">
+            <Star className="w-3 h-3 fill-amber-400 stroke-amber-400" />
+            <span>{c.rating}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Name & Role */}
+      <div>
+        <h5 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-tight">
+          {c.name}
+        </h5>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+          {c.role}
+        </p>
+      </div>
+
+      {/* Interview Badge if scheduled */}
+      {c.interview && (
+        <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-800/40 flex items-center gap-1.5 text-[10px] text-purple-700 dark:text-purple-300 font-bold">
+          <Video className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
+          <span className="truncate">{c.interview.date} • {c.interview.time}</span>
+        </div>
+      )}
+
+      {/* Experience and Location */}
+      <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+        <span>{c.experience}</span>
+        <span>{(c.location || '').split('/')[0].trim()}</span>
+      </div>
+
+      {/* Quick Stage Shifter Arrows */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex items-center justify-between pt-1"
+      >
+        <button
+          disabled={sIdx === 0}
+          onClick={() => onMoveStage(c.id, STAGES[sIdx - 1].key)}
+          className="p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+          title="Move Previous Stage"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          onClick={() => onOpenSchedule(c)}
+          className="text-[10px] font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+        >
+          <Calendar className="w-3 h-3" />
+          <span>Interview</span>
+        </button>
+
+        <button
+          disabled={sIdx === STAGES.length - 1}
+          onClick={() => onMoveStage(c.id, STAGES[sIdx + 1].key)}
+          className="p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+          title="Advance Stage"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+});
+
 const ATSPipeline = () => {
   const [candidates, setCandidates] = useState([]);
   const [interviews, setInterviews] = useState([]);
@@ -63,8 +170,23 @@ const ATSPipeline = () => {
   const [currentView, setCurrentView] = useState('kanban'); // 'kanban' | 'interviews' | 'table'
   const [toastMsg, setToastMsg] = useState('');
   const [screenedOutCandidates, setScreenedOutCandidates] = useState([]);
+  const [screenedOutCount, setScreenedOutCount] = useState(0);
   const [isScreenedOutOpen, setIsScreenedOutOpen] = useState(false);
   const [isSyncingGmail, setIsSyncingGmail] = useState(false);
+  const [showWakingUpNotice, setShowWakingUpNotice] = useState(false);
+
+  // Friendly waking-up notice after 3 seconds of waiting on cold start
+  useEffect(() => {
+    let timer = null;
+    if (loading) {
+      timer = setTimeout(() => {
+        setShowWakingUpNotice(true);
+      }, 3000);
+    } else {
+      setShowWakingUpNotice(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   // Drag and drop state
   const [draggedCandidateId, setDraggedCandidateId] = useState(null);
@@ -105,51 +227,75 @@ const ATSPipeline = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [appsRes, ivsRes, empRes, deptRes, screenedRes] = await Promise.allSettled([
-        api.getJobApplications(),
+      // 1. Fetch applications with high priority and immediately unblock Kanban UI
+      const appsPromise = api.getJobApplications().then((appsRes) => {
+        if (appsRes?.success && appsRes.data?.applications) {
+          setCandidates(appsRes.data.applications);
+        } else {
+          setCandidates([]);
+        }
+        setLoading(false); // Instantly display the Kanban as soon as applications arrive!
+      }).catch((err) => {
+        console.error('Failed to load applications:', err);
+        setCandidates([]);
+        setLoading(false);
+      });
+
+      // 2. Fetch interviews, employees, departments in parallel without holding back the Kanban
+      Promise.allSettled([
         api.getJobInterviews(),
         api.getEmployees(),
         api.getDepartments(),
-        api.getAiScreenedOutApplications(),
-      ]);
-
-      if (appsRes.status === 'fulfilled' && appsRes.value?.success && appsRes.value.data?.applications) {
-        setCandidates(appsRes.value.data.applications);
-      } else {
-        setCandidates([]);
-      }
-
-      if (screenedRes.status === 'fulfilled' && screenedRes.value?.success && screenedRes.value.data?.applications) {
-        setScreenedOutCandidates(screenedRes.value.data.applications);
-      } else {
-        setScreenedOutCandidates([]);
-      }
-
-      if (ivsRes.status === 'fulfilled' && ivsRes.value?.success && ivsRes.value.data?.interviews) {
-        setInterviews(ivsRes.value.data.interviews);
-      } else {
-        setInterviews([]);
-      }
-
-      if (empRes.status === 'fulfilled' && empRes.value?.success && empRes.value.data?.employees) {
-        const emps = empRes.value.data.employees;
-        setEmployees(emps);
-        if (emps.length > 0 && !interviewForm.interviewer) {
-          setInterviewForm((prev) => ({
-            ...prev,
-            interviewer: `${emps[0].firstName} ${emps[0].lastName}`,
-          }));
+      ]).then(([ivsRes, empRes, deptRes]) => {
+        if (ivsRes.status === 'fulfilled' && ivsRes.value?.success && ivsRes.value.data?.interviews) {
+          setInterviews(ivsRes.value.data.interviews);
         }
-      }
+        if (empRes.status === 'fulfilled' && empRes.value?.success && empRes.value.data?.employees) {
+          const emps = empRes.value.data.employees;
+          setEmployees(emps);
+          if (emps.length > 0 && !interviewForm.interviewer) {
+            setInterviewForm((prev) => ({
+              ...prev,
+              interviewer: `${emps[0].firstName} ${emps[0].lastName}`,
+            }));
+          }
+        }
+        if (deptRes.status === 'fulfilled' && deptRes.value?.data?.departments) {
+          setDepartments(deptRes.value.data.departments);
+        }
+      });
 
-      if (deptRes.status === 'fulfilled' && deptRes.value?.data?.departments) {
-        setDepartments(deptRes.value.data.departments);
-      }
+      await appsPromise;
     } catch (err) {
       console.error('Failed to load ATS Pipeline data:', err);
-    } finally {
       setLoading(false);
     }
+  };
+
+  // Open Candidate Detail Drawer lazily (instant UI response + background detail fill)
+  const handleOpenDetail = (candidate) => {
+    setSelectedCandidate(candidate);
+    setIsDetailDrawerOpen(true);
+    if (candidate && candidate.id && (!candidate.resumeSummary || !candidate.aiBreakdown)) {
+      api.getJobApplicationById(candidate.id).then((res) => {
+        if (res?.success && res.data?.application) {
+          const full = res.data.application;
+          setSelectedCandidate((prev) => (prev?.id === full.id ? { ...prev, ...full } : prev));
+          setCandidates((prev) => prev.map((c) => (c.id === full.id ? { ...c, ...full } : c)));
+        }
+      }).catch((err) => console.warn('Could not fetch candidate details:', err));
+    }
+  };
+
+  // Open Screened-Out Drawer lazily on demand
+  const handleOpenScreenedOut = () => {
+    setIsScreenedOutOpen(true);
+    api.getAiScreenedOutApplications().then((res) => {
+      if (res?.success && res.data?.applications) {
+        setScreenedOutCandidates(res.data.applications);
+        setScreenedOutCount(res.data.applications.length);
+      }
+    }).catch(console.error);
   };
 
   useEffect(() => {
@@ -354,20 +500,42 @@ const ATSPipeline = () => {
     }
   };
 
-  // Trigger manual Gmail ATS scan
+  // Trigger non-blocking manual Gmail ATS scan with status polling
   const handleSyncGmail = async () => {
     setIsSyncingGmail(true);
     try {
       const res = await api.syncAiScreeningGmail();
       if (res?.success) {
-        showToast(res.message || 'Gmail ATS sync completed!');
-        await loadData();
+        showToast('Gmail ATS sync initiated in background...');
+        let pollCount = 0;
+        const interval = setInterval(async () => {
+          pollCount++;
+          try {
+            const statusRes = await api.getAiScreeningStatus();
+            if (statusRes?.success && !statusRes.data?.isSyncing) {
+              clearInterval(interval);
+              setIsSyncingGmail(false);
+              showToast('Gmail ATS sync completed!');
+              // Re-fetch fresh applications
+              const freshRes = await api.getJobApplications({ fresh: 'true' });
+              if (freshRes?.success && freshRes.data?.applications) {
+                setCandidates(freshRes.data.applications);
+              }
+            } else if (pollCount > 24) {
+              clearInterval(interval);
+              setIsSyncingGmail(false);
+            }
+          } catch (e) {
+            clearInterval(interval);
+            setIsSyncingGmail(false);
+          }
+        }, 2500);
       } else {
         showToast(res?.message || 'Gmail credentials not configured yet');
+        setIsSyncingGmail(false);
       }
     } catch (err) {
       showToast(`Sync error: ${err.message || 'Failed to sync Gmail'}`);
-    } finally {
       setIsSyncingGmail(false);
     }
   };
@@ -564,12 +732,12 @@ const ATSPipeline = () => {
               <span>All Roster</span>
             </button>
             <button
-              onClick={() => setIsScreenedOutOpen(true)}
+              onClick={handleOpenScreenedOut}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 border-l border-slate-200 dark:border-slate-800 ml-1 pl-3"
               title="View low-score, unmatched, or error candidates stored for audit"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-              <span>AI Screened-Out ({screenedOutCandidates.length})</span>
+              <span>AI Screened-Out ({screenedOutCount || screenedOutCandidates.length})</span>
             </button>
           </div>
         </div>
@@ -579,7 +747,17 @@ const ATSPipeline = () => {
       {/* 3. MAIN ATS VIEWS */}
       {/* ========================================================================= */}
       {loading ? (
-        <TableSkeleton rows={6} cols={6} />
+        <div className="space-y-4">
+          {showWakingUpNotice && (
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-3 animate-pulse">
+              <RefreshCw className="w-4 h-4 animate-spin shrink-0 text-amber-600 dark:text-amber-400" />
+              <span>
+                <strong>Waking up the server...</strong> Connecting to cloud infrastructure, please hold on.
+              </span>
+            </div>
+          )}
+          <TableSkeleton rows={6} cols={6} />
+        </div>
       ) : (
         <>
           {/* VIEW 1: UNIFIED KANBAN BOARD WITH DRAG & DROP (Always on mobile if table selected) */}
@@ -618,102 +796,16 @@ const ATSPipeline = () => {
                     <div className="space-y-3 flex-1 overflow-y-auto pr-0.5">
                       {stageCandidates.length > 0 ? (
                         stageCandidates.map((c) => (
-                          <div
+                          <CandidateCard
                             key={c.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, c.id)}
-                            onClick={() => {
-                              setSelectedCandidate(c);
-                              setIsDetailDrawerOpen(true);
-                            }}
-                            className={`group bg-white dark:bg-[#1E293B] rounded-2xl p-4 shadow-sm hover:shadow-md border border-slate-200/70 dark:border-slate-800 transition-all cursor-grab active:cursor-grabbing space-y-2.5 ${
-                              draggedCandidateId === c.id ? 'opacity-40 scale-95 border-sky-500' : ''
-                            }`}
-                          >
-                            {/* Card Header: Avatar / Code & Rating */}
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono text-[10px] font-bold text-slate-400">
-                                {c.applicationId || c.id}
-                              </span>
-                              <div className="flex items-center gap-1.5">
-                                {(c.source === 'GMAIL' || typeof c.aiScore === 'number') && (
-                                  <span
-                                    className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 ${
-                                      (c.aiScore || 0) >= 85
-                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                                        : (c.aiScore || 0) >= 70
-                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
-                                        : 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
-                                    }`}
-                                    title={`AI Score: ${c.aiScore || 0}/100`}
-                                  >
-                                    <Sparkles className="w-2.5 h-2.5" />
-                                    <span>{c.aiScore || 0} AI</span>
-                                  </span>
-                                )}
-                                <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md">
-                                  <Star className="w-3 h-3 fill-amber-400 stroke-amber-400" />
-                                  <span>{c.rating}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Name & Role */}
-                            <div>
-                              <h5 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-tight">
-                                {c.name}
-                              </h5>
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                                {c.role}
-                              </p>
-                            </div>
-
-                            {/* Interview Badge if scheduled */}
-                            {c.interview && (
-                              <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-800/40 flex items-center gap-1.5 text-[10px] text-purple-700 dark:text-purple-300 font-bold">
-                                <Video className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
-                                <span className="truncate">{c.interview.date} • {c.interview.time}</span>
-                              </div>
-                            )}
-
-                            {/* Experience and Location */}
-                            <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                              <span>{c.experience}</span>
-                              <span>{c.location.split('/')[0].trim()}</span>
-                            </div>
-
-                            {/* Quick Stage Shifter Arrows */}
-                            <div
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center justify-between pt-1"
-                            >
-                              <button
-                                disabled={sIdx === 0}
-                                onClick={() => moveCandidateStage(c.id, STAGES[sIdx - 1].key)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-                                title="Move Previous Stage"
-                              >
-                                <ChevronLeft className="w-3.5 h-3.5" />
-                              </button>
-
-                              <button
-                                onClick={() => handleOpenSchedule(c)}
-                                className="text-[10px] font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
-                              >
-                                <Calendar className="w-3 h-3" />
-                                <span>Interview</span>
-                              </button>
-
-                              <button
-                                disabled={sIdx === STAGES.length - 1}
-                                onClick={() => moveCandidateStage(c.id, STAGES[sIdx + 1].key)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-                                title="Advance Stage"
-                              >
-                                <ChevronRight className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
+                            c={c}
+                            sIdx={sIdx}
+                            draggedCandidateId={draggedCandidateId}
+                            onDragStart={handleDragStart}
+                            onClick={handleOpenDetail}
+                            onMoveStage={moveCandidateStage}
+                            onOpenSchedule={handleOpenSchedule}
+                          />
                         ))
                       ) : (
                         <div className="py-10 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-400">
@@ -911,12 +1003,12 @@ const ATSPipeline = () => {
                                 </span>
                                 {(c.source === 'GMAIL' || typeof c.aiScore === 'number') && (
                                   <span
-                                    className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 ${
+                                    className={`px-2 py-0.5 rounded-[8px] text-[10px] font-bold tabular-nums flex items-center gap-1 ${
                                       (c.aiScore || 0) >= 85
-                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300'
-                                        : (c.aiScore || 0) >= 70
-                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300'
-                                        : 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300'
+    ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
+    : (c.aiScore || 0) >= 70
+    ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
+    : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
                                     }`}
                                     title={`AI Screening Score: ${c.aiScore || 0}/100`}
                                   >
@@ -1128,12 +1220,12 @@ const ATSPipeline = () => {
                         </div>
                         {typeof selectedCandidate.aiScore === 'number' && (
                           <span
-                            className={`px-2.5 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1 ${
+                            className={`px-2.5 py-1 rounded-[8px] text-xs font-bold tabular-nums flex items-center gap-1 ${
                               selectedCandidate.aiScore >= 85
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
-                                : selectedCandidate.aiScore >= 70
-                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300'
-                                : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
+    ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
+    : selectedCandidate.aiScore >= 70
+    ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
+    : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
                             }`}
                           >
                             Score: {selectedCandidate.aiScore}/100
@@ -1300,11 +1392,13 @@ const ATSPipeline = () => {
                             </p>
                           </div>
                           <span
-                            className={`px-2.5 py-1 rounded-xl text-xs font-extrabold ${
+                            className={`px-2.5 py-1 rounded-[8px] text-xs font-bold tabular-nums ${
                               app.aiScore !== null && app.aiScore !== undefined
-                                ? app.aiScore >= 70
-                                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300'
-                                  : 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300'
+                                ? app.aiScore >= 85
+    ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
+    : app.aiScore >= 70
+    ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
+    : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
                                 : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                             }`}
                           >
@@ -1549,7 +1643,7 @@ const ATSPipeline = () => {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Sarah Jenkins"
+                      placeholder="e.g. John"
                       value={newCandidateForm.name}
                       onChange={(e) => setNewCandidateForm({ ...newCandidateForm, name: e.target.value })}
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
