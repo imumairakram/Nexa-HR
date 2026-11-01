@@ -29,20 +29,6 @@ const getCookieOptions = () => {
 };
 
 /**
- * Hardcoded Root System Administrator Credentials
- * Allows System Administrator to log in through the HR Admin portal
- */
-const HARDCODED_SYSTEM_ADMIN = {
-  email: 'admin@nexahr.com',
-  password: 'AdminPassword123!',
-  employeeCode: 'EMP-ADMIN-001',
-  firstName: 'System',
-  lastName: 'Administrator',
-  phone: '+1 (555) 010-0001',
-  role: 'ADMIN',
-};
-
-/**
  * Register System Administrator
  * POST /api/auth/register-admin
  */
@@ -143,84 +129,6 @@ const login = async (req, res) => {
     const cleanEmail = email.toLowerCase().trim();
     const requestedRole = (portalRole || role || loginRole || '').toString().toLowerCase().trim();
 
-    // Check for hardcoded System Administrator credentials
-    if (cleanEmail === HARDCODED_SYSTEM_ADMIN.email.toLowerCase()) {
-      let isPasswordMatch = password === HARDCODED_SYSTEM_ADMIN.password;
-
-      let user = await prisma.user.findUnique({
-        where: { email: cleanEmail },
-      });
-
-      if (!isPasswordMatch && user) {
-        isPasswordMatch = await comparePassword(password, user.password);
-      }
-
-      if (!isPasswordMatch) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid credentials.',
-        });
-      }
-
-      // Enforce portal role restriction for Administrator accounts
-      if (requestedRole && ['employee', 'staff', 'user'].includes(requestedRole)) {
-        return res.status(403).json({
-          success: false,
-          message: 'Access denied: Administrator accounts cannot sign in through the Employee portal. Please switch to the HR Admin tab.',
-        });
-      }
-
-      // Ensure user and profile exist in database for seamless relational queries
-      if (!user) {
-        const hashedPassword = await hashPassword(HARDCODED_SYSTEM_ADMIN.password);
-        user = await prisma.user.create({
-          data: {
-            employeeCode: HARDCODED_SYSTEM_ADMIN.employeeCode,
-            email: HARDCODED_SYSTEM_ADMIN.email,
-            password: hashedPassword,
-            firstName: HARDCODED_SYSTEM_ADMIN.firstName,
-            lastName: HARDCODED_SYSTEM_ADMIN.lastName,
-            phone: HARDCODED_SYSTEM_ADMIN.phone,
-            role: 'ADMIN',
-            isActive: true,
-            mustChangePassword: false,
-          },
-        });
-      } else if (!user.isActive) {
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { isActive: true },
-        });
-      }
-
-      // Generate hardened 24-hour JWT with role ADMIN
-      const token = generateToken({
-        userId: user.id,
-        role: 'ADMIN',
-      });
-
-      // Attach HttpOnly, Secure, SameSite Cookie
-      res.cookie('token', token, getCookieOptions());
-
-      return res.status(200).json({
-        success: true,
-        message: 'Login successful.',
-        data: {
-          token,
-          expiresIn: 3600, // Strict 1-hour validity window (seconds)
-          user: {
-            id: user.id,
-            employeeCode: user.employeeCode,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: 'ADMIN',
-            mustChangePassword: false,
-          },
-        },
-      });
-    }
-
     // Standard database authentication flow for HR managers & Staff Employees
     const user = await prisma.user.findUnique({
       where: { email: cleanEmail },
@@ -276,7 +184,7 @@ const login = async (req, res) => {
     // Attach HttpOnly, Secure, SameSite Cookie
     res.cookie('token', token, getCookieOptions());
 
-    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
+    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com'].includes(user.email?.toLowerCase());
 
     return res.status(200).json({
       success: true,
@@ -733,8 +641,8 @@ const verifyResetOtp = async (req, res) => {
         email: user.email,
         purpose: 'PASSWORD_RESET',
       },
-      process.env.JWT_SECRET || 'nexahr_saas_super_secret_jwt_key_2026',
-      { expiresIn: '15m' }
+      process.env.JWT_SECRET,
+      { expiresIn: '15m', algorithm: 'HS256' }
     );
 
     return res.status(200).json({
@@ -794,7 +702,7 @@ const resetPassword = async (req, res) => {
 
     // 1. Try verifying as JWT Reset Token
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'nexahr_saas_super_secret_jwt_key_2026');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
       if (decoded && decoded.purpose === 'PASSWORD_RESET' && decoded.userId) {
         targetUserId = decoded.userId;
       }
@@ -866,7 +774,7 @@ const resetPassword = async (req, res) => {
       }),
     ]);
 
-    console.log(`[PASSWORD RESET SUCCESS] User ${user.email} (${user.role}) reset password.`);
+    console.log(`[PASSWORD RESET SUCCESS] User ${maskEmail(user.email)} (${user.role}) reset password.`);
 
     return res.status(200).json({
       success: true,
@@ -1094,7 +1002,7 @@ const changeMyPassword = async (req, res) => {
       });
     }
 
-    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(user.email?.toLowerCase());
+    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com'].includes(user.email?.toLowerCase());
     if (isDemoEmail) {
       return res.status(403).json({
         success: false,

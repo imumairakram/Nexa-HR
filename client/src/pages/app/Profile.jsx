@@ -158,7 +158,7 @@ const Profile = () => {
   };
 
   const populateUserData = (u) => {
-    const isAdmin = u.role === 'ADMIN' || u.email === 'admin@nexahr.com';
+    const isAdmin = u.role === 'ADMIN';
     const isHR = u.role === 'HR_MANAGER' || u.role === 'HR' || u.email === 'hr@nexahr.com';
 
     const residentialAddress = u.profile?.address || u.address || '';
@@ -452,7 +452,6 @@ const Profile = () => {
   const isGuest =
     formData.email?.toLowerCase() === 'hr@nexahr.com' ||
     formData.email?.toLowerCase() === 'umaaiirakram@gmail.com' ||
-    formData.email?.toLowerCase() === 'admin@nexahr.com' ||
     localStorage.getItem('isGuest') === 'true';
 
   const handlePasswordSubmit = async (e) => {

@@ -698,14 +698,7 @@ async function sendDocumentIssuedEmail({
  * Send Ephemeral Password Reset Link via Corporate Email
  */
 async function sendPasswordResetEmail({ email, name, resetUrl, expiresInHours = 1 }) {
-  console.log(`\n========================================================`);
-  console.log(`[NexaHR EMAIL DISPATCH: PASSWORD RESET LINK] -> ${email}`);
-  console.log(`Recipient: ${name}`);
-  console.log(`Subject: [NexaHR Security] Ephemeral Password Reset Request`);
-  console.log(`Reset URL: ${resetUrl}`);
-  console.log(`Valid for: ${expiresInHours} hour(s) (Single Use Only)`);
-  console.log(`Security Notice: Stored as SHA-256 cryptographic digest.`);
-  console.log(`========================================================\n`);
+  console.log(`[NexaHR NOTIFICATION] Password reset link event dispatched to ${maskEmail(email)}.`);
 
   const transporter = getMailTransporter();
   if (transporter) {
@@ -849,13 +842,7 @@ function buildOtpEmailHtml({ name, otp, expiryMinutes = 10 }) {
  */
 async function sendEmailOTP(email, otp, name = 'Team Member', expiryMinutes = 10) {
   const timestamp = new Date().toISOString();
-  console.log(`\n========================================================`);
-  console.log(`[NexaHR EMAIL DISPATCH: 6-DIGIT OTP] -> ${email}`);
-  console.log(`Recipient: ${name}`);
-  console.log(`OTP Verification Code: [ ${otp} ]`);
-  console.log(`Valid for: ${expiryMinutes} minutes`);
-  console.log(`Timestamp: ${timestamp}`);
-  console.log(`========================================================\n`);
+  console.log(`[NexaHR NOTIFICATION] 6-digit OTP verification code event dispatched to ${maskEmail(email)}.`);
 
   const transporter = getMailTransporter();
   let messageId = null;
@@ -876,13 +863,13 @@ async function sendEmailOTP(email, otp, name = 'Team Member', expiryMinutes = 10
       });
 
       messageId = info.messageId;
-      console.log(`[EMAIL SUCCESS] OTP email dispatched via SMTP to ${email}. MessageId: ${messageId}`);
+      console.log(`[EMAIL SUCCESS] OTP email dispatched via SMTP to ${maskEmail(email)}. MessageId: ${messageId}`);
     } catch (err) {
-      console.error(`[EMAIL ERROR] Failed to send email via SMTP to ${email}:`, err.message);
+      console.error(`[EMAIL ERROR] Failed to send email via SMTP to ${maskEmail(email)}:`, err.message);
       // Fallback logging ensures uninterrupted flow in test/dev
     }
   } else {
-    console.log(`[EMAIL INFO] SMTP not configured. (Set SMTP_HOST, SMTP_USER, SMTP_PASS in .env for live dispatch). Simulating successful dispatch.`);
+    console.log(`[EMAIL INFO] SMTP not configured. Simulating successful dispatch.`);
   }
 
   return {
@@ -911,13 +898,7 @@ async function sendWhatsAppOTP(phone, otp, name = 'Team Member', expiryMinutes =
   const timestamp = new Date().toISOString();
   const messageText = `*NexaHR Enterprise Security*\n\nHello *${name}*,\n\nYour NexaHR verification code is: *${otp}*\n\nThis code expires in *${expiryMinutes} minutes*.\n\n*Security Notice*: If you did not initiate this recovery, please notify your HR Administrator immediately.\n\n_NexaHR Workforce Systems_`;
 
-  console.log(`\n========================================================`);
-  console.log(`[NexaHR WHATSAPP DISPATCH: 6-DIGIT OTP] -> ${formattedPhone}`);
-  console.log(`Recipient: ${name}`);
-  console.log(`OTP Code: [ ${otp} ]`);
-  console.log(`Formatted E.164 Phone: ${formattedPhone}`);
-  console.log(`WhatsApp Content:\n${messageText}`);
-  console.log(`========================================================\n`);
+  console.log(`[NexaHR NOTIFICATION] WhatsApp OTP verification code event dispatched to ${maskPhone(formattedPhone)}.`);
 
   let messageId = null;
   let provider = 'SIMULATED';

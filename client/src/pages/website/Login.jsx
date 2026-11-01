@@ -187,7 +187,7 @@ const Login = () => {
           return;
         }
 
-        const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com', 'admin@nexahr.com'].includes(formData.email.trim().toLowerCase());
+        const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com'].includes(formData.email.trim().toLowerCase());
         if (isDemoEmail) {
           localStorage.setItem('isGuest', 'true');
         } else {

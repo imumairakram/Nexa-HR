@@ -354,17 +354,15 @@ NexaHR utilizes multi-tier optimizations to deliver sub-10ms response times and 
 
 ---
 
-## 🔑 Live Demo Credentials
+## 🔑 Initial System Administrator Provisioning
 
-NexaHR includes pre-configured demo user accounts for rapid testing and role verification:
+NexaHR enforces strict credential security and does not ship with default or hardcoded credentials. To initialize a system administrator account, execute the secure CLI provisioner:
 
-| Portal Environment | Role Identifier | Email Address | Password | Default Path |
-| :--- | :--- | :--- | :--- | :--- |
-| **System Administrator** | `ADMIN` | `admin@company.com` | `admin123` | [`/app/dashboard`](http://localhost:5173/app/dashboard) |
-| **HR Lead Manager** | `HR_MANAGER` | `hr@company.com` | `hr123` | [`/app/dashboard`](http://localhost:5173/app/dashboard) |
-| **Employee Self-Service** | `EMPLOYEE` | `employee@company.com` | `employee123` | [`/employee/dashboard`](http://localhost:5173/employee/dashboard) |
+```bash
+ADMIN_EMAIL="admin@yourdomain.com" ADMIN_INITIAL_PASSWORD="YourStrongPassword123!" node scripts/create-admin.js
+```
 
-> 💡 **Role Switcher**: Switch effortlessly between Administrative and Employee portals at any time via the sidebar navigation or profile avatar menu.
+> 💡 **Role Switcher**: Once authenticated, users can switch between Administrative and Employee portals according to their role via the navigation or profile avatar menu.
 
 ---
 

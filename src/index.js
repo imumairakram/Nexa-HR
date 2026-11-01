@@ -34,6 +34,9 @@ const { processEmailBatch } = require('./services/atsPipeline.service');
 const cacheService = require('./services/cache.service');
 
 const app = express();
+
+// Trust reverse proxy (Render / Vercel / Cloudflare) to ensure accurate client IP resolution and secure cookie handling
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 
 // =========================================================================
