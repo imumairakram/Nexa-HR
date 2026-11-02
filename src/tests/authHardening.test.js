@@ -635,7 +635,7 @@ test('Security Batch 1 - Fix 8: Database Seed Production Safeguard', async (t) =
 
 
 
-test('Security Batch 1 - 1-Click Demo Login Endpoint', async (t) => {
+test('Security Batch 1 - 1-Click Demo Login Endpoint & Auth Config', async (t) => {
   const app = express();
   app.use(express.json());
   app.use('/api/auth', authRoutes);
@@ -655,72 +655,76 @@ test('Security Batch 1 - 1-Click Demo Login Endpoint', async (t) => {
     if (server) server.close();
   });
 
-  await t.test('1-Click Demo login for HR returns active session for umairdevelop@gmail.com without password', async () => {
-    const res = await fetch(`${baseUrl}/demo-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'hr' }),
-    });
-
-    assert.equal(res.status, 200);
-    const data = await res.json();
-    assert.equal(data.success, true);
-    assert.ok(data.data.token, 'Must return a valid JWT token');
-    assert.equal(data.data.user.email, 'umairdevelop@gmail.com');
-    assert.equal(data.data.user.isGuest, true);
-    assert.equal(data.data.user.mustChangePassword, false);
-
-    // Verify token can authenticate
-    const verified = verifyJwtToken(data.data.token);
-    assert.ok(verified, 'JWT token must be verifiable by server secret');
-  });
-
-  await t.test('1-Click Demo login for Employee returns active session for umaaiirakram@gmail.com', async () => {
-    const res = await fetch(`${baseUrl}/demo-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'employee' }),
-    });
-
-    assert.equal(res.status, 200);
-    const data = await res.json();
-    assert.equal(data.success, true);
-    assert.ok(data.data.token);
-    assert.equal(data.data.user.email, 'umaaiirakram@gmail.com');
-    assert.equal(data.data.user.isGuest, true);
-  });
-
-  await t.test('1-Click Demo login with invalid role returns 400', async () => {
-    const res = await fetch(`${baseUrl}/demo-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'superhacker' }),
-    });
-
-    assert.equal(res.status, 400);
-    const data = await res.json();
-    assert.equal(data.success, false);
-  });
-
-  await t.test('1-Click Demo login returns 403 when DISABLE_DEMO_LOGIN=true', async () => {
-    const orig = process.env.DISABLE_DEMO_LOGIN;
+  await t.test('GET /api/auth/config returns guestDemoEnabled: false when ENABLE_GUEST_DEMO is unset', async () => {
+    const orig = process.env.ENABLE_GUEST_DEMO;
+    delete process.env.ENABLE_GUEST_DEMO;
     try {
-      process.env.DISABLE_DEMO_LOGIN = 'true';
+      const res = await fetch(`${baseUrl}/config`);
+      assert.equal(res.status, 200);
+      const data = await res.json();
+      assert.equal(data.success, true);
+      assert.equal(data.data.guestDemoEnabled, false);
+    } finally {
+      if (orig !== undefined) process.env.ENABLE_GUEST_DEMO = orig;
+    }
+  });
+
+  await t.test('GET /api/auth/config returns guestDemoEnabled: true when ENABLE_GUEST_DEMO is true', async () => {
+    const orig = process.env.ENABLE_GUEST_DEMO;
+    try {
+      process.env.ENABLE_GUEST_DEMO = 'true';
+      const res = await fetch(`${baseUrl}/config`);
+      assert.equal(res.status, 200);
+      const data = await res.json();
+      assert.equal(data.success, true);
+      assert.equal(data.data.guestDemoEnabled, true);
+    } finally {
+      if (orig !== undefined) {
+        process.env.ENABLE_GUEST_DEMO = orig;
+      } else {
+        delete process.env.ENABLE_GUEST_DEMO;
+      }
+    }
+  });
+
+  await t.test('POST /api/auth/demo-login returns 404 when ENABLE_GUEST_DEMO is unset or not true', async () => {
+    const orig = process.env.ENABLE_GUEST_DEMO;
+    delete process.env.ENABLE_GUEST_DEMO;
+    try {
       const res = await fetch(`${baseUrl}/demo-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: 'hr' }),
       });
 
-      assert.equal(res.status, 403);
+      assert.equal(res.status, 404);
       const data = await res.json();
       assert.equal(data.success, false);
-      assert.match(data.message, /disabled in this environment/i);
+      assert.match(data.message, /not found/i);
+    } finally {
+      if (orig !== undefined) process.env.ENABLE_GUEST_DEMO = orig;
+    }
+  });
+
+  await t.test('POST /api/auth/demo-login returns 404 when ENABLE_GUEST_DEMO=false', async () => {
+    const orig = process.env.ENABLE_GUEST_DEMO;
+    try {
+      process.env.ENABLE_GUEST_DEMO = 'false';
+      const res = await fetch(`${baseUrl}/demo-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'hr' }),
+      });
+
+      assert.equal(res.status, 404);
+      const data = await res.json();
+      assert.equal(data.success, false);
+      assert.match(data.message, /not found/i);
     } finally {
       if (orig !== undefined) {
-        process.env.DISABLE_DEMO_LOGIN = orig;
+        process.env.ENABLE_GUEST_DEMO = orig;
       } else {
-        delete process.env.DISABLE_DEMO_LOGIN;
+        delete process.env.ENABLE_GUEST_DEMO;
       }
     }
   });

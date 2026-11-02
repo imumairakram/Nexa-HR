@@ -176,6 +176,9 @@ async function fetchAPI(endpoint, options = {}) {
 
 export const api = {
   // --- Auth & User Profile ---
+  getAuthConfig: async () => {
+    return await fetchAPI('/auth/config');
+  },
   demoLogin: async ({ role = 'hr' } = {}) => {
     let res;
     try {

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {
+  getAuthConfig,
   registerAdmin,
   login,
   demoLogin,
@@ -30,6 +31,7 @@ const {
 // ====================================================
 // CORE AUTHENTICATION ROUTES
 // ====================================================
+router.get('/config', getAuthConfig);
 router.post('/register-admin', registerAdmin);
 router.post('/login', authRateLimiter, loginValidationRules, login);
 router.post('/demo-login', authRateLimiter, demoLogin);

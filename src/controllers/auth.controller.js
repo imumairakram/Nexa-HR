@@ -199,16 +199,30 @@ const login = async (req, res) => {
 };
 
 /**
+ * Public Authentication Configuration Endpoint
+ * GET /api/auth/config
+ */
+const getAuthConfig = (req, res) => {
+  return res.status(200).json({
+    success: true,
+    data: {
+      guestDemoEnabled: process.env.ENABLE_GUEST_DEMO === 'true',
+    },
+  });
+};
+
+/**
  * 1-Click Demo / Guest Session Initialization
  * POST /api/auth/demo-login
- * Dispatches demo JWT session for HR Admin (umairdevelop@gmail.com) or Employee (umaaiirakram@gmail.com)
+ * Returns 404 unless ENABLE_GUEST_DEMO === 'true'.
+ * NEVER queries or issues tokens for real accounts.
  */
 const demoLogin = async (req, res) => {
   try {
-    if (process.env.DISABLE_DEMO_LOGIN === 'true') {
-      return res.status(403).json({
+    if (process.env.ENABLE_GUEST_DEMO !== 'true') {
+      return res.status(404).json({
         success: false,
-        message: '1-Click Demo login is disabled in this environment.',
+        message: 'Route not found.',
       });
     }
 
@@ -217,9 +231,9 @@ const demoLogin = async (req, res) => {
 
     let targetEmail;
     if (['hr', 'admin', 'hr_manager', 'hr_admin'].includes(requestedRole)) {
-      targetEmail = 'umairdevelop@gmail.com';
+      targetEmail = 'guest-hr@demo.invalid';
     } else if (['employee', 'staff', 'user'].includes(requestedRole)) {
-      targetEmail = 'umaaiirakram@gmail.com';
+      targetEmail = 'guest-employee@demo.invalid';
     } else {
       return res.status(400).json({
         success: false,
@@ -241,10 +255,11 @@ const demoLogin = async (req, res) => {
       });
     }
 
-    // Generate hardened 1-hour JWT token
+    // Generate hardened 1-hour JWT token with isDemo flag
     const token = generateToken({
       userId: user.id,
       role: user.role,
+      isDemo: true,
     });
 
     return res.status(200).json({
@@ -262,6 +277,7 @@ const demoLogin = async (req, res) => {
           role: user.role,
           mustChangePassword: false,
           isGuest: true,
+          isDemo: true,
         },
       },
     });
@@ -1149,6 +1165,7 @@ const changeMyPassword = async (req, res) => {
 };
 
 module.exports = {
+  getAuthConfig,
   registerAdmin,
   login,
   demoLogin,

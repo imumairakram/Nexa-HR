@@ -449,18 +449,10 @@ const Profile = () => {
     }
   };
 
-  const isGuest =
-    formData.email?.toLowerCase() === 'umairdevelop@gmail.com' ||
-    formData.email?.toLowerCase() === 'umaaiirakram@gmail.com' ||
-    localStorage.getItem('isGuest') === 'true';
+  const isGuest = false;
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-
-    if (isGuest) {
-      showToast('Password cannot be changed for Guest / Demo accounts.');
-      return;
-    }
 
     if (!passwords.current) {
       showToast('Please enter your current password.');
@@ -809,18 +801,6 @@ const Profile = () => {
               </span>
             </div>
 
-            {isGuest && (
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-amber-700 dark:text-amber-300">
-                <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
-                <div>
-                  <h4 className="font-bold text-xs">Guest Demo Protection Active</h4>
-                  <p className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
-                    Modifying passwords and credentials is restricted in Guest / Demo mode to ensure uninterrupted demo access for all users.
-                  </p>
-                </div>
-              </div>
-            )}
-
             <form onSubmit={handlePasswordSubmit} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -828,15 +808,10 @@ const Profile = () => {
                   <input
                     type="password"
                     required
-                    disabled={isGuest}
-                    placeholder={isGuest ? 'Disabled for Demo' : '••••••••'}
+                    placeholder="••••••••"
                     value={passwords.current}
                     onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                    className={`w-full px-4 py-2.5 rounded-2xl border font-medium outline-none transition-all ${
-                      isGuest
-                        ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500'
-                    }`}
+                    className="w-full px-4 py-2.5 rounded-2xl border font-medium outline-none transition-all bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
                   />
                 </div>
 
@@ -845,15 +820,10 @@ const Profile = () => {
                   <input
                     type="password"
                     required
-                    disabled={isGuest}
-                    placeholder={isGuest ? 'Disabled for Demo' : 'Min 6 characters'}
+                    placeholder="Min 6 characters"
                     value={passwords.newPass}
                     onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
-                    className={`w-full px-4 py-2.5 rounded-2xl border font-medium outline-none transition-all ${
-                      isGuest
-                        ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500'
-                    }`}
+                    className="w-full px-4 py-2.5 rounded-2xl border font-medium outline-none transition-all bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
                   />
                 </div>
 
@@ -862,15 +832,10 @@ const Profile = () => {
                   <input
                     type="password"
                     required
-                    disabled={isGuest}
-                    placeholder={isGuest ? 'Disabled for Demo' : 'Repeat new password'}
+                    placeholder="Repeat new password"
                     value={passwords.confirmPass}
                     onChange={(e) => setPasswords({ ...passwords, confirmPass: e.target.value })}
-                    className={`w-full px-4 py-2.5 rounded-2xl border font-medium outline-none transition-all ${
-                      isGuest
-                        ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500'
-                    }`}
+                    className="w-full px-4 py-2.5 rounded-2xl border font-medium outline-none transition-all bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
                   />
                 </div>
               </div>
@@ -879,15 +844,11 @@ const Profile = () => {
                 <span className="text-[11px] text-slate-400">Requires minimum 6 characters with mixed symbols</span>
                 <button
                   type="submit"
-                  disabled={isSavingPassword || isGuest}
-                  className={`px-6 py-2.5 rounded-2xl font-bold transition-all shadow-md flex items-center gap-2 ${
-                    isGuest
-                      ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none'
-                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-rose-600 dark:hover:bg-rose-500 text-white cursor-pointer hover:scale-105 disabled:opacity-50'
-                  }`}
+                  disabled={isSavingPassword}
+                  className="px-6 py-2.5 rounded-2xl font-bold transition-all shadow-md flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-rose-600 dark:hover:bg-rose-500 text-white cursor-pointer hover:scale-105 disabled:opacity-50"
                 >
                   {isSavingPassword ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Key className="w-3.5 h-3.5" />}
-                  <span>{isGuest ? 'Password Locked for Demo' : 'Update Password'}</span>
+                  <span>Update Password</span>
                 </button>
               </div>
             </form>
