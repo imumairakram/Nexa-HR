@@ -152,6 +152,13 @@ app.use('/api', cacheService.mutationInvalidator());
 // 4. CORE API ROUTES
 // =========================================================================
 app.use('/api/auth', authRoutes);
+
+// Direct aliases for 1-Click Demo & Guest login
+const { demoLogin } = require('./controllers/auth.controller');
+const { authRateLimiter } = require('./middlewares/rateLimiter.middleware');
+app.post('/api/demo-login', authRateLimiter, demoLogin);
+app.post('/api/guest-login', authRateLimiter, demoLogin);
+
 app.use('/api/departments', departmentRoutes);
 app.use('/api/designations', designationRoutes);
 app.use('/api/employees', employeeRoutes);

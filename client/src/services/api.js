@@ -177,11 +177,23 @@ async function fetchAPI(endpoint, options = {}) {
 export const api = {
   // --- Auth & User Profile ---
   demoLogin: async ({ role = 'hr' } = {}) => {
-    const res = await fetchAPI('/auth/demo-login', {
-      method: 'POST',
-      body: JSON.stringify({ role }),
-    });
-    if (res.data?.token) {
+    let res;
+    try {
+      res = await fetchAPI('/auth/demo-login', {
+        method: 'POST',
+        body: JSON.stringify({ role }),
+      });
+    } catch (err) {
+      if (err.message && (err.message.includes('Route not found') || err.message.includes('404'))) {
+        res = await fetchAPI('/demo-login', {
+          method: 'POST',
+          body: JSON.stringify({ role }),
+        });
+      } else {
+        throw err;
+      }
+    }
+    if (res?.data?.token) {
       startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
     }
     return res;
