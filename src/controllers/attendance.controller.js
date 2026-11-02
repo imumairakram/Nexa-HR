@@ -1,17 +1,191 @@
+const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
 
 /**
+ * Constant-time string comparison preventing timing side-channel attacks
+ */
+function safeCompareKeys(provided, expected) {
+  if (typeof provided !== 'string' || typeof expected !== 'string') return false;
+  const providedBuf = Buffer.from(provided);
+  const expectedBuf = Buffer.from(expected);
+  if (providedBuf.length !== expectedBuf.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(providedBuf, expectedBuf);
+}
+
+/**
+ * Shared Attendance Punch Processing Logic
+ */
+async function processAttendancePunch({ employeeCode, timestamp, type, sourceNote, res }) {
+  if (!employeeCode || !timestamp || !type) {
+    return res.status(400).json({
+      success: false,
+      message: 'Required fields missing: employeeCode, timestamp, and type ("IN" | "OUT").',
+    });
+  }
+
+  const eventType = type.toUpperCase().trim();
+  if (!['IN', 'OUT'].includes(eventType)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid event type. Must be "IN" or "OUT".',
+    });
+  }
+
+  const eventTime = new Date(timestamp);
+  if (isNaN(eventTime.getTime())) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid timestamp format. Must be a valid ISO-8601 string.',
+    });
+  }
+
+  // Find employee by employeeCode
+  const user = await prisma.user.findUnique({
+    where: { employeeCode: employeeCode.trim() },
+  });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: `Employee with code '${employeeCode}' not found in system.`,
+    });
+  }
+
+  if (!user.isActive) {
+    return res.status(403).json({
+      success: false,
+      message: `Employee '${user.firstName} ${user.lastName}' is inactive. Attendance rejected.`,
+    });
+  }
+
+  const todayDate = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
+  let attendance = null;
+
+  if (eventType === 'IN') {
+    let currentHour = eventTime.getHours();
+    let currentMinute = eventTime.getMinutes();
+
+    try {
+      const timeFormatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Karachi',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false,
+      });
+      const parts = timeFormatter.formatToParts(eventTime);
+      const parsedHour = parseInt(parts.find((p) => p.type === 'hour')?.value, 10);
+      const parsedMin = parseInt(parts.find((p) => p.type === 'minute')?.value, 10);
+      if (!isNaN(parsedHour) && !isNaN(parsedMin)) {
+        currentHour = parsedHour;
+        currentMinute = parsedMin;
+      }
+    } catch (e) {
+      // Fallback to server local time
+    }
+
+    let status = 'PRESENT';
+    if (currentHour > 9 || (currentHour === 9 && currentMinute > 15)) {
+      status = 'LATE';
+    }
+
+    attendance = await prisma.attendance.upsert({
+      where: {
+        userId_date: {
+          userId: user.id,
+          date: todayDate,
+        },
+      },
+      update: {
+        checkInTime: eventTime,
+        status,
+        notes: `${sourceNote} (Check-In)`,
+      },
+      create: {
+        userId: user.id,
+        date: todayDate,
+        checkInTime: eventTime,
+        status,
+        notes: `${sourceNote} (Check-In)`,
+      },
+    });
+  } else if (eventType === 'OUT') {
+    const existing = await prisma.attendance.findUnique({
+      where: {
+        userId_date: {
+          userId: user.id,
+          date: todayDate,
+        },
+      },
+    });
+
+    if (!existing) {
+      attendance = await prisma.attendance.create({
+        data: {
+          userId: user.id,
+          date: todayDate,
+          checkInTime: eventTime,
+          checkOutTime: eventTime,
+          status: 'PRESENT',
+          totalHours: 0,
+          notes: `${sourceNote} (Check-Out without prior Check-In)`,
+        },
+      });
+    } else {
+      const checkIn = new Date(existing.checkInTime);
+      const diffMs = Math.max(0, eventTime.getTime() - checkIn.getTime());
+      const totalHours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
+
+      attendance = await prisma.attendance.update({
+        where: { id: existing.id },
+        data: {
+          checkOutTime: eventTime,
+          totalHours,
+          notes: `${existing.notes || ''} (${sourceNote} Check-Out)`.trim(),
+        },
+      });
+    }
+  }
+
+  // Invalidate caches so admin and employee screens update immediately
+  cacheService.invalidateTags(['attendance', 'dashboard']);
+
+  return res.status(200).json({
+    success: true,
+    message: `${eventType} punch recorded successfully for ${user.firstName} ${user.lastName} (${user.employeeCode}).`,
+    data: {
+      employee: {
+        id: user.id,
+        employeeCode: user.employeeCode,
+        name: `${user.firstName} ${user.lastName}`,
+      },
+      attendance,
+    },
+  });
+}
+
+/**
  * Biometric Hardware Device Attendance Sync Endpoint
  * POST /api/attendance/hardware-sync
- * Security: Validates x-hardware-key header
+ * Security: Validates x-hardware-key header with timing-safe comparison
  */
 const hardwareSync = async (req, res) => {
   try {
-    const hardwareKey = req.headers['x-hardware-key'];
-    const expectedKey = process.env.HARDWARE_SECRET_KEY || 'nexahr_biometric_hardware_secret_2026';
+    const expectedKey = process.env.HARDWARE_SECRET_KEY;
 
-    if (!hardwareKey || hardwareKey !== expectedKey) {
+    // Fail closed if HARDWARE_SECRET_KEY is missing or shorter than 32 characters
+    if (!expectedKey || expectedKey.trim().length < 32) {
+      console.warn('[SECURITY WARNING] HARDWARE_SECRET_KEY is missing or shorter than 32 characters. Failing closed.');
+      return res.status(500).json({
+        success: false,
+        message: 'Hardware sync misconfigured.',
+      });
+    }
+
+    const hardwareKey = req.headers['x-hardware-key'];
+    if (!hardwareKey || !safeCompareKeys(hardwareKey, expectedKey.trim())) {
       return res.status(401).json({
         success: false,
         message: 'Unauthorized hardware device request. Invalid hardware secret key.',
@@ -19,156 +193,12 @@ const hardwareSync = async (req, res) => {
     }
 
     const { employeeCode, timestamp, type } = req.body;
-
-    if (!employeeCode || !timestamp || !type) {
-      return res.status(400).json({
-        success: false,
-        message: 'Required fields missing: employeeCode, timestamp, and type ("IN" | "OUT").',
-      });
-    }
-
-    const eventType = type.toUpperCase().trim();
-    if (!['IN', 'OUT'].includes(eventType)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid event type. Must be "IN" or "OUT".',
-      });
-    }
-
-    const eventTime = new Date(timestamp);
-    if (isNaN(eventTime.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid timestamp format. Must be a valid ISO-8601 string.',
-      });
-    }
-
-    // Find employee by employeeCode
-    const user = await prisma.user.findUnique({
-      where: { employeeCode: employeeCode.trim() },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: `Employee with code '${employeeCode}' not found in system.`,
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(403).json({
-        success: false,
-        message: `Employee '${user.firstName} ${user.lastName}' is inactive. Attendance rejected.`,
-      });
-    }
-
-    const todayDate = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
-
-    let attendance = null;
-
-    if (eventType === 'IN') {
-      // Determine status (Late if after 09:15 AM - 15 Mins Grace Policy)
-      // Evaluate in company timezone (Asia/Karachi, UTC+5)
-      let currentHour = eventTime.getHours();
-      let currentMinute = eventTime.getMinutes();
-
-      try {
-        const timeFormatter = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'Asia/Karachi',
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: false,
-        });
-        const parts = timeFormatter.formatToParts(eventTime);
-        const parsedHour = parseInt(parts.find((p) => p.type === 'hour')?.value, 10);
-        const parsedMin = parseInt(parts.find((p) => p.type === 'minute')?.value, 10);
-        if (!isNaN(parsedHour) && !isNaN(parsedMin)) {
-          currentHour = parsedHour;
-          currentMinute = parsedMin;
-        }
-      } catch (e) {
-        // Fallback to server local time
-      }
-
-      let status = 'PRESENT';
-      if (currentHour > 9 || (currentHour === 9 && currentMinute > 15)) {
-        status = 'LATE';
-      }
-
-      attendance = await prisma.attendance.upsert({
-        where: {
-          userId_date: {
-            userId: user.id,
-            date: todayDate,
-          },
-        },
-        update: {
-          checkInTime: eventTime,
-          status,
-          notes: 'Biometric Hardware Sync (Check-In)',
-        },
-        create: {
-          userId: user.id,
-          date: todayDate,
-          checkInTime: eventTime,
-          status,
-          notes: 'Biometric Hardware Sync (Check-In)',
-        },
-      });
-    } else if (eventType === 'OUT') {
-      // Find today's attendance
-      const existing = await prisma.attendance.findUnique({
-        where: {
-          userId_date: {
-            userId: user.id,
-            date: todayDate,
-          },
-        },
-      });
-
-      if (!existing) {
-        // If check-out received without prior check-in, set checkInTime = checkOutTime
-        attendance = await prisma.attendance.create({
-          data: {
-            userId: user.id,
-            date: todayDate,
-            checkInTime: eventTime,
-            checkOutTime: eventTime,
-            status: 'PRESENT',
-            totalHours: 0,
-            notes: 'Biometric Hardware Sync (Check-Out without prior Check-In)',
-          },
-        });
-      } else {
-        const checkIn = new Date(existing.checkInTime);
-        const diffMs = Math.max(0, eventTime.getTime() - checkIn.getTime());
-        const totalHours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
-
-        attendance = await prisma.attendance.update({
-          where: { id: existing.id },
-          data: {
-            checkOutTime: eventTime,
-            totalHours,
-            notes: `${existing.notes || ''} (Biometric Check-Out)`.trim(),
-          },
-        });
-      }
-    }
-
-    // Invalidate caches so admin and employee screens update immediately
-    cacheService.invalidateTags(['attendance', 'dashboard']);
-
-    return res.status(200).json({
-      success: true,
-      message: `Biometric ${eventType} synced successfully for ${user.firstName} ${user.lastName} (${user.employeeCode}).`,
-      data: {
-        employee: {
-          id: user.id,
-          employeeCode: user.employeeCode,
-          name: `${user.firstName} ${user.lastName}`,
-        },
-        attendance,
-      },
+    return await processAttendancePunch({
+      employeeCode,
+      timestamp,
+      type,
+      sourceNote: 'Biometric Hardware Sync',
+      res,
     });
   } catch (error) {
     console.error('Error in hardwareSync:', error);
@@ -181,135 +211,203 @@ const hardwareSync = async (req, res) => {
 };
 
 /**
- * Get My Attendance Logs (Employee)
- * GET /api/attendance/my-logs
+ * Admin-Only Simulate Punch (Development & Staging)
+ * POST /api/attendance/simulate-punch
+ * Disabled in production unless ALLOW_SIMULATE_PUNCH=true
  */
-const getMyLogs = async (req, res) => {
+const simulatePunch = async (req, res) => {
   try {
-    const userId = req.user.userId;
-    const { startDate, endDate } = req.query;
+    const isProduction = process.env.NODE_ENV === 'production';
+    const allowSimulate = process.env.ALLOW_SIMULATE_PUNCH === 'true';
 
-    const whereClause = { userId };
-
-    if (startDate || endDate) {
-      whereClause.date = {};
-      if (startDate) whereClause.date.gte = new Date(startDate);
-      if (endDate) whereClause.date.lte = new Date(endDate);
+    if (isProduction && !allowSimulate) {
+      return res.status(404).json({
+        success: false,
+        message: 'Simulate punch endpoint is disabled in production.',
+      });
     }
 
-    const logs = await prisma.attendance.findMany({
-      where: whereClause,
-      orderBy: { date: 'desc' },
-    });
-
-    return res.status(200).json({
-      success: true,
-      data: { attendances: logs },
+    const { employeeCode, timestamp, type } = req.body;
+    return await processAttendancePunch({
+      employeeCode,
+      timestamp,
+      type,
+      sourceNote: 'Simulated Admin Punch',
+      res,
     });
   } catch (error) {
-    console.error('Error in getMyLogs:', error);
+    console.error('Error in simulatePunch:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to fetch attendance logs.',
+      message: 'Failed to simulate punch.',
       error: error.message,
     });
   }
 };
 
 /**
- * Get Company Attendance Overview (Admin/HR)
- * GET /api/attendance
+ * Check Simulate Punch Availability Status
+ * GET /api/attendance/simulate-punch/status
  */
-const getCompanyAttendance = async (req, res) => {
+const getSimulatePunchStatus = async (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const allowSimulate = process.env.ALLOW_SIMULATE_PUNCH === 'true';
+  const enabled = !isProduction || allowSimulate;
+
+  return res.status(200).json({
+    success: true,
+    enabled,
+  });
+};
+
+/**
+ * Get current employee personal logs
+ * GET /api/attendance/my-logs
+ */
+const getMyLogs = async (req, res) => {
   try {
-    const { date, status, departmentId } = req.query;
+    const userId = req.user.id;
+    const { month, year } = req.query;
 
-    const targetDate = date ? new Date(date) : new Date();
-    const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const now = new Date();
+    const targetMonth = month ? parseInt(month, 10) - 1 : now.getMonth();
+    const targetYear = year ? parseInt(year, 10) : now.getFullYear();
 
-    const whereClause = {
-      date: dayStart,
-    };
-
-    if (status) {
-      whereClause.status = status;
-    }
-
-    if (departmentId) {
-      whereClause.user = {
-        profile: { departmentId },
-      };
-    }
+    const startDate = new Date(targetYear, targetMonth, 1);
+    const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
 
     const logs = await prisma.attendance.findMany({
-      where: whereClause,
-      include: {
-        user: {
-          select: {
-            id: true,
-            employeeCode: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            profile: {
-              include: {
-                department: { select: { name: true, code: true } },
-                designation: { select: { title: true } },
-              },
-            },
-          },
+      where: {
+        userId,
+        date: {
+          gte: startDate,
+          lte: endDate,
         },
       },
-      orderBy: { checkInTime: 'desc' },
+      orderBy: { date: 'desc' },
     });
 
     return res.status(200).json({
       success: true,
-      data: {
-        date: dayStart.toISOString().split('T')[0],
-        attendances: logs,
+      data: logs,
+    });
+  } catch (error) {
+    console.error('Error in getMyLogs:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve personal attendance logs.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Get company-wide attendance logs (Admin & HR)
+ * GET /api/attendance
+ */
+const getCompanyAttendance = async (req, res) => {
+  try {
+    const { date, departmentId, status, page = 1, limit = 50 } = req.query;
+
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+    const take = parseInt(limit, 10);
+
+    const whereClause = {};
+
+    if (date) {
+      const queryDate = new Date(date);
+      const startOfDay = new Date(queryDate.getFullYear(), queryDate.getMonth(), queryDate.getDate());
+      const endOfDay = new Date(queryDate.getFullYear(), queryDate.getMonth(), queryDate.getDate(), 23, 59, 59, 999);
+      whereClause.date = {
+        gte: startOfDay,
+        lte: endOfDay,
+      };
+    }
+
+    if (status) {
+      whereClause.status = status.toUpperCase();
+    }
+
+    if (departmentId) {
+      whereClause.user = {
+        profile: {
+          departmentId,
+        },
+      };
+    }
+
+    const [total, attendanceRecords] = await Promise.all([
+      prisma.attendance.count({ where: whereClause }),
+      prisma.attendance.findMany({
+        where: whereClause,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              employeeCode: true,
+              profile: {
+                select: {
+                  avatarUrl: true,
+                  department: {
+                    select: { id: true, name: true, code: true },
+                  },
+                  designation: {
+                    select: { id: true, title: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: [{ date: 'desc' }, { checkInTime: 'desc' }],
+        skip,
+        take,
+      }),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: attendanceRecords,
+      pagination: {
+        total,
+        page: parseInt(page, 10),
+        limit: take,
+        pages: Math.ceil(total / take),
       },
     });
   } catch (error) {
     console.error('Error in getCompanyAttendance:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to fetch attendance overview.',
+      message: 'Failed to retrieve company attendance.',
       error: error.message,
     });
   }
 };
 
 /**
- * Batch Punch-In All Active Users for Today
+ * Admin Action: Batch Punch In All Active Users for Today
  * POST /api/attendance/punch-all-today
- * Accessible by: ADMIN, HR_MANAGER
  */
 const punchAllUsersToday = async (req, res) => {
   try {
+    const today = new Date();
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
     const activeUsers = await prisma.user.findMany({
       where: { isActive: true },
-      select: { id: true, employeeCode: true, firstName: true, lastName: true },
+      select: { id: true, firstName: true, lastName: true, employeeCode: true },
     });
 
-    if (!activeUsers || activeUsers.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'No active users found to punch in.',
-      });
-    }
-
-    const now = new Date();
-    const todayDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
     const results = [];
 
-    for (let i = 0; i < activeUsers.length; i++) {
-      const u = activeUsers[i];
-      // Generate a realistic biometric check-in time between 08:55 and 09:10
-      const checkInHour = 8;
-      const checkInMinute = 55 + (i * 3) % 15;
-      const checkInSecond = (i * 17) % 60;
-      const checkInTime = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), checkInHour - 5, checkInMinute, checkInSecond));
+    for (const u of activeUsers) {
+      const randomOffsetMinutes = Math.floor(Math.random() * 25);
+      const checkInTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 8, 55 + randomOffsetMinutes);
+      const status = randomOffsetMinutes > 20 ? 'LATE' : 'PRESENT';
 
       const record = await prisma.attendance.upsert({
         where: {
@@ -318,29 +416,23 @@ const punchAllUsersToday = async (req, res) => {
             date: todayDate,
           },
         },
-        update: {
-          checkInTime: checkInTime,
-          status: 'PRESENT',
-          notes: 'Biometric Face-ID (Terminal 01)',
-        },
+        update: {},
         create: {
           userId: u.id,
           date: todayDate,
-          checkInTime: checkInTime,
-          status: 'PRESENT',
-          notes: 'Biometric Face-ID (Terminal 01)',
+          checkInTime,
+          status,
+          notes: 'Admin Batch Punch-In Simulation',
         },
       });
-
       results.push({
-        employeeCode: u.employeeCode,
+        id: u.id,
         name: `${u.firstName} ${u.lastName}`,
+        employeeCode: u.employeeCode,
         status: record.status,
-        checkInTime: record.checkInTime,
       });
     }
 
-    // Invalidate caches so admin and employee screens update immediately
     cacheService.invalidateTags(['attendance', 'dashboard']);
 
     return res.status(200).json({
@@ -364,8 +456,9 @@ const punchAllUsersToday = async (req, res) => {
 
 module.exports = {
   hardwareSync,
+  simulatePunch,
+  getSimulatePunchStatus,
   getMyLogs,
   getCompanyAttendance,
   punchAllUsersToday,
 };
-

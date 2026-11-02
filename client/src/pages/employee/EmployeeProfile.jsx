@@ -430,7 +430,7 @@ const EmployeeProfile = () => {
   };
 
   const isGuest =
-    formData.email?.toLowerCase() === 'hr@nexahr.com' ||
+    formData.email?.toLowerCase() === 'umairdevelop@gmail.com' ||
     formData.email?.toLowerCase() === 'umaaiirakram@gmail.com' ||
     localStorage.getItem('isGuest') === 'true';
 

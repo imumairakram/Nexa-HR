@@ -10,12 +10,11 @@ const verifyToken = async (req, res, next) => {
 
     let token = null;
 
-    // 1. Primary Vector: Secure HttpOnly Cookie
-    if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
-    }
-    // 2. Secondary Vector: Standard Authorization Bearer Header (for mobile/API clients)
-    else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    // Strict Authorization: Bearer <token> validation.
+    // Bearer-only token authentication eliminates CSRF vulnerabilities by design,
+    // as web browsers never attach custom Authorization headers to cross-site requests automatically.
+    // Cookies are explicitly ignored for API authentication.
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
     }
 
@@ -26,11 +25,11 @@ const verifyToken = async (req, res, next) => {
       });
     }
 
-    // 3. Cryptographic Verification of JWT
+    // Cryptographic Verification of JWT
     const decoded = verifyJwtToken(token);
     const decodedUserId = decoded.userId || decoded.id;
 
-    // 4. Verify user exists and is active (Fast in-memory cache lookup)
+    // Verify user exists and is active (Fast in-memory cache lookup)
     let user = cacheService.getCachedUser(decodedUserId);
     if (!user) {
       user = await prisma.user.findUnique({
@@ -57,7 +56,7 @@ const verifyToken = async (req, res, next) => {
       });
     }
 
-    // 5. Attach authenticated user context to request
+    // Attach authenticated user context to request
     req.user = {
       id: user.id,
       userId: user.id,

@@ -123,6 +123,7 @@ const Dashboard = () => {
   });
   const [punchLoading, setPunchLoading] = useState(false);
   const [punchToast, setPunchToast] = useState('');
+  const [simulatePunchEnabled, setSimulatePunchEnabled] = useState(false);
 
   const loadDashboardMetrics = async () => {
     if (!api.hasCached('/dashboard/admin')) {
@@ -160,6 +161,7 @@ const Dashboard = () => {
   useEffect(() => {
     loadDashboardMetrics();
     loadEmployeesForPunch();
+    api.getSimulatePunchStatus().then((r) => r && r.success && setSimulatePunchEnabled(r.enabled)).catch(() => {});
     // Warm client cache in idle background for smooth instant navigation across all pages
     if (typeof window !== 'undefined') {
       setTimeout(() => {
@@ -173,7 +175,7 @@ const Dashboard = () => {
     if (!punchForm.employeeCode) return;
     setPunchLoading(true);
     try {
-      const res = await api.syncBiometricHardware({
+      const res = await api.simulatePunch({
         employeeCode: punchForm.employeeCode,
         type: punchForm.type,
         timestamp: new Date(punchForm.timestamp).toISOString(),
@@ -344,7 +346,7 @@ const Dashboard = () => {
         onRefresh={() => loadDashboardMetrics()}
         loading={loading}
         action={
-          mobileDashboardTitle === 'Admin Dashboard' || isHrPortal ? (
+          (mobileDashboardTitle === 'Admin Dashboard' || isHrPortal) && simulatePunchEnabled ? (
             <button
               onClick={() => setIsPunchModalOpen(true)}
               className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-2xl shadow-sm shadow-sky-500/20 transition-all cursor-pointer"

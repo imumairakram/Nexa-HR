@@ -81,7 +81,7 @@ async function fetchAPI(endpoint, options = {}) {
   };
 
   const config = {
-    credentials: 'include', // Include HttpOnly cookies in API requests
+    // Bearer-only Authorization
     ...options,
     headers,
   };
@@ -176,6 +176,17 @@ async function fetchAPI(endpoint, options = {}) {
 
 export const api = {
   // --- Auth & User Profile ---
+  demoLogin: async ({ role = 'hr' } = {}) => {
+    const res = await fetchAPI('/auth/demo-login', {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    });
+    if (res.data?.token) {
+      startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
+    }
+    return res;
+  },
+
   login: async (credentials) => {
     const res = await fetchAPI('/auth/login', {
       method: 'POST',
@@ -340,12 +351,24 @@ export const api = {
     return await fetchAPI(`/attendance/my-logs${query ? `?${query}` : ''}`);
   },
 
-  syncBiometricHardware: async (payload) => {
-    return await fetchAPI('/attendance/hardware-sync', {
+  simulatePunch: async (payload) => {
+    return await fetchAPI('/attendance/simulate-punch', {
       method: 'POST',
-      headers: {
-        'x-hardware-key': 'nexahr_biometric_hardware_secret_2026',
-      },
+      body: JSON.stringify({
+        employeeCode: payload.employeeCode,
+        timestamp: payload.timestamp || new Date().toISOString(),
+        type: payload.type || 'IN',
+      }),
+    });
+  },
+
+  getSimulatePunchStatus: async () => {
+    return await fetchAPI('/attendance/simulate-punch/status');
+  },
+
+  syncBiometricHardware: async (payload) => {
+    return await fetchAPI('/attendance/simulate-punch', {
+      method: 'POST',
       body: JSON.stringify({
         employeeCode: payload.employeeCode,
         timestamp: payload.timestamp || new Date().toISOString(),
@@ -890,7 +913,6 @@ export const api = {
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const res = await fetch(`${BASE_URL}/recruitment/applications/${id}/resume`, {
       method: 'GET',
-      credentials: 'include',
       headers,
     });
     if (!res.ok) {

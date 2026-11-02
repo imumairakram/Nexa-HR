@@ -37,6 +37,11 @@ const app = express();
 
 // Trust reverse proxy (Render / Vercel / Cloudflare) to ensure accurate client IP resolution and secure cookie handling
 app.set('trust proxy', 1);
+
+// Hardware Secret Key validation warning
+if (!process.env.HARDWARE_SECRET_KEY || process.env.HARDWARE_SECRET_KEY.trim().length < 32) {
+  console.warn('[SECURITY WARNING] HARDWARE_SECRET_KEY is missing or shorter than 32 characters. Biometric hardware sync will fail closed.');
+}
 const PORT = process.env.PORT || 5000;
 
 // =========================================================================
@@ -63,29 +68,62 @@ app.use(
 );
 
 // =========================================================================
-// 2. CORS CONFIGURATION (With Credentials for HttpOnly Cookies)
+// 2. CORS CONFIGURATION (Allow-List Enforced, Bearer-Only Cross-Site Safe)
 // =========================================================================
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5173',
-];
+// CSRF Architecture Notice:
+// Authentication is strictly Bearer-only (explicit Authorization: Bearer <token>).
+// Web browsers never attach custom Authorization headers to cross-site requests automatically.
+// As a result, cookie-based Cross-Site Request Forgery (CSRF) is impossible by design,
+// eliminating the need for CSRF state tokens.
+function parseCorsOrigins() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const rawOrigins = process.env.CORS_ORIGINS;
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests) or whitelisted origins
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(null, true); // Permissive in dev/fallback while enforcing credentials
-      }
-    },
-    credentials: true, // Crucial for HttpOnly Cookie transport
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-hardware-key'],
-  })
-);
+  if (rawOrigins && rawOrigins.trim()) {
+    return rawOrigins
+      .split(',')
+      .map((origin) => origin.trim().replace(/\/+$/, ''))
+      .filter(Boolean);
+  }
+
+  if (isProduction) {
+    console.warn('[SECURITY WARNING] CORS_ORIGINS is not set in production! Falling back to minimal FRONTEND_URL allow-list.');
+    const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.trim().replace(/\/+$/, '') : null;
+    return frontendUrl ? [frontendUrl] : [];
+  }
+
+  // Development fallback allow-list
+  return [
+    (process.env.FRONTEND_URL || 'http://localhost:5173').trim().replace(/\/+$/, ''),
+    'http://localhost:5173',
+    'http://localhost:3000',
+  ].filter(Boolean);
+}
+
+const allowedOrigins = parseCorsOrigins();
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests with no origin (curl, server-to-server, biometric terminals)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalized = origin.trim().replace(/\/+$/, '');
+    if (allowedOrigins.includes(normalized)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS request rejected: Origin ${origin} not in authorized allow-list.`));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false, // Bearer-only token auth; cookies are not accepted for authentication
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // =========================================================================
 // 3. COMPRESSION, STATIC ASSETS, BODY & COOKIE PARSERS
@@ -174,28 +212,34 @@ app.use((req, res) => {
 // 5. GLOBAL SANITIZED ERROR HANDLER
 // =========================================================================
 app.use((err, req, res, next) => {
-  const statusCode = err.status || 500;
+  const isCorsError = err.message && err.message.includes('CORS request rejected');
+  const statusCode = isCorsError ? 403 : (err.status || 500);
   const isProduction = process.env.NODE_ENV === 'production';
 
   console.error(`[UNHANDLED ERROR ${statusCode}] ${req.method} ${req.url}:`, err.message);
 
   res.status(statusCode).json({
     success: false,
-    message: isProduction && statusCode === 500 ? 'An internal server error occurred.' : err.message,
+    message: isCorsError
+      ? 'Access denied by CORS policy: Origin not allowed.'
+      : (isProduction && statusCode === 500 ? 'An internal server error occurred.' : err.message),
     ...(isProduction ? {} : { stack: err.stack }),
   });
 });
 
 // Start Server
-const server = app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`[ENTERPRISE SECURITY ACTIVE] NexaHR Backend on http://localhost:${PORT}`);
-  console.log(`====================================================`);
+let server;
+if (require.main === module) {
+  server = app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`[ENTERPRISE SECURITY ACTIVE] NexaHR Backend on http://localhost:${PORT}`);
+    console.log(`====================================================`);
 
-  // Start background self-ping service (for Render free tier spindown prevention)
-  startSelfPing();
-  startGmailPolling(processEmailBatch);
-});
+    // Start background self-ping service (for Render free tier spindown prevention)
+    startSelfPing();
+    startGmailPolling(processEmailBatch);
+  });
+}
 
 // Graceful Shutdown
 const handleShutdown = async (signal) => {
@@ -207,10 +251,14 @@ const handleShutdown = async (signal) => {
   } catch (err) {
     console.error('Error disconnecting Prisma client:', err.message);
   }
-  server.close(() => {
-    console.log('Server closed.');
+  if (server) {
+    server.close(() => {
+      console.log('Server closed.');
+      process.exit(0);
+    });
+  } else {
     process.exit(0);
-  });
+  }
 };
 
 process.on('SIGINT', () => handleShutdown('SIGINT'));

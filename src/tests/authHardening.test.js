@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const prisma = require('../config/prisma');
 const authRoutes = require('../routes/auth.routes');
 const {
   sendPasswordResetEmail,
@@ -263,4 +264,464 @@ test('Security Batch 1 - Fix 7: Reverse Proxy Trust & Real Client IP Resolution'
     clientPublicIp,
     'Express behind trust proxy (1 hop) must resolve client IP from X-Forwarded-For'
   );
+});
+
+test('Security Batch 1 - Fix 2: CORS Allow-List & Bearer-Only Authentication', async (t) => {
+  const mainApp = require('../index');
+  const cacheService = require('../services/cache.service');
+
+  let server;
+  let baseUrl;
+
+  await new Promise((resolve) => {
+    server = mainApp.listen(0, () => {
+      baseUrl = `http://127.0.0.1:${server.address().port}`;
+      resolve();
+    });
+  });
+
+  t.after(() => {
+    if (server) server.close();
+  });
+
+  const activeAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN', isActive: true } });
+  const validToken = generateToken({ userId: activeAdmin.id, role: 'ADMIN' });
+
+  await t.test('Request from a non-whitelisted Origin is rejected with 403', async () => {
+    const res = await fetch(`${baseUrl}/api/health`, {
+      method: 'GET',
+      headers: {
+        Origin: 'https://malicious-site.com',
+      },
+    });
+
+    assert.equal(res.status, 403);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /CORS policy/i);
+  });
+
+  await t.test('Preflight OPTIONS from an allowed origin succeeds', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'OPTIONS',
+      headers: {
+        Origin: 'http://localhost:5173',
+        'Access-Control-Request-Method': 'POST',
+        'Access-Control-Request-Headers': 'Content-Type, Authorization',
+      },
+    });
+
+    assert.equal(res.status, 204);
+    assert.equal(res.headers.get('access-control-allow-origin'), 'http://localhost:5173');
+    assert.match(res.headers.get('access-control-allow-headers'), /Authorization/i);
+  });
+
+  await t.test('Request with only a cookie (no Bearer) returns 401 Unauthorized', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/me`, {
+      method: 'GET',
+      headers: {
+        Origin: 'http://localhost:5173',
+        Cookie: `token=${validToken}`,
+      },
+    });
+
+    assert.equal(res.status, 401);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.equal(data.message, 'Access denied. No authentication session or token provided.');
+  });
+
+  await t.test('Valid Bearer token from an allowed origin succeeds', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/me`, {
+      method: 'GET',
+      headers: {
+        Origin: 'http://localhost:5173',
+        Authorization: `Bearer ${validToken}`,
+      },
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.data.user.email, activeAdmin.email);
+  });
+
+  await t.test('Request with NO Origin header (server-to-server / curl) is allowed through CORS', async () => {
+    const res = await fetch(`${baseUrl}/health`, {
+      method: 'GET',
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.status, 'UP');
+  });
+});
+
+test('Security Batch 1 - Fix 3: Biometric Hardware Secret & Admin Simulate Punch', async (t) => {
+  const mainApp = require('../index');
+  let server;
+  let baseUrl;
+
+  await new Promise((resolve) => {
+    server = mainApp.listen(0, () => {
+      baseUrl = `http://127.0.0.1:${server.address().port}`;
+      resolve();
+    });
+  });
+
+  t.after(() => {
+    if (server) server.close();
+  });
+
+  const activeAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN', isActive: true } });
+  const activeEmployee = await prisma.user.findFirst({ where: { role: 'EMPLOYEE', isActive: true } });
+
+  const adminToken = generateToken({ userId: activeAdmin.id, role: 'ADMIN' });
+  const empToken = generateToken({ userId: activeEmployee.id, role: 'EMPLOYEE' });
+
+  await t.test('Hardware endpoint with no key returns 401', async () => {
+    const res = await fetch(`${baseUrl}/api/attendance/hardware-sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        employeeCode: activeAdmin.employeeCode,
+        timestamp: new Date().toISOString(),
+        type: 'IN',
+      }),
+    });
+
+    assert.equal(res.status, 401);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /invalid hardware secret key/i);
+  });
+
+  await t.test('Hardware endpoint with wrong key returns 401', async () => {
+    const res = await fetch(`${baseUrl}/api/attendance/hardware-sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-hardware-key': 'wrong_key_12345678901234567890123456789012',
+      },
+      body: JSON.stringify({
+        employeeCode: activeAdmin.employeeCode,
+        timestamp: new Date().toISOString(),
+        type: 'IN',
+      }),
+    });
+
+    assert.equal(res.status, 401);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /invalid hardware secret key/i);
+  });
+
+  await t.test('Hardware endpoint with unset or short env returns 500 (fail closed)', async () => {
+    const originalKey = process.env.HARDWARE_SECRET_KEY;
+    try {
+      process.env.HARDWARE_SECRET_KEY = 'too-short';
+      const res = await fetch(`${baseUrl}/api/attendance/hardware-sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-hardware-key': 'any-key',
+        },
+        body: JSON.stringify({
+          employeeCode: activeAdmin.employeeCode,
+          timestamp: new Date().toISOString(),
+          type: 'IN',
+        }),
+      });
+
+      assert.equal(res.status, 500);
+      const data = await res.json();
+      assert.equal(data.success, false);
+      assert.equal(data.message, 'Hardware sync misconfigured.');
+    } finally {
+      process.env.HARDWARE_SECRET_KEY = originalKey;
+    }
+  });
+
+  await t.test('Simulate punch is 403 for non-admin user', async () => {
+    const res = await fetch(`${baseUrl}/api/attendance/simulate-punch`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${empToken}`,
+      },
+      body: JSON.stringify({
+        employeeCode: activeEmployee.employeeCode,
+        timestamp: new Date().toISOString(),
+        type: 'IN',
+      }),
+    });
+
+    assert.equal(res.status, 403);
+  });
+
+  await t.test('Simulate punch is 404 in production without ALLOW_SIMULATE_PUNCH=true', async () => {
+    const origEnv = process.env.NODE_ENV;
+    const origFlag = process.env.ALLOW_SIMULATE_PUNCH;
+    try {
+      process.env.NODE_ENV = 'production';
+      delete process.env.ALLOW_SIMULATE_PUNCH;
+
+      const res = await fetch(`${baseUrl}/api/attendance/simulate-punch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          employeeCode: activeAdmin.employeeCode,
+          timestamp: new Date().toISOString(),
+          type: 'IN',
+        }),
+      });
+
+      assert.equal(res.status, 404);
+      const data = await res.json();
+      assert.equal(data.success, false);
+      assert.match(data.message, /disabled in production/i);
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      if (origFlag !== undefined) process.env.ALLOW_SIMULATE_PUNCH = origFlag;
+    }
+  });
+});
+
+test('Security Batch 1 - Fix 5: Password Recovery Anti-Enumeration & Cooldown Enforcement', async (t) => {
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(express.json());
+  app.use('/api/auth', authRoutes);
+
+  let server;
+  let baseUrl;
+
+  await new Promise((resolve) => {
+    server = app.listen(0, () => {
+      const port = server.address().port;
+      baseUrl = `http://127.0.0.1:${port}/api/auth`;
+      resolve();
+    });
+  });
+
+  t.after(() => {
+    if (server) server.close();
+  });
+
+  const activeUser = await prisma.user.findFirst({ where: { isActive: true } });
+
+  await t.test('Check with existing user returns generic response without PII', async () => {
+    const res = await fetch(`${baseUrl}/forgot-password/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.195' },
+      body: JSON.stringify({ email: activeUser.email }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.message, 'If an active account exists, recovery instructions can be delivered.');
+    assert.ok(data.data.allowedChannels);
+    assert.ok(data.data.maskedEmail);
+    assert.equal(typeof data.data.hasPhone, 'boolean');
+    // Ensure absolutely NO raw PII is returned
+    assert.equal(data.data.fullName, undefined);
+    assert.equal(data.data.role, undefined);
+    assert.equal(data.data.employeeCode, undefined);
+    assert.equal(data.data.phone, undefined);
+    assert.equal(data.data.email, undefined);
+  });
+
+  await t.test('Check with non-existing user returns identical structure with 200', async () => {
+    const res = await fetch(`${baseUrl}/forgot-password/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.196' },
+      body: JSON.stringify({ email: 'ghost-nonexistent-user-xyz@nexahr.com' }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.message, 'If an active account exists, recovery instructions can be delivered.');
+    assert.deepEqual(Object.keys(data.data).sort(), ['allowedChannels', 'hasPhone', 'maskedEmail', 'maskedPhone']);
+    assert.equal(data.data.fullName, undefined);
+    assert.equal(data.data.role, undefined);
+    assert.equal(data.data.employeeCode, undefined);
+  });
+
+  await t.test('OTP send cooldown rejects second request within 60s with 429', async () => {
+    const targetEmail = `cooldown-test-${Date.now()}@example.com`;
+    // First request should succeed (uniform 200)
+    const res1 = await fetch(`${baseUrl}/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.197' },
+      body: JSON.stringify({ email: targetEmail, channel: 'EMAIL' }),
+    });
+    assert.equal(res1.status, 200);
+
+    // Second request immediately within 60s must be throttled with 429
+    const res2 = await fetch(`${baseUrl}/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.197' },
+      body: JSON.stringify({ email: targetEmail, channel: 'EMAIL' }),
+    });
+    assert.equal(res2.status, 429);
+    const data2 = await res2.json();
+    assert.equal(data2.success, false);
+    assert.match(data2.message, /wait before requesting another code/i);
+  });
+
+  await t.test('Recovery check endpoint rate limit triggers after 10 requests', async () => {
+    const ip = '203.0.113.198';
+    let hitRateLimit = false;
+
+    // Send 11 requests from the same IP
+    for (let i = 1; i <= 11; i++) {
+      const res = await fetch(`${baseUrl}/forgot-password/check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
+        body: JSON.stringify({ email: `rate-limit-check-${i}@example.com` }),
+      });
+
+      if (res.status === 429) {
+        hitRateLimit = true;
+        const body = await res.json();
+        assert.equal(body.code, 'RATE_LIMIT_EXCEEDED');
+        break;
+      }
+    }
+
+    assert.equal(hitRateLimit, true, 'Rate limiter must reject subsequent requests with 429 after 10 calls');
+  });
+});
+
+test('Security Batch 1 - Fix 8: Database Seed Production Safeguard', async (t) => {
+  await t.test('Executing seed in production without ALLOW_SEED=true exits with non-zero status', async () => {
+    const { execFile } = require('child_process');
+    const seedScriptPath = path.join(__dirname, '../../prisma/seed.js');
+
+    const exitResult = await new Promise((resolve) => {
+      execFile(
+        process.execPath,
+        [seedScriptPath],
+        {
+          env: {
+            ...process.env,
+            NODE_ENV: 'production',
+            ALLOW_SEED: 'false',
+          },
+        },
+        (error, stdout, stderr) => {
+          resolve({
+            code: error ? error.code : 0,
+            stdout,
+            stderr,
+          });
+        }
+      );
+    });
+
+    assert.notEqual(exitResult.code, 0, 'Seed must exit with non-zero in production');
+    assert.match(
+      exitResult.stderr + exitResult.stdout,
+      /Refusing to seed in production/i,
+      'Must log clear refusal message'
+    );
+  });
+});
+
+
+
+test('Security Batch 1 - 1-Click Demo Login Endpoint', async (t) => {
+  const app = express();
+  app.use(express.json());
+  app.use('/api/auth', authRoutes);
+
+  let server;
+  let baseUrl;
+
+  await new Promise((resolve) => {
+    server = app.listen(0, () => {
+      const port = server.address().port;
+      baseUrl = `http://127.0.0.1:${port}/api/auth`;
+      resolve();
+    });
+  });
+
+  t.after(() => {
+    if (server) server.close();
+  });
+
+  await t.test('1-Click Demo login for HR returns active session for umairdevelop@gmail.com without password', async () => {
+    const res = await fetch(`${baseUrl}/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'hr' }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.data.token, 'Must return a valid JWT token');
+    assert.equal(data.data.user.email, 'umairdevelop@gmail.com');
+    assert.equal(data.data.user.isGuest, true);
+    assert.equal(data.data.user.mustChangePassword, false);
+
+    // Verify token can authenticate
+    const verified = verifyJwtToken(data.data.token);
+    assert.ok(verified, 'JWT token must be verifiable by server secret');
+  });
+
+  await t.test('1-Click Demo login for Employee returns active session for umaaiirakram@gmail.com', async () => {
+    const res = await fetch(`${baseUrl}/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'employee' }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.data.token);
+    assert.equal(data.data.user.email, 'umaaiirakram@gmail.com');
+    assert.equal(data.data.user.isGuest, true);
+  });
+
+  await t.test('1-Click Demo login with invalid role returns 400', async () => {
+    const res = await fetch(`${baseUrl}/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'superhacker' }),
+    });
+
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.success, false);
+  });
+
+  await t.test('1-Click Demo login returns 403 when DISABLE_DEMO_LOGIN=true', async () => {
+    const orig = process.env.DISABLE_DEMO_LOGIN;
+    try {
+      process.env.DISABLE_DEMO_LOGIN = 'true';
+      const res = await fetch(`${baseUrl}/demo-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'hr' }),
+      });
+
+      assert.equal(res.status, 403);
+      const data = await res.json();
+      assert.equal(data.success, false);
+      assert.match(data.message, /disabled in this environment/i);
+    } finally {
+      if (orig !== undefined) {
+        process.env.DISABLE_DEMO_LOGIN = orig;
+      } else {
+        delete process.env.DISABLE_DEMO_LOGIN;
+      }
+    }
+  });
 });

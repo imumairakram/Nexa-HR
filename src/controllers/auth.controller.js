@@ -15,20 +15,6 @@ const {
 } = require('../services/notification.service');
 
 /**
- * Cookie security options helper
- */
-const getCookieOptions = () => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  return {
-    httpOnly: true, // Mitigates XSS token theft
-    secure: isProduction, // HTTPS only in production
-    sameSite: isProduction ? 'strict' : 'lax', // Mitigates CSRF
-    maxAge: 60 * 60 * 1000, // Strict 1 Hour session lifespan (3,600,000 ms)
-    path: '/',
-  };
-};
-
-/**
  * Register System Administrator
  * POST /api/auth/register-admin
  */
@@ -80,8 +66,7 @@ const registerAdmin = async (req, res) => {
       role: user.role,
     });
 
-    // Set secure HttpOnly cookie
-    res.cookie('token', token, getCookieOptions());
+    // Bearer token returned in response body (cookies not set)
 
     return res.status(201).json({
       success: true,
@@ -181,10 +166,9 @@ const login = async (req, res) => {
       role: user.role,
     });
 
-    // Attach HttpOnly, Secure, SameSite Cookie
-    res.cookie('token', token, getCookieOptions());
+    // Bearer token returned in response body; cookies explicitly not set to eliminate CSRF risk
 
-    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com'].includes(user.email?.toLowerCase());
+    const isDemoEmail = ['umaaiirakram@gmail.com'].includes(user.email?.toLowerCase());
 
     return res.status(200).json({
       success: true,
@@ -209,6 +193,83 @@ const login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Login failed.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * 1-Click Demo / Guest Session Initialization
+ * POST /api/auth/demo-login
+ * Dispatches demo JWT session for HR Admin (umairdevelop@gmail.com) or Employee (umaaiirakram@gmail.com)
+ */
+const demoLogin = async (req, res) => {
+  try {
+    if (process.env.DISABLE_DEMO_LOGIN === 'true') {
+      return res.status(403).json({
+        success: false,
+        message: '1-Click Demo login is disabled in this environment.',
+      });
+    }
+
+    const { role } = req.body || {};
+    const requestedRole = String(role || 'hr').toLowerCase().trim();
+
+    let targetEmail;
+    if (['hr', 'admin', 'hr_manager', 'hr_admin'].includes(requestedRole)) {
+      targetEmail = 'umairdevelop@gmail.com';
+    } else if (['employee', 'staff', 'user'].includes(requestedRole)) {
+      targetEmail = 'umaaiirakram@gmail.com';
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid demo role. Must be 'hr' or 'employee'.",
+      });
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email: targetEmail,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `Demo user for role '${requestedRole}' not found or inactive.`,
+      });
+    }
+
+    // Generate hardened 1-hour JWT token
+    const token = generateToken({
+      userId: user.id,
+      role: user.role,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Demo session initialized successfully.',
+      data: {
+        token,
+        expiresIn: 3600,
+        user: {
+          id: user.id,
+          employeeCode: user.employeeCode,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          mustChangePassword: false,
+          isGuest: true,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('[AUTH ERROR] in demoLogin:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to initialize demo session.',
       error: error.message,
     });
   }
@@ -330,6 +391,27 @@ const getMe = async (req, res) => {
   }
 };
 
+// In-memory 60-second cooldown tracker for OTP dispatches (Map<identifier, timestampMs>)
+const otpCooldownMap = new Map();
+
+const isOtpCooldownActive = (identifier) => {
+  const now = Date.now();
+  const lastTime = otpCooldownMap.get(identifier);
+  if (lastTime && now - lastTime < 60 * 1000) {
+    return true;
+  }
+  otpCooldownMap.set(identifier, now);
+  // Periodic cleanup
+  if (otpCooldownMap.size > 2000) {
+    for (const [key, ts] of otpCooldownMap.entries()) {
+      if (now - ts > 5 * 60 * 1000) {
+        otpCooldownMap.delete(key);
+      }
+    }
+  }
+  return false;
+};
+
 /**
  * Check Recovery Account & Authorized Channels
  * POST /api/auth/forgot-password/check
@@ -345,7 +427,7 @@ const checkRecoveryUser = async (req, res) => {
       });
     }
 
-    const identifier = email.toLowerCase().trim();
+    const identifier = String(email).toLowerCase().trim();
 
     const user = await prisma.user.findFirst({
       where: {
@@ -356,39 +438,34 @@ const checkRecoveryUser = async (req, res) => {
       },
     });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'No account found matching this email address or employee code.',
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(403).json({
-        success: false,
-        message: 'This account has been deactivated. Please contact your HR department.',
+    // Constant-structure & timing safe: Always return 200 with identical shape and plausible fake hints
+    if (!user || !user.isActive) {
+      crypto.createHash('sha256').update(identifier).digest('hex');
+      const fakeMaskedEmail = maskEmail(identifier.includes('@') ? identifier : `${identifier}@corporate.local`);
+      return res.status(200).json({
+        success: true,
+        message: 'If an active account exists, recovery instructions can be delivered.',
+        data: {
+          allowedChannels: ['EMAIL', 'WHATSAPP'],
+          maskedEmail: fakeMaskedEmail,
+          maskedPhone: '+** *** ****',
+          hasPhone: true,
+        },
       });
     }
 
     const isHrOrAdmin = user.role === 'ADMIN' || user.role === 'HR_MANAGER';
-    const allowedChannels = isHrOrAdmin ? ['EMAIL'] : (user.phone ? ['EMAIL', 'WHATSAPP'] : ['EMAIL']);
+    const hasPhone = Boolean(user.phone && user.phone.trim().length > 0 && !isHrOrAdmin);
+    const allowedChannels = hasPhone ? ['EMAIL', 'WHATSAPP'] : ['EMAIL'];
 
     return res.status(200).json({
       success: true,
+      message: 'If an active account exists, recovery instructions can be delivered.',
       data: {
-        email: user.email,
-        employeeCode: user.employeeCode,
-        fullName: `${user.firstName} ${user.lastName}`,
-        role: user.role,
-        isHrOrAdmin,
         allowedChannels,
-        phone: user.phone,
         maskedEmail: maskEmail(user.email),
-        maskedPhone: maskPhone(user.phone),
-        hasPhone: Boolean(user.phone && user.phone.trim().length > 0),
-        policyNotice: isHrOrAdmin
-          ? 'Enterprise Security Policy: Ephemeral cryptographic verification codes are restricted to Corporate Email for Administrators.'
-          : 'Multi-Channel Security: Select your preferred delivery channel for your 6-digit OTP verification code.',
+        maskedPhone: hasPhone ? maskPhone(user.phone) : '+** *** ****',
+        hasPhone,
       },
     });
   } catch (error) {
@@ -428,6 +505,15 @@ const forgotPassword = async (req, res) => {
       });
     }
 
+    // Enforce 60-second cooldown between OTP requests for the same identifier
+    if (isOtpCooldownActive(identifier)) {
+      return res.status(429).json({
+        success: false,
+        message: 'Please wait before requesting another code.',
+        code: 'OTP_COOLDOWN_ACTIVE',
+      });
+    }
+
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -439,13 +525,32 @@ const forgotPassword = async (req, res) => {
 
     // Timing attack & enumeration safe: Always return uniform response
     if (!user || !user.isActive) {
+      const fakeDestination = deliveryChannel === 'WHATSAPP' ? '+** *** ****' : maskEmail(identifier.includes('@') ? identifier : `${identifier}@corporate.local`);
       return res.status(200).json({
         success: true,
-        message: `If an active account with that identifier exists, a 6-digit recovery code has been dispatched via ${deliveryChannel}.`,
+        message: `If an active account exists, a 6-digit recovery code has been dispatched via ${deliveryChannel} to ${fakeDestination}.`,
         data: {
+          destination: fakeDestination,
           channel: deliveryChannel,
           expiresInMinutes: 10,
         },
+      });
+    }
+
+    // Secondary DB check for cooldown on existing user
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const recentDbOtp = await prisma.passwordResetOtp.findFirst({
+      where: {
+        userId: user.id,
+        createdAt: { gte: oneMinuteAgo },
+      },
+    });
+
+    if (recentDbOtp) {
+      return res.status(429).json({
+        success: false,
+        message: 'Please wait before requesting another code.',
+        code: 'OTP_COOLDOWN_ACTIVE',
       });
     }
 
@@ -511,27 +616,28 @@ const forgotPassword = async (req, res) => {
       },
     });
 
-    // 6. Route dispatch via conditional block (switch or if/else)
-    let dispatchResult = null;
+    // 6. Route dispatch: initiate notification dispatch in background so SMTP latency never blocks UI
     const recipientName = `${user.firstName} ${user.lastName}`;
 
-    if (deliveryChannel === 'EMAIL') {
-      dispatchResult = await sendEmailOTP(user.email, otp, recipientName);
-    } else if (deliveryChannel === 'WHATSAPP') {
-      dispatchResult = await sendWhatsAppOTP(user.phone, otp, recipientName);
-    }
+    const dispatchPromise = (deliveryChannel === 'EMAIL')
+      ? sendEmailOTP(user.email, otp, recipientName)
+      : sendWhatsAppOTP(user.phone, otp, recipientName);
+
+    dispatchPromise.catch((err) => {
+      console.error(`[NOTIFICATION DISPATCH ERROR via ${deliveryChannel}]:`, err.message);
+    });
 
     const destination = deliveryChannel === 'WHATSAPP' ? maskPhone(user.phone) : maskEmail(user.email);
 
     return res.status(200).json({
       success: true,
-      message: `A 6-digit recovery code has been successfully dispatched via ${deliveryChannel} to ${destination}.`,
+      message: `If an active account exists, a 6-digit recovery code has been dispatched via ${deliveryChannel} to ${destination}.`,
       data: {
         destination,
         channel: deliveryChannel,
         expiresInMinutes: 10,
         // Expose preview OTP in non-production environments to support automated test suites and dev diagnostics
-        previewOtp: otp,
+        ...(process.env.NODE_ENV === 'production' ? {} : { previewOtp: otp }),
       },
     });
   } catch (error) {
@@ -1045,6 +1151,7 @@ const changeMyPassword = async (req, res) => {
 module.exports = {
   registerAdmin,
   login,
+  demoLogin,
   logout,
   getMe,
   checkRecoveryUser,

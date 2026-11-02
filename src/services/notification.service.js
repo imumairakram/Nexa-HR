@@ -34,9 +34,25 @@ function getMailTransporter() {
       port,
       secure,
       auth: { user, pass },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
     });
   }
   return mailTransporter;
+}
+
+/**
+ * Resolve verified sender From address
+ * When using Gmail SMTP, envelope sender must strictly match SMTP_USER to avoid silent delivery drops
+ */
+function getFromAddress(serviceName = 'NexaHR Security') {
+  const host = process.env.SMTP_HOST || '';
+  const emailFrom = process.env.EMAIL_FROM || process.env.SMTP_FROM || '';
+  if (host.includes('gmail.com') || emailFrom.includes('no-reply@nexahr.com') || !emailFrom) {
+    return `"${serviceName}" <${process.env.SMTP_USER}>`;
+  }
+  return emailFrom;
 }
 
 /**
@@ -703,7 +719,7 @@ async function sendPasswordResetEmail({ email, name, resetUrl, expiresInHours = 
   const transporter = getMailTransporter();
   if (transporter) {
     try {
-      const from = process.env.EMAIL_FROM || process.env.SMTP_FROM || `"NexaHR Security" <${process.env.SMTP_USER}>`;
+      const from = getFromAddress('NexaHR Security');
       await transporter.sendMail({
         from,
         to: email,
@@ -849,7 +865,7 @@ async function sendEmailOTP(email, otp, name = 'Team Member', expiryMinutes = 10
 
   if (transporter) {
     try {
-      const from = process.env.EMAIL_FROM || process.env.SMTP_FROM || `"NexaHR Security" <${process.env.SMTP_USER}>`;
+      const from = getFromAddress('NexaHR Security');
       const subject = `[NexaHR] Your Verification Code: ${otp}`;
       const text = `Your NexaHR verification code is: ${otp}. This code expires in ${expiryMinutes} minutes.\n\nSecurity Notice: If you did not initiate this recovery, please notify your HR Administrator immediately.\n\n— NexaHR Workforce Systems`;
       const html = buildOtpEmailHtml({ name, otp, expiryMinutes });

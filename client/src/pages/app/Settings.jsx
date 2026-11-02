@@ -97,7 +97,7 @@ const Settings = () => {
     workWeek: savedCompanySettings?.workWeek || 'Monday - Friday (Sat/Sun Off)',
     autoClockoutHours: savedCompanySettings?.autoClockoutHours || '12',
     biometricPort: savedCompanySettings?.biometricPort || '8080',
-    biometricSecret: savedCompanySettings?.biometricSecret || 'nexahr_biometric_hardware_secret_2026',
+    biometricSecret: savedCompanySettings?.biometricSecret || '',
     currency,
     timezone,
     timeFormat,

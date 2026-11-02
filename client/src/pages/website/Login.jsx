@@ -187,7 +187,7 @@ const Login = () => {
           return;
         }
 
-        const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com'].includes(formData.email.trim().toLowerCase());
+        const isDemoEmail = ['umairdevelop@gmail.com', 'umaaiirakram@gmail.com'].includes(formData.email.trim().toLowerCase());
         if (isDemoEmail) {
           localStorage.setItem('isGuest', 'true');
         } else {
@@ -208,22 +208,17 @@ const Login = () => {
     const targetRole = roleToLogin || loginRole;
     setLoading(true);
     setError(null);
-
-    const guestCredentials = targetRole === 'hr'
-      ? { email: 'hr@nexahr.com', password: 'HrPassword123!', portalRole: 'hr' }
-      : { email: 'umaaiirakram@gmail.com', password: 'UserPassword123!', portalRole: 'employee' };
-
     localStorage.setItem('isGuest', 'true');
 
     try {
-      const res = await api.login(guestCredentials);
+      const res = await api.demoLogin({ role: targetRole });
       if (res && res.success) {
         // Ensure guest users never have mustChangePassword active in storage
         if (res.data?.user) {
           const userWithGuestFlag = { ...res.data.user, mustChangePassword: false, isGuest: true };
           localStorage.setItem('user', JSON.stringify(userWithGuestFlag));
         }
-        const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'HR_MANAGER' : 'EMPLOYEE');
+        const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'ADMIN' : 'EMPLOYEE');
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
         setError(res?.message || 'Guest login failed. Please try again.');

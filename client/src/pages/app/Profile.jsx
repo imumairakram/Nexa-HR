@@ -159,7 +159,7 @@ const Profile = () => {
 
   const populateUserData = (u) => {
     const isAdmin = u.role === 'ADMIN';
-    const isHR = u.role === 'HR_MANAGER' || u.role === 'HR' || u.email === 'hr@nexahr.com';
+    const isHR = u.role === 'HR_MANAGER' || u.role === 'HR' || u.email === 'umairdevelop@gmail.com';
 
     const residentialAddress = u.profile?.address || u.address || '';
     const officeLocation = u.profile?.workLocation || u.workLocation || 'Islamabad HQ & Innovation Lab';
@@ -450,7 +450,7 @@ const Profile = () => {
   };
 
   const isGuest =
-    formData.email?.toLowerCase() === 'hr@nexahr.com' ||
+    formData.email?.toLowerCase() === 'umairdevelop@gmail.com' ||
     formData.email?.toLowerCase() === 'umaaiirakram@gmail.com' ||
     localStorage.getItem('isGuest') === 'true';
 

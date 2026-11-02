@@ -33,6 +33,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [destination, setDestination] = useState('');
+  const [previewOtp, setPreviewOtp] = useState(null);
 
   // Password Reset State
   const [resetToken, setResetToken] = useState(null);
@@ -56,6 +57,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
       setNewPassword('');
       setConfirmPassword('');
       setResetToken(null);
+      setPreviewOtp(null);
 
       const targetEmail = initialEmail || '';
       setEmail(targetEmail);
@@ -66,14 +68,17 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
   // Actively read & lookup user whenever email is typed/changed
   useEffect(() => {
     if (!isOpen) return;
-    if (!email || email.trim().length < 3) {
+    const trimmed = email ? email.trim() : '';
+    // Only lookup when there is a plausible email or employee code format to avoid rate-limit spamming
+    const isPlausible = trimmed.includes('@') ? (trimmed.includes('.') && trimmed.length >= 6) : trimmed.length >= 4;
+    if (!isPlausible) {
       setUserInfo(null);
       return;
     }
 
     const timer = setTimeout(() => {
-      lookupAccount(email.trim());
-    }, 300);
+      lookupAccount(trimmed);
+    }, 600);
 
     return () => clearTimeout(timer);
   }, [email, isOpen]);
@@ -107,8 +112,8 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
       const res = await api.checkRecoveryUser(emailToLookup.trim());
       if (res && res.success && res.data) {
         setUserInfo(res.data);
-        // If user is HR/Admin, enforce EMAIL channel
-        if (res.data.isHrOrAdmin) {
+        const allowsWhatsApp = Array.isArray(res.data.allowedChannels) && res.data.allowedChannels.includes('WHATSAPP');
+        if (!allowsWhatsApp) {
           setChannel('EMAIL');
         } else if (res.data.hasPhone) {
           // If employee has a registered WhatsApp number, default or allow WhatsApp
@@ -140,7 +145,10 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
       });
 
       if (res && res.success) {
-        const dest = res.data?.destination || (channel === 'WHATSAPP' ? (userInfo?.phone || userInfo?.maskedPhone) : (userInfo?.email || email.trim()));
+        if (res.data?.previewOtp) {
+          setPreviewOtp(res.data.previewOtp);
+        }
+        const dest = res.data?.destination || (channel === 'WHATSAPP' ? userInfo?.maskedPhone : (userInfo?.maskedEmail || email.trim()));
         setDestination(dest);
         setCountdown(60);
         setCanResend(false);
@@ -294,8 +302,9 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
 
   if (!isOpen) return null;
 
-  const isHrOrAdmin = userInfo?.isHrOrAdmin ?? (email.toLowerCase().includes('admin') || initialRole === 'admin');
-  const registeredWhatsAppNumber = userInfo?.phone || userInfo?.maskedPhone || null;
+  const allowsWhatsApp = Array.isArray(userInfo?.allowedChannels) && userInfo.allowedChannels.includes('WHATSAPP');
+  const isHrOrAdmin = userInfo ? !allowsWhatsApp : (email.toLowerCase().includes('admin') || initialRole === 'admin');
+  const registeredWhatsAppNumber = userInfo?.maskedPhone || null;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
@@ -426,7 +435,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                           </span>
                         </div>
                         <div className="text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate mt-0.5">
-                          {userInfo?.email || email || 'Registered HR Admin Address'}
+                          {userInfo?.maskedEmail || email || 'Registered HR Admin Address'}
                         </div>
                       </div>
                     </div>
@@ -460,7 +469,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                             Corporate Email
                           </div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 font-medium">
-                            {userInfo?.email || email || 'Registered Inbox'}
+                            {userInfo?.maskedEmail || email || 'Registered Inbox'}
                           </div>
                         </div>
                       </div>
@@ -530,7 +539,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                       {channel === 'WHATSAPP' && !isHrOrAdmin
                         ? `OTP will be sent to your registered WhatsApp mobile: ${registeredWhatsAppNumber || '+92 300 1234567'}`
-                        : `OTP will be sent to your corporate email: ${userInfo?.email || email || 'registered email'}`}
+                        : `OTP will be sent to your corporate email: ${userInfo?.maskedEmail || email || 'registered email'}`}
                     </div>
                   </div>
                 </div>
@@ -607,6 +616,22 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     {channel === 'WHATSAPP' ? 'WhatsApp' : 'Email'}: {destination}
                   </strong>
                 </p>
+                {previewOtp && (
+                  <div className="mt-2.5 inline-flex items-center justify-center gap-2 py-1.5 px-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 rounded-lg text-amber-800 dark:text-amber-300 text-[11px] font-medium">
+                    <span>Dev/Test Code: <strong>{previewOtp}</strong></span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const digits = String(previewOtp).split('');
+                        setOtpDigits(digits);
+                        if (otpInputRefs.current[5]) otpInputRefs.current[5].focus();
+                      }}
+                      className="underline font-bold hover:text-amber-950 dark:hover:text-amber-100 cursor-pointer ml-1"
+                    >
+                      Auto-fill
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* 6-box OTP Input */}

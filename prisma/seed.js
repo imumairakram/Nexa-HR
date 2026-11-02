@@ -1,5 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
 
+// Fail-closed guard: Block database seed execution in production unless explicitly permitted
+if (process.env.NODE_ENV === 'production' && process.env.ALLOW_SEED !== 'true') {
+  console.error('Refusing to seed in production. To override, set ALLOW_SEED=true.');
+  process.exit(1);
+}
+
 const prisma = new PrismaClient();
 
 async function seed() {
