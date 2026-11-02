@@ -9,7 +9,7 @@ const {
   publishCompanyPolicy,
   deleteCompanyPolicy,
 } = require('../controllers/document.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
 const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 
@@ -19,13 +19,13 @@ const canManageDocuments = checkRole('ADMIN', 'HR_MANAGER');
 
 // Issued / Vault Documents Endpoints
 router.get('/issued', getIssuedDocuments);
-router.post('/issue', canManageDocuments, issueDocument);
-router.post('/upload', uploadEmployeeDocument);
-router.delete('/issued/:id', deleteIssuedDocument);
+router.post('/issue', blockDemo, canManageDocuments, issueDocument);
+router.post('/upload', blockDemo, uploadEmployeeDocument);
+router.delete('/issued/:id', blockDemo, deleteIssuedDocument);
 
 // Company Policies Endpoints
 router.get('/policies', getCompanyPolicies);
-router.post('/policies', canManageDocuments, publishCompanyPolicy);
-router.delete('/policies/:id', canManageDocuments, deleteCompanyPolicy);
+router.post('/policies', blockDemo, canManageDocuments, publishCompanyPolicy);
+router.delete('/policies/:id', blockDemo, canManageDocuments, deleteCompanyPolicy);
 
 module.exports = router;

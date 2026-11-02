@@ -81,8 +81,38 @@ const verifyOtpValidationRules = [
  */
 const resetPasswordValidationRules = [
   body('newPassword')
-    .isLength({ min: 6 })
-    .withMessage('New password must be at least 6 characters long.'),
+    .isLength({ min: 10 })
+    .withMessage('Password must be at least 10 characters long.')
+    .matches(/[A-Z]/)
+    .withMessage('Password must contain at least one uppercase letter.')
+    .matches(/[a-z]/)
+    .withMessage('Password must contain at least one lowercase letter.')
+    .matches(/[0-9]/)
+    .withMessage('Password must contain at least one digit.')
+    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/)
+    .withMessage('Password must contain at least one special symbol.'),
+  validateRequest,
+];
+
+/**
+ * Validation rules for authenticated password change
+ */
+const changePasswordValidationRules = [
+  body('currentPassword')
+    .isString()
+    .notEmpty()
+    .withMessage('Current password is required.'),
+  body('newPassword')
+    .isLength({ min: 10 })
+    .withMessage('Password must be at least 10 characters long.')
+    .matches(/[A-Z]/)
+    .withMessage('Password must contain at least one uppercase letter.')
+    .matches(/[a-z]/)
+    .withMessage('Password must contain at least one lowercase letter.')
+    .matches(/[0-9]/)
+    .withMessage('Password must contain at least one digit.')
+    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/)
+    .withMessage('Password must contain at least one special symbol.'),
   validateRequest,
 ];
 
@@ -92,5 +122,6 @@ module.exports = {
   forgotPasswordValidationRules,
   verifyOtpValidationRules,
   resetPasswordValidationRules,
+  changePasswordValidationRules,
 };
 

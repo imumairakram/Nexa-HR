@@ -366,6 +366,50 @@ ADMIN_EMAIL="admin@yourdomain.com" ADMIN_INITIAL_PASSWORD="YourStrongPassword123
 
 ---
 
+## 🌐 Deploying the Isolated Demo Environment
+
+To guarantee complete data isolation and prevent demo users from ever viewing, modifying, or leaking real company records, NexaHR runs guest demo sessions exclusively on an isolated sandbox environment backed by its own dedicated database.
+
+```
+┌────────────────────────────────────────────────────────┐  ┌────────────────────────────────────────────────────────┐
+│                   PRODUCTION ENVIRONMENT               │  │                 ISOLATED DEMO SANDBOX                  │
+│  • Render Web Service 1 (Production)                   │  │  • Render Web Service 2 (Demo Staging)                 │
+│  • Primary Supabase / PostgreSQL (Real Employee Data)  │  │  • Dedicated Demo Supabase / PostgreSQL (Synthetic)    │
+│  • ENABLE_GUEST_DEMO=false (or unset)                  │  │  • ENABLE_GUEST_DEMO=true                              │
+│  • Guest Login Endpoints: 404 Route Not Found          │  │  • Guest Login Endpoints: Active (60-min Ephemeral)    │
+│  • 1-Click Guest Buttons: Automatically Hidden         │  │  • 1-Click Guest Buttons: Visible                      │
+└────────────────────────────────────────────────────────┘  └────────────────────────────────────────────────────────┘
+```
+
+### Architecture & Security Controls:
+1. **Zero Production Leakage**: In production, `ENABLE_GUEST_DEMO` is unset. Guest login buttons are automatically hidden via `GET /api/auth/config`, and all demo login endpoints return `404 Route not found`.
+2. **Startup Verification Guard**: On service boot, `initDemoGuard` verifies that the connected database contains zero real accounts (`isDemo: false`). If any real account is detected while `ENABLE_GUEST_DEMO=true`, the server logs a critical security alert and fails closed (locking all guest endpoints).
+3. **Synthetic Seed Script**: `scripts/seed-demo-data.js` populates an empty demo database with 15 realistic synthetic employee profiles, 30 days of attendance logs, leave records, 3 job openings, 6 candidates with AI evaluations, payslips, announcements, and the two dedicated demo credentials (`guest-hr@demo.invalid` and `guest-employee@demo.invalid`). It strictly refuses to execute if the database contains any non-demo users.
+4. **Defense-in-Depth Middleware (`blockDemo`)**: Guest sessions (`req.user.isDemo === true`) are blocked from mutating sensitive resources (e.g. password changes, profile edits, document uploads, employee onboarding/deletion, payroll runs, Gmail sync) with `403 { code: 'DEMO_MODE' }`.
+
+### Step-by-Step Deployment:
+1. **Provision Dedicated Demo Database**: Create a new, empty database instance in Supabase (or any PostgreSQL provider).
+2. **Deploy Second Web Service on Render**: Create a secondary web service pointing to the repository.
+3. **Configure Demo Service Environment Variables**:
+   ```env
+   NODE_ENV=production
+   ENABLE_GUEST_DEMO=true
+   DATABASE_URL="postgresql://postgres:password@demo-db.supabase.co:5432/postgres?schema=public"
+   JWT_SECRET="demo_dedicated_secret_key_minimum_32_characters_long"
+   CORS_ORIGINS="https://demo.nexahr.com,https://your-demo-client.vercel.app"
+   ```
+4. **Run Database Migrations & Demo Seeder**:
+   ```bash
+   # Apply database migrations on the demo database
+   DATABASE_URL="postgresql://...demo-db..." npx prisma migrate deploy
+
+   # Seed synthetic demo data (requires confirmation flag or DEMO_DATABASE_URL)
+   DEMO_DATABASE_URL="postgresql://...demo-db..." node scripts/seed-demo-data.js
+   ```
+5. **Session Expiration**: Demo sessions issue 60-minute ephemeral tokens. Demo users view a subtle "Demo Sandbox" chip in the application header with a 1-click "Exit demo" action.
+
+---
+
 ## 🛠️ Tech Stack
 
 ### **Frontend Client**

@@ -31,6 +31,7 @@ const documentRoutes = require('./routes/document.routes');
 const { startSelfPing, stopSelfPing } = require('./services/selfPing.service');
 const { startGmailPolling, stopGmailPolling } = require('./services/gmail.service');
 const { processEmailBatch } = require('./services/atsPipeline.service');
+const { initDemoGuard } = require('./services/demoGuard.service');
 const cacheService = require('./services/cache.service');
 
 const app = express();
@@ -232,6 +233,11 @@ app.use((err, req, res, next) => {
       : (isProduction && statusCode === 500 ? 'An internal server error occurred.' : err.message),
     ...(isProduction ? {} : { stack: err.stack }),
   });
+});
+
+// Initialize Demo Environment Startup Guard
+initDemoGuard(prisma).catch((err) => {
+  console.error('[DEMO GUARD INITIALIZATION ERROR]:', err.message);
 });
 
 // Start Server

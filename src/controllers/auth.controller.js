@@ -1,8 +1,9 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/prisma');
-const { hashPassword, comparePassword } = require('../utils/password');
+const { hashPassword, comparePassword, validatePasswordStrength } = require('../utils/password');
 const { generateToken } = require('../utils/jwt');
+const { isGuestDemoActive } = require('../services/demoGuard.service');
 const {
   sendEmailOTP,
   sendWhatsAppOTP,
@@ -141,6 +142,13 @@ const login = async (req, res) => {
       });
     }
 
+    if (user.isDemo === true) {
+      return res.status(403).json({
+        success: false,
+        message: 'Demo accounts cannot authenticate via standard login. Please use the guest experience portal.',
+      });
+    }
+
     // Role-based portal restriction enforcement
     if (requestedRole) {
       if (['hr', 'admin', 'hr_admin', 'hr_manager'].includes(requestedRole)) {
@@ -160,21 +168,19 @@ const login = async (req, res) => {
       }
     }
 
-    // Generate hardened 24-hour JWT
+    // Generate hardened 1-hour JWT
     const token = generateToken({
       userId: user.id,
       role: user.role,
+      isDemo: false,
     });
 
     // Bearer token returned in response body; cookies explicitly not set to eliminate CSRF risk
-
-    const isDemoEmail = ['umaaiirakram@gmail.com'].includes(user.email?.toLowerCase());
-
     return res.status(200).json({
       success: true,
       message: 'Login successful.',
       data: {
-        token, // Included for backward compatibility with clients passing Authorization header
+        token,
         expiresIn: 3600, // Strict 1-hour validity window (seconds)
         user: {
           id: user.id,
@@ -183,8 +189,9 @@ const login = async (req, res) => {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
-          mustChangePassword: isDemoEmail ? false : (user.mustChangePassword ?? false),
-          isGuest: isDemoEmail,
+          mustChangePassword: user.mustChangePassword ?? false,
+          isGuest: false,
+          isDemo: false,
         },
       },
     });
@@ -206,28 +213,28 @@ const getAuthConfig = (req, res) => {
   return res.status(200).json({
     success: true,
     data: {
-      guestDemoEnabled: process.env.ENABLE_GUEST_DEMO === 'true',
+      guestDemoEnabled: isGuestDemoActive(),
     },
   });
 };
 
 /**
  * 1-Click Demo / Guest Session Initialization
- * POST /api/auth/demo-login
- * Returns 404 unless ENABLE_GUEST_DEMO === 'true'.
- * NEVER queries or issues tokens for real accounts.
+ * POST /api/auth/guest-login & POST /api/auth/demo-login
+ * Returns 404 unless ENABLE_GUEST_DEMO === 'true' AND startup guard passed.
+ * Dedicated to isolated demo users (guest-hr@demo.invalid / guest-employee@demo.invalid).
  */
 const demoLogin = async (req, res) => {
   try {
-    if (process.env.ENABLE_GUEST_DEMO !== 'true') {
+    if (process.env.ENABLE_GUEST_DEMO !== 'true' || !isGuestDemoActive()) {
       return res.status(404).json({
         success: false,
         message: 'Route not found.',
       });
     }
 
-    const { role } = req.body || {};
-    const requestedRole = String(role || 'hr').toLowerCase().trim();
+    const { role, type } = req.body || {};
+    const requestedRole = String(type || role || 'hr').toLowerCase().trim();
 
     let targetEmail;
     if (['hr', 'admin', 'hr_manager', 'hr_admin'].includes(requestedRole)) {
@@ -237,13 +244,14 @@ const demoLogin = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: "Invalid demo role. Must be 'hr' or 'employee'.",
+        message: "Invalid demo type. Must be 'HR' or 'EMPLOYEE'.",
       });
     }
 
     const user = await prisma.user.findFirst({
       where: {
         email: targetEmail,
+        isDemo: true,
         isActive: true,
       },
     });
@@ -251,7 +259,7 @@ const demoLogin = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: `Demo user for role '${requestedRole}' not found or inactive.`,
+        message: `Demo user for role '${requestedRole}' not found or inactive. Please run 'node scripts/seed-demo-data.js'.`,
       });
     }
 
@@ -327,6 +335,7 @@ const getMe = async (req, res) => {
         role: true,
         isActive: true,
         mustChangePassword: true,
+        isDemo: true,
         createdAt: true,
         salaryStructure: true,
         profile: {
@@ -455,7 +464,7 @@ const checkRecoveryUser = async (req, res) => {
     });
 
     // Constant-structure & timing safe: Always return 200 with identical shape and plausible fake hints
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || user.isDemo) {
       crypto.createHash('sha256').update(identifier).digest('hex');
       const fakeMaskedEmail = maskEmail(identifier.includes('@') ? identifier : `${identifier}@corporate.local`);
       return res.status(200).json({
@@ -567,6 +576,14 @@ const forgotPassword = async (req, res) => {
         success: false,
         message: 'Please wait before requesting another code.',
         code: 'OTP_COOLDOWN_ACTIVE',
+      });
+    }
+
+    if (user.isDemo) {
+      return res.status(403).json({
+        success: false,
+        code: 'DEMO_MODE',
+        message: 'Password recovery is disabled for demo accounts.',
       });
     }
 
@@ -863,6 +880,26 @@ const resetPassword = async (req, res) => {
       });
     }
 
+    if (user.isDemo) {
+      return res.status(403).json({
+        success: false,
+        code: 'DEMO_MODE',
+        message: 'Password reset is disabled for demo accounts.',
+      });
+    }
+
+    const strength = validatePasswordStrength(newPassword, {
+      email: user.email,
+    });
+
+    if (!strength.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: strength.errors[0],
+        errors: strength.errors,
+      });
+    }
+
     // 3. Hash new password
     const hashedPassword = await hashPassword(newPassword);
 
@@ -942,6 +979,14 @@ const updateMyProfile = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'User profile not found.',
+      });
+    }
+
+    if (user.isDemo === true || req.user?.isDemo === true) {
+      return res.status(403).json({
+        success: false,
+        code: 'DEMO_MODE',
+        message: 'Profile updates are not available in demo mode.',
       });
     }
 
@@ -1099,13 +1144,6 @@ const changeMyPassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: 'New password must be at least 6 characters long.',
-      });
-    }
-
     if (confirmPassword && newPassword !== confirmPassword) {
       return res.status(400).json({
         success: false,
@@ -1124,10 +1162,10 @@ const changeMyPassword = async (req, res) => {
       });
     }
 
-    const isDemoEmail = ['hr@nexahr.com', 'umaaiirakram@gmail.com'].includes(user.email?.toLowerCase());
-    if (isDemoEmail) {
+    if (user.isDemo === true || req.user?.isDemo === true) {
       return res.status(403).json({
         success: false,
+        code: 'DEMO_MODE',
         message: 'Password and credential changes are locked for Demo / Guest accounts.',
       });
     }
@@ -1137,6 +1175,19 @@ const changeMyPassword = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Incorrect current password. Please try again.',
+      });
+    }
+
+    const strength = validatePasswordStrength(newPassword, {
+      email: user.email,
+      currentPassword,
+    });
+
+    if (!strength.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: strength.errors[0],
+        errors: strength.errors,
       });
     }
 

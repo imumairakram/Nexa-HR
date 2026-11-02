@@ -14,18 +14,20 @@ const {
   updateMyProfile,
   changeMyPassword,
 } = require('../controllers/auth.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
 const {
   authRateLimiter,
   passwordResetRateLimiter,
   recoveryCheckRateLimiter,
   recoveryCheckIdentifierLimiter,
+  guestLoginRateLimiter,
 } = require('../middlewares/rateLimiter.middleware');
 const {
   loginValidationRules,
   forgotPasswordValidationRules,
   verifyOtpValidationRules,
   resetPasswordValidationRules,
+  changePasswordValidationRules,
 } = require('../middlewares/validator.middleware');
 
 // ====================================================
@@ -34,12 +36,12 @@ const {
 router.get('/config', getAuthConfig);
 router.post('/register-admin', registerAdmin);
 router.post('/login', authRateLimiter, loginValidationRules, login);
-router.post('/demo-login', authRateLimiter, demoLogin);
-router.post('/guest-login', authRateLimiter, demoLogin);
+router.post('/demo-login', guestLoginRateLimiter, demoLogin);
+router.post('/guest-login', guestLoginRateLimiter, demoLogin);
 router.post('/logout', logout);
 router.get('/me', verifyToken, getMe);
-router.put('/profile', verifyToken, updateMyProfile);
-router.put('/change-password', verifyToken, changeMyPassword);
+router.put('/profile', verifyToken, blockDemo, updateMyProfile);
+router.put('/change-password', verifyToken, blockDemo, changePasswordValidationRules, changeMyPassword);
 
 // ====================================================
 // EPHEMERAL CRYPTOGRAPHIC PASSWORD RECOVERY ROUTES

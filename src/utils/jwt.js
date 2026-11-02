@@ -29,6 +29,7 @@ const generateToken = (payload) => {
     {
       userId: payload.userId,
       role: payload.role,
+      isDemo: payload.isDemo === true,
     },
     JWT_SECRET,
     {

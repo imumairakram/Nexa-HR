@@ -95,6 +95,22 @@ const generalApiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+/**
+ * Dedicated Rate Limiter for Guest/Demo Login Endpoint
+ * 20 attempts per 15-minute window per IP in production (100 in dev)
+ */
+const guestLoginRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 20 : 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many demo session requests from this IP. Please try again after 15 minutes.',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+});
+
 module.exports = {
   authRateLimiter,
   passwordResetRateLimiter,
@@ -102,4 +118,5 @@ module.exports = {
   recoveryCheckRateLimiter,
   recoveryCheckIdentifierLimiter,
   generalApiLimiter,
+  guestLoginRateLimiter,
 };

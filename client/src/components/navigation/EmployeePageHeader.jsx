@@ -400,6 +400,25 @@ const EmployeePageHeader = ({
 
         {/* Utility Action Buttons: Row 1 Col 2 on Mobile, Right side on Desktop */}
         <div className="col-start-2 row-start-1 self-center justify-self-end flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap sm:order-3">
+          {/* Demo Sandbox Session Chip */}
+          {currentUser?.isDemo && (
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs font-semibold shrink-0">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="hidden sm:inline">Demo Sandbox</span>
+              <button
+                type="button"
+                onClick={() => {
+                  clearSession();
+                  window.location.href = '/login';
+                }}
+                className="ml-1 text-[11px] underline hover:text-amber-700 dark:hover:text-amber-300 font-bold cursor-pointer"
+                title="Exit Demo Sandbox"
+              >
+                Exit
+              </button>
+            </div>
+          )}
+
           {/* Refresh Button */}
           <button
             type="button"

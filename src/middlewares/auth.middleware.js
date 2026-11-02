@@ -42,6 +42,7 @@ const verifyToken = async (req, res, next) => {
           role: true,
           isActive: true,
           employeeCode: true,
+          isDemo: true,
         },
       });
       if (user && user.isActive) {
@@ -64,6 +65,7 @@ const verifyToken = async (req, res, next) => {
       role: user.role,
       fullName: `${user.firstName} ${user.lastName}`,
       employeeCode: user.employeeCode || null,
+      isDemo: decoded.isDemo === true || user.isDemo === true,
     };
 
     return next();
@@ -84,6 +86,21 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
+/**
+ * Defense-in-depth middleware to block demo sessions from mutating data or accessing sensitive resources
+ */
+const blockDemo = (req, res, next) => {
+  if (req.user?.isDemo === true) {
+    return res.status(403).json({
+      success: false,
+      code: 'DEMO_MODE',
+      message: 'Not available in demo mode.',
+    });
+  }
+  next();
+};
+
 module.exports = {
   verifyToken,
+  blockDemo,
 };

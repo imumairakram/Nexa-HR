@@ -205,12 +205,7 @@ const Login = () => {
           return;
         }
 
-        const isDemoEmail = ['umairdevelop@gmail.com', 'umaaiirakram@gmail.com'].includes(formData.email.trim().toLowerCase());
-        if (isDemoEmail) {
-          localStorage.setItem('isGuest', 'true');
-        } else {
-          localStorage.removeItem('isGuest');
-        }
+        localStorage.removeItem('isGuest');
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
         setError(res?.message || 'Invalid email or password. Please try again.');
@@ -231,9 +226,9 @@ const Login = () => {
     try {
       const res = await api.demoLogin({ role: targetRole });
       if (res && res.success) {
-        // Ensure guest users never have mustChangePassword active in storage
+        // Ensure guest users never have mustChangePassword active in storage and mark isDemo
         if (res.data?.user) {
-          const userWithGuestFlag = { ...res.data.user, mustChangePassword: false, isGuest: true };
+          const userWithGuestFlag = { ...res.data.user, mustChangePassword: false, isGuest: true, isDemo: true };
           localStorage.setItem('user', JSON.stringify(userWithGuestFlag));
         }
         const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'ADMIN' : 'EMPLOYEE');

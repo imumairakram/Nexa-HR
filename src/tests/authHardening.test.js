@@ -13,6 +13,7 @@ const {
   maskPhone,
 } = require('../services/notification.service');
 const { generateToken, verifyJwtToken } = require('../utils/jwt');
+const { setGuestDemoActiveForTesting } = require('../services/demoGuard.service');
 
 test('Security Batch 1 - Fix 1B: Backdoor Removal & Database-Only Authentication', async (t) => {
   const app = express();
@@ -673,12 +674,14 @@ test('Security Batch 1 - 1-Click Demo Login Endpoint & Auth Config', async (t) =
     const orig = process.env.ENABLE_GUEST_DEMO;
     try {
       process.env.ENABLE_GUEST_DEMO = 'true';
+      setGuestDemoActiveForTesting(true);
       const res = await fetch(`${baseUrl}/config`);
       assert.equal(res.status, 200);
       const data = await res.json();
       assert.equal(data.success, true);
       assert.equal(data.data.guestDemoEnabled, true);
     } finally {
+      setGuestDemoActiveForTesting(false);
       if (orig !== undefined) {
         process.env.ENABLE_GUEST_DEMO = orig;
       } else {
