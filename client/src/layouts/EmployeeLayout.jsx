@@ -4,14 +4,22 @@ import EmployeeSidebar from '../components/navigation/EmployeeSidebar';
 import EmployeeBottomNav from '../components/navigation/EmployeeBottomNav';
 import ErrorBoundary from '../components/common/ErrorBoundary';
 import FirstLoginPasswordModal from '../components/common/FirstLoginPasswordModal';
+import DemoToast from '../components/common/DemoToast';
 import { isSessionValid, useSessionExpiry } from '../utils/session';
+import { isDemoSessionActive, getDemoSession, useDemoSessionExpiry } from '../demo/demoSession';
 
 const EmployeeLayout = () => {
-  const valid = isSessionValid();
+  const isDemo = isDemoSessionActive();
+  const demoSession = getDemoSession();
 
   // Active 1-Hour Session Timer: auto-expires and redirects when lifespan ends
   useSessionExpiry(() => {
     window.location.href = '/?expired=1';
+  });
+
+  // Active 60-Minute Demo Session Timer
+  useDemoSessionExpiry(() => {
+    window.location.href = '/?demo_ended=1';
   });
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -34,8 +42,16 @@ const EmployeeLayout = () => {
     });
   };
 
-  if (!valid) {
-    return <Navigate to="/?expired=1" replace />;
+  // Portal Route Guard: Strict Isolation
+  if (isDemo) {
+    if (demoSession?.role !== 'EMPLOYEE') {
+      // Guest HR attempted to access Employee portal
+      return <Navigate to="/app/dashboard" replace />;
+    }
+  } else {
+    if (!isSessionValid()) {
+      return <Navigate to="/?expired=1" replace />;
+    }
   }
 
   return (
@@ -44,8 +60,11 @@ const EmployeeLayout = () => {
         isCollapsed ? 'lg:pl-[112px]' : 'lg:pl-[288px]'
       }`}
     >
-      {/* Mandatory Password Change Modal for First Time Login */}
-      <FirstLoginPasswordModal />
+      {/* Global Toast for Demo Alerts */}
+      <DemoToast />
+
+      {/* Mandatory Password Change Modal for First Time Login (Real users only) */}
+      {!isDemo && <FirstLoginPasswordModal />}
 
       {/* Fixed Left Sidebar with Collapse/Expand */}
       <EmployeeSidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />

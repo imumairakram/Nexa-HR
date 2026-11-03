@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, ShieldAlert, KeyRound, CheckCircle2, RefreshCw, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { api } from '../../services/api';
+import { isDemoSessionActive } from '../../demo/demoSession';
 
 const FirstLoginPasswordModal = () => {
   const [user, setUser] = useState(null);
@@ -19,12 +20,16 @@ const FirstLoginPasswordModal = () => {
 
   const checkUserStatus = () => {
     try {
+      if (isDemoSessionActive()) {
+        setShowModal(false);
+        return;
+      }
       const stored = localStorage.getItem('user');
       const isGuestFlag = localStorage.getItem('isGuest') === 'true';
       if (stored) {
         const u = JSON.parse(stored);
         setUser(u);
-        const isDemo = isGuestFlag || u.isGuest || ['umairdevelop@gmail.com', 'umaaiirakram@gmail.com'].includes(u.email?.toLowerCase());
+        const isDemo = isGuestFlag || Boolean(u?.isGuest || u?.isDemo);
         if (!isDemo && u && u.mustChangePassword === true) {
           setShowModal(true);
         } else {

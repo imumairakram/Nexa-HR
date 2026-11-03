@@ -1,6 +1,12 @@
 // Centralized High-Performance API Client for NexaHR Frontend Integration
 // Features: In-memory SWR caching, in-flight deduplication, and instant mutation invalidation.
 import { startSession, isSessionValid, clearSession } from '../utils/session';
+import {
+  isDemoSessionActive,
+  showDemoToast,
+  DemoModeError,
+} from '../demo/demoSession';
+import { handleDemoGetRequest } from '../demo/fixtureRouter';
 
 const rawBase = import.meta.env.VITE_API_URL || '';
 const BASE_URL = rawBase ? (rawBase.endsWith('/api') ? rawBase : `${rawBase.replace(/\/+$/, '')}/api`) : '/api';
@@ -36,6 +42,29 @@ async function fetchAPI(endpoint, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
   const isGet = method === 'GET';
   const bypassCache = options.bypassCache === true;
+
+  // 0. FRONTEND DEMO MODE GUARD: ZERO network calls, pure fixture emulation
+  if (isDemoSessionActive()) {
+    if (!isGet) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      throw new DemoModeError('Demo mode: view only. Changes are disabled.');
+    }
+    if (!bypassCache) {
+      const cached = clientCache.get(endpoint);
+      if (cached) {
+        const age = Date.now() - cached.timestamp;
+        if (age < DEFAULT_CACHE_TTL) {
+          return cached.data;
+        }
+      }
+    }
+    const demoData = await handleDemoGetRequest(endpoint);
+    clientCache.set(endpoint, {
+      timestamp: Date.now(),
+      data: demoData,
+    });
+    return demoData;
+  }
 
   // 1. SWR / In-Memory Cache Lookup for GET requests
   if (isGet && !bypassCache) {
@@ -253,6 +282,10 @@ export const api = {
   },
 
   uploadProfilePicture: async (formData) => {
+    if (isDemoSessionActive()) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      throw new DemoModeError('Demo mode: view only. Changes are disabled.');
+    }
     const token = localStorage.getItem('token');
     const response = await fetch(`${BASE_URL}/employees/profile-picture`, {
       method: 'POST',
@@ -924,6 +957,10 @@ export const api = {
     return await fetchAPI(`/recruitment/applications/${id}`);
   },
   viewApplicationResume: async (id) => {
+    if (isDemoSessionActive()) {
+      showDemoToast('CV preview is not available in demo mode.');
+      throw new DemoModeError('CV preview is not available in demo mode.');
+    }
     const token = localStorage.getItem('token');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const res = await fetch(`${BASE_URL}/recruitment/applications/${id}/resume`, {

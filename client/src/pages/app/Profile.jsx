@@ -33,6 +33,7 @@ import {
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { ProfileSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
+import { isDemoSessionActive } from '../../demo/demoSession';
 
 // Helper to reliably parse Emergency Contact string into individual fields
 const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / Guardian', fallbackPhone = '') => {
@@ -166,7 +167,7 @@ const Profile = () => {
 
   const populateUserData = (u) => {
     const isAdmin = u.role === 'ADMIN';
-    const isHR = u.role === 'HR_MANAGER' || u.role === 'HR' || u.email === 'umairdevelop@gmail.com';
+    const isHR = u.role === 'HR_MANAGER' || u.role === 'HR';
 
     const residentialAddress = u.profile?.address || u.address || '';
     const officeLocation = u.profile?.workLocation || u.workLocation || 'Islamabad HQ & Innovation Lab';
@@ -458,7 +459,7 @@ const Profile = () => {
     }
   };
 
-  const isGuest = currentUser?.isDemo === true;
+  const isGuest = isDemoSessionActive() || currentUser?.isDemo === true;
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();

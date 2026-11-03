@@ -27,6 +27,7 @@ import { useTheme } from '../../context/ThemeContext';
 import Logo from '../../components/common/Logo';
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal';
 import { isSessionValid, clearSession, consumeSessionExpiredNotice } from '../../utils/session';
+import { isGuestDemoConfigured, startDemoSession, isDemoSessionActive, getDemoSession } from '../../demo/demoSession';
 
 
 // High-fidelity SVG Donut Chart for Workforce Presence
@@ -93,30 +94,25 @@ const Login = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
   const [sessionExpiredNotice, setSessionExpiredNotice] = useState(null);
-  const [guestDemoEnabled, setGuestDemoEnabled] = useState(false);
+  const [guestDemoEnabled, setGuestDemoEnabled] = useState(() => isGuestDemoConfigured());
 
-  // Fetch authentication configuration to conditionally display guest buttons
+  // Client-side demo feature flag check
   useEffect(() => {
-    let isMounted = true;
-    api.getAuthConfig()
-      .then((res) => {
-        if (isMounted && res?.data?.guestDemoEnabled) {
-          setGuestDemoEnabled(true);
-        }
-      })
-      .catch(() => {
-        if (isMounted) setGuestDemoEnabled(false);
-      });
-    return () => {
-      isMounted = false;
-    };
+    setGuestDemoEnabled(isGuestDemoConfigured());
   }, []);
 
   // Check for expired session query param or stored notice on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const noticeFromStorage = consumeSessionExpiredNotice();
-    if (params.get('expired') === '1' || noticeFromStorage) {
+    if (params.get('demo_ended') === '1') {
+      setSessionExpiredNotice(
+        'Your 60-minute guest demo session has concluded. Thank you for exploring NexaHR.'
+      );
+      try {
+        window.history.replaceState({}, '', window.location.pathname);
+      } catch { }
+    } else if (params.get('expired') === '1' || noticeFromStorage) {
       setSessionExpiredNotice(
         noticeFromStorage || 'Your 1-hour session has expired for security. Please sign in again.'
       );
@@ -168,6 +164,12 @@ const Login = () => {
     return () => clearInterval(timer);
   }, [slides.length]);
 
+  // If demo session active, redirect to portal immediately
+  if (isDemoSessionActive()) {
+    const demo = getDemoSession();
+    return <Navigate to={demo?.role === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard'} replace />;
+  }
+
   // If already authenticated with an active valid 1-hour session, redirect to portal
   const hasValidSession = isSessionValid();
   if (hasValidSession) {
@@ -217,30 +219,11 @@ const Login = () => {
     }
   };
 
-  const handleGuestLogin = async (roleToLogin) => {
-    const targetRole = roleToLogin || loginRole;
-    setLoading(true);
+  const handleGuestLogin = (roleToLogin) => {
+    const targetRole = (roleToLogin || loginRole) === 'hr' ? 'ADMIN' : 'EMPLOYEE';
     setError(null);
-    localStorage.setItem('isGuest', 'true');
-
-    try {
-      const res = await api.demoLogin({ role: targetRole });
-      if (res && res.success) {
-        // Ensure guest users never have mustChangePassword active in storage and mark isDemo
-        if (res.data?.user) {
-          const userWithGuestFlag = { ...res.data.user, mustChangePassword: false, isGuest: true, isDemo: true };
-          localStorage.setItem('user', JSON.stringify(userWithGuestFlag));
-        }
-        const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'ADMIN' : 'EMPLOYEE');
-        navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
-      } else {
-        setError(res?.message || 'Guest login failed. Please try again.');
-      }
-    } catch (err) {
-      setError(err.message || 'Unable to connect to server for guest demo.');
-    } finally {
-      setLoading(false);
-    }
+    startDemoSession(targetRole);
+    navigate(targetRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
   };
 
 

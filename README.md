@@ -408,6 +408,19 @@ To guarantee complete data isolation and prevent demo users from ever viewing, m
    ```
 5. **Session Expiration**: Demo sessions issue 60-minute ephemeral tokens. Demo users view a subtle "Demo Sandbox" chip in the application header with a 1-click "Exit demo" action.
 
+### 🌐 Frontend-Only Demo Mode (Zero Network, Zero Real Accounts)
+
+In addition to the isolated backend sandbox, NexaHR provides a completely **zero-network frontend-only demo mode**. It lets visitors test all HR and Employee portal workflows instantly using synthetic in-memory fixtures without contacting any backend server or touching real customer data.
+
+- **Environment Variables**:
+  - `VITE_ENABLE_GUEST_DEMO="true"`: Enables "Experience as Guest HR" and "Experience as Guest Employee" 1-click demo buttons on the login screen.
+  - `VITE_GUEST_DEMO_UNTIL="2026-12-31T23:59:59Z"`: Optional ISO date deadline. After this timestamp, guest buttons are hidden and active demo sessions terminate automatically.
+- **Data Isolation**: Guest sessions exist strictly in `sessionStorage` under `nexahr_demo_session` with a 60-minute timeout. Real sessions in `localStorage` are untouched.
+- **Central Network Guard**: All client API requests in `client/src/services/api.js` are intercepted:
+  - **GET**: Answered locally with synthetic fixtures across ~15 demo employees (`@demo.invalid`), 30-day attendance records, leave balances, payslips, job openings, and candidates.
+  - **Mutations (POST / PUT / PATCH / DELETE / Upload)**: Blocked immediately with a `DemoModeError` and toast: *"Demo mode: view only. Changes are disabled."*
+  - **CV Preview**: Shows toast: *"CV preview is not available in demo mode."*
+
 ---
 
 ## 🛠️ Tech Stack

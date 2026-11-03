@@ -1,3 +1,4 @@
+import { isDemoSessionActive } from '../demo/demoSession';
 import { useEffect, useRef } from 'react';
 
 // Strict 1-Hour Session Lifespan (60 minutes = 3,600,000 milliseconds)
@@ -115,6 +116,9 @@ export const clearSession = (noticeReason = null) => {
  */
 export const isSessionValid = () => {
   try {
+    if (isDemoSessionActive()) {
+      return true;
+    }
     const token = localStorage.getItem(SESSION_KEYS.TOKEN);
     const expiresAtStr = localStorage.getItem(SESSION_KEYS.EXPIRES_AT);
 

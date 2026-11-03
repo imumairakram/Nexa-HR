@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { TableSkeleton } from '../../../components/common/Skeleton';
 import { api } from '../../../services/api';
+import { isDemoSessionActive, showDemoToast } from '../../../demo/demoSession';
 import {
   Users,
   Search,
@@ -330,6 +331,11 @@ const ATSPipeline = () => {
     const candidate = candidates.find((c) => c.id === candidateId);
     if (!candidate) return;
 
+    if (isDemoSessionActive()) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      return;
+    }
+
     // Optimistic UI state update
     const updated = candidates.map((c) => (c.id === candidateId ? { ...c, stage: newStage } : c));
     persistCandidates(updated);
@@ -558,6 +564,10 @@ const ATSPipeline = () => {
   // Re-scan candidate CV with AI
 const handleViewResume = async (candidateId) => {
     try {
+      if (isDemoSessionActive()) {
+        showDemoToast('CV preview is not available in demo mode.');
+        return;
+      }
       showToast('Opening candidate CV...');
       await api.viewApplicationResume(candidateId);
     } catch (err) {

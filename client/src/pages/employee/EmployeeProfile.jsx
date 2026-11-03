@@ -33,6 +33,7 @@ import {
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { ProfileSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
+import { isDemoSessionActive } from '../../demo/demoSession';
 
 const DEFAULT_AVATAR = '/blank-profile-picture.png';
 
@@ -438,7 +439,7 @@ const EmployeeProfile = () => {
     }
   };
 
-  const isGuest = currentUser?.isDemo === true;
+  const isGuest = isDemoSessionActive() || currentUser?.isDemo === true;
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
