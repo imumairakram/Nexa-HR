@@ -35,6 +35,20 @@ function invalidateClientCache(pattern) {
   }
 }
 
+export function isGuestOrDemo() {
+  if (isDemoSessionActive()) return true;
+  if (typeof window === 'undefined') return false;
+  if (localStorage.getItem('isGuest') === 'true') return true;
+  try {
+    const rawUser = localStorage.getItem('user');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u.isDemo || u.isGuest) return true;
+    }
+  } catch {}
+  return false;
+}
+
 /**
  * Helper to execute HTTP fetch requests with auth headers, client caching, and deduplication.
  */
@@ -69,14 +83,7 @@ async function fetchAPI(endpoint, options = {}) {
   // Guest / Demo mode mutation protection:
   // Allow all GET requests to fetch live data from the backend.
   // Block any POST, PUT, PATCH, DELETE mutation on the client side with a clear toast.
-  let isGuestUser = localStorage.getItem('isGuest') === 'true';
-  try {
-    const rawUser = localStorage.getItem('user');
-    if (rawUser) {
-      const u = JSON.parse(rawUser);
-      if (u.isDemo || u.isGuest) isGuestUser = true;
-    }
-  } catch {}
+  const isGuestUser = isGuestOrDemo();
 
   if (isGuestUser && !isGet) {
     const isAuthEndpoint =
@@ -160,6 +167,9 @@ async function fetchAPI(endpoint, options = {}) {
           if (typeof window !== 'undefined' && window.location.pathname !== '/' && window.location.pathname !== '/login') {
             window.location.href = '/?expired=1';
           }
+        }
+        if (data?.code === 'DEMO_MODE' || (data?.message && data.message.toLowerCase().includes('demo mode'))) {
+          showDemoToast(data.message || 'Demo mode: view only. Changes are disabled.');
         }
         throw new Error(data.message || `Server error (${response.status})`);
       }
@@ -308,7 +318,7 @@ export const api = {
   },
 
   uploadProfilePicture: async (formData) => {
-    if (isDemoSessionActive()) {
+    if (isGuestOrDemo()) {
       showDemoToast('Demo mode: view only. Changes are disabled.');
       throw new DemoModeError('Demo mode: view only. Changes are disabled.');
     }
@@ -983,7 +993,7 @@ export const api = {
     return await fetchAPI(`/recruitment/applications/${id}`);
   },
   viewApplicationResume: async (id) => {
-    if (isDemoSessionActive()) {
+    if (isGuestOrDemo()) {
       showDemoToast('CV preview is not available in demo mode.');
       throw new DemoModeError('CV preview is not available in demo mode.');
     }

@@ -210,6 +210,7 @@ const EmploymentStatus = () => {
         alert(res?.message || 'Failed to update employee status.');
       }
     } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') return;
       console.error('Failed to update employee status:', err);
       alert('Error updating status. Please try again.');
     } finally {
@@ -232,6 +233,10 @@ const EmploymentStatus = () => {
         alert(res?.message || 'Failed to delete employee.');
       }
     } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') {
+        setEmployeeToDelete(null);
+        return;
+      }
       console.error('Error removing employee:', err);
       alert('Error removing employee. Please try again.');
     } finally {

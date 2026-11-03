@@ -33,7 +33,7 @@ import {
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { ProfileSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
-import { isDemoSessionActive } from '../../demo/demoSession';
+import { isDemoSessionActive, showDemoToast } from '../../demo/demoSession';
 
 // Helper to reliably parse Emergency Contact string into individual fields
 const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / Guardian', fallbackPhone = '') => {
@@ -116,6 +116,7 @@ const Profile = () => {
       return {};
     }
   });
+  const isGuest = isDemoSessionActive() || currentUser?.isDemo === true || localStorage.getItem('isGuest') === 'true';
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
@@ -303,6 +304,12 @@ const Profile = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (isGuest) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      e.target.value = '';
+      return;
+    }
+
     // Fast preview
     const previewUrl = URL.createObjectURL(file);
     setAvatar(previewUrl);
@@ -356,6 +363,10 @@ const Profile = () => {
   };
 
   const handleRemoveAvatar = async () => {
+    if (isGuest) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      return;
+    }
     setIsUploadingAvatar(true);
     try {
       await api.removeProfilePicture();
@@ -392,6 +403,10 @@ const Profile = () => {
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    if (isGuest) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      return;
+    }
     setIsSaving(true);
 
     try {
@@ -437,6 +452,10 @@ const Profile = () => {
 
       showToast('Personal information & Emergency Contact updated successfully in database!');
     } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') {
+        showDemoToast('Demo mode: view only. Changes are disabled.');
+        return;
+      }
       console.warn('Backend update notice (saving locally):', err.message);
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
       const updatedUser = {
@@ -459,13 +478,11 @@ const Profile = () => {
     }
   };
 
-  const isGuest = isDemoSessionActive() || currentUser?.isDemo === true;
-
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
 
     if (isGuest) {
-      showToast('Password changes are restricted in Demo / Guest mode.');
+      showDemoToast('Demo mode: view only. Changes are disabled.');
       return;
     }
 

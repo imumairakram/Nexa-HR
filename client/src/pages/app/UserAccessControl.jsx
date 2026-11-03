@@ -262,6 +262,7 @@ const UserAccessControl = () => {
         showToast('Could not save user feature access.', 'error');
       }
     } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') return;
       showToast(err.message || 'Failed to update user role in database.', 'error');
     } finally {
       setSubmitting(false);

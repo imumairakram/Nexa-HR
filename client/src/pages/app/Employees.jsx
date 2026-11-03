@@ -194,6 +194,10 @@ const Employees = () => {
         showToast(res?.message || 'Failed to remove employee.', 'error');
       }
     } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') {
+        setEmployeeToDelete(null);
+        return;
+      }
       console.error('Delete employee error:', err);
       // Optimistic local fallback if backend endpoint handles soft delete or succeeds
       setEmployees((prev) => prev.filter((e) => e.id !== employeeToDelete.id));
@@ -482,6 +486,10 @@ NexaHR Workforce Systems`;
       setIsEditOpen(false);
       showToast(`Profile for ${updatedEmp.firstName} ${updatedEmp.lastName} updated successfully.`);
     } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') {
+        setIsEditOpen(false);
+        return;
+      }
       console.error('Update employee error:', err);
       // Update locally
       const updatedEmp = {

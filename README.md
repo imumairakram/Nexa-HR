@@ -406,7 +406,7 @@ To guarantee complete data isolation and prevent demo users from ever viewing, m
    # Seed synthetic demo data (requires confirmation flag or DEMO_DATABASE_URL)
    DEMO_DATABASE_URL="postgresql://...demo-db..." node scripts/seed-demo-data.js
    ```
-5. **Session Expiration**: Demo sessions issue 60-minute ephemeral tokens. Demo users view a subtle "Demo Sandbox" chip in the application header with a 1-click "Exit demo" action.
+5. **Session Expiration & View-Only Protection**: Demo sessions issue 60-minute ephemeral tokens. If a demo user attempts to modify or delete data, an alert toaster popup informs them that demo mode is view-only.
 
 ### 🌐 Frontend-Only Demo Mode (Zero Network, Zero Real Accounts)
 
