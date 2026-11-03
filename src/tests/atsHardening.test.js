@@ -3,6 +3,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+
+// Enforce zero external network calls
+const { installNetworkGuard } = require('./helpers/networkGuard');
+installNetworkGuard();
+
+const { getDbTestEligibility } = require('./helpers/dbGuard');
 const prisma = require('../config/prisma');
 const { generateToken } = require('../utils/jwt');
 const cacheService = require('../services/cache.service');
@@ -121,7 +127,12 @@ test('ATS Hardening - Authenticated Resume Access & RBAC', async (t) => {
     assert.match(body.message, /Forbidden.*EMPLOYEE/i);
   });
 
-  await t.test('200 OK with Content-Type and Content-Disposition when requesting resume with HR_MANAGER role', async () => {
+  await t.test('200 OK with Content-Type and Content-Disposition when requesting resume with HR_MANAGER role', async (sub) => {
+    const dbEligibility = getDbTestEligibility();
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
     const hrToken = generateToken({
       userId: 'mock-hr-id',
       email: 'hr@nexahr.com',

@@ -7,10 +7,28 @@ const GMAIL_SCOPES = [
 ];
 
 const PROCESSED_LABEL_NAME = 'NexaHR-Processed';
+const IGNORED_LABEL_NAME = 'NexaHR-Ignored';
+const DEFAULT_GMAIL_SEARCH_QUERY =
+  'is:unread has:attachment -label:NexaHR-Processed -label:NexaHR-Ignored -from:mailer-daemon -from:postmaster -from:me -subject:("Delivery Status Notification") -subject:("Undeliverable")';
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
 
 let cronTask = null;
 let cachedLabelId = null;
+let cachedIgnoredLabelId = null;
+let ignoredCount = 0;
+
+function getIgnoredCount() {
+  return ignoredCount;
+}
+
+function incrementIgnoredCount(n = 1) {
+  ignoredCount += n;
+  return ignoredCount;
+}
+
+function resetIgnoredCount() {
+  ignoredCount = 0;
+}
 
 /**
  * Checks if all required Gmail credentials are set
@@ -82,6 +100,132 @@ async function getOrCreateProcessedLabel(gmail, userId = 'me') {
     console.error('[GMAIL SERVICE] Failed to get or create NexaHR-Processed label:', error.message);
     throw error;
   }
+}
+
+/**
+ * Ensures the NexaHR-Ignored label exists on the mailbox and returns its ID
+ */
+async function getOrCreateIgnoredLabel(gmail, userId = 'me') {
+  if (cachedIgnoredLabelId) return cachedIgnoredLabelId;
+
+  try {
+    const res = await gmail.users.labels.list({ userId });
+    const labels = res.data.labels || [];
+    const existing = labels.find((l) => l.name.toLowerCase() === IGNORED_LABEL_NAME.toLowerCase());
+
+    if (existing) {
+      cachedIgnoredLabelId = existing.id;
+      return existing.id;
+    }
+
+    const created = await gmail.users.labels.create({
+      userId,
+      requestBody: {
+        name: IGNORED_LABEL_NAME,
+        labelListVisibility: 'labelShow',
+        messageListVisibility: 'show',
+      },
+    });
+
+    cachedIgnoredLabelId = created.data.id;
+    return cachedIgnoredLabelId;
+  } catch (error) {
+    console.error('[GMAIL SERVICE] Failed to get or create NexaHR-Ignored label:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Detects whether an email is a system notification, bounce (NDR),
+ * delivery failure, auto-responder/out-of-office, or self-sent HR mail.
+ *
+ * @param {Object} params
+ * @param {Array<{name: string, value: string}>} [params.headers]
+ * @param {string} [params.subject]
+ * @param {string} [params.from]
+ * @param {Object} [params.payload]
+ * @returns {{ isBounce: boolean, reason?: string }}
+ */
+function isSystemOrBounceEmail({ headers = [], subject = '', from = '', payload = null } = {}) {
+  const getHeader = (name) => {
+    if (Array.isArray(headers)) {
+      const found = headers.find((h) => h && h.name && h.name.toLowerCase() === name.toLowerCase());
+      return found ? found.value : '';
+    }
+    return '';
+  };
+
+  const fromVal = (from || getHeader('from') || '').toLowerCase();
+  const subjectVal = (subject || getHeader('subject') || '').toLowerCase();
+  const returnPath = getHeader('return-path').toLowerCase();
+  const autoSubmitted = getHeader('auto-submitted').toLowerCase().trim();
+  const xFailedRecipients = getHeader('x-failed-recipients');
+  const precedence = getHeader('precedence').toLowerCase().trim();
+  const contentType = (getHeader('content-type') || payload?.mimeType || '').toLowerCase();
+
+  // 1. Mailer-daemon / Postmaster
+  if (fromVal.includes('mailer-daemon') || returnPath.includes('mailer-daemon')) {
+    return { isBounce: true, reason: 'Sender is mailer-daemon' };
+  }
+  if (fromVal.includes('postmaster') || returnPath.includes('postmaster')) {
+    return { isBounce: true, reason: 'Sender is postmaster' };
+  }
+
+  // 2. No-reply / Noreply
+  if (fromVal.includes('no-reply') || fromVal.includes('noreply')) {
+    return { isBounce: true, reason: 'Sender is no-reply address' };
+  }
+
+  // 3. Sent from HR mailbox itself / self-sent / bounce loop protection
+  const hrAddresses = [
+    process.env.GMAIL_HR_ADDRESS,
+    process.env.SMTP_USER,
+    process.env.EMAIL_FROM,
+  ]
+    .filter(Boolean)
+    .map((a) => a.toLowerCase().trim());
+
+  if (fromVal === 'me' || hrAddresses.some((addr) => addr && fromVal.includes(addr))) {
+    return { isBounce: true, reason: 'Self-sent email from HR / system mailbox' };
+  }
+
+  // 4. Auto-Submitted header (anything other than 'no')
+  if (autoSubmitted && autoSubmitted !== 'no') {
+    return { isBounce: true, reason: `Auto-Submitted header present (${autoSubmitted})` };
+  }
+
+  // 5. X-Failed-Recipients header
+  if (xFailedRecipients && xFailedRecipients.trim()) {
+    return { isBounce: true, reason: `X-Failed-Recipients header present (${xFailedRecipients})` };
+  }
+
+  // 6. Precedence: bulk | auto_reply | junk | list
+  if (['bulk', 'auto_reply', 'junk', 'list'].includes(precedence)) {
+    return { isBounce: true, reason: `Precedence header is ${precedence}` };
+  }
+
+  // 7. Content-Type multipart/report
+  if (contentType.includes('multipart/report')) {
+    return { isBounce: true, reason: 'Content-Type is multipart/report' };
+  }
+
+  // 8. Subject bounce / undeliverable / auto-response patterns
+  const bounceSubjects = [
+    'delivery status notification',
+    'undeliverable',
+    'mail delivery failed',
+    'returned mail',
+    'failure notice',
+    'automatic reply',
+    'out of office',
+    'autoreply',
+    'delivery failure',
+  ];
+  if (bounceSubjects.some((phrase) => subjectVal.includes(phrase))) {
+    return { isBounce: true, reason: `Subject indicates bounce or automated notice: "${subject || subjectVal}"` };
+  }
+
+  return { isBounce: false };
 }
 
 /**
@@ -202,7 +346,7 @@ async function fetchApplicationEmails({ maxResults = 10 } = {}) {
   }
 
   const userId = process.env.GMAIL_HR_ADDRESS || 'me';
-  const query = process.env.GMAIL_SEARCH_QUERY || 'is:unread has:attachment -label:NexaHR-Processed';
+  const query = process.env.GMAIL_SEARCH_QUERY || DEFAULT_GMAIL_SEARCH_QUERY;
 
   const listRes = await gmail.users.messages.list({
     userId,
@@ -228,11 +372,26 @@ async function fetchApplicationEmails({ maxResults = 10 } = {}) {
 
       const message = msgRes.data;
       const headers = message.payload?.headers || [];
-      const getHeader = (name) => headers.find((h) => h.name.toLowerCase() === name.toLowerCase())?.value || '';
+      const getHeader = (name) => headers.find((h) => h && h.name && h.name.toLowerCase() === name.toLowerCase())?.value || '';
 
       const from = getHeader('from');
       const subject = getHeader('subject');
       const date = getHeader('date');
+
+      // 1. Skip system notifications, NDRs, bounces, auto-responders, and self-sent emails
+      const bounceCheck = isSystemOrBounceEmail({
+        headers,
+        subject,
+        from,
+        payload: message.payload,
+      });
+
+      if (bounceCheck.isBounce) {
+        console.log(`[GMAIL SERVICE] Skipping system/bounce email "${subject}" (${message.id}): ${bounceCheck.reason}`);
+        await markEmailAsIgnored(message.id, bounceCheck.reason);
+        continue;
+      }
+
       const { name: senderName, email: senderEmail } = parseSender(from);
       const bodyText = extractBodyText(message.payload);
 
@@ -252,7 +411,7 @@ async function fetchApplicationEmails({ maxResults = 10 } = {}) {
         }
       }
 
-      // Only include emails that have at least one valid CV attachment
+      // Only include emails that have at least one valid CV attachment (<= 10MB)
       if (loadedAttachments.length > 0) {
         emails.push({
           messageId: message.id,
@@ -265,9 +424,9 @@ async function fetchApplicationEmails({ maxResults = 10 } = {}) {
           attachments: loadedAttachments,
         });
       } else {
-        // If no PDF/DOCX attachment found, mark processed so we don't inspect repeatedly
-        console.log(`[GMAIL SERVICE] Email "${subject}" (${message.id}) has no valid PDF/DOCX attachment. Marking processed.`);
-        await markEmailAsProcessed(message.id);
+        // If no valid PDF/DOCX attachment found, mark as ignored so we don't inspect repeatedly and don't spend AI tokens
+        console.log(`[GMAIL SERVICE] Email "${subject}" (${message.id}) has no valid PDF/DOCX attachment (<= 10MB). Marking ignored.`);
+        await markEmailAsIgnored(message.id, 'No valid PDF/DOCX attachment');
       }
     } catch (msgErr) {
       console.error(`[GMAIL SERVICE] Error inspecting email message ${item.id}:`, msgErr.message);
@@ -299,6 +458,33 @@ async function markEmailAsProcessed(messageId) {
     });
   } catch (error) {
     console.error(`[GMAIL SERVICE] Failed to mark message ${messageId} as processed:`, error.message);
+  }
+}
+
+/**
+ * Marks a Gmail message as ignored (bounces, system notices, emails without CV):
+ * 1. Adds label 'NexaHR-Ignored'
+ * 2. Removes 'UNREAD' label
+ */
+async function markEmailAsIgnored(messageId, reason = '') {
+  incrementIgnoredCount();
+  const gmail = getGmailClient();
+  if (!gmail) return;
+
+  const userId = process.env.GMAIL_HR_ADDRESS || 'me';
+  try {
+    const ignoredLabelId = await getOrCreateIgnoredLabel(gmail, userId);
+    await gmail.users.messages.modify({
+      userId,
+      id: messageId,
+      requestBody: {
+        addLabelIds: [ignoredLabelId],
+        removeLabelIds: ['UNREAD'],
+      },
+    });
+    console.log(`[GMAIL SERVICE] Marked message ${messageId} as ignored: ${reason || 'filter rule'}`);
+  } catch (error) {
+    console.error(`[GMAIL SERVICE] Failed to mark message ${messageId} as ignored:`, error.message);
   }
 }
 
@@ -353,10 +539,21 @@ module.exports = {
   getGmailClient,
   fetchApplicationEmails,
   markEmailAsProcessed,
+  markEmailAsIgnored,
+  getOrCreateProcessedLabel,
+  getOrCreateIgnoredLabel,
+  isSystemOrBounceEmail,
+  getIgnoredCount,
+  incrementIgnoredCount,
+  resetIgnoredCount,
   startGmailPolling,
   stopGmailPolling,
   parseSender,
   extractBodyText,
+  findCvAttachments,
   GMAIL_SCOPES,
+  PROCESSED_LABEL_NAME,
+  IGNORED_LABEL_NAME,
+  DEFAULT_GMAIL_SEARCH_QUERY,
 };
 

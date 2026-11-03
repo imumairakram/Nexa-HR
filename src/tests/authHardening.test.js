@@ -3,6 +3,12 @@ const assert = require('node:assert/strict');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+// Enforce zero external network calls
+const { installNetworkGuard } = require('./helpers/networkGuard');
+installNetworkGuard();
+
+const { getDbTestEligibility } = require('./helpers/dbGuard');
+const cacheService = require('../services/cache.service');
 const prisma = require('../config/prisma');
 const authRoutes = require('../routes/auth.routes');
 const {
@@ -11,6 +17,9 @@ const {
   sendWhatsAppOTP,
   maskEmail,
   maskPhone,
+  getTestMailOutbox,
+  getTestWhatsAppOutbox,
+  clearTestOutboxes,
 } = require('../services/notification.service');
 const { generateToken, verifyJwtToken } = require('../utils/jwt');
 const { setGuestDemoActiveForTesting } = require('../services/demoGuard.service');
@@ -74,6 +83,7 @@ test('Security Batch 1 - Fix 1B: Backdoor Removal & Database-Only Authentication
 });
 
 test('Security Batch 1 - Fix 4: No OTP or Password Reset URLs in Console Logs', async (t) => {
+  clearTestOutboxes();
   await t.test('sendPasswordResetEmail masks email and does NOT log reset URL', async () => {
     const originalLog = console.log;
     const capturedLogs = [];
@@ -105,6 +115,12 @@ test('Security Batch 1 - Fix 4: No OTP or Password Reset URLs in Console Logs', 
         true,
         'Email must be masked in log output'
       );
+
+      const mailOutbox = getTestMailOutbox();
+      assert.equal(mailOutbox.length, 1);
+      assert.equal(mailOutbox[0].to, 'audit-user@company.com');
+      assert.match(mailOutbox[0].subject, /Password Reset/i);
+      clearTestOutboxes();
     } finally {
       console.log = originalLog;
     }
@@ -130,6 +146,12 @@ test('Security Batch 1 - Fix 4: No OTP or Password Reset URLs in Console Logs', 
         true,
         'Email must be masked in log output'
       );
+
+      const mailOutbox = getTestMailOutbox();
+      assert.equal(mailOutbox.length, 1);
+      assert.equal(mailOutbox[0].to, 'employee@testcorp.com');
+      assert.match(mailOutbox[0].subject, /Verification Code/i);
+      clearTestOutboxes();
     } finally {
       console.log = originalLog;
     }
@@ -160,6 +182,11 @@ test('Security Batch 1 - Fix 4: No OTP or Password Reset URLs in Console Logs', 
         false,
         'Raw phone number must not appear in console logs'
       );
+
+      const waOutbox = getTestWhatsAppOutbox();
+      assert.equal(waOutbox.length, 1);
+      assert.equal(waOutbox[0].otp, secretOtp);
+      clearTestOutboxes();
     } finally {
       console.log = originalLog;
     }
@@ -370,12 +397,27 @@ test('Security Batch 1 - Fix 3: Biometric Hardware Secret & Admin Simulate Punch
     });
   });
 
-  t.after(() => {
+  t.after(async () => {
     if (server) server.close();
+    await prisma.$disconnect().catch(() => {});
   });
 
-  const activeAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN', isActive: true } });
-  const activeEmployee = await prisma.user.findFirst({ where: { role: 'EMPLOYEE', isActive: true } });
+  const activeAdmin = {
+    id: 'c3616fb3-dfa5-4266-8c47-f44fd82ef04f',
+    email: 'admin-test@test.invalid',
+    employeeCode: 'EMP-ADMIN-001',
+    role: 'ADMIN',
+    isActive: true,
+  };
+  const activeEmployee = {
+    id: '47b52b1d-582e-4b5e-a4ad-6ac039866fa3',
+    email: 'employee-test@test.invalid',
+    employeeCode: 'EMP-01',
+    role: 'EMPLOYEE',
+    isActive: true,
+  };
+  cacheService.setCachedUser(activeAdmin.id, activeAdmin);
+  cacheService.setCachedUser(activeEmployee.id, activeEmployee);
 
   const adminToken = generateToken({ userId: activeAdmin.id, role: 'ADMIN' });
   const empToken = generateToken({ userId: activeEmployee.id, role: 'EMPLOYEE' });
@@ -508,13 +550,24 @@ test('Security Batch 1 - Fix 5: Password Recovery Anti-Enumeration & Cooldown En
     });
   });
 
-  t.after(() => {
+  t.after(async () => {
     if (server) server.close();
+    await prisma.$disconnect().catch(() => {});
   });
 
-  const activeUser = await prisma.user.findFirst({ where: { isActive: true } });
+  const dbEligibility = getDbTestEligibility();
 
-  await t.test('Check with existing user returns generic response without PII', async () => {
+  await t.test('Check with existing user returns generic response without PII', async (sub) => {
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
+    const activeUser = await prisma.user.findFirst({ where: { isActive: true } });
+    if (!activeUser) {
+      sub.skip('No active user in test database');
+      return;
+    }
+
     const res = await fetch(`${baseUrl}/forgot-password/check`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.195' },

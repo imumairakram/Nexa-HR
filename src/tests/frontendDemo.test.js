@@ -9,6 +9,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+// Enforce zero external network calls
+const { installNetworkGuard } = require('./helpers/networkGuard');
+installNetworkGuard();
+
 // Mock browser window and storages for Node.js test environment
 class MockStorage {
   constructor() {

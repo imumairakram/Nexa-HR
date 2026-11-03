@@ -7,7 +7,11 @@ const {
   screenCandidate,
   evaluateDecision,
 } = require('./aiScreening.service');
-const { markEmailAsProcessed } = require('./gmail.service');
+const {
+  markEmailAsProcessed,
+  markEmailAsIgnored,
+  getIgnoredCount,
+} = require('./gmail.service');
 const {
   extractPhoneFromText,
   normalizePhoneNumber,
@@ -23,6 +27,7 @@ const syncTelemetry = {
   screenedOutCount: 0,
   unmatchedCount: 0,
   errorCount: 0,
+  ignoredCount: 0,
   lastErrors: [],
 };
 
@@ -75,10 +80,11 @@ async function processEmailApplication(email) {
   }
 
   // 2. Locate CV attachment (PDF or DOCX)
-  const primaryAttachment = attachments[0];
+  const primaryAttachment = attachments && attachments[0];
   if (!primaryAttachment || !primaryAttachment.buffer) {
-    console.warn(`[ATS PIPELINE] Email ${messageId} has no attachments. Marking processed.`);
-    await markEmailAsProcessed(messageId);
+    console.warn(`[ATS PIPELINE] Email ${messageId} has no attachments. Marking ignored.`);
+    syncTelemetry.ignoredCount++;
+    await markEmailAsIgnored(messageId, 'No valid CV attachment');
     return { skipped: true, reason: 'No valid CV attachment' };
   }
 
@@ -386,6 +392,7 @@ function getSyncStatus() {
   const threshold = parseInt(process.env.ATS_PASS_THRESHOLD || '70', 10);
   return {
     ...syncTelemetry,
+    ignoredCount: (syncTelemetry.ignoredCount || 0) + (typeof getIgnoredCount === 'function' ? getIgnoredCount() : 0),
     passThreshold: threshold,
   };
 }

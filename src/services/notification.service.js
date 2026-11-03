@@ -1,9 +1,31 @@
 const nodemailer = require('nodemailer');
 const prisma = require('../config/prisma');
 
+// ====================================================
+// IN-MEMORY TEST OUTBOXES (Active when NODE_ENV === 'test')
+// Zero network calls, zero production email/SMS dispatches
+// ====================================================
+const testMailOutbox = [];
+const testWhatsAppOutbox = [];
+
+function getTestMailOutbox() {
+  return [...testMailOutbox];
+}
+
+function getTestWhatsAppOutbox() {
+  return [...testWhatsAppOutbox];
+}
+
+function clearTestOutboxes() {
+  testMailOutbox.length = 0;
+  testWhatsAppOutbox.length = 0;
+}
+
+
 // Optional Twilio client instantiation
 let twilioClient = null;
 function getTwilioClient() {
+  if (process.env.NODE_ENV === 'test') return null;
   if (twilioClient) return twilioClient;
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -21,7 +43,37 @@ function getTwilioClient() {
 // Nodemailer SMTP Transporter
 let mailTransporter = null;
 function getMailTransporter() {
-  if (mailTransporter) return mailTransporter;
+  if (process.env.NODE_ENV === 'test') {
+    if (!mailTransporter || !mailTransporter._isTestStub) {
+      const stub = nodemailer.createTransport({
+        jsonTransport: true,
+      });
+      const origSendMail = stub.sendMail.bind(stub);
+      stub.sendMail = async (mailOptions) => {
+        const info = await origSendMail(mailOptions);
+        const record = {
+          from: mailOptions.from,
+          to: mailOptions.to,
+          subject: mailOptions.subject,
+          text: mailOptions.text,
+          html: mailOptions.html,
+          messageId: info.messageId || `<test-${Date.now()}-${Math.random().toString(36).slice(2)}@nexahr.test>`,
+          timestamp: new Date().toISOString(),
+        };
+        testMailOutbox.push(record);
+        return {
+          ...info,
+          messageId: record.messageId,
+          response: '250 Test message saved to in-memory test outbox',
+        };
+      };
+      stub._isTestStub = true;
+      mailTransporter = stub;
+    }
+    return mailTransporter;
+  }
+
+  if (mailTransporter && !mailTransporter._isTestStub) return mailTransporter;
   const host = process.env.SMTP_HOST;
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
   const user = process.env.SMTP_USER;
@@ -916,6 +968,25 @@ async function sendWhatsAppOTP(phone, otp, name = 'Team Member', expiryMinutes =
 
   console.log(`[NexaHR NOTIFICATION] WhatsApp OTP verification code event dispatched to ${maskPhone(formattedPhone)}.`);
 
+  if (process.env.NODE_ENV === 'test') {
+    const record = {
+      phone: formattedPhone,
+      otp,
+      name,
+      expiryMinutes,
+      messageText,
+      timestamp,
+      messageId: `SM_TEST_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    };
+    testWhatsAppOutbox.push(record);
+    console.log(`[TEST STUB] WhatsApp OTP event for ${maskPhone(formattedPhone)} recorded to test outbox.`);
+    return {
+      success: true,
+      provider: 'TEST_STUB',
+      messageId: record.messageId,
+    };
+  }
+
   let messageId = null;
   let provider = 'SIMULATED';
 
@@ -1012,6 +1083,9 @@ module.exports = {
   maskEmail,
   maskPhone,
   formatE164,
+  getTestMailOutbox,
+  getTestWhatsAppOutbox,
+  clearTestOutboxes,
 };
 
 

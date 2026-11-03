@@ -1,5 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+
+// Enforce zero external network calls
+const { installNetworkGuard } = require('./helpers/networkGuard');
+installNetworkGuard();
+
 const { validatePasswordStrength } = require('../utils/password');
 const { blockDemo } = require('../middlewares/auth.middleware');
 const { initDemoGuard, isGuestDemoActive, setGuestDemoActiveForTesting } = require('../services/demoGuard.service');

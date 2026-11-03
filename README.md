@@ -659,27 +659,29 @@ CLOUDINARY_CLOUD_NAME="your_cloud_name"
 CLOUDINARY_API_KEY="your_api_key"
 CLOUDINARY_API_SECRET="your_api_secret"
 
-# Corporate SMTP Email Configuration (Nodemailer)
+# Corporate SMTP Email Configuration (Outbound Transactional Mailbox)
+# Architecture Note: Use a dedicated transactional sender (notifications@company.com or SES/Resend/SendGrid)
+# Keep strictly separate from GMAIL_HR_ADDRESS to prevent bounce loops.
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER="your_email@gmail.com"
+SMTP_USER="notifications@company.com"
 SMTP_PASS="your_app_specific_password"
-EMAIL_FROM="NexaHR Security <no-reply@nexahr.com>"
+EMAIL_FROM="NexaHR Notifications <no-reply@company.com>"
 
 # WhatsApp OTP Dispatch API (Twilio / Meta Cloud API)
 TWILIO_ACCOUNT_SID="your_twilio_account_sid"
 TWILIO_AUTH_TOKEN="your_twilio_auth_token"
 TWILIO_WHATSAPP_NUMBER="whatsapp:+14155238886"
 
-# AI-Powered ATS Screening & Google Cloud Gmail Integration
+# AI-Powered ATS Screening & Google Cloud Gmail Integration (Inbound Candidate Mailbox)
 GOOGLE_CLIENT_ID="your_google_client_id.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET="your_google_client_secret"
 GOOGLE_REDIRECT_URI="http://localhost:5000/oauth2callback"
 GMAIL_REFRESH_TOKEN="your_gmail_oauth_refresh_token"
-GMAIL_HR_ADDRESS="hr@company.com"
+GMAIL_HR_ADDRESS="careers@company.com"
 GMAIL_POLL_CRON="*/5 * * * *"
-GMAIL_SEARCH_QUERY="is:unread has:attachment -label:NexaHR-Processed"
+GMAIL_SEARCH_QUERY="is:unread has:attachment -label:NexaHR-Processed -label:NexaHR-Ignored -from:mailer-daemon -from:postmaster -from:me -subject:(\"Delivery Status Notification\") -subject:(\"Undeliverable\")"
 
 # AI Provider Configuration (gemini | openai | anthropic)
 AI_PROVIDER="gemini"
