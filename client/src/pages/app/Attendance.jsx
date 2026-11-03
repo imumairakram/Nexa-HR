@@ -25,7 +25,8 @@ import { api } from '../../services/api';
 
 const Attendance = () => {
   const [logs, setLogs] = useState(() => {
-    const cached = api.getCached('/attendance')?.data?.attendances;
+    const rawCache = api.getCached('/attendance')?.data;
+    const cached = Array.isArray(rawCache) ? rawCache : (rawCache?.attendances || rawCache?.records);
     if (cached) {
       return cached.map((item) => ({
         id: item.id,
@@ -58,8 +59,8 @@ const Attendance = () => {
     }
     try {
       const res = await api.getAttendanceLogs();
-      if (res && res.success && res.data?.attendances) {
-        const raw = res.data.attendances;
+      const raw = Array.isArray(res?.data) ? res.data : (res?.data?.attendances || res?.data?.records || []);
+      if (res && res.success && raw.length >= 0) {
         const formatted = raw.map((item) => ({
           id: item.id,
           date: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],

@@ -267,24 +267,29 @@ const getSimulatePunchStatus = async (req, res) => {
 const getMyLogs = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { month, year } = req.query;
+    const { month, year, limit } = req.query;
 
-    const now = new Date();
-    const targetMonth = month ? parseInt(month, 10) - 1 : now.getMonth();
-    const targetYear = year ? parseInt(year, 10) : now.getFullYear();
+    const where = { userId };
 
-    const startDate = new Date(targetYear, targetMonth, 1);
-    const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
+    if (month || year) {
+      const now = new Date();
+      const targetMonth = month ? parseInt(month, 10) - 1 : now.getMonth();
+      const targetYear = year ? parseInt(year, 10) : now.getFullYear();
+
+      const startDate = new Date(targetYear, targetMonth, 1);
+      const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
+      where.date = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
+
+    const take = limit ? parseInt(limit, 10) : 100;
 
     const logs = await prisma.attendance.findMany({
-      where: {
-        userId,
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
+      where,
       orderBy: { date: 'desc' },
+      take,
     });
 
     return res.status(200).json({
