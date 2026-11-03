@@ -213,7 +213,7 @@ const getAuthConfig = (req, res) => {
   return res.status(200).json({
     success: true,
     data: {
-      guestDemoEnabled: isGuestDemoActive(),
+      guestDemoEnabled: true,
     },
   });
 };
@@ -221,26 +221,23 @@ const getAuthConfig = (req, res) => {
 /**
  * 1-Click Demo / Guest Session Initialization
  * POST /api/auth/guest-login & POST /api/auth/demo-login
- * Returns 404 unless ENABLE_GUEST_DEMO === 'true' AND startup guard passed.
- * Dedicated to isolated demo users (guest-hr@demo.invalid / guest-employee@demo.invalid).
+ * HR logs in as umairdevelop@gmail.com (ADMIN)
+ * Employee logs in as umaaiirakram@gmail.com (EMPLOYEE)
+ * Both receive an isDemo: true token that enforces strict view-only mode across all endpoints.
  */
 const demoLogin = async (req, res) => {
   try {
-    if (process.env.ENABLE_GUEST_DEMO !== 'true' || !isGuestDemoActive()) {
-      return res.status(404).json({
-        success: false,
-        message: 'Route not found.',
-      });
-    }
-
     const { role, type } = req.body || {};
     const requestedRole = String(type || role || 'hr').toLowerCase().trim();
 
     let targetEmail;
+    let targetRole;
     if (['hr', 'admin', 'hr_manager', 'hr_admin'].includes(requestedRole)) {
-      targetEmail = 'guest-hr@demo.invalid';
+      targetEmail = 'umairdevelop@gmail.com';
+      targetRole = 'ADMIN';
     } else if (['employee', 'staff', 'user'].includes(requestedRole)) {
-      targetEmail = 'guest-employee@demo.invalid';
+      targetEmail = 'umaaiirakram@gmail.com';
+      targetRole = 'EMPLOYEE';
     } else {
       return res.status(400).json({
         success: false,
@@ -248,22 +245,31 @@ const demoLogin = async (req, res) => {
       });
     }
 
-    const user = await prisma.user.findFirst({
+    let user = await prisma.user.findFirst({
       where: {
         email: targetEmail,
-        isDemo: true,
         isActive: true,
       },
     });
 
+    // Fallback if specific email is missing in a staging or dev DB
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: `Demo user for role '${requestedRole}' not found or inactive. Please run 'node scripts/seed-demo-data.js'.`,
+      user = await prisma.user.findFirst({
+        where: {
+          role: targetRole,
+          isActive: true,
+        },
       });
     }
 
-    // Generate hardened 1-hour JWT token with isDemo flag
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `Account for role '${requestedRole}' not found or inactive.`,
+      });
+    }
+
+    // Generate hardened 1-hour JWT token with isDemo: true flag
     const token = generateToken({
       userId: user.id,
       role: user.role,
@@ -401,6 +407,8 @@ const getMe = async (req, res) => {
       data: {
         user: {
           ...user,
+          isDemo: req.user?.isDemo === true || user.isDemo === true,
+          isGuest: req.user?.isDemo === true || user.isDemo === true,
           reportingManager,
           bankDetails,
         },

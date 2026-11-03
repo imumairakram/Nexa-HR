@@ -709,79 +709,76 @@ test('Security Batch 1 - 1-Click Demo Login Endpoint & Auth Config', async (t) =
     if (server) server.close();
   });
 
-  await t.test('GET /api/auth/config returns guestDemoEnabled: false when ENABLE_GUEST_DEMO is unset', async () => {
-    const orig = process.env.ENABLE_GUEST_DEMO;
-    delete process.env.ENABLE_GUEST_DEMO;
-    try {
-      const res = await fetch(`${baseUrl}/config`);
-      assert.equal(res.status, 200);
-      const data = await res.json();
-      assert.equal(data.success, true);
-      assert.equal(data.data.guestDemoEnabled, false);
-    } finally {
-      if (orig !== undefined) process.env.ENABLE_GUEST_DEMO = orig;
-    }
+  await t.test('GET /api/auth/config returns guestDemoEnabled: true', async () => {
+    const res = await fetch(`${baseUrl}/config`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.data.guestDemoEnabled, true);
   });
 
-  await t.test('GET /api/auth/config returns guestDemoEnabled: true when ENABLE_GUEST_DEMO is true', async () => {
-    const orig = process.env.ENABLE_GUEST_DEMO;
-    try {
-      process.env.ENABLE_GUEST_DEMO = 'true';
-      setGuestDemoActiveForTesting(true);
-      const res = await fetch(`${baseUrl}/config`);
-      assert.equal(res.status, 200);
-      const data = await res.json();
-      assert.equal(data.success, true);
-      assert.equal(data.data.guestDemoEnabled, true);
-    } finally {
-      setGuestDemoActiveForTesting(false);
-      if (orig !== undefined) {
-        process.env.ENABLE_GUEST_DEMO = orig;
-      } else {
-        delete process.env.ENABLE_GUEST_DEMO;
-      }
-    }
+  await t.test('POST /api/auth/demo-login with hr logs in as umairdevelop@gmail.com with isDemo: true', async () => {
+    const res = await fetch(`${baseUrl}/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'hr' }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.data.user.email, 'umairdevelop@gmail.com');
+    assert.equal(data.data.user.role, 'ADMIN');
+    assert.equal(data.data.user.isDemo, true);
+    assert.equal(data.data.user.isGuest, true);
+
+    const decoded = verifyJwtToken(data.data.token);
+    assert.equal(decoded.isDemo, true);
   });
 
-  await t.test('POST /api/auth/demo-login returns 404 when ENABLE_GUEST_DEMO is unset or not true', async () => {
-    const orig = process.env.ENABLE_GUEST_DEMO;
-    delete process.env.ENABLE_GUEST_DEMO;
-    try {
-      const res = await fetch(`${baseUrl}/demo-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'hr' }),
-      });
+  await t.test('POST /api/auth/demo-login with employee logs in as umaaiirakram@gmail.com with isDemo: true', async () => {
+    const res = await fetch(`${baseUrl}/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'employee' }),
+    });
 
-      assert.equal(res.status, 404);
-      const data = await res.json();
-      assert.equal(data.success, false);
-      assert.match(data.message, /not found/i);
-    } finally {
-      if (orig !== undefined) process.env.ENABLE_GUEST_DEMO = orig;
-    }
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.data.user.email, 'umaaiirakram@gmail.com');
+    assert.equal(data.data.user.role, 'EMPLOYEE');
+    assert.equal(data.data.user.isDemo, true);
+    assert.equal(data.data.user.isGuest, true);
+
+    const decoded = verifyJwtToken(data.data.token);
+    assert.equal(decoded.isDemo, true);
   });
 
-  await t.test('POST /api/auth/demo-login returns 404 when ENABLE_GUEST_DEMO=false', async () => {
-    const orig = process.env.ENABLE_GUEST_DEMO;
-    try {
-      process.env.ENABLE_GUEST_DEMO = 'false';
-      const res = await fetch(`${baseUrl}/demo-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'hr' }),
-      });
+  await t.test('Guest demo token blocks all mutation attempts (view-only mode)', async () => {
+    // Obtain guest HR token
+    const loginRes = await fetch(`${baseUrl}/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'hr' }),
+    });
+    const loginData = await loginRes.json();
+    const guestToken = loginData.data.token;
 
-      assert.equal(res.status, 404);
-      const data = await res.json();
-      assert.equal(data.success, false);
-      assert.match(data.message, /not found/i);
-    } finally {
-      if (orig !== undefined) {
-        process.env.ENABLE_GUEST_DEMO = orig;
-      } else {
-        delete process.env.ENABLE_GUEST_DEMO;
-      }
-    }
+    // Attempt profile update mutation
+    const mutationRes = await fetch(`${baseUrl}/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${guestToken}`,
+      },
+      body: JSON.stringify({ firstName: 'Hacked Name' }),
+    });
+
+    assert.equal(mutationRes.status, 403);
+    const mutationData = await mutationRes.json();
+    assert.equal(mutationData.success, false);
+    assert.equal(mutationData.code, 'DEMO_MODE');
+    assert.match(mutationData.message, /view-only/i);
   });
 });

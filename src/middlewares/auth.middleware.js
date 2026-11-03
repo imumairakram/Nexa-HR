@@ -68,6 +68,19 @@ const verifyToken = async (req, res, next) => {
       isDemo: decoded.isDemo === true || user.isDemo === true,
     };
 
+    // Global mutation guard for Guest / Demo sessions:
+    // All non-GET requests (except /logout) are strictly blocked for demo users
+    if (req.user.isDemo && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+      const isLogout = req.path.endsWith('/logout') || req.originalUrl?.includes('/logout');
+      if (!isLogout) {
+        return res.status(403).json({
+          success: false,
+          code: 'DEMO_MODE',
+          message: 'Guest / Demo mode is view-only. Modifying data is disabled to ensure uninterrupted access.',
+        });
+      }
+    }
+
     return next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
@@ -94,7 +107,7 @@ const blockDemo = (req, res, next) => {
     return res.status(403).json({
       success: false,
       code: 'DEMO_MODE',
-      message: 'Not available in demo mode.',
+      message: 'Guest / Demo mode is view-only. Modifying data is disabled to ensure uninterrupted access.',
     });
   }
   next();

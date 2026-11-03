@@ -66,6 +66,31 @@ async function fetchAPI(endpoint, options = {}) {
     return demoData;
   }
 
+  // Guest / Demo mode mutation protection:
+  // Allow all GET requests to fetch live data from the backend.
+  // Block any POST, PUT, PATCH, DELETE mutation on the client side with a clear toast.
+  let isGuestUser = localStorage.getItem('isGuest') === 'true';
+  try {
+    const rawUser = localStorage.getItem('user');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u.isDemo || u.isGuest) isGuestUser = true;
+    }
+  } catch {}
+
+  if (isGuestUser && !isGet) {
+    const isAuthEndpoint =
+      endpoint.includes('/auth/login') ||
+      endpoint.includes('/auth/logout') ||
+      endpoint.includes('/auth/demo-login') ||
+      endpoint.includes('/auth/guest-login') ||
+      endpoint.includes('/demo-login');
+    if (!isAuthEndpoint) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      throw new DemoModeError('Demo mode: view only. Changes are disabled.');
+    }
+  }
+
   // 1. SWR / In-Memory Cache Lookup for GET requests
   if (isGet && !bypassCache) {
     const cached = clientCache.get(endpoint);
@@ -227,6 +252,7 @@ export const api = {
     }
     if (res?.data?.token) {
       startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
+      localStorage.setItem('isGuest', 'true');
     }
     return res;
   },

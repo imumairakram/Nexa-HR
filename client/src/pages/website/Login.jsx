@@ -94,11 +94,11 @@ const Login = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
   const [sessionExpiredNotice, setSessionExpiredNotice] = useState(null);
-  const [guestDemoEnabled, setGuestDemoEnabled] = useState(() => isGuestDemoConfigured());
+  const [guestDemoEnabled, setGuestDemoEnabled] = useState(true);
 
-  // Client-side demo feature flag check
+  // Guest demo login is enabled by default
   useEffect(() => {
-    setGuestDemoEnabled(isGuestDemoConfigured());
+    setGuestDemoEnabled(true);
   }, []);
 
   // Check for expired session query param or stored notice on mount
@@ -219,11 +219,25 @@ const Login = () => {
     }
   };
 
-  const handleGuestLogin = (roleToLogin) => {
-    const targetRole = (roleToLogin || loginRole) === 'hr' ? 'ADMIN' : 'EMPLOYEE';
+  const handleGuestLogin = async (roleToLogin) => {
+    const targetRole = (roleToLogin || loginRole) === 'hr' ? 'hr' : 'employee';
+    setLoading(true);
     setError(null);
-    startDemoSession(targetRole);
-    navigate(targetRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
+    try {
+      const res = await api.demoLogin({ role: targetRole });
+      if (res && res.success && res.data) {
+        const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'ADMIN' : 'EMPLOYEE');
+        localStorage.setItem('isGuest', 'true');
+        navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
+      } else {
+        throw new Error(res?.message || 'Failed to start demo session.');
+      }
+    } catch (err) {
+      console.error('[Guest Login Error]', err);
+      setError(err?.response?.data?.message || err?.message || 'Failed to start demo session. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
 
