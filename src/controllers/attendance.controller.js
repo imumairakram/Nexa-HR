@@ -294,7 +294,10 @@ const getMyLogs = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: logs,
+      data: {
+        attendances: logs,
+        logs,
+      },
     });
   } catch (error) {
     console.error('Error in getMyLogs:', error);

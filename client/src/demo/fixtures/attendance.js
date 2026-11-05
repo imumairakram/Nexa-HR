@@ -5,7 +5,15 @@
 
 import { DEMO_EMPLOYEES } from './employees.js';
 
-// Generate 30 days of past attendance records for all 15 demo employees
+const DEMO_TERMINALS = [
+  'Biometric Face-ID Terminal (HQ Gate 1)',
+  'Main Turnstile - Facial Recognition',
+  'Engineering Wing IoT Gateway',
+  'Executive Wing Biometric Scanner',
+  'Speed-Gate Face-ID Terminal Fl-2',
+];
+
+// Generate 30 days of distinct past attendance records for all 15 demo employees
 function generatePastAttendance() {
   const records = [];
   const now = new Date();
@@ -24,21 +32,34 @@ function generatePastAttendance() {
       // Deterministic pseudo-random status
       const seed = (i * 17 + empIdx * 31) % 100;
       let status = 'PRESENT';
-      let checkInTime = '08:55:00';
-      let checkOutTime = '17:35:00';
-      let workHours = 8.5;
+      let inHourUtc = 3; // 08:00 AM PKT
+      let inMin = 48 + ((seed + empIdx * 5) % 12); // 03:48 - 03:59 UTC -> 08:48 - 08:59 AM PKT
+      let outHourUtc = 12; // 05:00 PM PKT
+      let outMin = 30 + ((seed * 3 + empIdx * 7) % 35); // 12:30 - 13:04 UTC -> 05:30 - 06:04 PM PKT
+      let workHours = parseFloat(((outHourUtc * 60 + outMin - (inHourUtc * 60 + inMin)) / 60).toFixed(1));
+      let terminal = DEMO_TERMINALS[(seed + empIdx) % DEMO_TERMINALS.length];
 
-      if (seed > 90) {
+      if (seed > 92) {
         status = 'ON_LEAVE';
-        checkInTime = null;
-        checkOutTime = null;
         workHours = 0;
-      } else if (seed > 75) {
+        terminal = 'Approved Vacation / Time-Off';
+      } else if (seed > 80) {
         status = 'LATE';
-        checkInTime = '09:35:00';
-        checkOutTime = '17:35:00';
-        workHours = 8.0;
+        inHourUtc = 4; // 09:00 AM PKT
+        inMin = 15 + ((seed + empIdx * 3) % 20); // 04:15 - 04:34 UTC -> 09:15 - 09:34 AM PKT
+        outHourUtc = 12;
+        outMin = 40 + (seed % 15);
+        workHours = parseFloat(((outHourUtc * 60 + outMin - (inHourUtc * 60 + inMin)) / 60).toFixed(1));
+        terminal = 'Late Arrival Recorded - Face-ID Gateway';
       }
+
+      const inPad = String(inMin).padStart(2, '0');
+      const outPad = String(outMin).padStart(2, '0');
+      const inHourPad = String(inHourUtc).padStart(2, '0');
+      const outHourPad = String(outHourUtc).padStart(2, '0');
+
+      const checkInIso = status !== 'ON_LEAVE' ? `${dateStr}T${inHourPad}:${inPad}:00.000Z` : null;
+      const checkOutIso = status !== 'ON_LEAVE' ? `${dateStr}T${outHourPad}:${outPad}:00.000Z` : null;
 
       records.push({
         id: `att-${dateStr}-${emp.id}`,
@@ -46,19 +67,19 @@ function generatePastAttendance() {
         user: emp,
         employeeCode: emp.employeeCode,
         employeeName: `${emp.firstName} ${emp.lastName}`,
-        department: emp.profile.department.name,
+        department: emp.profile?.department?.name || 'Operations',
         date: dateStr,
-        clockIn: checkInTime ? `${dateStr}T${checkInTime}.000Z` : null,
-        clockOut: checkOutTime ? `${dateStr}T${checkOutTime}.000Z` : null,
-        checkInTime: checkInTime ? `${dateStr}T${checkInTime}.000Z` : null,
-        checkOutTime: checkOutTime ? `${dateStr}T${checkOutTime}.000Z` : null,
+        clockIn: checkInIso,
+        clockOut: checkOutIso,
+        checkInTime: checkInIso,
+        checkOutTime: checkOutIso,
         status,
         durationMinutes: workHours * 60,
         workHours,
         totalHours: workHours,
-        notes: 'Biometric Face-ID Terminal HQ',
+        notes: terminal,
         deviceSource: 'BIOMETRIC_GATEWAY_HQ',
-        verified: true,
+        verified: status !== 'ON_LEAVE',
       });
     });
   }

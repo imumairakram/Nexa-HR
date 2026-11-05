@@ -148,12 +148,20 @@ export async function handleDemoGetRequest(endpoint) {
 
   if (pathname === '/attendance/my-logs') {
     const limit = parseInt(searchParams.get('limit') || '30', 10);
-    const userLogs = DEMO_ATTENDANCE_LOGS.slice(0, limit);
+    // Find logs for current employee (default Gabriel Ross: usr-demo-emp-02)
+    const targetUserId = 'usr-demo-emp-02';
+    let userLogs = DEMO_ATTENDANCE_LOGS.filter((l) => l.userId === targetUserId);
+    if (!userLogs.length) {
+      userLogs = DEMO_ATTENDANCE_LOGS.filter((l) => l.userId === DEMO_ATTENDANCE_LOGS[0]?.userId);
+    }
+    // Sort descending by date (most recent workday first)
+    userLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const sliced = userLogs.slice(0, limit);
     return {
       success: true,
       data: {
-        attendances: userLogs,
-        logs: userLogs,
+        attendances: sliced,
+        logs: sliced,
       },
     };
   }

@@ -19,6 +19,8 @@ import {
   Sparkles,
   ArrowUpRight,
   Building2,
+  Search,
+  X,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -29,11 +31,12 @@ import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 const EmployeeAttendance = () => {
   const { formatTime, formatDate, timezone } = useRegionalSettings();
   const [logs, setLogs] = useState(() => {
-    const cached = api.getCached('/attendance/my-logs')?.data?.attendances;
+    const cached = api.getCached('/attendance/my-logs')?.data?.attendances || api.getCached('/attendance/my-logs')?.data?.logs;
     return cached || [];
   });
   const [loading, setLoading] = useState(() => !api.hasCached('/attendance/my-logs'));
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
   const [todayLog, setTodayLog] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -59,30 +62,47 @@ const EmployeeAttendance = () => {
     }
     try {
       const res = await api.getMyAttendanceLogs();
-      if (res && res.success && res.data?.attendances) {
-        const rawLogs = res.data.attendances;
-
+      const rawLogs = res?.data?.attendances || res?.data?.logs || (Array.isArray(res?.data) ? res?.data : null);
+      if (rawLogs && Array.isArray(rawLogs)) {
         // Transform DB attendance objects
         const formatted = rawLogs.map((att) => {
-          const inTime = att.checkInTime ? formatTime(att.checkInTime, false) : '--:--';
-          const outTime = att.checkOutTime ? formatTime(att.checkOutTime, false) : '--:--';
+          const inTime = att.checkInTime ? formatTime(att.checkInTime, false) : (att.clockIn ? formatTime(att.clockIn, false) : '--:--');
+          const outTime = att.checkOutTime ? formatTime(att.checkOutTime, false) : (att.clockOut ? formatTime(att.clockOut, false) : '--:--');
 
-          const dateObj = new Date(att.date);
+          const dateObj = new Date(att.date || att.checkInTime || att.clockIn);
           const dayName = !isNaN(dateObj.getTime())
             ? dateObj.toLocaleDateString('en-US', { weekday: 'long' })
             : 'Weekday';
+          const dayNum = !isNaN(dateObj.getTime())
+            ? String(dateObj.getDate()).padStart(2, '0')
+            : '--';
+          const monthShort = !isNaN(dateObj.getTime())
+            ? dateObj.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+            : '---';
+
+          const todayStr = new Date().toISOString().split('T')[0];
+          const itemDateStr = att.date ? String(att.date).split('T')[0] : (!isNaN(dateObj.getTime()) ? dateObj.toISOString().split('T')[0] : '');
+          const isToday = itemDateStr === todayStr;
+
+          const totalHours = att.totalHours != null ? Number(att.totalHours) : (att.workHours != null ? Number(att.workHours) : (att.checkInTime && att.checkOutTime ? parseFloat((Math.max(0, new Date(att.checkOutTime) - new Date(att.checkInTime)) / 3600000).toFixed(1)) : 0));
+          const ot = att.ot != null ? Number(att.ot) : (totalHours > 8.0 ? parseFloat((totalHours - 8.0).toFixed(1)) : 0);
 
           return {
             id: att.id,
-            rawDate: att.date,
-            formattedDate: formatDate(att.date),
+            rawDate: att.date || att.checkInTime || att.clockIn,
+            dateObj,
+            dayNum,
+            monthShort,
+            dayName,
+            isToday,
+            formattedDate: formatDate(att.date || att.checkInTime || att.clockIn),
             day: dayName,
             checkIn: inTime,
             checkOut: outTime,
-            hours: att.totalHours || (att.checkInTime && att.checkOutTime ? parseFloat((Math.max(0, new Date(att.checkOutTime) - new Date(att.checkInTime)) / 3600000).toFixed(1)) : 0),
-            ot: att.totalHours && att.totalHours > 8.0 ? parseFloat((att.totalHours - 8.0).toFixed(1)) : 0,
-            status: att.status || 'PRESENT',
-            method: att.notes || 'Biometric Gate Terminal',
+            hours: totalHours,
+            ot,
+            status: (att.status || 'PRESENT').toUpperCase(),
+            method: att.notes || att.terminal || 'Biometric Face-ID Terminal HQ',
             notes: att.notes || 'Biometric verified entry',
           };
         });
@@ -109,10 +129,60 @@ const EmployeeAttendance = () => {
     fetchMyAttendance();
   }, [timezone]);
 
-  const filteredLogs = logs.filter((item) => {
-    if (statusFilter === 'ALL') return true;
-    return item.status === statusFilter;
-  });
+  const filteredLogs = useMemo(() => {
+    return logs.filter((item) => {
+      if (statusFilter !== 'ALL') {
+        if (statusFilter === 'PRESENT' && item.status !== 'PRESENT') return false;
+        if (statusFilter === 'LATE' && item.status !== 'LATE') return false;
+        if (statusFilter === 'ON_LEAVE' && item.status !== 'ON_LEAVE' && item.status !== 'LEAVE') return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchDate = (item.formattedDate || '').toLowerCase().includes(q);
+        const matchDay = (item.day || '').toLowerCase().includes(q);
+        const matchMethod = (item.method || '').toLowerCase().includes(q);
+        const matchStatus = (item.status || '').toLowerCase().includes(q);
+        const matchIn = (item.checkIn || '').toLowerCase().includes(q);
+        const matchOut = (item.checkOut || '').toLowerCase().includes(q);
+        if (!matchDate && !matchDay && !matchMethod && !matchStatus && !matchIn && !matchOut) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [logs, statusFilter, searchQuery]);
+
+  const counts = useMemo(() => {
+    return {
+      all: logs.length,
+      present: logs.filter((l) => l.status === 'PRESENT').length,
+      late: logs.filter((l) => l.status === 'LATE').length,
+      leave: logs.filter((l) => l.status === 'ON_LEAVE' || l.status === 'LEAVE').length,
+    };
+  }, [logs]);
+
+  const exportToCSV = () => {
+    if (!logs.length) return;
+    const headers = ['Date', 'Day', 'Punch In', 'Punch Out', 'Hours Logged', 'Overtime', 'Status', 'Verification Terminal'];
+    const rows = filteredLogs.map((l) => [
+      `"${l.formattedDate}"`,
+      `"${l.day}"`,
+      `"${l.checkIn}"`,
+      `"${l.checkOut}"`,
+      `"${l.hours}h"`,
+      `"${l.ot}h"`,
+      `"${l.status}"`,
+      `"${l.method}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Attendance_Log_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Calculate live database metrics directly from PostgreSQL records
   const totalDaysPresent = logs.filter((l) => l.status === 'PRESENT' || l.status === 'LATE').length;
@@ -438,194 +508,422 @@ const EmployeeAttendance = () => {
       {loading ? (
         <TableSkeleton rows={6} cols={6} />
       ) : (
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-        {/* Header & Filter Controls */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>Attendance History & Machine Timestamps</span>
-            </h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Verified daily time punches captured by IoT biometric attendance terminals
-            </p>
-          </div>
-
-          {/* Segmented Filter Pills */}
-          <div
-            role="tablist"
-            aria-label="Attendance status filters"
-            className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl self-start sm:self-auto gap-1"
-          >
-            {[
-              { id: 'ALL', label: 'All Logs' },
-              { id: 'PRESENT', label: 'Present' },
-              { id: 'LATE', label: 'Late' },
-            ].map((st) => (
-              <button
-                key={st.id}
-                type="button"
-                role="tab"
-                aria-selected={statusFilter === st.id}
-                onClick={() => setStatusFilter(st.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-                  statusFilter === st.id
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
-                }`}
-              >
-                {st.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Table / Timeline Data Grid */}
-        {filteredLogs.length > 0 ? (
-          <>
-            {/* Mobile Responsive Grid View (Hidden on Desktop) */}
-            <div className="block md:hidden p-3.5 sm:p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {filteredLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-emerald-400/60 transition-all"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
-                          <CalendarDays className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">{log.formattedDate}</div>
-                          <div className="text-[10px] text-slate-400 font-medium">{log.day}</div>
-                        </div>
-                      </div>
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
-                          log.status === 'PRESENT'
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
-                        }`}
-                      >
-                        {log.status}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-center">
-                      <div>
-                        <div className="text-[9px] uppercase font-bold text-slate-400">Punch In</div>
-                        <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
-                          {log.checkIn}
-                        </div>
-                      </div>
-                      <div className="border-x border-slate-100 dark:border-slate-800">
-                        <div className="text-[9px] uppercase font-bold text-slate-400">Punch Out</div>
-                        <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
-                          {log.checkOut}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-[9px] uppercase font-bold text-slate-400">Hours</div>
-                        <div className="text-xs font-black text-slate-800 dark:text-slate-200 mt-0.5">
-                          {log.hours ? `${Number(log.hours).toFixed(1)}h` : '--'}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                      <span className="font-mono">{log.method}</span>
-                      {log.ot > 0 && (
-                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                          +{log.ot}h Overtime
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-emerald-950/40 overflow-hidden transition-all">
+          {/* Header & Filter Controls */}
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                  <Fingerprint className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    Attendance History & Terminal Telemetry
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Verified daily biometric punches captured across enterprise IoT gate terminals
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Desktop Table View (Hidden on Mobile) */}
-            <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-6">Work Date</th>
-                  <th className="py-3.5 px-4">Punch In</th>
-                  <th className="py-3.5 px-4">Punch Out</th>
-                  <th className="py-3.5 px-4">Logged Duration</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-6 text-right">Verification Terminal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
-                    <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/60 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                          <CalendarDays className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-100">{log.formattedDate}</div>
-                          <div className="text-[10px] text-slate-400 font-medium">{log.day}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 font-mono font-bold text-slate-800 dark:text-slate-200">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        {log.checkIn}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 font-mono font-bold text-slate-800 dark:text-slate-200">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        {log.checkOut}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-slate-800 dark:text-slate-200">
-                        {log.hours ? `${Number(log.hours).toFixed(1)} hrs` : '--'}
-                      </div>
-                      {log.ot > 0 && (
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                          +{log.ot}h Overtime
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-4 px-4">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
-                          log.status === 'PRESENT'
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
-                        }`}
-                      >
-                        {log.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 font-mono">
-                        {log.method}
-                      </span>
-                    </td>
-                  </tr>
+            {/* Right actions: Search + Segmented tabs + Export */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              {/* Search Bar */}
+              <div className="relative min-w-[200px]">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search date, terminal..."
+                  className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Segmented Filter Pills */}
+              <div
+                role="tablist"
+                aria-label="Attendance status filters"
+                className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl gap-1 overflow-x-auto"
+              >
+                {[
+                  { id: 'ALL', label: 'All', count: counts.all },
+                  { id: 'PRESENT', label: 'Present', count: counts.present, dot: 'bg-emerald-500' },
+                  { id: 'LATE', label: 'Late', count: counts.late, dot: 'bg-amber-500' },
+                  { id: 'ON_LEAVE', label: 'Leave', count: counts.leave, dot: 'bg-indigo-500' },
+                ].map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={statusFilter === st.id}
+                    onClick={() => setStatusFilter(st.id)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                      statusFilter === st.id
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    {st.dot && <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />}
+                    <span>{st.label}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        statusFilter === st.id
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300'
+                          : 'bg-slate-200/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      {st.count}
+                    </span>
+                  </button>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              {/* Export Button */}
+              <button
+                type="button"
+                onClick={exportToCSV}
+                title="Export filtered records to CSV"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all cursor-pointer shadow-xs"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+            </div>
           </div>
-          </>
-        ) : (
-          <div className="p-12 text-center flex flex-col items-center justify-center">
-            <Fingerprint className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-            <h4 className="text-base font-black text-slate-900 dark:text-white">No Biometric Logs Recorded</h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              Your daily presence records will appear here as biometric hardware punch events occur.
-            </p>
-          </div>
-        )}
-      </div>
+
+          {/* Table / Timeline Data Grid */}
+          {filteredLogs.length > 0 ? (
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50/75 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                    <tr>
+                      <th className="py-3.5 px-6">Work Date</th>
+                      <th className="py-3.5 px-4">Punch In</th>
+                      <th className="py-3.5 px-4">Punch Out</th>
+                      <th className="py-3.5 px-4">Logged Duration</th>
+                      <th className="py-3.5 px-4">Status</th>
+                      <th className="py-3.5 px-6 text-right">Verification Terminal</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
+                    {filteredLogs.map((log) => {
+                      const isLeave = log.status === 'ON_LEAVE' || log.status === 'LEAVE';
+                      const isLate = log.status === 'LATE';
+                      const durationVal = Number(log.hours) || 0;
+                      const progressPct = Math.min(100, Math.round((durationVal / 8.5) * 100));
+
+                      return (
+                        <tr
+                          key={log.id}
+                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group"
+                        >
+                          {/* 1. Work Date Column */}
+                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
+                            <div className="flex items-center gap-3.5">
+                              {/* Date Number Badge */}
+                              <div
+                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${
+                                  log.isToday
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 dark:border-emerald-600 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                                    : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-emerald-400/50'
+                                }`}
+                              >
+                                <span className="text-[9px] font-black uppercase tracking-wider leading-none">
+                                  {log.monthShort || 'DAY'}
+                                </span>
+                                <span className="text-base font-black leading-tight mt-0.5">
+                                  {log.dayNum || '01'}
+                                </span>
+                              </div>
+
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
+                                    {log.formattedDate}
+                                  </span>
+                                  {log.isToday && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 animate-pulse">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                      Today
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-[11px] text-slate-400 font-medium mt-0.5">
+                                  {log.day}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* 2. Punch In Column */}
+                          <td className="py-4 px-4 font-mono">
+                            {isLeave ? (
+                              <span className="text-slate-400 dark:text-slate-500 text-xs font-sans italic">
+                                — (Time Off)
+                              </span>
+                            ) : (
+                              <div>
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${
+                                    isLate
+                                      ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/70 dark:border-amber-800/40 text-amber-700 dark:text-amber-300'
+                                      : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/70 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300'
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-2 h-2 rounded-full ${
+                                      isLate ? 'bg-amber-500' : 'bg-emerald-500'
+                                    }`}
+                                  />
+                                  {log.checkIn}
+                                </span>
+                                <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
+                                  {isLate ? 'Late Arrival Flagged' : 'On-Time Shift Start'}
+                                </div>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 3. Punch Out Column */}
+                          <td className="py-4 px-4 font-mono">
+                            {isLeave ? (
+                              <span className="text-slate-400 dark:text-slate-500 text-xs font-sans italic">
+                                — (Time Off)
+                              </span>
+                            ) : (
+                              <div>
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-800/40 text-blue-700 dark:text-blue-300 text-xs font-bold">
+                                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                                  {log.checkOut}
+                                </span>
+                                <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
+                                  {log.checkOut !== '--:--' ? 'Shift Completed' : 'Shift Active'}
+                                </div>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 4. Logged Duration Column */}
+                          <td className="py-4 px-4">
+                            {isLeave ? (
+                              <span className="text-slate-400 text-xs font-medium">0.0 hrs</span>
+                            ) : (
+                              <div className="space-y-1.5 min-w-[130px]">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="font-extrabold text-slate-900 dark:text-white">
+                                    {durationVal.toFixed(1)} hrs
+                                  </span>
+                                  {log.ot > 0 && (
+                                    <span className="inline-flex items-center px-1.5 py-0.2 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
+                                      +{log.ot}h OT
+                                    </span>
+                                  )}
+                                </div>
+                                {/* Slim progress bar */}
+                                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700/60 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-500 ${
+                                      log.ot > 0
+                                        ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                                        : durationVal >= 8.0
+                                        ? 'bg-emerald-500'
+                                        : isLate
+                                        ? 'bg-amber-500'
+                                        : 'bg-teal-500'
+                                    }`}
+                                    style={{ width: `${progressPct}%` }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 5. Status Column */}
+                          <td className="py-4 px-4">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${
+                                log.status === 'PRESENT'
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                                  : isLate
+                                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
+                                  : isLeave
+                                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-800/50'
+                                  : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                              }`}
+                            >
+                              {log.status === 'PRESENT' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
+                              {isLate && <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
+                              {isLeave && <Calendar className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />}
+                              <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status}</span>
+                            </span>
+                          </td>
+
+                          {/* 6. Verification Terminal Column */}
+                          <td className="py-4 px-6 text-right">
+                            <div className="inline-flex flex-col items-end">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200">
+                                <Cpu className="w-3.5 h-3.5 text-emerald-500" />
+                                <span>{log.method}</span>
+                              </span>
+                              <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 font-medium mt-0.5">
+                                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                                <span>IoT Hardware Verified</span>
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Responsive Grid View (Hidden on Desktop) */}
+              <div className="block md:hidden p-3.5 sm:p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {filteredLogs.map((log) => {
+                    const isLeave = log.status === 'ON_LEAVE' || log.status === 'LEAVE';
+                    const isLate = log.status === 'LATE';
+                    const durationVal = Number(log.hours) || 0;
+                    const progressPct = Math.min(100, Math.round((durationVal / 8.5) * 100));
+
+                    return (
+                      <div
+                        key={log.id}
+                        className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/70 space-y-3.5 shadow-xs hover:border-emerald-400/60 transition-all"
+                      >
+                        {/* Header: Date + Status */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${
+                                log.isToday
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 text-emerald-600 dark:text-emerald-400'
+                                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
+                              }`}
+                            >
+                              <span className="text-[8px] font-black uppercase tracking-wider leading-none">
+                                {log.monthShort || 'DAY'}
+                              </span>
+                              <span className="text-sm font-black leading-tight mt-0.5">
+                                {log.dayNum || '01'}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
+                                  {log.formattedDate}
+                                </span>
+                                {log.isToday && (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                                    Today
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-medium">{log.day}</div>
+                            </div>
+                          </div>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
+                              log.status === 'PRESENT'
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
+                                : isLate
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
+                                : isLeave
+                                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/40'
+                                : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40'
+                            }`}
+                          >
+                            <span>{isLate ? 'Late' : isLeave ? 'Leave' : log.status}</span>
+                          </span>
+                        </div>
+
+                        {/* Punch In / Out Tiles */}
+                        <div className="grid grid-cols-2 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-100 dark:border-slate-800 text-center">
+                          <div>
+                            <div className="text-[9px] uppercase font-bold text-slate-400">Punch In</div>
+                            <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                              {log.checkIn}
+                            </div>
+                          </div>
+                          <div className="border-l border-slate-100 dark:border-slate-800">
+                            <div className="text-[9px] uppercase font-bold text-slate-400">Punch Out</div>
+                            <div className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                              {log.checkOut}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Duration meter & Overtime */}
+                        <div className="space-y-1.5 pt-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                              Duration: <span className="font-extrabold text-slate-900 dark:text-white">{durationVal.toFixed(1)} hrs</span>
+                            </span>
+                            {log.ot > 0 && (
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                                +{log.ot}h Overtime
+                              </span>
+                            )}
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-200/70 dark:bg-slate-700/60 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-500 rounded-full"
+                              style={{ width: `${progressPct}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Terminal footer */}
+                        <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                          <span className="truncate max-w-[200px] font-medium">{log.method}</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
+                            <ShieldCheck className="w-3 h-3" />
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="p-12 text-center flex flex-col items-center justify-center">
+              <Fingerprint className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+              <h4 className="text-base font-black text-slate-900 dark:text-white">
+                {searchQuery ? 'No Matching Records Found' : 'No Biometric Logs Recorded'}
+              </h4>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm">
+                {searchQuery
+                  ? `No attendance punches matched your query "${searchQuery}". Try searching by another date or status.`
+                  : 'Your daily presence records will appear here as biometric hardware punch events occur.'}
+              </p>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="mt-3 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer"
+                >
+                  Clear Search Filter
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
