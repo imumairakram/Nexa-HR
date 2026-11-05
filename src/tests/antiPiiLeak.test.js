@@ -25,7 +25,12 @@ function getAllFiles(dir, fileList = []) {
 }
 
 test('Anti-PII Leak Guard - Zero real personal emails in code or client', async () => {
-  const forbiddenPatterns = ['umairdevelop', 'umaaiirakram'];
+  const forbiddenPatterns = [
+    'umairdevelop',
+    'umaaiirakram',
+    'muhammadum9ir',
+    'mumairakramaptech',
+  ];
   const rootDir = path.resolve(__dirname, '../..');
   const targetDirs = [
     path.join(rootDir, 'src'),

@@ -216,7 +216,9 @@ const Profile = () => {
       id: u.id || prev.id,
       firstName: u.firstName ?? prev.firstName,
       lastName: u.lastName ?? prev.lastName,
-      email: u.email ?? prev.email,
+      email: (u?.isDemo || u?.isGuest || u?.email?.includes('@gmail.com'))
+        ? (u.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com')
+        : (u.email ?? prev.email),
       phone: u.phone ?? prev.phone,
       role: u.role || prev.role,
       designation: u.profile?.designation?.title || u.designation || prev.designation || defaultDesignation,

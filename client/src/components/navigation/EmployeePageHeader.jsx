@@ -325,6 +325,14 @@ const EmployeePageHeader = ({
 
   const userRole = currentUser?.designation || (currentUser?.role === 'ADMIN' ? 'System Administrator' : 'Staff Member');
 
+  const displayUserEmail = useMemo(() => {
+    if (!currentUser?.email) return '';
+    if (currentUser?.isDemo || currentUser?.isGuest || currentUser.email.includes('@gmail.com')) {
+      return currentUser.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com';
+    }
+    return currentUser.email;
+  }, [currentUser]);
+
   const filteredShortcuts = EMPLOYEE_SEARCH_SHORTCUTS.filter((s) =>
     s.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -559,7 +567,7 @@ const EmployeePageHeader = ({
               <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto sm:right-0 top-16 sm:top-auto sm:mt-2 sm:w-64 bg-white dark:bg-[#1E293B] rounded-[14px] shadow-drawer border border-[#E2E1DC] dark:border-slate-800 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
                   <div className="text-xs font-bold text-slate-900 dark:text-white">{userFullName}</div>
-                  <div className="text-[11px] text-slate-400 truncate">{currentUser?.email || ''}</div>
+                  <div className="text-[11px] text-slate-400 truncate">{displayUserEmail || ''}</div>
                   <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">{userRole}</div>
                 </div>
 

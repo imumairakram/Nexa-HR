@@ -329,6 +329,8 @@ const demoLogin = async (req, res) => {
       isDemo: true,
     });
 
+    const displayEmail = targetRole === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com';
+
     return res.status(200).json({
       success: true,
       message: 'Demo session initialized successfully.',
@@ -338,12 +340,13 @@ const demoLogin = async (req, res) => {
         user: {
           id: user.id,
           employeeCode: user.employeeCode,
-          email: user.email,
+          email: displayEmail,
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
           mustChangePassword: false,
           isDemo: true,
+          isGuest: true,
         },
       },
     });
@@ -462,13 +465,19 @@ const getMe = async (req, res) => {
       providentFund: 'Enrolled (8.33% Tier)',
     };
 
+    const isDemoUser = req.user?.isDemo === true || user.isDemo === true;
+    const sanitizedEmail = isDemoUser
+      ? (user.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com')
+      : user.email;
+
     return res.status(200).json({
       success: true,
       data: {
         user: {
           ...user,
-          isDemo: req.user?.isDemo === true || user.isDemo === true,
-          isGuest: req.user?.isDemo === true || user.isDemo === true,
+          email: sanitizedEmail,
+          isDemo: isDemoUser,
+          isGuest: isDemoUser,
           reportingManager,
           bankDetails,
         },

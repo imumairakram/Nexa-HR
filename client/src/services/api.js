@@ -36,7 +36,15 @@ function invalidateClientCache(pattern) {
 }
 
 export function isGuestOrDemo() {
-  return isDemoSessionActive();
+  if (isDemoSessionActive()) return true;
+  try {
+    const raw = localStorage.getItem('user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u?.isDemo === true || u?.isGuest === true) return true;
+    }
+  } catch {}
+  return false;
 }
 
 /**
@@ -240,6 +248,17 @@ export const api = {
       body: JSON.stringify(credentials),
     });
     if (res.data?.token) {
+      startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
+    }
+    return res;
+  },
+
+  demoLogin: async ({ role = 'hr' } = {}) => {
+    const res = await fetchAPI('/auth/demo-login', {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    });
+    if (res?.data?.token) {
       startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
     }
     return res;

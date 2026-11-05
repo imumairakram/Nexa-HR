@@ -273,10 +273,21 @@ const getEmployees = async (req, res) => {
       }),
     ]);
 
+    const sanitizedEmployees = users.map((u) => {
+      const isDemo = u.isDemo === true || req.user?.isDemo === true;
+      if (isDemo) {
+        return {
+          ...u,
+          email: u.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com',
+        };
+      }
+      return u;
+    });
+
     return res.status(200).json({
       success: true,
       data: {
-        employees: users,
+        employees: sanitizedEmployees,
         pagination: {
           total,
           page: parseInt(page),
@@ -343,9 +354,17 @@ const getEmployeeById = async (req, res) => {
       });
     }
 
+    const isDemo = user.isDemo === true || req.user?.isDemo === true;
+    const sanitizedEmployee = isDemo
+      ? {
+          ...user,
+          email: user.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com',
+        }
+      : user;
+
     return res.status(200).json({
       success: true,
-      data: { employee: user },
+      data: { employee: sanitizedEmployee },
     });
   } catch (error) {
     console.error('Error in getEmployeeById:', error);

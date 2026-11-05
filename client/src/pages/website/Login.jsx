@@ -94,7 +94,7 @@ const Login = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
   const [sessionExpiredNotice, setSessionExpiredNotice] = useState(null);
-  const guestDemoEnabled = isGuestDemoConfigured();
+  const guestDemoEnabled = isGuestDemoConfigured() !== false;
 
   // Check for expired session query param or stored notice on mount
   useEffect(() => {
@@ -213,10 +213,24 @@ const Login = () => {
     }
   };
 
-  const handleGuestLogin = (roleToLogin) => {
+  const handleGuestLogin = async (roleToLogin) => {
     const targetRole = (roleToLogin || loginRole) === 'hr' ? 'ADMIN' : 'EMPLOYEE';
-    startDemoSession(targetRole);
-    navigate(targetRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.demoLogin({ role: targetRole.toLowerCase() });
+      if (res?.data?.token) {
+        navigate(targetRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
+        return;
+      }
+      throw new Error('Backend demo login did not return a session.');
+    } catch (err) {
+      console.warn('Backend demo login fell back to offline demo session:', err.message);
+      startDemoSession(targetRole);
+      navigate(targetRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
+    } finally {
+      setLoading(false);
+    }
   };
 
 

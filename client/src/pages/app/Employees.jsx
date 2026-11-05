@@ -94,6 +94,15 @@ const formatDob = (dobStr) => {
   }
 };
 
+const getSafeEmail = (emp) => {
+  if (!emp) return '';
+  const email = emp.email || '';
+  if (emp.isDemo || emp.isGuest || email.includes('@gmail.com')) {
+    return emp.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com';
+  }
+  return email;
+};
+
 const formatJoiningDate = (joinStr) => {
   if (!joinStr) return 'Active';
   try {
@@ -986,12 +995,12 @@ NexaHR Workforce Systems`;
                   <div className="space-y-2 mt-4 text-xs font-normal text-slate-700 dark:text-slate-300">
                     <div className="flex items-center gap-2.5">
                       <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      {emp.email ? (
+                      {getSafeEmail(emp) ? (
                         <a
-                          href={`mailto:${emp.email}`}
+                          href={`mailto:${getSafeEmail(emp)}`}
                           className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
                         >
-                          {emp.email}
+                          {getSafeEmail(emp)}
                         </a>
                       ) : (
                         <span className="text-slate-400 italic">No email provided</span>
@@ -2053,7 +2062,7 @@ NexaHR Workforce Systems`;
               </div>
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                 <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Contact Email</span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{selectedEmployee.email}</span>
+                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{getSafeEmail(selectedEmployee)}</span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                 <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider flex items-center gap-1.5 mb-1">
@@ -2273,7 +2282,7 @@ NexaHR Workforce Systems`;
               </div>
               <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
                 <span className="text-slate-400 font-bold text-[11px]">Work Email:</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{employeeToDelete.email}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{getSafeEmail(employeeToDelete)}</span>
               </div>
             </div>
 

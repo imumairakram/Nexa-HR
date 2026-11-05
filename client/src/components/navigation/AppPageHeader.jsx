@@ -363,6 +363,14 @@ const AppPageHeader = ({
 
   const userHandle = currentUser ? `@${currentUser.firstName?.toLowerCase()}` : '@system';
 
+  const displayUserEmail = useMemo(() => {
+    if (!currentUser?.email) return '';
+    if (currentUser?.isDemo || currentUser?.isGuest || currentUser.email.includes('@gmail.com')) {
+      return currentUser.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com';
+    }
+    return currentUser.email;
+  }, [currentUser]);
+
   // Resolved role-based title for mobile header
   const resolvedMobileTitle = useMemo(() => {
     if (mobileTitle && mobileTitle !== 'auto') return mobileTitle;
@@ -737,7 +745,7 @@ const AppPageHeader = ({
                   <div className="overflow-hidden">
                     <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{userFullName}</p>
                     <p className="text-[10px] font-semibold text-slate-400 truncate">
-                      {userHandle}{currentUser?.email ? ` • ${currentUser.email}` : ''}
+                      {userHandle}{displayUserEmail ? ` • ${displayUserEmail}` : ''}
                     </p>
                   </div>
                 </div>

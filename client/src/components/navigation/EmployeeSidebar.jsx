@@ -337,7 +337,9 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
                     {currentUser.firstName} {currentUser.lastName || ''}
                   </p>
                   <p className="text-[10px] text-slate-400 truncate">
-                    {currentUser.role || 'Employee'} • {currentUser.email || ''}
+                    {currentUser.role || 'Employee'} • {(currentUser?.isDemo || currentUser?.isGuest || currentUser?.email?.includes('@gmail.com'))
+                      ? (currentUser?.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com')
+                      : (currentUser.email || '')}
                   </p>
                 </div>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
