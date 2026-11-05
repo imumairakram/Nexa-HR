@@ -173,7 +173,12 @@ test('ATS Hardening - Authenticated Resume Access & RBAC', async (t) => {
     }
   });
 
-  await t.test('404 Not Found when HR requests resume for non-existent candidate', async () => {
+  await t.test('404 Not Found when HR requests resume for non-existent candidate', async (sub) => {
+    const dbEligibility = getDbTestEligibility();
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
     const hrToken = generateToken({
       userId: 'mock-hr-id',
       email: 'hr@nexahr.com',

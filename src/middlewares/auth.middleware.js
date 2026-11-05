@@ -1,6 +1,7 @@
 const { verifyJwtToken } = require('../utils/jwt');
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
+const { isGuestDemoActive } = require('../services/demoGuard.service');
 
 const verifyToken = async (req, res, next) => {
   try {
@@ -57,6 +58,38 @@ const verifyToken = async (req, res, next) => {
       });
     }
 
+    const isTokenDemo = decoded.isDemo === true;
+    const isUserDemo = user.isDemo === true;
+
+    // Requirement A:
+    // 1. Reject (401) any token carrying isDemo: true when demo guard is inactive
+    if (isTokenDemo && !isGuestDemoActive()) {
+      return res.status(401).json({
+        success: false,
+        code: 'DEMO_TOKEN_INVALID',
+        message: 'Invalid authorization token: Demo environment is inactive.',
+      });
+    }
+
+    // 2. Reject (401) if token's isDemo claim differs from the user's DB flag
+    // (Guarantees tokens previously minted for real accounts are immediately invalidated)
+    if (isTokenDemo !== isUserDemo) {
+      return res.status(401).json({
+        success: false,
+        code: 'TOKEN_CLAIM_MISMATCH',
+        message: 'Invalid authorization token: Token claims do not match account profile.',
+      });
+    }
+
+    // 3. Reject (401) any isDemo: true token when the loaded DB user is not flagged isDemo
+    if (isTokenDemo && !isUserDemo) {
+      return res.status(401).json({
+        success: false,
+        code: 'DEMO_USER_REQUIRED',
+        message: 'Invalid authorization token: User account is not flagged as a demo user.',
+      });
+    }
+
     // Attach authenticated user context to request
     req.user = {
       id: user.id,
@@ -65,7 +98,7 @@ const verifyToken = async (req, res, next) => {
       role: user.role,
       fullName: `${user.firstName} ${user.lastName}`,
       employeeCode: user.employeeCode || null,
-      isDemo: decoded.isDemo === true || user.isDemo === true,
+      isDemo: isUserDemo && isTokenDemo,
     };
 
     // Global mutation guard for Guest / Demo sessions:
@@ -100,6 +133,49 @@ const verifyToken = async (req, res, next) => {
 };
 
 /**
+ * Global default-deny middleware for demo sessions.
+ * Intercepts any mutating HTTP method (POST, PUT, PATCH, DELETE) for demo users.
+ * Allows only GET, HEAD, OPTIONS, and the logout endpoint.
+ */
+const enforceDemoReadonly = (req, res, next) => {
+  const method = req.method.toUpperCase();
+  if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    return next();
+  }
+
+  const isLogout = req.path.endsWith('/logout') || req.originalUrl?.includes('/logout');
+  if (isLogout) {
+    return next();
+  }
+
+  if (req.user && req.user.isDemo) {
+    return res.status(403).json({
+      success: false,
+      code: 'DEMO_MODE',
+      message: 'Guest / Demo mode is view-only. Modifying data is disabled to ensure uninterrupted access.',
+    });
+  }
+
+  // Pre-parse Authorization header if verifyToken hasn't run yet
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.split(' ')[1];
+      const decoded = verifyJwtToken(token);
+      if (decoded && decoded.isDemo === true) {
+        return res.status(403).json({
+          success: false,
+          code: 'DEMO_MODE',
+          message: 'Guest / Demo mode is view-only. Modifying data is disabled to ensure uninterrupted access.',
+        });
+      }
+    } catch {}
+  }
+
+  return next();
+};
+
+/**
  * Defense-in-depth middleware to block demo sessions from mutating data or accessing sensitive resources
  */
 const blockDemo = (req, res, next) => {
@@ -116,4 +192,5 @@ const blockDemo = (req, res, next) => {
 module.exports = {
   verifyToken,
   blockDemo,
+  enforceDemoReadonly,
 };

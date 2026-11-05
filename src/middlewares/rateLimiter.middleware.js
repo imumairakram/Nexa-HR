@@ -111,6 +111,17 @@ const guestLoginRateLimiter = rateLimit({
   },
 });
 
+const registerAdminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many administrator registration attempts. Please try again after 15 minutes.',
+  },
+});
+
 module.exports = {
   authRateLimiter,
   passwordResetRateLimiter,
@@ -119,4 +130,5 @@ module.exports = {
   recoveryCheckIdentifierLimiter,
   generalApiLimiter,
   guestLoginRateLimiter,
+  registerAdminLimiter,
 };

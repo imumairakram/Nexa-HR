@@ -21,6 +21,7 @@ const {
   recoveryCheckRateLimiter,
   recoveryCheckIdentifierLimiter,
   guestLoginRateLimiter,
+  registerAdminLimiter,
 } = require('../middlewares/rateLimiter.middleware');
 const {
   loginValidationRules,
@@ -34,7 +35,7 @@ const {
 // CORE AUTHENTICATION ROUTES
 // ====================================================
 router.get('/config', getAuthConfig);
-router.post('/register-admin', registerAdmin);
+router.post('/register-admin', registerAdminLimiter, registerAdmin);
 router.post('/login', authRateLimiter, loginValidationRules, login);
 router.post('/demo-login', guestLoginRateLimiter, demoLogin);
 router.post('/guest-login', guestLoginRateLimiter, demoLogin);

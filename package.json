@@ -15,7 +15,7 @@
     "dev:client": "npm run dev --prefix client",
     "build:client": "npm run build --prefix client",
     "install:all": "npm install && npm install --prefix client",
-    "test": "node --test src/tests/*.test.js",
+    "test": "node --require ./src/tests/setup.js --test src/tests/*.test.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },

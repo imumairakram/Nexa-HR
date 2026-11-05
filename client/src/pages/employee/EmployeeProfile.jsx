@@ -116,7 +116,7 @@ const EmployeeProfile = () => {
       return {};
     }
   });
-  const isGuest = isDemoSessionActive() || currentUser?.isDemo === true || localStorage.getItem('isGuest') === 'true';
+  const isGuest = isDemoSessionActive() || currentUser?.isDemo === true;
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 

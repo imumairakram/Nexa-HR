@@ -9,7 +9,6 @@ export const SESSION_KEYS = {
   USER: 'user',
   EXPIRES_AT: 'sessionExpiresAt',
   STARTED_AT: 'sessionStartedAt',
-  GUEST: 'isGuest',
   AVATAR: 'user_avatar',
   EXPIRED_NOTICE: 'session_expired_notice',
 };
@@ -85,7 +84,6 @@ export const clearSession = (noticeReason = null) => {
     localStorage.removeItem(SESSION_KEYS.USER);
     localStorage.removeItem(SESSION_KEYS.EXPIRES_AT);
     localStorage.removeItem(SESSION_KEYS.STARTED_AT);
-    localStorage.removeItem(SESSION_KEYS.GUEST);
     localStorage.removeItem(SESSION_KEYS.AVATAR);
 
     // Clean up user-scoped cached avatars

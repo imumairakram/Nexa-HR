@@ -11,7 +11,7 @@ const {
   seedDefaultTransactions,
   clearAllTransactions,
 } = require('../controllers/account.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
 const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 const cacheService = require('../services/cache.service');
@@ -19,24 +19,25 @@ const cacheService = require('../services/cache.service');
 router.use(verifyToken, requireTenant);
 
 const canManageAccounts = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+const adminOnly = checkRole('ADMIN');
 
 // Account Transactions & Financial Statistics
 router.get('/stats', canManageAccounts, cacheService.middleware({ ttlSeconds: 60, tags: ['accounts'] }), getTransactionStats);
 router.get('/transactions', canManageAccounts, cacheService.middleware({ ttlSeconds: 60, tags: ['accounts'] }), getTransactions);
-router.post('/transactions', canManageAccounts, createTransaction);
-router.put('/transactions/:id', canManageAccounts, updateTransaction);
-router.patch('/transactions/:id', canManageAccounts, updateTransaction);
-router.delete('/transactions/:id', canManageAccounts, deleteTransaction);
+router.post('/transactions', blockDemo, canManageAccounts, createTransaction);
+router.put('/transactions/:id', blockDemo, canManageAccounts, updateTransaction);
+router.patch('/transactions/:id', blockDemo, canManageAccounts, updateTransaction);
+router.delete('/transactions/:id', blockDemo, canManageAccounts, deleteTransaction);
 
-// Clear All Transactions
-router.post('/clear', canManageAccounts, clearAllTransactions);
-router.delete('/clear', canManageAccounts, clearAllTransactions);
+// Clear All Transactions (Admin Only)
+router.post('/clear', blockDemo, adminOnly, clearAllTransactions);
+router.delete('/clear', blockDemo, adminOnly, clearAllTransactions);
 
-// Batch Operations
-router.post('/batch-delete', canManageAccounts, batchDeleteTransactions);
-router.post('/batch-status', canManageAccounts, batchUpdateStatus);
+// Batch Operations (Admin Only)
+router.post('/batch-delete', blockDemo, adminOnly, batchDeleteTransactions);
+router.post('/batch-status', blockDemo, adminOnly, batchUpdateStatus);
 
-// Seeding endpoint
-router.post('/seed', canManageAccounts, seedDefaultTransactions);
+// Seeding endpoint (Admin Only)
+router.post('/seed', blockDemo, adminOnly, seedDefaultTransactions);
 
 module.exports = router;

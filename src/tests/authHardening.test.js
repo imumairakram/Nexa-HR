@@ -44,7 +44,12 @@ test('Security Batch 1 - Fix 1B: Backdoor Removal & Database-Only Authentication
     if (server) server.close();
   });
 
-  await t.test('Login with non-existent credentials returns 401 and does not auto-create accounts', async () => {
+  await t.test('Login with non-existent credentials returns 401 and does not auto-create accounts', async (sub) => {
+    const dbEligibility = getDbTestEligibility();
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
     const res = await fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -312,8 +317,15 @@ test('Security Batch 1 - Fix 2: CORS Allow-List & Bearer-Only Authentication', a
     if (server) server.close();
   });
 
-  const activeAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN', isActive: true } });
-  const validToken = generateToken({ userId: activeAdmin.id, role: 'ADMIN' });
+  const activeAdmin = {
+    id: 'mock-admin-token-id',
+    email: 'admin@test.invalid',
+    role: 'ADMIN',
+    isActive: true,
+    isDemo: false,
+  };
+  cacheService.setCachedUser(activeAdmin.id, activeAdmin);
+  const validToken = generateToken({ userId: activeAdmin.id, role: 'ADMIN', isDemo: false });
 
   await t.test('Request from a non-whitelisted Origin is rejected with 403', async () => {
     const res = await fetch(`${baseUrl}/api/health`, {
@@ -589,7 +601,11 @@ test('Security Batch 1 - Fix 5: Password Recovery Anti-Enumeration & Cooldown En
     assert.equal(data.data.email, undefined);
   });
 
-  await t.test('Check with non-existing user returns identical structure with 200', async () => {
+  await t.test('Check with non-existing user returns identical structure with 200', async (sub) => {
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
     const res = await fetch(`${baseUrl}/forgot-password/check`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.196' },
@@ -606,7 +622,11 @@ test('Security Batch 1 - Fix 5: Password Recovery Anti-Enumeration & Cooldown En
     assert.equal(data.data.employeeCode, undefined);
   });
 
-  await t.test('OTP send cooldown rejects second request within 60s with 429', async () => {
+  await t.test('OTP send cooldown rejects second request within 60s with 429', async (sub) => {
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
     const targetEmail = `cooldown-test-${Date.now()}@example.com`;
     // First request should succeed (uniform 200)
     const res1 = await fetch(`${baseUrl}/forgot-password`, {
@@ -705,80 +725,158 @@ test('Security Batch 1 - 1-Click Demo Login Endpoint & Auth Config', async (t) =
     });
   });
 
+  const origGuestDemo = process.env.ENABLE_GUEST_DEMO;
+  const origNodeEnv = process.env.NODE_ENV;
+  const origBootstrap = process.env.BOOTSTRAP_TOKEN;
+
   t.after(() => {
     if (server) server.close();
+    setGuestDemoActiveForTesting(false);
+    if (origGuestDemo !== undefined) process.env.ENABLE_GUEST_DEMO = origGuestDemo;
+    else delete process.env.ENABLE_GUEST_DEMO;
+    if (origNodeEnv !== undefined) process.env.NODE_ENV = origNodeEnv;
+    else delete process.env.NODE_ENV;
+    if (origBootstrap !== undefined) process.env.BOOTSTRAP_TOKEN = origBootstrap;
+    else delete process.env.BOOTSTRAP_TOKEN;
   });
 
-  await t.test('GET /api/auth/config returns guestDemoEnabled: true', async () => {
-    const res = await fetch(`${baseUrl}/config`);
-    assert.equal(res.status, 200);
-    const data = await res.json();
-    assert.equal(data.success, true);
-    assert.equal(data.data.guestDemoEnabled, true);
+  await t.test('GET /api/auth/config reflects isGuestDemoActive state', async () => {
+    setGuestDemoActiveForTesting(false);
+    delete process.env.ENABLE_GUEST_DEMO;
+    const resInactive = await fetch(`${baseUrl}/config`);
+    const dataInactive = await resInactive.json();
+    assert.equal(dataInactive.data.guestDemoEnabled, false);
+
+    process.env.ENABLE_GUEST_DEMO = 'true';
+    setGuestDemoActiveForTesting(true);
+    const resActive = await fetch(`${baseUrl}/config`);
+    const dataActive = await resActive.json();
+    assert.equal(dataActive.data.guestDemoEnabled, true);
   });
 
-  await t.test('POST /api/auth/demo-login with hr logs in as umairdevelop@gmail.com with isDemo: true', async () => {
+  await t.test('POST /api/auth/demo-login returns 404 when demo guard is inactive', async () => {
+    setGuestDemoActiveForTesting(false);
+    delete process.env.ENABLE_GUEST_DEMO;
+
     const res = await fetch(`${baseUrl}/demo-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role: 'hr' }),
     });
 
-    assert.equal(res.status, 200);
-    const data = await res.json();
-    assert.equal(data.success, true);
-    assert.equal(data.data.user.email, 'umairdevelop@gmail.com');
-    assert.equal(data.data.user.role, 'ADMIN');
-    assert.equal(data.data.user.isDemo, true);
-    assert.equal(data.data.user.isGuest, true);
-
-    const decoded = verifyJwtToken(data.data.token);
-    assert.equal(decoded.isDemo, true);
+    assert.equal(res.status, 404);
   });
 
-  await t.test('POST /api/auth/demo-login with employee logs in as umaaiirakram@gmail.com with isDemo: true', async () => {
+  await t.test('POST /api/auth/demo-login returns 404 if no demo user exists in DB', async (sub) => {
+    const dbEligibility = getDbTestEligibility();
+    if (!dbEligibility.canRun) {
+      sub.skip(dbEligibility.reason);
+      return;
+    }
+    process.env.ENABLE_GUEST_DEMO = 'true';
+    setGuestDemoActiveForTesting(true);
+
     const res = await fetch(`${baseUrl}/demo-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'employee' }),
-    });
-
-    assert.equal(res.status, 200);
-    const data = await res.json();
-    assert.equal(data.success, true);
-    assert.equal(data.data.user.email, 'umaaiirakram@gmail.com');
-    assert.equal(data.data.user.role, 'EMPLOYEE');
-    assert.equal(data.data.user.isDemo, true);
-    assert.equal(data.data.user.isGuest, true);
-
-    const decoded = verifyJwtToken(data.data.token);
-    assert.equal(decoded.isDemo, true);
-  });
-
-  await t.test('Guest demo token blocks all mutation attempts (view-only mode)', async () => {
-    // Obtain guest HR token
-    const loginRes = await fetch(`${baseUrl}/demo-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role: 'hr' }),
     });
-    const loginData = await loginRes.json();
-    const guestToken = loginData.data.token;
 
-    // Attempt profile update mutation
-    const mutationRes = await fetch(`${baseUrl}/profile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${guestToken}`,
-      },
-      body: JSON.stringify({ firstName: 'Hacked Name' }),
+    assert.equal(res.status, 404);
+    const data = await res.json();
+    assert.equal(data.success, false);
+  });
+
+  await t.test('POST /api/auth/register-admin is blocked in production without valid BOOTSTRAP_TOKEN', async () => {
+    process.env.NODE_ENV = 'production';
+    delete process.env.BOOTSTRAP_TOKEN;
+
+    const res = await fetch(`${baseUrl}/register-admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: 'New',
+        lastName: 'Admin',
+        email: 'newadmin@corp.test',
+        password: 'Password123!',
+      }),
     });
 
-    assert.equal(mutationRes.status, 403);
-    const mutationData = await mutationRes.json();
-    assert.equal(mutationData.success, false);
-    assert.equal(mutationData.code, 'DEMO_MODE');
-    assert.match(mutationData.message, /view-only/i);
+    assert.equal(res.status, 403);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /disabled in production/i);
+  });
+
+  await t.test('POST /api/auth/register-admin enforces password strength validation', async () => {
+    process.env.NODE_ENV = 'development';
+
+    const res = await fetch(`${baseUrl}/register-admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: 'New',
+        lastName: 'Admin',
+        email: 'newadmin@corp.test',
+        password: 'weak',
+      }),
+    });
+
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /Password does not meet security requirements/i);
+  });
+
+  await t.test('verifyToken: rejects token carrying isDemo: true when demo guard is inactive (401)', async () => {
+    setGuestDemoActiveForTesting(false);
+    delete process.env.ENABLE_GUEST_DEMO;
+
+    const demoUserId = 'demo-test-user-id';
+    cacheService.setCachedUser(demoUserId, {
+      id: demoUserId,
+      email: 'demo@corp.test',
+      role: 'ADMIN',
+      isActive: true,
+      isDemo: true,
+    });
+
+    const demoToken = generateToken({ userId: demoUserId, role: 'ADMIN', isDemo: true });
+
+    const res = await fetch(`${baseUrl}/me`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${demoToken}` },
+    });
+
+    assert.equal(res.status, 401);
+    const data = await res.json();
+    assert.equal(data.code, 'DEMO_TOKEN_INVALID');
+  });
+
+  await t.test('verifyToken: rejects token where isDemo claim mismatches user profile (401)', async () => {
+    process.env.ENABLE_GUEST_DEMO = 'true';
+    setGuestDemoActiveForTesting(true);
+
+    // Real user account (isDemo: false)
+    const realUserId = 'real-user-test-id';
+    cacheService.setCachedUser(realUserId, {
+      id: realUserId,
+      email: 'real@corp.test',
+      role: 'ADMIN',
+      isActive: true,
+      isDemo: false,
+    });
+
+    // Token forged or old token minted with isDemo: true
+    const forgedToken = generateToken({ userId: realUserId, role: 'ADMIN', isDemo: true });
+
+    const res = await fetch(`${baseUrl}/me`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${forgedToken}` },
+    });
+
+    assert.equal(res.status, 401);
+    const data = await res.json();
+    assert.equal(data.code, 'TOKEN_CLAIM_MISMATCH');
   });
 });

@@ -36,17 +36,7 @@ function invalidateClientCache(pattern) {
 }
 
 export function isGuestOrDemo() {
-  if (isDemoSessionActive()) return true;
-  if (typeof window === 'undefined') return false;
-  if (localStorage.getItem('isGuest') === 'true') return true;
-  try {
-    const rawUser = localStorage.getItem('user');
-    if (rawUser) {
-      const u = JSON.parse(rawUser);
-      if (u.isDemo || u.isGuest) return true;
-    }
-  } catch {}
-  return false;
+  return isDemoSessionActive();
 }
 
 /**
@@ -242,29 +232,6 @@ export const api = {
   // --- Auth & User Profile ---
   getAuthConfig: async () => {
     return await fetchAPI('/auth/config');
-  },
-  demoLogin: async ({ role = 'hr' } = {}) => {
-    let res;
-    try {
-      res = await fetchAPI('/auth/demo-login', {
-        method: 'POST',
-        body: JSON.stringify({ role }),
-      });
-    } catch (err) {
-      if (err.message && (err.message.includes('Route not found') || err.message.includes('404'))) {
-        res = await fetchAPI('/demo-login', {
-          method: 'POST',
-          body: JSON.stringify({ role }),
-        });
-      } else {
-        throw err;
-      }
-    }
-    if (res?.data?.token) {
-      startSession(res.data.token, res.data.user, res.data.expiresIn || 3600);
-      localStorage.setItem('isGuest', 'true');
-    }
-    return res;
   },
 
   login: async (credentials) => {

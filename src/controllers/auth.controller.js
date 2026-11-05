@@ -4,6 +4,7 @@ const prisma = require('../config/prisma');
 const { hashPassword, comparePassword, validatePasswordStrength } = require('../utils/password');
 const { generateToken } = require('../utils/jwt');
 const { isGuestDemoActive } = require('../services/demoGuard.service');
+const cacheService = require('../services/cache.service');
 const {
   sendEmailOTP,
   sendWhatsAppOTP,
@@ -16,17 +17,73 @@ const {
 } = require('../services/notification.service');
 
 /**
- * Register System Administrator
+ * Register System Administrator (Initial Bootstrap Only)
  * POST /api/auth/register-admin
+ * Security:
+ * - Disabled in production unless BOOTSTRAP_TOKEN is configured.
+ * - Requires timing-safe match with BOOTSTRAP_TOKEN when set.
+ * - Only allowed when NO existing ADMIN user exists in the database.
+ * - Enforces strong password policy.
  */
 const registerAdmin = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, phone, employeeCode = 'EMP-ADMIN-001' } = req.body;
+    const isProduction = process.env.NODE_ENV === 'production';
+    const expectedBootstrap = process.env.BOOTSTRAP_TOKEN;
+
+    // Disabled in production without an explicit BOOTSTRAP_TOKEN
+    if (isProduction && (!expectedBootstrap || expectedBootstrap.trim().length < 16)) {
+      return res.status(403).json({
+        success: false,
+        message: 'System administrator registration is disabled in production.',
+      });
+    }
+
+    // When BOOTSTRAP_TOKEN is set, require it
+    if (expectedBootstrap) {
+      const providedToken = req.headers['x-bootstrap-token'] || req.body?.bootstrapToken;
+      if (!providedToken || typeof providedToken !== 'string') {
+        return res.status(401).json({
+          success: false,
+          message: 'Missing required x-bootstrap-token header.',
+        });
+      }
+      const pBuf = Buffer.from(providedToken);
+      const eBuf = Buffer.from(expectedBootstrap.trim());
+      if (pBuf.length !== eBuf.length || !crypto.timingSafeEqual(pBuf, eBuf)) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid bootstrap token.',
+        });
+      }
+    }
+
+    const { email, password, firstName, lastName, phone, employeeCode = 'EMP-ADMIN-001' } = req.body || {};
 
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({
         success: false,
         message: 'Please provide required fields (email, password, firstName, lastName).',
+      });
+    }
+
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: `Password does not meet security requirements: ${passwordValidation.errors.join(' ')}`,
+        errors: passwordValidation.errors,
+      });
+    }
+
+    // Refuse registration if an ADMIN already exists in the database
+    const existingAdminCount = await prisma.user.count({
+      where: { role: 'ADMIN' },
+    });
+
+    if (existingAdminCount > 0) {
+      return res.status(403).json({
+        success: false,
+        message: 'System administrator already exists. Registration is closed.',
       });
     }
 
@@ -67,14 +124,12 @@ const registerAdmin = async (req, res) => {
       role: user.role,
     });
 
-    // Bearer token returned in response body (cookies not set)
-
     return res.status(201).json({
       success: true,
       message: 'System Administrator registered successfully.',
       data: {
-        token, // Provided for API/mobile interoperability
-        expiresIn: 3600, // Strict 1-hour validity window (seconds)
+        token,
+        expiresIn: 3600,
         user: {
           id: user.id,
           employeeCode: user.employeeCode,
@@ -213,7 +268,7 @@ const getAuthConfig = (req, res) => {
   return res.status(200).json({
     success: true,
     data: {
-      guestDemoEnabled: true,
+      guestDemoEnabled: isGuestDemoActive(),
     },
   });
 };
@@ -221,22 +276,28 @@ const getAuthConfig = (req, res) => {
 /**
  * 1-Click Demo / Guest Session Initialization
  * POST /api/auth/guest-login & POST /api/auth/demo-login
- * HR logs in as umairdevelop@gmail.com (ADMIN)
- * Employee logs in as umaaiirakram@gmail.com (EMPLOYEE)
- * Both receive an isDemo: true token that enforces strict view-only mode across all endpoints.
+ *
+ * Security Requirements:
+ * - Disabled (404) unless ENABLE_GUEST_DEMO=true AND isolated demo database passes startup guard.
+ * - Looks up ONLY dedicated demo accounts (isDemo: true).
+ * - Never looks up, references, or mints tokens for real or non-demo accounts.
  */
 const demoLogin = async (req, res) => {
   try {
+    if (process.env.ENABLE_GUEST_DEMO !== 'true' || !isGuestDemoActive()) {
+      return res.status(404).json({
+        success: false,
+        message: 'Demo login is disabled on this environment.',
+      });
+    }
+
     const { role, type } = req.body || {};
     const requestedRole = String(type || role || 'hr').toLowerCase().trim();
 
-    let targetEmail;
     let targetRole;
     if (['hr', 'admin', 'hr_manager', 'hr_admin'].includes(requestedRole)) {
-      targetEmail = 'umairdevelop@gmail.com';
       targetRole = 'ADMIN';
     } else if (['employee', 'staff', 'user'].includes(requestedRole)) {
-      targetEmail = 'umaaiirakram@gmail.com';
       targetRole = 'EMPLOYEE';
     } else {
       return res.status(400).json({
@@ -245,27 +306,19 @@ const demoLogin = async (req, res) => {
       });
     }
 
-    let user = await prisma.user.findFirst({
+    // Must look up ONLY accounts flagged isDemo: true in the isolated demo database
+    const user = await prisma.user.findFirst({
       where: {
-        email: targetEmail,
+        role: targetRole,
+        isDemo: true,
         isActive: true,
       },
     });
 
-    // Fallback if specific email is missing in a staging or dev DB
-    if (!user) {
-      user = await prisma.user.findFirst({
-        where: {
-          role: targetRole,
-          isActive: true,
-        },
-      });
-    }
-
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: `Account for role '${requestedRole}' not found or inactive.`,
+        message: `Demo account for role '${requestedRole}' not found in demo database.`,
       });
     }
 
@@ -290,7 +343,6 @@ const demoLogin = async (req, res) => {
           lastName: user.lastName,
           role: user.role,
           mustChangePassword: false,
-          isGuest: true,
           isDemo: true,
         },
       },
@@ -299,7 +351,7 @@ const demoLogin = async (req, res) => {
     console.error('[AUTH ERROR] in demoLogin:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to initialize demo session.',
+      message: 'Demo login failed.',
       error: error.message,
     });
   }
@@ -329,29 +381,37 @@ const logout = async (req, res) => {
  */
 const getMe = async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.userId },
-      select: {
-        id: true,
-        employeeCode: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        mustChangePassword: true,
-        isDemo: true,
-        createdAt: true,
-        salaryStructure: true,
-        profile: {
-          include: {
-            department: true,
-            designation: true,
+    let user = cacheService.getCachedUser(req.user.userId);
+    if (!user || !user.createdAt) {
+      try {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: req.user.userId },
+          select: {
+            id: true,
+            employeeCode: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            role: true,
+            isActive: true,
+            mustChangePassword: true,
+            isDemo: true,
+            createdAt: true,
+            salaryStructure: true,
+            profile: {
+              include: {
+                department: true,
+                designation: true,
+              },
+            },
           },
-        },
-      },
-    });
+        });
+        if (dbUser) user = dbUser;
+      } catch (dbErr) {
+        if (!user) throw dbErr;
+      }
+    }
 
     if (!user) {
       return res.status(404).json({

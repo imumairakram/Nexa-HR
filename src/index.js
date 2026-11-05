@@ -149,6 +149,10 @@ app.use('/api', generalApiLimiter);
 // Smart cache mutation invalidator: instantly clears related cache on POST/PUT/PATCH/DELETE
 app.use('/api', cacheService.mutationInvalidator());
 
+// Global default-deny demo mutation guard for all /api endpoints
+const { enforceDemoReadonly } = require('./middlewares/auth.middleware');
+app.use('/api', enforceDemoReadonly);
+
 // =========================================================================
 // 4. CORE API ROUTES
 // =========================================================================

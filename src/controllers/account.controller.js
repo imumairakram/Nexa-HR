@@ -128,6 +128,14 @@ const DEFAULT_SAMPLE_TXNS = [
  */
 const seedDefaultTransactions = async (req, res) => {
   try {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction && process.env.ALLOW_ACCOUNTS_SEED !== 'true') {
+      return res.status(403).json({
+        success: false,
+        message: 'Seeding account transactions is disabled in production without explicit ALLOW_ACCOUNTS_SEED=true flag.',
+      });
+    }
+
     const count = await prisma.accountTransaction.count();
     if (count > 0 && !req.query.force) {
       return res.status(200).json({
@@ -695,6 +703,14 @@ const batchUpdateStatus = async (req, res) => {
  */
 const clearAllTransactions = async (req, res) => {
   try {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction && process.env.ALLOW_ACCOUNTS_CLEAR !== 'true') {
+      return res.status(403).json({
+        success: false,
+        message: 'Clearing corporate ledger transactions is disabled in production without explicit ALLOW_ACCOUNTS_CLEAR=true flag.',
+      });
+    }
+
     const deleted = await prisma.accountTransaction.deleteMany();
     return res.status(200).json({
       success: true,

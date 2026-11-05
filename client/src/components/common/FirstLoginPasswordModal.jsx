@@ -25,11 +25,10 @@ const FirstLoginPasswordModal = () => {
         return;
       }
       const stored = localStorage.getItem('user');
-      const isGuestFlag = localStorage.getItem('isGuest') === 'true';
       if (stored) {
         const u = JSON.parse(stored);
         setUser(u);
-        const isDemo = isGuestFlag || Boolean(u?.isGuest || u?.isDemo);
+        const isDemo = Boolean(u?.isDemo);
         if (!isDemo && u && u.mustChangePassword === true) {
           setShowModal(true);
         } else {

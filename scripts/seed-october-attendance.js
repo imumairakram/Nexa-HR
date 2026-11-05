@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 /**
  * Seed realistic, randomized attendance data for October 2026
- * For all active users in the system (e.g., umairdevelop@gmail.com and umaaiirakram@gmail.com)
+ * For all active users in the system (e.g., active employee accounts)
  */
 async function seedOctoberAttendance() {
   console.log('[SEED] Starting October 2026 attendance generation...');

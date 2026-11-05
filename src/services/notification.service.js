@@ -43,7 +43,7 @@ function getTwilioClient() {
 // Nodemailer SMTP Transporter
 let mailTransporter = null;
 function getMailTransporter() {
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test' || process.env.EMAIL_DELIVERY_MODE === 'log') {
     if (!mailTransporter || !mailTransporter._isTestStub) {
       const stub = nodemailer.createTransport({
         jsonTransport: true,
@@ -968,7 +968,7 @@ async function sendWhatsAppOTP(phone, otp, name = 'Team Member', expiryMinutes =
 
   console.log(`[NexaHR NOTIFICATION] WhatsApp OTP verification code event dispatched to ${maskPhone(formattedPhone)}.`);
 
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test' || process.env.EMAIL_DELIVERY_MODE === 'log') {
     const record = {
       phone: formattedPhone,
       otp,

@@ -94,12 +94,7 @@ const Login = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [resetSuccessNotification, setResetSuccessNotification] = useState(null);
   const [sessionExpiredNotice, setSessionExpiredNotice] = useState(null);
-  const [guestDemoEnabled, setGuestDemoEnabled] = useState(true);
-
-  // Guest demo login is enabled by default
-  useEffect(() => {
-    setGuestDemoEnabled(true);
-  }, []);
+  const guestDemoEnabled = isGuestDemoConfigured();
 
   // Check for expired session query param or stored notice on mount
   useEffect(() => {
@@ -207,7 +202,6 @@ const Login = () => {
           return;
         }
 
-        localStorage.removeItem('isGuest');
         navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
       } else {
         setError(res?.message || 'Invalid email or password. Please try again.');
@@ -219,25 +213,10 @@ const Login = () => {
     }
   };
 
-  const handleGuestLogin = async (roleToLogin) => {
-    const targetRole = (roleToLogin || loginRole) === 'hr' ? 'hr' : 'employee';
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.demoLogin({ role: targetRole });
-      if (res && res.success && res.data) {
-        const userRole = res.data?.user?.role || (targetRole === 'hr' ? 'ADMIN' : 'EMPLOYEE');
-        localStorage.setItem('isGuest', 'true');
-        navigate(userRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
-      } else {
-        throw new Error(res?.message || 'Failed to start demo session.');
-      }
-    } catch (err) {
-      console.error('[Guest Login Error]', err);
-      setError(err?.response?.data?.message || err?.message || 'Failed to start demo session. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handleGuestLogin = (roleToLogin) => {
+    const targetRole = (roleToLogin || loginRole) === 'hr' ? 'ADMIN' : 'EMPLOYEE';
+    startDemoSession(targetRole);
+    navigate(targetRole === 'EMPLOYEE' ? '/employee/dashboard' : '/app/dashboard');
   };
 
 
