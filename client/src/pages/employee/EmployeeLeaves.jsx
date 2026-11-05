@@ -26,6 +26,32 @@ import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { broadcastAppEvent, subscribeAppEvent } from '../../utils/crossTabSync';
 
+export const calculateLeaveDays = (req) => {
+  if (!req) return 1;
+  // If startDate and endDate are present, compute exact days from the schedule window
+  if (req.startDate && req.endDate) {
+    try {
+      const s = new Date(req.startDate);
+      const e = new Date(req.endDate);
+      if (!isNaN(s.getTime()) && !isNaN(e.getTime())) {
+        const utc1 = Date.UTC(s.getFullYear(), s.getMonth(), s.getDate());
+        const utc2 = Date.UTC(e.getFullYear(), e.getMonth(), e.getDate());
+        const diff = Math.max(1, Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24)) + 1);
+        return req.dayType === 'HALF' ? 0.5 : diff;
+      }
+    } catch {}
+  }
+  const explicit = Number(req.totalDays ?? req.days);
+  if (!isNaN(explicit) && explicit > 0) return explicit;
+  return 1;
+};
+
+export const formatLeaveDays = (days) => {
+  const count = Number(days);
+  if (isNaN(count) || count <= 0) return '1 day';
+  return `${count} ${count === 1 ? 'day' : 'days'}`;
+};
+
 const EmployeeLeaves = () => {
   const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
   const [requests, setRequests] = useState(() => api.getCached('/leaves/my-requests')?.data?.leaveRequests || api.getCached('/leaves/requests')?.data?.leaveRequests || []);
@@ -155,10 +181,10 @@ const EmployeeLeaves = () => {
     return leaveTypes.map((lt, idx) => {
       const usedDays = requests
         .filter((r) => (r.leaveTypeId === lt.id || r.leaveType?.id === lt.id || r.leaveType?.name === lt.name || r.leaveType?.code === lt.code) && r.status === 'APPROVED')
-        .reduce((acc, r) => acc + (Number(r.totalDays) || 1), 0);
+        .reduce((acc, r) => acc + calculateLeaveDays(r), 0);
       const pendingDays = requests
         .filter((r) => (r.leaveTypeId === lt.id || r.leaveType?.id === lt.id || r.leaveType?.name === lt.name || r.leaveType?.code === lt.code) && r.status === 'PENDING')
-        .reduce((acc, r) => acc + (Number(r.totalDays) || 1), 0);
+        .reduce((acc, r) => acc + calculateLeaveDays(r), 0);
       const available = Math.max(0, lt.daysAllowed - usedDays);
       const percent = Math.min(100, Math.max(0, Math.round((available / (lt.daysAllowed || 1)) * 100)));
 
@@ -216,12 +242,15 @@ const EmployeeLeaves = () => {
       const approver = `${r.approvedBy?.firstName || ''} ${r.approvedBy?.lastName || ''}`.toLowerCase();
       const query = searchQuery.toLowerCase().trim();
 
+      const durationStr = `${calculateLeaveDays(r)} day`;
       const matchesSearch =
         !query ||
         type.includes(query) ||
         reason.includes(query) ||
         remarks.includes(query) ||
         approver.includes(query) ||
+        durationStr.includes(query) ||
+        (r.id && r.id.toLowerCase().includes(query)) ||
         (r.startDate && r.startDate.includes(query)) ||
         (r.endDate && r.endDate.includes(query));
 
@@ -538,7 +567,7 @@ const EmployeeLeaves = () => {
                         <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
                           <span className="text-slate-500 font-medium">Duration:</span>
                           <span className="font-extrabold text-emerald-600 dark:text-emerald-400">
-                            {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                            {formatLeaveDays(calculateLeaveDays(req))}
                           </span>
                         </div>
 
@@ -599,7 +628,7 @@ const EmployeeLeaves = () => {
                         </td>
                         <td className="py-4 px-4">
                           <div className="font-bold text-slate-900 dark:text-white">
-                            {req.totalDays || 1} {req.totalDays === 1 ? 'day' : 'days'}
+                            {formatLeaveDays(calculateLeaveDays(req))}
                           </div>
                           <div className="text-xs text-slate-400 mt-0.5">
                             {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
@@ -724,7 +753,7 @@ const EmployeeLeaves = () => {
                 <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Duration</div>
                   <div className="font-black text-sm text-slate-900 dark:text-white mt-1">
-                    {selectedReq.totalDays || 1} {selectedReq.totalDays === 1 ? 'Day' : 'Days'}
+                    {formatLeaveDays(calculateLeaveDays(selectedReq))}
                   </div>
                 </div>
               </div>

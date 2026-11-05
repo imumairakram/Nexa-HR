@@ -32,6 +32,7 @@ import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 import { getYearHolidays } from '../../utils/holidayEngine';
 import { subscribeAppEvent } from '../../utils/crossTabSync';
+import { calculateLeaveDays } from './EmployeeLeaves';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
@@ -174,7 +175,7 @@ const EmployeeDashboard = () => {
               r.leaveType?.code === type.code) &&
             r.status === 'APPROVED'
         )
-        .reduce((sum, r) => sum + (Number(r.totalDays) || 1), 0);
+        .reduce((sum, r) => sum + calculateLeaveDays(r), 0);
 
       const pendingDays = leaveRequests
         .filter(
@@ -184,7 +185,7 @@ const EmployeeDashboard = () => {
               r.leaveType?.code === type.code) &&
             r.status === 'PENDING'
         )
-        .reduce((sum, r) => sum + (Number(r.totalDays) || 1), 0);
+        .reduce((sum, r) => sum + calculateLeaveDays(r), 0);
 
       const remaining = Math.max(0, totalAllowed - approvedDays);
       const percentage = totalAllowed > 0 ? Math.min(100, Math.max(0, Math.round((remaining / totalAllowed) * 100))) : 0;
