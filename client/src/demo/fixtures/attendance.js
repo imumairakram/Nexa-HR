@@ -13,12 +13,12 @@ const DEMO_TERMINALS = [
   'Speed-Gate Face-ID Terminal Fl-2',
 ];
 
-// Generate 30 days of distinct past attendance records for all 15 demo employees
+// Generate past attendance records across multiple months (180 days ~ 6 months) for all 15 demo employees
 function generatePastAttendance() {
   const records = [];
   const now = new Date();
 
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 180; i++) {
     const targetDate = new Date(now);
     targetDate.setDate(now.getDate() - i);
     const dayOfWeek = targetDate.getDay();

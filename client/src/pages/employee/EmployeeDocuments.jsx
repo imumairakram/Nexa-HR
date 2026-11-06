@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   FolderOpen,
+  FolderLock,
   FileCode,
   Lock,
   Plus,
@@ -35,6 +36,65 @@ import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton, DocumentCardSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
+import { isDemoSessionActive } from '../../demo/demoSession';
+
+// Helper to determine icon, color, and styling by document category/type
+const getDocTypeMeta = (type = '') => {
+  const norm = String(type || '').toUpperCase();
+  if (norm.includes('CONTRACT') || norm.includes('OFFER') || norm.includes('APPOINTMENT')) {
+    return {
+      icon: <FileCheck className="w-4 h-4" />,
+      bg: 'bg-emerald-50 dark:bg-emerald-950/60',
+      color: 'text-emerald-600 dark:text-emerald-400',
+      border: 'border-emerald-200/70 dark:border-emerald-800/60',
+      badgeBg: 'bg-emerald-50 dark:bg-emerald-950/60',
+      badgeColor: 'text-emerald-700 dark:text-emerald-300',
+      badgeBorder: 'border-emerald-200/60 dark:border-emerald-800/60',
+    };
+  }
+  if (norm.includes('CERTIFICATE') || norm.includes('ACADEMIC') || norm.includes('DEGREE')) {
+    return {
+      icon: <Award className="w-4 h-4" />,
+      bg: 'bg-purple-50 dark:bg-purple-950/60',
+      color: 'text-purple-600 dark:text-purple-400',
+      border: 'border-purple-200/70 dark:border-purple-800/60',
+      badgeBg: 'bg-purple-50 dark:bg-purple-950/60',
+      badgeColor: 'text-purple-700 dark:text-purple-300',
+      badgeBorder: 'border-purple-200/60 dark:border-purple-800/60',
+    };
+  }
+  if (norm.includes('IDENT') || norm.includes('PASSPORT') || norm.includes('CNIC') || norm.includes('NDA')) {
+    return {
+      icon: <Shield className="w-4 h-4" />,
+      bg: 'bg-cyan-50 dark:bg-cyan-950/60',
+      color: 'text-cyan-600 dark:text-cyan-400',
+      border: 'border-cyan-200/70 dark:border-cyan-800/60',
+      badgeBg: 'bg-cyan-50 dark:bg-cyan-950/60',
+      badgeColor: 'text-cyan-700 dark:text-cyan-300',
+      badgeBorder: 'border-cyan-200/60 dark:border-cyan-800/60',
+    };
+  }
+  if (norm.includes('TAX') || norm.includes('FINANCE') || norm.includes('SALARY')) {
+    return {
+      icon: <FileSpreadsheet className="w-4 h-4" />,
+      bg: 'bg-amber-50 dark:bg-amber-950/60',
+      color: 'text-amber-600 dark:text-amber-400',
+      border: 'border-amber-200/70 dark:border-amber-800/60',
+      badgeBg: 'bg-amber-50 dark:bg-amber-950/60',
+      badgeColor: 'text-amber-700 dark:text-amber-300',
+      badgeBorder: 'border-amber-200/60 dark:border-amber-800/60',
+    };
+  }
+  return {
+    icon: <FileText className="w-4 h-4" />,
+    bg: 'bg-teal-50 dark:bg-teal-950/60',
+    color: 'text-teal-600 dark:text-teal-400',
+    border: 'border-teal-200/70 dark:border-teal-800/60',
+    badgeBg: 'bg-slate-100 dark:bg-slate-800',
+    badgeColor: 'text-slate-700 dark:text-slate-300',
+    badgeBorder: 'border-slate-200/60 dark:border-slate-700/60',
+  };
+};
 
 // Cross-portal broadcast channel for instantaneous 2-way sync
 const syncChannel =
@@ -48,20 +108,22 @@ const notifyVaultSync = () => {
       syncChannel.postMessage({ type: 'DOCUMENTS_UPDATED', timestamp: Date.now() });
     }
     localStorage.setItem('nexahr_sync_pulse', Date.now().toString());
-  } catch {}
+  } catch { }
 };
 
 const EmployeeDocuments = () => {
   const { formatDate } = useRegionalSettings();
 
-  // Clean initial state - scrub legacy mock IDs
+  // Clean initial state - scrub legacy dummy documents
   const [personalDocs, setPersonalDocs] = useState(() => {
     try {
       const saved = localStorage.getItem('nexahr_personal_docs');
       if (saved) {
         const parsed = JSON.parse(saved);
         return parsed.filter(
-          (d) => !['DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id)
+          (d) =>
+            !['doc-01', 'doc-02', 'doc-03', 'doc-04', 'DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id) &&
+            !String(d.id || '').startsWith('doc-0')
         );
       }
       return [];
@@ -108,29 +170,37 @@ const EmployeeDocuments = () => {
         docRes.value?.success &&
         Array.isArray(docRes.value.data?.documents)
       ) {
-        const backendDocs = docRes.value.data.documents.map((d) => ({
-          id: d.id,
-          title: d.title,
-          type: d.type,
-          typeLabel: d.typeLabel || d.type,
-          issueDate: d.issueDate,
-          size: d.size,
-          status: d.status,
-          issuer: d.issuer,
-          description: d.description,
-          referenceNumber: d.referenceNumber,
-          fileUrl: d.fileUrl,
-          uploadedBy: d.uploadedBy,
-        }));
+        const backendDocs = docRes.value.data.documents
+          .filter(
+            (d) =>
+              !['doc-01', 'doc-02', 'doc-03', 'doc-04', 'DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id) &&
+              !String(d.id || '').startsWith('doc-0')
+          )
+          .map((d) => ({
+            id: d.id,
+            title: d.title || d.documentTitle || d.name || 'Official Document',
+            type: d.type || d.documentType || 'DOCUMENT',
+            typeLabel: d.typeLabel || (d.documentType ? d.documentType.replace(/_/g, ' ') : (d.type || 'Document')),
+            issueDate: d.issueDate || d.issuedDate || (d.createdAt ? new Date(d.createdAt).toISOString().split('T')[0] : '—'),
+            size: d.size || d.fileSize || '1.2 MB',
+            status: d.status || 'VERIFIED',
+            issuer: d.issuer || d.authority || d.author || 'NexaHR Enterprise Authority',
+            description: d.description || '',
+            referenceNumber: d.referenceNumber || (d.id ? (d.id.startsWith('#') ? d.id : `#${d.id}`) : ''),
+            fileUrl: d.fileUrl || d.downloadUrl || null,
+            uploadedBy: d.uploadedBy || 'NexaHR Operations',
+          }));
         setPersonalDocs(backendDocs);
         try {
           localStorage.setItem('nexahr_personal_docs', JSON.stringify(backendDocs));
-        } catch {}
+        } catch { }
       } else {
         const saved = localStorage.getItem('nexahr_personal_docs');
         if (saved) {
           const parsed = JSON.parse(saved).filter(
-            (d) => !['DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id)
+            (d) =>
+              !['doc-01', 'doc-02', 'doc-03', 'doc-04', 'DOC-101', 'DOC-102', 'DOC-103', 'DOC-104', 'DOC-105'].includes(d.id) &&
+              !String(d.id || '').startsWith('doc-0')
           );
           setPersonalDocs(parsed);
         }
@@ -141,10 +211,22 @@ const EmployeeDocuments = () => {
         polRes.value?.success &&
         Array.isArray(polRes.value.data?.policies)
       ) {
-        setPolicies(polRes.value.data.policies);
+        const backendPolicies = polRes.value.data.policies.map((p) => ({
+          id: p.id,
+          title: p.title || 'Corporate Governance Policy',
+          category: p.category || 'GOVERNANCE',
+          categoryLabel: p.categoryLabel || (p.category ? p.category.replace(/_/g, ' ') : 'General'),
+          version: p.version ? (p.version.startsWith('v') ? p.version : `v${p.version}`) : 'v1.0',
+          updated: p.effectiveDate || p.updated || '2026-01-01',
+          size: p.fileSize || p.size || '1.0 MB',
+          description: p.summary || p.description || '',
+          downloadUrl: p.downloadUrl || '#',
+          author: p.author || p.issuer || 'Executive Committee',
+        }));
+        setPolicies(backendPolicies);
         try {
-          localStorage.setItem('nexahr_company_policies', JSON.stringify(polRes.value.data.policies));
-        } catch {}
+          localStorage.setItem('nexahr_company_policies', JSON.stringify(backendPolicies));
+        } catch { }
       } else {
         const savedPol = localStorage.getItem('nexahr_company_policies');
         if (savedPol) {
@@ -207,12 +289,22 @@ const EmployeeDocuments = () => {
 
   const handleDeleteDoc = async (docId) => {
     try {
+      if (isDemoSessionActive()) {
+        const updated = personalDocs.filter((d) => d.id !== docId);
+        setPersonalDocs(updated);
+        try {
+          localStorage.setItem('nexahr_personal_docs', JSON.stringify(updated));
+        } catch { }
+        showToast('Document removed from personal vault');
+        notifyVaultSync();
+        return;
+      }
       await api.deleteIssuedDocument(docId);
       const updated = personalDocs.filter((d) => d.id !== docId);
       setPersonalDocs(updated);
       try {
         localStorage.setItem('nexahr_personal_docs', JSON.stringify(updated));
-      } catch {}
+      } catch { }
       showToast('Document removed from personal vault');
       notifyVaultSync();
     } catch (err) {
@@ -240,6 +332,41 @@ const EmployeeDocuments = () => {
         CUSTOM: 'Official Document',
       };
 
+      if (isDemoSessionActive()) {
+        const newDoc = {
+          id: `usr-doc-${Date.now()}`,
+          title: uploadForm.title.trim(),
+          type: uploadForm.type,
+          typeLabel: typeLabels[uploadForm.type] || 'Professional Certificate',
+          issuer: uploadForm.issuer.trim() || 'Verified Self-Submission',
+          issueDate: new Date().toISOString().split('T')[0],
+          size: uploadForm.size || (uploadForm.file ? `${(uploadForm.file.size / (1024 * 1024)).toFixed(1)} MB` : '1.4 MB'),
+          status: 'VERIFIED',
+          referenceNumber: `DOC-VER-${Math.floor(1000 + Math.random() * 9000)}`,
+          fileUrl: uploadForm.fileUrl || null,
+          description: `Verified ${typeLabels[uploadForm.type] || 'certificate'} uploaded to personal compliance vault.`,
+          uploadedBy: 'Self (Employee)',
+        };
+        setPersonalDocs((prev) => [newDoc, ...prev]);
+        try {
+          const existing = JSON.parse(localStorage.getItem('nexahr_personal_docs') || '[]');
+          localStorage.setItem('nexahr_personal_docs', JSON.stringify([newDoc, ...existing]));
+        } catch { }
+        showToast(`Document "${newDoc.title}" successfully verified & stored in vault!`);
+        notifyVaultSync();
+        setIsUploadOpen(false);
+        setUploadForm({
+          title: '',
+          type: 'CERTIFICATE',
+          issuer: 'Certifying Authority',
+          file: null,
+          fileUrl: null,
+          fileName: '',
+          size: '',
+        });
+        return;
+      }
+
       const payload = {
         title: uploadForm.title.trim(),
         type: uploadForm.type,
@@ -257,7 +384,7 @@ const EmployeeDocuments = () => {
         try {
           const existing = JSON.parse(localStorage.getItem('nexahr_personal_docs') || '[]');
           localStorage.setItem('nexahr_personal_docs', JSON.stringify([newDoc, ...existing]));
-        } catch {}
+        } catch { }
         showToast(`Document "${newDoc.title}" successfully verified & stored in vault!`);
         notifyVaultSync();
       } else {
@@ -354,30 +481,45 @@ const EmployeeDocuments = () => {
     showToast(`Downloaded verified document: ${doc.title}`);
   };
 
-  // Filtered documents
+  // Filtered documents (100% null-safe)
   const filteredPersonalDocs = useMemo(() => {
+    if (!searchQuery.trim()) return personalDocs;
+    const q = searchQuery.toLowerCase().trim();
     return personalDocs.filter((d) => {
-      const q = searchQuery.toLowerCase().trim();
-      if (!q) return true;
+      const title = (d.title || '').toLowerCase();
+      const id = (d.id || '').toLowerCase();
+      const ref = (d.referenceNumber || '').toLowerCase();
+      const issuer = (d.issuer || '').toLowerCase();
+      const type = (d.type || '').toLowerCase();
+      const typeLabel = (d.typeLabel || '').toLowerCase();
       return (
-        d.title.toLowerCase().includes(q) ||
-        d.id.toLowerCase().includes(q) ||
-        d.issuer.toLowerCase().includes(q) ||
-        d.type.toLowerCase().includes(q)
+        title.includes(q) ||
+        id.includes(q) ||
+        ref.includes(q) ||
+        issuer.includes(q) ||
+        type.includes(q) ||
+        typeLabel.includes(q)
       );
     });
   }, [personalDocs, searchQuery]);
 
   const filteredPolicies = useMemo(() => {
+    if (!searchQuery.trim()) return policies;
+    const q = searchQuery.toLowerCase().trim();
     return policies.filter((p) => {
-      const q = searchQuery.toLowerCase().trim();
-      if (!q) return true;
+      const title = (p.title || '').toLowerCase();
+      const id = (p.id || '').toLowerCase();
+      const category = (p.category || '').toLowerCase();
+      const categoryLabel = (p.categoryLabel || '').toLowerCase();
+      const author = (p.author || p.issuer || '').toLowerCase();
+      const description = (p.description || p.summary || '').toLowerCase();
       return (
-        p.title.toLowerCase().includes(q) ||
-        p.id.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.issuer.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
+        title.includes(q) ||
+        id.includes(q) ||
+        category.includes(q) ||
+        categoryLabel.includes(q) ||
+        author.includes(q) ||
+        description.includes(q)
       );
     });
   }, [policies, searchQuery]);
@@ -597,11 +739,10 @@ const EmployeeDocuments = () => {
         <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl">
           <button
             onClick={() => setActiveTab('personal')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === 'personal'
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'personal'
                 ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
+              }`}
           >
             <FolderOpen className="w-3.5 h-3.5" />
             <span>Personal Vault ({personalDocs.length})</span>
@@ -609,11 +750,10 @@ const EmployeeDocuments = () => {
 
           <button
             onClick={() => setActiveTab('policies')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === 'policies'
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'policies'
                 ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
+              }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>Company Policies ({policies.length})</span>
@@ -645,22 +785,20 @@ const EmployeeDocuments = () => {
             <button
               onClick={() => setViewMode('list')}
               title="Table List View"
-              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'list'
+              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${viewMode === 'list'
                   ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
+                }`}
             >
               <List className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('grid')}
               title="Card Grid View"
-              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'grid'
+              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${viewMode === 'grid'
                   ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
+                }`}
             >
               <Grid className="w-4 h-4" />
             </button>
@@ -673,18 +811,27 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {activeTab === 'personal' && (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Personal Employment Vault & Certificates
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>Personal Employment Vault & Certificates</span>
               </h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Encrypted repository of your signed agreements, salary letters, and uploaded licenses
+                AES-256 encrypted repository of verified employment contracts, credentials, and tax filings
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-              {filteredPersonalDocs.length} Documents
-            </span>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+                {filteredPersonalDocs.length} Documents
+              </span>
+              <button
+                onClick={() => setIsUploadOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
+              >
+                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Upload</span>
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -694,7 +841,7 @@ const EmployeeDocuments = () => {
               </div>
               <div className="hidden md:block">
                 {viewMode === 'list' ? (
-                  <TableSkeleton rows={5} cols={6} />
+                  <TableSkeleton rows={5} cols={7} />
                 ) : (
                   <div className="p-6">
                     <DocumentCardSkeleton count={6} />
@@ -703,229 +850,408 @@ const EmployeeDocuments = () => {
               </div>
             </>
           ) : filteredPersonalDocs.length === 0 ? (
-            <div className="p-12 sm:p-16 text-center space-y-4">
-              <div className="w-16 h-16 rounded-3xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 shadow-sm">
-                <FolderOpen className="w-8 h-8 stroke-[1.8]" />
+            <div className="p-12 sm:p-16 text-center space-y-5">
+              <div className="relative inline-flex">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-teal-500/10 via-emerald-500/15 to-teal-500/20 dark:from-teal-500/20 dark:via-emerald-500/20 dark:to-teal-500/30 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/70 dark:border-teal-700/50 shadow-xl shadow-teal-500/10">
+                  <FolderLock className="w-10 h-10 stroke-[1.6]" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+                  <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+                </div>
               </div>
-              <div className="space-y-1.5 max-w-md mx-auto">
-                <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
+              <div className="space-y-2 max-w-lg mx-auto">
+                <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   {searchQuery ? 'No documents matched your search' : 'Personal Vault is Empty'}
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                   {searchQuery
-                    ? 'Try clearing your search query or adjusting your keywords.'
-                    : 'No documents have been issued to you yet. Official contracts, offer letters, or certificates uploaded by you or HR will appear securely here.'}
+                    ? 'No records match your query. Try clearing your search or using different keywords.'
+                    : 'No documents are currently stored in your personal vault. Official contracts, offer letters, or certificates uploaded by you or HR will appear securely here with AES-256 cloud encryption.'}
                 </p>
               </div>
               {!searchQuery && (
-                <button
-                  onClick={() => setIsUploadOpen(true)}
-                  className="px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
-                >
-                  <Plus className="w-4 h-4 stroke-[2.5]" />
-                  <span>Upload Certificate</span>
-                </button>
+                <div className="pt-2">
+                  <button
+                    onClick={() => setIsUploadOpen(true)}
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-teal-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  >
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                    <span>Upload Document to Vault</span>
+                  </button>
+                </div>
               )}
+              <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <Lock className="w-3.5 h-3.5 text-teal-500" />
+                  <span>AES-256 Cloud Vault</span>
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>SOC-2 Type II Certified</span>
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <Zap className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Tamper-Proof Audit Trail</span>
+                </span>
+              </div>
             </div>
           ) : (
             <>
+              {/* Desktop Table View */}
               {viewMode === 'list' && (
                 <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-                  <tr>
-                    <th className="py-3.5 px-6">Document Title</th>
-                    <th className="py-3.5 px-4">Category</th>
-                    <th className="py-3.5 px-4">Issuer / Authority</th>
-                    <th className="py-3.5 px-4">Date Added</th>
-                    <th className="py-3.5 px-4">File Size</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                  {filteredPersonalDocs.map((doc) => (
-                    <tr
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead className="bg-slate-50/80 dark:bg-slate-800/70 text-slate-400 dark:text-slate-400 uppercase font-black text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                      <tr>
+                        <th className="py-4 px-6">Document Name & Ref</th>
+                        <th className="py-4 px-4">Category</th>
+                        <th className="py-4 px-4">Issuing Authority</th>
+                        <th className="py-4 px-4">Date Issued</th>
+                        <th className="py-4 px-4">File Size</th>
+                        <th className="py-4 px-4">Status</th>
+                        <th className="py-4 px-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 font-medium">
+                      {filteredPersonalDocs.map((doc) => {
+                        const typeInfo = getDocTypeMeta(doc.type);
+                        return (
+                          <tr
+                            key={doc.id}
+                            className="hover:bg-teal-50/30 dark:hover:bg-slate-800/50 transition-colors group"
+                          >
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`w-10 h-10 rounded-2xl ${typeInfo.bg} ${typeInfo.color} flex items-center justify-center shrink-0 border ${typeInfo.border} shadow-xs group-hover:scale-105 transition-transform`}
+                                >
+                                  {typeInfo.icon}
+                                </div>
+                                <div className="min-w-0 max-w-[240px] lg:max-w-xs">
+                                  <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                                    {doc.title}
+                                  </span>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-bold">
+                                      {doc.referenceNumber || `#${doc.id}`}
+                                    </span>
+                                    <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-mono font-extrabold uppercase">
+                                      PDF
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="py-4 px-4 whitespace-nowrap">
+                              <span
+                                className={`px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap-1.5 ${typeInfo.badgeBg} ${typeInfo.badgeColor} border ${typeInfo.badgeBorder}`}
+                              >
+                                {doc.typeLabel || doc.type?.replace(/_/g, ' ') || 'Document'}
+                              </span>
+                            </td>
+
+                            <td className="py-4 px-4 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                              <div className="flex items-center gap-2">
+                                <Building className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                <span className="font-bold text-xs truncate max-w-[170px]">
+                                  {doc.issuer || 'NexaHR Authority'}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="py-4 px-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono text-[11px]">
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                <span>{doc.issueDate || '—'}</span>
+                              </div>
+                            </td>
+
+                            <td className="py-4 px-4 whitespace-nowrap">
+                              <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-[11px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
+                                {doc.size || '1.2 MB'}
+                              </span>
+                            </td>
+
+                            <td className="py-4 px-4 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                                <span>{doc.status || 'Verified'}</span>
+                              </span>
+                            </td>
+
+                            <td className="py-4 px-6 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => setSelectedDoc(doc)}
+                                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950/60 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer shadow-xs"
+                                  title="Preview Details"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDownload(doc)}
+                                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm shadow-teal-600/20 hover:shadow-md transition-all active:scale-95"
+                                >
+                                  <Download className="w-3 h-3" />
+                                  <span>Download</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteDoc(doc.id)}
+                                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer shadow-xs"
+                                  title="Delete Document"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Cards Grid View (for viewMode === 'grid' or Mobile) */}
+              <div
+                className={`p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${viewMode === 'list' ? 'md:hidden' : ''
+                  }`}
+              >
+                {filteredPersonalDocs.map((doc) => {
+                  const typeInfo = getDocTypeMeta(doc.type);
+                  return (
+                    <div
                       key={doc.id}
-                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group"
+                      className="rounded-3xl p-5 border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all space-y-3.5 group"
                     >
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/60 dark:border-teal-800/50">
-                            <FileText className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                              {doc.title}
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-mono font-bold">{doc.referenceNumber || `#${doc.id}`}</span>
-                          </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div
+                          className={`w-10 h-10 rounded-2xl ${typeInfo.bg} ${typeInfo.color} flex items-center justify-center border ${typeInfo.border}`}
+                        >
+                          {typeInfo.icon}
                         </div>
-                      </td>
-
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                          {doc.typeLabel || doc.type}
+                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                          <span>{doc.status || 'Verified'}</span>
                         </span>
-                      </td>
+                      </div>
 
-                      <td className="py-4 px-4 text-slate-700 dark:text-slate-300">
-                        {doc.issuer}
-                      </td>
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                          {doc.title}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                            {doc.issuer}
+                          </span>
+                          <span className="text-slate-300 dark:text-slate-600">•</span>
+                          <span className="text-[10px] text-slate-400 font-mono font-bold">
+                            {doc.referenceNumber || `#${doc.id}`}
+                          </span>
+                        </div>
+                      </div>
 
-                      <td className="py-4 px-4 text-slate-500 dark:text-slate-400 font-mono">
-                        {doc.issueDate}
-                      </td>
-
-                      <td className="py-4 px-4 text-slate-400 font-mono">
-                        {doc.size}
-                      </td>
-
-                      <td className="py-4 px-6 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
+                        <span className="text-[11px] text-slate-400 font-mono">{doc.size || '1.2 MB'}</span>
+                        <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setSelectedDoc(doc)}
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-600 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer"
                             title="Preview Details"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => handleDownload(doc)}
-                            className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
-                          >
-                            <Download className="w-3 h-3" />
-                            <span>Download</span>
-                          </button>
-                          <button
                             onClick={() => handleDeleteDoc(doc.id)}
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
                             title="Delete Document"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
+                          <button
+                            onClick={() => handleDownload(doc)}
+                            className="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+                          >
+                            <Download className="w-3 h-3" />
+                            <span>Download</span>
+                          </button>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <div className={`p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${viewMode === 'list' ? 'md:hidden' : ''}`}>
-              {filteredPersonalDocs.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="rounded-3xl p-5 border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all space-y-3 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60">
-                      <FileText className="w-5 h-5" />
+                      </div>
                     </div>
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200">
-                      Verified
-                    </span>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-1 group-hover:text-teal-600 transition-colors">
-                      {doc.title}
-                    </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{doc.issuer}</p>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
-                    <span className="text-[11px] text-slate-400 font-mono">{doc.size}</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleDeleteDoc(doc.id)}
-                        className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 transition-colors cursor-pointer"
-                        title="Delete Document"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDownload(doc)}
-                        className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       )}
 
       {/* Policies Tab Content */}
       {activeTab === 'policies' && (
-        loading ? (
-          <DocumentCardSkeleton count={4} />
-        ) : filteredPolicies.length === 0 ? (
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 sm:p-16 text-center space-y-4 border border-slate-100 dark:border-slate-800 shadow-soft">
-            <div className="w-16 h-16 rounded-3xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 shadow-sm">
-              <BookOpen className="w-8 h-8 stroke-[1.8]" />
-            </div>
-            <div className="space-y-1.5 max-w-md mx-auto">
-              <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
-                {searchQuery ? 'No policies match your search' : 'No Company Policies Published Yet'}
-              </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                {searchQuery
-                  ? 'Try adjusting your search keywords.'
-                  : 'Official organization handbooks, governance charters, and benefits guides published by HR/Admin will appear here.'}
+        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                Company Policies & Operating Handbooks
+              </h3>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Official enterprise charters, compliance frameworks, and employee benefit guides
               </p>
             </div>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full self-start sm:self-auto">
+              {filteredPolicies.length} Handbooks
+            </span>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filteredPolicies.map((pol) => (
-            <div
-              key={pol.id}
-              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:shadow-md transition-all group"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60">
-                      <BookOpen className="w-4 h-4" />
-                    </div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                      {pol.categoryLabel}
-                    </span>
-                  </div>
-                  <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
-                </div>
 
-                <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  {pol.title}
+          {loading ? (
+            <div className="p-6">
+              <DocumentCardSkeleton count={4} />
+            </div>
+          ) : filteredPolicies.length === 0 ? (
+            <div className="p-12 sm:p-16 text-center space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 shadow-sm">
+                <BookOpen className="w-8 h-8 stroke-[1.8]" />
+              </div>
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  {searchQuery ? 'No policies match your search' : 'No Company Policies Published Yet'}
                 </h4>
-
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                  {pol.description}
+                  {searchQuery
+                    ? 'Try adjusting your search keywords.'
+                    : 'Official organization handbooks, governance charters, and benefits guides published by HR/Admin will appear here.'}
                 </p>
               </div>
-
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-                <span className="text-[11px] text-slate-400 font-medium">
-                  Updated {pol.updated} • {pol.size}
-                </span>
-
-                <button
-                  onClick={() => handleDownload(pol)}
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Handbook</span>
-                </button>
-              </div>
             </div>
-          ))}
+          ) : (
+            <>
+              {/* Policies Table (List View) */}
+              {viewMode === 'list' && (
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead className="bg-slate-50/80 dark:bg-slate-800/70 text-slate-400 dark:text-slate-400 uppercase font-black text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                      <tr>
+                        <th className="py-4 px-6">Handbook / Policy Title</th>
+                        <th className="py-4 px-4">Category</th>
+                        <th className="py-4 px-4">Version</th>
+                        <th className="py-4 px-4">Effective Date</th>
+                        <th className="py-4 px-4">Size</th>
+                        <th className="py-4 px-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 font-medium">
+                      {filteredPolicies.map((pol) => (
+                        <tr
+                          key={pol.id}
+                          className="hover:bg-emerald-50/30 dark:hover:bg-slate-800/50 transition-colors group"
+                        >
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/70 dark:border-emerald-800/60 shadow-xs group-hover:scale-105 transition-transform">
+                                <BookOpen className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0 max-w-sm lg:max-w-md">
+                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                  {pol.title}
+                                </span>
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium line-clamp-1 mt-0.5">
+                                  {pol.description}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                              {pol.categoryLabel || pol.category}
+                            </span>
+                          </td>
+
+                          <td className="py-4 px-4 whitespace-nowrap font-mono font-bold text-xs text-slate-500 dark:text-slate-400">
+                            {pol.version}
+                          </td>
+
+                          <td className="py-4 px-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono text-[11px]">
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <span>{pol.updated}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-[11px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
+                              {pol.size}
+                            </span>
+                          </td>
+
+                          <td className="py-4 px-6 text-right whitespace-nowrap">
+                            <button
+                              onClick={() => handleDownload(pol)}
+                              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Download Handbook</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Policies Cards Grid (for viewMode === 'grid' or Mobile) */}
+              <div
+                className={`p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 ${viewMode === 'list' ? 'md:hidden' : ''
+                  }`}
+              >
+                {filteredPolicies.map((pol) => (
+                  <div
+                    key={pol.id}
+                    className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:shadow-md transition-all group"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60">
+                            <BookOpen className="w-4 h-4" />
+                          </div>
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                            {pol.categoryLabel || pol.category}
+                          </span>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
+                      </div>
+
+                      <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        {pol.title}
+                      </h4>
+
+                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                        {pol.description}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        Updated {pol.updated} • {pol.size}
+                      </span>
+
+                      <button
+                        onClick={() => handleDownload(pol)}
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download Handbook</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
-        )
       )}
 
       {/* ========================================================================= */}
@@ -1027,19 +1353,17 @@ const EmployeeDocuments = () => {
                         type="button"
                         key={cat.id}
                         onClick={() => setUploadForm({ ...uploadForm, type: cat.id })}
-                        className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${
-                          isSelected
+                        className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${isSelected
                             ? 'bg-gradient-to-br from-teal-50 to-cyan-50/50 dark:from-teal-950/50 dark:to-slate-800 border-teal-500/80 dark:border-teal-600 text-teal-950 dark:text-white shadow-sm ring-2 ring-teal-500/20'
                             : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <div
-                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                              isSelected
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isSelected
                                 ? 'bg-teal-500 text-white shadow-xs'
                                 : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
-                            }`}
+                              }`}
                           >
                             <CatIcon className="w-3.5 h-3.5" />
                           </div>
@@ -1099,11 +1423,10 @@ const EmployeeDocuments = () => {
                     />
 
                     <div
-                      className={`p-3.5 sm:p-4 rounded-xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${
-                        uploadForm.file
+                      className={`p-3.5 sm:p-4 rounded-xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${uploadForm.file
                           ? 'border-teal-500/80 bg-teal-50/50 dark:bg-teal-950/30'
                           : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/20'
-                      }`}
+                        }`}
                     >
                       {uploadForm.file ? (
                         <div className="flex items-center justify-between w-full gap-3">

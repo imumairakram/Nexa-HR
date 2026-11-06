@@ -22,6 +22,9 @@ import {
   Building2,
   Search,
   X,
+  RotateCcw,
+  Check,
+  History,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -31,6 +34,12 @@ import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const EmployeeAttendance = () => {
   const { formatTime, formatDate, timezone } = useRegionalSettings();
+  const todayDate = useMemo(() => new Date(), []);
+  const [selectedMonth, setSelectedMonth] = useState(() => todayDate.getMonth() + 1); // 1-12
+  const [selectedYear, setSelectedYear] = useState(() => todayDate.getFullYear());
+  const [showMonthMenu, setShowMonthMenu] = useState(false);
+  const monthDropdownRef = useRef(null);
+
   const [logs, setLogs] = useState(() => {
     const cached = api.getCached('/attendance/my-logs')?.data?.attendances || api.getCached('/attendance/my-logs')?.data?.logs;
     return cached || [];
@@ -49,14 +58,77 @@ const EmployeeAttendance = () => {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
         setShowFilterMenu(false);
       }
+      if (monthDropdownRef.current && !monthDropdownRef.current.contains(event.target)) {
+        setShowMonthMenu(false);
+      }
     };
-    if (showFilterMenu) {
+    if (showFilterMenu || showMonthMenu) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showFilterMenu]);
+  }, [showFilterMenu, showMonthMenu]);
+
+  // Is current real calendar month?
+  const isCurrentMonth = selectedMonth === (todayDate.getMonth() + 1) && selectedYear === todayDate.getFullYear();
+
+  // Disable Next button if already on current month (can't go to future)
+  const isNextDisabled = isCurrentMonth || (
+    selectedYear > todayDate.getFullYear() ||
+    (selectedYear === todayDate.getFullYear() && selectedMonth >= todayDate.getMonth() + 1)
+  );
+
+  // Formatted month labels
+  const selectedMonthLabel = useMemo(() => {
+    const d = new Date(selectedYear, selectedMonth - 1, 1);
+    return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }, [selectedMonth, selectedYear]);
+
+  const selectedMonthShortLabel = useMemo(() => {
+    const d = new Date(selectedYear, selectedMonth - 1, 1);
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  }, [selectedMonth, selectedYear]);
+
+  // Available past 12 months for quick direct selection
+  const pastMonthsList = useMemo(() => {
+    const list = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(todayDate.getFullYear(), todayDate.getMonth() - i, 1);
+      list.push({
+        month: d.getMonth() + 1,
+        year: d.getFullYear(),
+        label: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        short: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        isCurrent: i === 0,
+      });
+    }
+    return list;
+  }, [todayDate]);
+
+  const handlePrevMonth = () => {
+    if (selectedMonth === 1) {
+      setSelectedMonth(12);
+      setSelectedYear((y) => y - 1);
+    } else {
+      setSelectedMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (isNextDisabled) return;
+    if (selectedMonth === 12) {
+      setSelectedMonth(1);
+      setSelectedYear((y) => y + 1);
+    } else {
+      setSelectedMonth((m) => m + 1);
+    }
+  };
+
+  const handleJumpToCurrent = () => {
+    setSelectedMonth(todayDate.getMonth() + 1);
+    setSelectedYear(todayDate.getFullYear());
+  };
 
   const officeLocation = useMemo(() => {
     try {
@@ -73,13 +145,11 @@ const EmployeeAttendance = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch real database attendance logs
-  const fetchMyAttendance = async () => {
-    if (!api.hasCached('/attendance/my-logs')) {
-      setLoading(true);
-    }
+  // Fetch real database attendance logs for the selected month and year
+  const fetchMyAttendance = async (m = selectedMonth, y = selectedYear) => {
+    setLoading(true);
     try {
-      const res = await api.getMyAttendanceLogs();
+      const res = await api.getMyAttendanceLogs({ month: m, year: y, limit: 100 });
       const rawLogs = res?.data?.attendances || res?.data?.logs || (Array.isArray(res?.data) ? res?.data : null);
       if (rawLogs && Array.isArray(rawLogs)) {
         // Transform DB attendance objects
@@ -135,17 +205,21 @@ const EmployeeAttendance = () => {
         } else {
           setTodayLog(null);
         }
+      } else {
+        setLogs([]);
+        setTodayLog(null);
       }
     } catch (err) {
       console.warn('Failed to load real database attendance:', err.message);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMyAttendance();
-  }, [timezone]);
+    fetchMyAttendance(selectedMonth, selectedYear);
+  }, [selectedMonth, selectedYear, timezone]);
 
   const filteredLogs = useMemo(() => {
     return logs.filter((item) => {
@@ -195,7 +269,7 @@ const EmployeeAttendance = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Attendance_Log_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Attendance_Log_${selectedMonthLabel.replace(/\s+/g, '_')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -405,13 +479,12 @@ const EmployeeAttendance = () => {
                 <span>Today's Activity</span>
               </span>
               <span
-                className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                  todayLog?.status === 'LATE'
+                className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${todayLog?.status === 'LATE'
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                     : todayLog?.status === 'PRESENT'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
-                }`}
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
+                  }`}
               >
                 {todayLog?.status || 'Awaiting Punch'}
               </span>
@@ -520,143 +593,255 @@ const EmployeeAttendance = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODERN ATTENDANCE LOG DATA GRID */}
+      {/* 3. MODERN ATTENDANCE LOG DATA GRID WITH MONTH NAVIGATION */}
       {/* ========================================================================= */}
       {loading ? (
-        <TableSkeleton rows={6} cols={6} />
+        <TableSkeleton rows={6} cols={5} />
       ) : (
         <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-emerald-950/40 overflow-hidden transition-all">
-          {/* Header & Filter Controls */}
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Header with Title & Month Navigation Controls */}
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                  <Fingerprint className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                  <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                    Attendance History & Timesheets
+                    <span>Attendance History & Timesheets</span>
+                    {!isCurrentMonth && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/50">
+                        Past Month Archive
+                      </span>
+                    )}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Verified daily attendance records, punch timestamps, and shift durations
+                    {isCurrentMonth
+                      ? `Viewing current month attendance records (${selectedMonthLabel})`
+                      : `Viewing archived attendance records for ${selectedMonthLabel}`}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Right actions: Search on top, Filter + Export in one responsive row */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            {/* Month Navigator Toolbar */}
+            <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+              {/* Stepper with Previous / Month Picker / Next */}
+              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  title="Previous Month"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Month Picker Button & Dropdown */}
+                <div className="relative" ref={monthDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowMonthMenu((prev) => !prev)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>{selectedMonthLabel}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </button>
+
+                  {showMonthMenu && (
+                    <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-56 max-h-72 overflow-y-auto bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
+                      <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                        Select Month & Year
+                      </div>
+                      {pastMonthsList.map((mItem) => {
+                        const isSelected = mItem.month === selectedMonth && mItem.year === selectedYear;
+                        return (
+                          <button
+                            key={`${mItem.year}-${mItem.month}`}
+                            type="button"
+                            onClick={() => {
+                              setSelectedMonth(mItem.month);
+                              setSelectedYear(mItem.year);
+                              setShowMonthMenu(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSelected
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                              }`}
+                          >
+                            <span>{mItem.label}</span>
+                            {mItem.isCurrent ? (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                                Current
+                              </span>
+                            ) : isSelected ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  disabled={isNextDisabled}
+                  title={isNextDisabled ? 'Cannot navigate to future months' : 'Next Month'}
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isNextDisabled
+                      ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-40'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer'
+                    }`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Quick Jump to Current Month Button (when in previous month) */}
+              {!isCurrentMonth && (
+                <button
+                  type="button"
+                  onClick={handleJumpToCurrent}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 cursor-pointer transition-all shadow-2xs"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Current Month</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Action Toolbar & Summary Strip */}
+          <div className="px-5 sm:px-6 py-3.5 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            {/* Quick summary badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>{totalDaysPresent} Present</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-2xs">
+                <Clock className="w-3 h-3 text-amber-500" />
+                <span>{totalHoursLogged.toFixed(1)} hrs</span>
+              </span>
+              {totalOvertime > 0 && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/50 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                  +{totalOvertime.toFixed(1)}h Overtime
+                </span>
+              )}
+              {lateArrivals > 0 && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/50 text-xs font-bold text-amber-700 dark:text-amber-300">
+                  {lateArrivals} Late
+                </span>
+              )}
+            </div>
+
+            {/* Right actions: Search + Filter + Export */}
+            <div className="flex items-center gap-2">
               {/* Search Bar */}
-              <div className="relative flex-1 sm:w-auto min-w-[200px]">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <div className="relative flex-1 sm:w-auto min-w-[180px]">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search date, weekday, time..."
-                  className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                  placeholder="Search dates, hours..."
+                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3" />
                   </button>
                 )}
               </div>
 
-              {/* Action buttons row: Filter + Export */}
-              <div className="flex items-center gap-2">
-                {/* Filter Button with Dropdown Menu */}
-                <div className="relative flex-1 sm:flex-initial" ref={filterDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setShowFilterMenu((prev) => !prev)}
-                    className={`w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs ${
-                      statusFilter !== 'ALL'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
-                        : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300'
-                    }`}
-                  >
-                    <div className="inline-flex items-center gap-1.5">
-                      <Filter className="w-3.5 h-3.5" />
-                      <span>
-                        {statusFilter === 'ALL'
-                          ? 'Filter'
-                          : statusFilter === 'PRESENT'
-                          ? 'Present'
-                          : statusFilter === 'LATE'
-                          ? 'Late'
-                          : 'Leave'}
-                      </span>
-                    </div>
-                    {statusFilter !== 'ALL' ? (
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    ) : (
-                      <ChevronDown className="w-3 h-3 text-slate-400" />
-                    )}
-                  </button>
-
-                  {showFilterMenu && (
-                    <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
-                      <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                        Filter by Status
-                      </div>
-                      {[
-                        { id: 'ALL', label: 'All Records', count: counts.all },
-                        { id: 'PRESENT', label: 'Present', count: counts.present, dot: 'bg-emerald-500' },
-                        { id: 'LATE', label: 'Late Arrival', count: counts.late, dot: 'bg-amber-500' },
-                        { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave, dot: 'bg-indigo-500' },
-                      ].map((st) => (
-                        <button
-                          key={st.id}
-                          type="button"
-                          onClick={() => {
-                            setStatusFilter(st.id);
-                            setShowFilterMenu(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            statusFilter === st.id
-                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {st.dot ? (
-                              <span className={`w-2 h-2 rounded-full ${st.dot}`} />
-                            ) : (
-                              <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
-                            )}
-                            <span>{st.label}</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                              statusFilter === st.id
-                                ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                            }`}
-                          >
-                            {st.count}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Export Button */}
+              {/* Filter Button with Dropdown Menu */}
+              <div className="relative" ref={filterDropdownRef}>
                 <button
                   type="button"
-                  onClick={exportToCSV}
-                  title="Export filtered records to CSV"
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all cursor-pointer shadow-xs whitespace-nowrap"
+                  onClick={() => setShowFilterMenu((prev) => !prev)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${statusFilter !== 'ALL'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300'
+                    }`}
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export</span>
+                  <Filter className="w-3.5 h-3.5" />
+                  <span>
+                    {statusFilter === 'ALL'
+                      ? 'Filter'
+                      : statusFilter === 'PRESENT'
+                        ? 'Present'
+                        : statusFilter === 'LATE'
+                          ? 'Late'
+                          : 'Leave'}
+                  </span>
+                  {statusFilter !== 'ALL' ? (
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  ) : (
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  )}
                 </button>
+
+                {showFilterMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                      Filter by Status
+                    </div>
+                    {[
+                      { id: 'ALL', label: 'All Records', count: counts.all },
+                      { id: 'PRESENT', label: 'Present', count: counts.present, dot: 'bg-emerald-500' },
+                      { id: 'LATE', label: 'Late Arrival', count: counts.late, dot: 'bg-amber-500' },
+                      { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave, dot: 'bg-indigo-500' },
+                    ].map((st) => (
+                      <button
+                        key={st.id}
+                        type="button"
+                        onClick={() => {
+                          setStatusFilter(st.id);
+                          setShowFilterMenu(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${statusFilter === st.id
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                          }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {st.dot ? (
+                            <span className={`w-2 h-2 rounded-full ${st.dot}`} />
+                          ) : (
+                            <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
+                          )}
+                          <span>{st.label}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${statusFilter === st.id
+                              ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                            }`}
+                        >
+                          {st.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {/* Export Button */}
+              <button
+                type="button"
+                onClick={exportToCSV}
+                title="Export filtered records to CSV"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Export</span>
+              </button>
             </div>
           </div>
 
@@ -692,11 +877,10 @@ const EmployeeAttendance = () => {
                             <div className="flex items-center gap-3.5">
                               {/* Date Number Badge */}
                               <div
-                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${
-                                  log.isToday
+                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${log.isToday
                                     ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 dark:border-emerald-600 text-emerald-600 dark:text-emerald-400 shadow-xs'
                                     : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-emerald-400/50'
-                                }`}
+                                  }`}
                               >
                                 <span className="text-[9px] font-black uppercase tracking-wider leading-none">
                                   {log.monthShort || 'DAY'}
@@ -734,16 +918,14 @@ const EmployeeAttendance = () => {
                             ) : (
                               <div>
                                 <span
-                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${
-                                    isLate
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${isLate
                                       ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/70 dark:border-amber-800/40 text-amber-700 dark:text-amber-300'
                                       : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/70 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300'
-                                  }`}
+                                    }`}
                                 >
                                   <span
-                                    className={`w-2 h-2 rounded-full ${
-                                      isLate ? 'bg-amber-500' : 'bg-emerald-500'
-                                    }`}
+                                    className={`w-2 h-2 rounded-full ${isLate ? 'bg-amber-500' : 'bg-emerald-500'
+                                      }`}
                                   />
                                   {log.checkIn}
                                 </span>
@@ -792,15 +974,14 @@ const EmployeeAttendance = () => {
                                 {/* Slim progress bar */}
                                 <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700/60 rounded-full overflow-hidden">
                                   <div
-                                    className={`h-full rounded-full transition-all duration-500 ${
-                                      log.ot > 0
+                                    className={`h-full rounded-full transition-all duration-500 ${log.ot > 0
                                         ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
                                         : durationVal >= 8.0
-                                        ? 'bg-emerald-500'
-                                        : isLate
-                                        ? 'bg-amber-500'
-                                        : 'bg-teal-500'
-                                    }`}
+                                          ? 'bg-emerald-500'
+                                          : isLate
+                                            ? 'bg-amber-500'
+                                            : 'bg-teal-500'
+                                      }`}
                                     style={{ width: `${progressPct}%` }}
                                   />
                                 </div>
@@ -811,15 +992,14 @@ const EmployeeAttendance = () => {
                           {/* 5. Status Column (Right aligned) */}
                           <td className="py-4 px-6 text-right">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${
-                                log.status === 'PRESENT'
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${log.status === 'PRESENT'
                                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
                                   : isLate
-                                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
-                                  : isLeave
-                                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-800/50'
-                                  : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
-                              }`}
+                                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
+                                    : isLeave
+                                      ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-800/50'
+                                      : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                                }`}
                             >
                               {log.status === 'PRESENT' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
                               {isLate && <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
@@ -832,6 +1012,18 @@ const EmployeeAttendance = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Table Bottom Monthly Summary Strip */}
+              <div className="px-6 py-3.5 bg-slate-50/80 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="font-medium">
+                  Showing <span className="font-bold text-slate-800 dark:text-slate-200">{filteredLogs.length}</span> records for <span className="font-bold text-emerald-600 dark:text-emerald-400">{selectedMonthLabel}</span>
+                </div>
+                <div className="flex items-center gap-4 text-slate-600 dark:text-slate-300">
+                  <span>Total Logged: <strong className="text-slate-900 dark:text-white">{totalHoursLogged.toFixed(1)} hrs</strong></span>
+                  <span>Overtime: <strong className="text-emerald-600 dark:text-emerald-400">+{totalOvertime.toFixed(1)} hrs</strong></span>
+                  <span>On-Time Rate: <strong className="text-slate-900 dark:text-white">{onTimePercentage}%</strong></span>
+                </div>
               </div>
 
               {/* Mobile Responsive Grid View (Hidden on Desktop) */}
@@ -852,11 +1044,10 @@ const EmployeeAttendance = () => {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-3">
                             <div
-                              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${
-                                log.isToday
+                              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${log.isToday
                                   ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 text-emerald-600 dark:text-emerald-400'
                                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
-                              }`}
+                                }`}
                             >
                               <span className="text-[8px] font-black uppercase tracking-wider leading-none">
                                 {log.monthShort || 'DAY'}
@@ -880,15 +1071,14 @@ const EmployeeAttendance = () => {
                             </div>
                           </div>
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
-                              log.status === 'PRESENT'
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${log.status === 'PRESENT'
                                 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
                                 : isLate
-                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
-                                : isLeave
-                                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/40'
-                                : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40'
-                            }`}
+                                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
+                                  : isLeave
+                                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/40'
+                                    : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40'
+                              }`}
                           >
                             <span>{isLate ? 'Late' : isLeave ? 'Leave' : log.status}</span>
                           </span>
@@ -937,24 +1127,38 @@ const EmployeeAttendance = () => {
             </>
           ) : (
             <div className="p-12 text-center flex flex-col items-center justify-center">
-              <Fingerprint className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+              <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
               <h4 className="text-base font-black text-slate-900 dark:text-white">
-                {searchQuery ? 'No Matching Records Found' : 'No Biometric Logs Recorded'}
+                {searchQuery
+                  ? 'No Matching Records Found'
+                  : `No Attendance Records for ${selectedMonthLabel}`}
               </h4>
               <p className="text-xs text-slate-400 mt-1 max-w-sm">
                 {searchQuery
-                  ? `No attendance punches matched your query "${searchQuery}". Try searching by another date or status.`
-                  : 'Your daily presence records will appear here as biometric hardware punch events occur.'}
+                  ? `No attendance punches matched your query "${searchQuery}" in ${selectedMonthLabel}.`
+                  : `There are no attendance records logged for ${selectedMonthLabel}. You can switch to another month using the navigator above.`}
               </p>
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="mt-3 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer"
-                >
-                  Clear Search Filter
-                </button>
-              )}
+              <div className="flex items-center gap-2 mt-4">
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors cursor-pointer"
+                  >
+                    Clear Search Filter
+                  </button>
+                )}
+                {!isCurrentMonth && (
+                  <button
+                    type="button"
+                    onClick={handleJumpToCurrent}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer shadow-xs"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Return to Current Month</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

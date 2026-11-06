@@ -136,23 +136,45 @@ export async function handleDemoGetRequest(endpoint) {
 
   // 4. Attendance
   if (pathname === '/attendance') {
+    const month = searchParams.get('month');
+    const year = searchParams.get('year');
+    let logs = DEMO_ATTENDANCE_LOGS;
+    if (month || year) {
+      logs = logs.filter((l) => {
+        const d = new Date(l.date);
+        if (month && d.getMonth() + 1 !== parseInt(month, 10)) return false;
+        if (year && d.getFullYear() !== parseInt(year, 10)) return false;
+        return true;
+      });
+    }
     return {
       success: true,
       data: {
-        attendances: DEMO_ATTENDANCE_LOGS,
-        logs: DEMO_ATTENDANCE_LOGS,
+        attendances: logs,
+        logs: logs,
         summary: DEMO_TODAY_ATTENDANCE_SUMMARY,
       },
     };
   }
 
   if (pathname === '/attendance/my-logs') {
-    const limit = parseInt(searchParams.get('limit') || '30', 10);
+    const limit = parseInt(searchParams.get('limit') || '100', 10);
+    const month = searchParams.get('month');
+    const year = searchParams.get('year');
     // Find logs for current employee (default Gabriel Ross: usr-demo-emp-02)
     const targetUserId = 'usr-demo-emp-02';
     let userLogs = DEMO_ATTENDANCE_LOGS.filter((l) => l.userId === targetUserId);
     if (!userLogs.length) {
       userLogs = DEMO_ATTENDANCE_LOGS.filter((l) => l.userId === DEMO_ATTENDANCE_LOGS[0]?.userId);
+    }
+    // Filter by requested month and year (1-based month)
+    if (month || year) {
+      userLogs = userLogs.filter((l) => {
+        const d = new Date(l.date);
+        if (month && d.getMonth() + 1 !== parseInt(month, 10)) return false;
+        if (year && d.getFullYear() !== parseInt(year, 10)) return false;
+        return true;
+      });
     }
     // Sort descending by date (most recent workday first)
     userLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -323,8 +345,11 @@ export async function handleDemoGetRequest(endpoint) {
 
   const docMatch = pathname.match(/^\/documents\/issued\/([^/]+)$/);
   if (docMatch) {
-    const doc = DEMO_ISSUED_DOCUMENTS.find((d) => d.id === docMatch[1]) || DEMO_ISSUED_DOCUMENTS[0];
-    return { success: true, data: { document: doc, ...doc } };
+    const doc = DEMO_ISSUED_DOCUMENTS.find((d) => d.id === docMatch[1]) || null;
+    if (doc) {
+      return { success: true, data: { document: doc, ...doc } };
+    }
+    return { success: false, message: 'Document not found' };
   }
 
   // 12. Accounts & Finance
