@@ -138,7 +138,22 @@ export async function handleDemoGetRequest(endpoint) {
   if (pathname === '/attendance') {
     const month = searchParams.get('month');
     const year = searchParams.get('year');
+    const employeeId = searchParams.get('employeeId') || searchParams.get('userId');
+    const department = searchParams.get('department') || searchParams.get('departmentId');
     let logs = DEMO_ATTENDANCE_LOGS;
+    if (employeeId && employeeId !== 'ALL') {
+      logs = logs.filter(
+        (l) => l.userId === employeeId || l.user?.id === employeeId || l.employeeCode === employeeId
+      );
+    }
+    if (department && department !== 'ALL') {
+      const deptLow = department.toLowerCase();
+      logs = logs.filter((l) => {
+        const dName = (l.department || l.user?.profile?.department?.name || '').toLowerCase();
+        const dId = (l.user?.profile?.department?.id || '').toLowerCase();
+        return dName.includes(deptLow) || dId === deptLow;
+      });
+    }
     if (month || year) {
       logs = logs.filter((l) => {
         const d = new Date(l.date);
