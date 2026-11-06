@@ -388,28 +388,70 @@ const Departments = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search departments by name or unit code..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-          />
+      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search departments by name or unit code..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 transition-all font-medium"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={() => {
+              setForm({ name: '', code: '', description: '' });
+              setIsAddOpen(true);
+            }}
+            className="px-3.5 sm:px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl sm:rounded-2xl flex items-center gap-1.5 sm:gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">New Department</span>
+            <span className="inline sm:hidden">Add</span>
+          </button>
         </div>
 
-        <button
-          onClick={() => {
-            setForm({ name: '', code: '', description: '' });
-            setIsAddOpen(true);
-          }}
-          className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Department</span>
-        </button>
+        {/* Active Filter Badges */}
+        {searchQuery && (
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Active:
+            </span>
+
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
+              "{searchQuery}"
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
+            >
+              Reset Search
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Grid of Departments */}

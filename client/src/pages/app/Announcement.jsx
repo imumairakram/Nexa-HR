@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { AnnouncementSkeleton } from '../../components/common/Skeleton';
@@ -20,6 +20,8 @@ import {
   Building,
   Bell,
   RefreshCw,
+  ChevronDown,
+  RotateCcw,
 } from 'lucide-react';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -32,7 +34,20 @@ const Announcement = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const filterDropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Close filter dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
+        setShowFilterMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
@@ -156,6 +171,14 @@ const Announcement = () => {
     pinned: announcements.filter((a) => a.pinned).length,
     events: announcements.filter((a) => a.category === 'EVENTS').length,
     benefits: announcements.filter((a) => a.category === 'BENEFITS').length,
+  }), [announcements]);
+
+  const categoryCounts = useMemo(() => ({
+    ALL: announcements.length,
+    PINNED: announcements.filter((a) => a.pinned).length,
+    EVENTS: announcements.filter((a) => a.category === 'EVENTS').length,
+    BENEFITS: announcements.filter((a) => a.category === 'BENEFITS').length,
+    MEETINGS: announcements.filter((a) => a.category === 'MEETINGS').length,
   }), [announcements]);
 
   const bulletinsSparkData = useMemo(() => {
@@ -332,44 +355,199 @@ const Announcement = () => {
         />
       </div>
 
-      {/* SEARCH & FILTERS CONTROLS */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search circulars by title, keyword, or department..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
-            {['ALL', 'PINNED', 'EVENTS', 'BENEFITS', 'MEETINGS'].map((cat) => (
+      {/* Toolbar */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search circulars by title, keyword, or department..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 transition-all"
+            />
+            {searchQuery && (
               <button
-                key={cat}
-                onClick={() => setCategoryFilter(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  categoryFilter === cat
-                    ? 'bg-sky-500 text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title="Clear Search"
               >
-                {cat === 'ALL' ? 'All' : cat === 'PINNED' ? 'Pinned' : cat}
+                <X className="w-3.5 h-3.5" />
               </button>
-            ))}
+            )}
+          </div>
+
+          {/* Filter Button with Dropdown Menu */}
+          <div className="relative shrink-0" ref={filterDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setShowFilterMenu((prev) => !prev)}
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
+                categoryFilter !== 'ALL'
+                  ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
+                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
+              }`}
+              title="Filter by Category"
+            >
+              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              <span className="hidden sm:inline">
+                {categoryFilter === 'ALL'
+                  ? 'Filter'
+                  : categoryFilter === 'PINNED'
+                  ? 'Pinned'
+                  : categoryFilter === 'EVENTS'
+                  ? 'Events'
+                  : categoryFilter === 'BENEFITS'
+                  ? 'Benefits'
+                  : 'Meetings'}
+              </span>
+              <span className="inline sm:hidden">
+                {categoryFilter === 'ALL' ? 'Filter' : categoryFilter}
+              </span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                  showFilterMenu ? 'rotate-180' : ''
+                }`}
+              />
+              {categoryFilter !== 'ALL' && (
+                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Category Filter
+                  </div>
+                </div>
+
+                <div className="p-1 space-y-0.5">
+                  {[
+                    { key: 'ALL', label: 'All Circulars', count: categoryCounts.ALL },
+                    { key: 'PINNED', label: 'Pinned Announcements', count: categoryCounts.PINNED },
+                    { key: 'EVENTS', label: 'Events & Functions', count: categoryCounts.EVENTS },
+                    { key: 'BENEFITS', label: 'HR Directives & Benefits', count: categoryCounts.BENEFITS },
+                    { key: 'MEETINGS', label: 'Meetings & Syncs', count: categoryCounts.MEETINGS },
+                  ].map(({ key, label, count }) => {
+                    const isSelected = categoryFilter === key;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => {
+                          setCategoryFilter(key);
+                          setShowFilterMenu(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isSelected
+                                ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
+                                : 'bg-slate-300 dark:bg-slate-600'
+                            }`}
+                          />
+                          <span>{label}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
+                            isSelected
+                              ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
+                              : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {categoryFilter !== 'ALL' && (
+                  <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-700/60 p-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCategoryFilter('ALL');
+                        setShowFilterMenu(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Reset Category Filter</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <button
             onClick={() => setIsPostModalOpen(true)}
-            className="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
+            className="px-3.5 sm:px-4 py-2.5 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white text-xs font-bold rounded-xl sm:rounded-2xl flex items-center gap-1.5 sm:gap-2 shadow-md shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4" />
-            <span>Post Circular</span>
+            <span className="hidden sm:inline">Post Circular</span>
+            <span className="inline sm:hidden">Post</span>
           </button>
         </div>
+
+        {/* Active Filter Badges */}
+        {(categoryFilter !== 'ALL' || searchQuery) && (
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Active:
+            </span>
+
+            {categoryFilter !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
+                Category: {categoryFilter}
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('ALL')}
+                  className="hover:text-sky-900 dark:hover:text-sky-100 cursor-pointer p-0.5"
+                  title="Remove Filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
+                "{searchQuery}"
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
+                  title="Clear Search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                setCategoryFilter('ALL');
+                setSearchQuery('');
+              }}
+              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ANNOUNCEMENTS LIST */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Megaphone,
   Calendar,
@@ -31,6 +31,8 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
+  ChevronDown,
+  RotateCcw,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { AnnouncementSkeleton } from '../../components/common/Skeleton';
@@ -68,8 +70,21 @@ const CATEGORY_TABS = [
 
 const EmployeeAnnouncements = () => {
   const [filter, setFilter] = useState('ALL');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const filterDropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [heroIndex, setHeroIndex] = useState(0);
+
+  // Close filter dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
+        setShowFilterMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const [announcements, setAnnouncements] = useState(() => {
     const cached = api.getCached('/announcements')?.data?.announcements;
     if (Array.isArray(cached)) {
@@ -226,6 +241,20 @@ const EmployeeAnnouncements = () => {
     });
   }, [announcements, filter, searchQuery]);
 
+  const categoryCounts = useMemo(() => {
+    const counts = {};
+    CATEGORY_TABS.forEach((cat) => {
+      if (cat.id === 'ALL') {
+        counts[cat.id] = announcements.length;
+      } else if (cat.id === 'PINNED') {
+        counts[cat.id] = announcements.filter((a) => a.pinned || a.priority === 'HIGH').length;
+      } else {
+        counts[cat.id] = announcements.filter((a) => a.category === cat.id).length;
+      }
+    });
+    return counts;
+  }, [announcements]);
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <EmployeePageHeader
@@ -345,58 +374,186 @@ const EmployeeAnnouncements = () => {
       {/* ========================================================================= */}
       {/* 2. SEARCH & CATEGORY FILTER TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search circulars by keyword, department, author..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-10 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all font-medium"
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title="Clear Search"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Showing <strong className="text-slate-900 dark:text-white">{filteredNotices.length}</strong> of {announcements.length} notices</span>
+          {/* Filter Button with Dropdown Menu */}
+          <div className="relative shrink-0" ref={filterDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setShowFilterMenu((prev) => !prev)}
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
+                filter !== 'ALL'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
+                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
+              }`}
+              title="Filter by Category"
+            >
+              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              <span className="hidden sm:inline">
+                {CATEGORY_TABS.find((c) => c.id === filter)?.label || 'Filter'}
+              </span>
+              <span className="inline sm:hidden">
+                {filter === 'ALL' ? 'Filter' : filter}
+              </span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                  showFilterMenu ? 'rotate-180' : ''
+                }`}
+              />
+              {filter !== 'ALL' && (
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Category Filter
+                  </div>
+                </div>
+
+                <div className="p-1 space-y-0.5 max-h-64 overflow-y-auto">
+                  {CATEGORY_TABS.map((cat) => {
+                    const isSelected = filter === cat.id;
+                    const count = categoryCounts[cat.id] ?? 0;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => {
+                          setFilter(cat.id);
+                          setShowFilterMenu(false);
+                          const matchIdx = heroCandidates.findIndex(
+                            (a) => cat.id === 'ALL' || a.category === cat.id
+                          );
+                          if (matchIdx !== -1) setHeroIndex(matchIdx);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate pr-2">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                              isSelected
+                                ? 'bg-emerald-500 ring-2 ring-emerald-300 dark:ring-emerald-700'
+                                : 'bg-slate-300 dark:bg-slate-600'
+                            }`}
+                          />
+                          <span className="truncate">{cat.label}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
+                            isSelected
+                              ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {filter !== 'ALL' && (
+                  <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-700/60 p-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFilter('ALL');
+                        setShowFilterMenu(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Reset Category Filter</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0 pl-1">
+            <span>
+              <strong className="text-slate-900 dark:text-white font-bold">{filteredNotices.length}</strong> of {announcements.length}
+            </span>
           </div>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-          {CATEGORY_TABS.map((cat) => (
+        {/* Active Filter Badges */}
+        {(filter !== 'ALL' || searchQuery) && (
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Active:
+            </span>
+
+            {filter !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold">
+                Category: {CATEGORY_TABS.find((c) => c.id === filter)?.label || filter}
+                <button
+                  type="button"
+                  onClick={() => setFilter('ALL')}
+                  className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer p-0.5"
+                  title="Remove Filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
+                "{searchQuery}"
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
+                  title="Clear Search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
             <button
-              key={cat.id}
+              type="button"
               onClick={() => {
-                setFilter(cat.id);
-                // Also jump hero index to first matching item in that category
-                const matchIdx = heroCandidates.findIndex((a) => cat.id === 'ALL' || a.category === cat.id);
-                if (matchIdx !== -1) setHeroIndex(matchIdx);
+                setFilter('ALL');
+                setSearchQuery('');
               }}
-              className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                filter === cat.id
-                  ? 'bg-slate-900 text-white dark:bg-emerald-600 dark:text-white shadow-xs scale-102'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
-              }`}
+              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
             >
-              <span>{cat.label}</span>
-              {cat.id === 'ALL' && (
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${filter === 'ALL' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
-                  {announcements.length}
-                </span>
-              )}
+              Reset Filters
             </button>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ========================================================================= */}

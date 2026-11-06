@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { EmployeeCardSkeleton } from '../../components/common/Skeleton';
 import {
   Users,
   Search,
+  Filter,
   CheckCircle2,
   Clock,
   MapPin,
@@ -22,6 +23,8 @@ import {
   UserX,
   Building2,
   Home,
+  ChevronDown,
+  RotateCcw,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -135,6 +138,18 @@ const EmploymentStatus = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const filterDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
+        setShowFilterMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
@@ -304,6 +319,14 @@ const EmploymentStatus = () => {
     probation: employees.filter((e) => getEffectiveType(e) === 'PROBATION' || getEffectiveType(e) === 'CONTRACT').length,
   };
 
+  const typeCounts = useMemo(() => ({
+    ALL: employees.length,
+    FULL_TIME: employees.filter((e) => getEffectiveType(e) === 'FULL_TIME').length,
+    REMOTE: employees.filter((e) => getEffectiveType(e) === 'REMOTE').length,
+    CONTRACT: employees.filter((e) => getEffectiveType(e) === 'CONTRACT').length,
+    PROBATION: employees.filter((e) => getEffectiveType(e) === 'PROBATION').length,
+  }), [employees]);
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
@@ -432,33 +455,195 @@ const EmploymentStatus = () => {
       {/* ========================================================================= */}
       {/* 3. TOOLBAR & FILTER CONTROLS */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search by employee name, role, ID, or department..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-          />
+      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search by employee name, role, ID, or department..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 transition-all font-medium"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Filter Button with Dropdown Menu */}
+          <div className="relative shrink-0" ref={filterDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setShowFilterMenu((prev) => !prev)}
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
+                typeFilter !== 'ALL'
+                  ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
+                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
+              }`}
+              title="Filter by Employment Type"
+            >
+              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              <span className="hidden sm:inline">
+                {typeFilter === 'ALL'
+                  ? 'Filter'
+                  : typeFilter === 'FULL_TIME'
+                  ? 'Full Time'
+                  : typeFilter === 'REMOTE'
+                  ? 'Remote'
+                  : typeFilter === 'CONTRACT'
+                  ? 'Contract'
+                  : 'Probation'}
+              </span>
+              <span className="inline sm:hidden">
+                {typeFilter === 'ALL' ? 'Filter' : typeFilter.replace('_', ' ')}
+              </span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                  showFilterMenu ? 'rotate-180' : ''
+                }`}
+              />
+              {typeFilter !== 'ALL' && (
+                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Classification Filter
+                  </div>
+                </div>
+
+                <div className="p-1 space-y-0.5">
+                  {[
+                    { key: 'ALL', label: 'All Personnel', count: typeCounts.ALL },
+                    { key: 'FULL_TIME', label: 'Full Time', count: typeCounts.FULL_TIME },
+                    { key: 'REMOTE', label: 'Remote Contract', count: typeCounts.REMOTE },
+                    { key: 'CONTRACT', label: 'Contractor', count: typeCounts.CONTRACT },
+                    { key: 'PROBATION', label: 'Probationary', count: typeCounts.PROBATION },
+                  ].map(({ key, label, count }) => {
+                    const isSelected = typeFilter === key;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => {
+                          setTypeFilter(key);
+                          setShowFilterMenu(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isSelected
+                                ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
+                                : 'bg-slate-300 dark:bg-slate-600'
+                            }`}
+                          />
+                          <span>{label}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
+                            isSelected
+                              ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
+                              : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {typeFilter !== 'ALL' && (
+                  <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-700/60 p-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTypeFilter('ALL');
+                        setShowFilterMenu(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Reset Classification Filter</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0 pl-1">
+            <span>
+              <strong className="text-slate-900 dark:text-white font-bold">{filtered.length}</strong> of {employees.length}
+            </span>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          {['ALL', 'FULL_TIME', 'REMOTE', 'CONTRACT', 'PROBATION'].map((type) => (
+        {/* Active Filter Badges */}
+        {(typeFilter !== 'ALL' || searchQuery) && (
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Active:
+            </span>
+
+            {typeFilter !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
+                Classification: {typeFilter.replace('_', ' ')}
+                <button
+                  type="button"
+                  onClick={() => setTypeFilter('ALL')}
+                  className="hover:text-sky-900 dark:hover:text-sky-100 cursor-pointer p-0.5"
+                  title="Remove Filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
+                "{searchQuery}"
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
+                  title="Clear Search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
             <button
-              key={type}
-              onClick={() => setTypeFilter(type)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                typeFilter === type
-                  ? 'bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 text-white shadow-md shadow-sky-500/25'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-700 dark:hover:text-sky-300'
-              }`}
+              type="button"
+              onClick={() => {
+                setTypeFilter('ALL');
+                setSearchQuery('');
+              }}
+              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
             >
-              {type === 'ALL' ? 'All Personnel' : type.replace('_', ' ')}
+              Reset Filters
             </button>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ========================================================================= */}

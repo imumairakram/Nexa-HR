@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search,
   UserPlus,
@@ -33,6 +33,8 @@ import {
   Trash2,
   UserX,
   Home,
+  ChevronDown,
+  RotateCcw,
 } from 'lucide-react';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
@@ -158,9 +160,70 @@ const Employees = () => {
   const [loading, setLoading] = useState(() => !api.hasCached('/employees'));
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const filterDropdownRef = useRef(null);
   const [viewMode, setViewMode] = useState('grid');
   const [toastMsg, setToastMsg] = useState('');
   const [toastType, setToastType] = useState('success');
+
+  // Close filter dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
+        setShowFilterMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Compute unique department options with counts
+  const departmentOptions = useMemo(() => {
+    const map = new Map();
+    // Standard baseline departments
+    const baseline = ['Engineering', 'Product & Design', 'People Operations', 'Finance'];
+    baseline.forEach((d) => map.set(d, 0));
+
+    // Dynamic departments from API
+    departments.forEach((d) => {
+      if (d.name && !map.has(d.name)) {
+        map.set(d.name, 0);
+      }
+    });
+
+    // Tally counts from current employee roster
+    employees.forEach((emp) => {
+      const dName = emp.profile?.department?.name || emp.department || '';
+      if (!dName) return;
+
+      let matchedKey = null;
+      for (const [key] of map.entries()) {
+        if (
+          dName.toLowerCase() === key.toLowerCase() ||
+          (key === 'Engineering' && dName.toLowerCase().includes('eng')) ||
+          (key === 'Product & Design' &&
+            (dName.toLowerCase().includes('product') || dName.toLowerCase().includes('design'))) ||
+          (key === 'People Operations' &&
+            (dName.toLowerCase().includes('hr') ||
+              dName.toLowerCase().includes('people') ||
+              dName.toLowerCase().includes('human'))) ||
+          (key === 'Finance' &&
+            (dName.toLowerCase().includes('fin') || dName.toLowerCase().includes('account')))
+        ) {
+          matchedKey = key;
+          break;
+        }
+      }
+
+      if (matchedKey) {
+        map.set(matchedKey, (map.get(matchedKey) || 0) + 1);
+      } else {
+        map.set(dName, (map.get(dName) || 0) + 1);
+      }
+    });
+
+    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  }, [departments, employees]);
 
   // Modals state
   const [isOnboardOpen, setIsOnboardOpen] = useState(false);
@@ -841,65 +904,225 @@ NexaHR Workforce Systems`;
       {/* ========================================================================= */}
       {/* 2. SEARCH & FILTER TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-        <div className="flex flex-col md:flex-row items-center gap-3">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search employees by name, code, designation, or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            {/* View Mode Toggle: Hidden on mobile (mobile strictly displays Grid View) */}
-            <div className="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-xl transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                title="Grid View"
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`p-2 rounded-xl transition-all cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                title="Table View"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Department Filter Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Filter Dept:</span>
-          {['ALL', 'Engineering', 'Product & Design', 'People Operations', 'Finance'].map((dept) => (
+          {/* Filter Button with Dropdown Menu */}
+          <div className="relative shrink-0" ref={filterDropdownRef}>
             <button
-              key={dept}
-              onClick={() => setSelectedDept(dept)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                selectedDept === dept
-                  ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              type="button"
+              onClick={() => setShowFilterMenu((prev) => !prev)}
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
+                selectedDept !== 'ALL'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
+                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
               }`}
+              title="Filter by Department"
             >
-              {dept === 'ALL' ? 'All Departments' : dept}
+              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              <span className="hidden sm:inline">
+                {selectedDept === 'ALL' ? 'Filter' : selectedDept}
+              </span>
+              <span className="inline sm:hidden">
+                {selectedDept === 'ALL' ? 'Filter' : selectedDept.split(' ')[0]}
+              </span>
+              {selectedDept !== 'ALL' ? (
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              ) : (
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                    showFilterMenu ? 'rotate-180' : ''
+                  }`}
+                />
+              )}
             </button>
-          ))}
+
+            {/* Dropdown Menu */}
+            {showFilterMenu && (
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="flex items-center justify-between px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
+                  <span>Filter by Department</span>
+                  {selectedDept !== 'ALL' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDept('ALL');
+                        setShowFilterMenu(false);
+                      }}
+                      className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+
+                <div className="space-y-0.5 max-h-64 overflow-y-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDept('ALL');
+                      setShowFilterMenu(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      selectedDept === 'ALL'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                      <span>All Departments</span>
+                    </div>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                        selectedDept === 'ALL'
+                          ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {employees.length}
+                    </span>
+                  </button>
+
+                  {departmentOptions.map((dept) => (
+                    <button
+                      key={dept.name}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDept(dept.name);
+                        setShowFilterMenu(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        selectedDept === dept.name
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate pr-2">
+                        {selectedDept === dept.name ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
+                        )}
+                        <span className="truncate">{dept.name}</span>
+                      </div>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
+                          selectedDept === dept.name
+                            ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}
+                      >
+                        {dept.count}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* View Mode Toggle: Grid / Table */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl sm:rounded-2xl shrink-0">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
+                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+              title="Grid View"
+            >
+              <Grid className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
+                viewMode === 'table'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
+                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+              title="Table View"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
+
+        {/* Active Filters Bar (Shown only when a filter or search is active) */}
+        {(searchTerm || selectedDept !== 'ALL') && (
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Active Filter:
+              </span>
+              {selectedDept !== 'ALL' && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                  <span>Dept: {selectedDept}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDept('ALL')}
+                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
+                    title="Remove Department Filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {searchTerm && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
+                  <span className="truncate max-w-[150px]">"{searchTerm}"</span>
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                    title="Clear Search"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              <span className="text-slate-400 text-[11px]">
+                ({filteredEmployees.length} of {employees.length} shown)
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedDept('ALL');
+              }}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ========================================================================= */}
@@ -918,6 +1141,33 @@ NexaHR Workforce Systems`;
             )}
           </div>
         </>
+      ) : filteredEmployees.length === 0 ? (
+        <div className="p-12 sm:p-16 text-center space-y-4 bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 shadow-sm">
+            <Users className="w-8 h-8 stroke-[1.8]" />
+          </div>
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
+              No Team Members Found
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+              No employees matched your current search and department filters. Try clearing your filters or searching with a different term.
+            </p>
+          </div>
+          {(searchTerm || selectedDept !== 'ALL') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedDept('ALL');
+              }}
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-all"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset All Filters</span>
+            </button>
+          )}
+        </div>
       ) : (
         <>
           <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
