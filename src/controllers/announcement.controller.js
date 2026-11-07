@@ -3,6 +3,7 @@ const {
   broadcastInAppNotification,
   sendAnnouncementEmail,
 } = require('../services/notification.service');
+const { nonDemoUsersWhere } = require('../utils/userFilters');
 
 /**
  * Fetch all announcements (accessible by both HR & Employees)
@@ -100,7 +101,7 @@ const createAnnouncement = async (req, res) => {
 
     // 2. Fetch all active employee emails and dispatch Corporate Email Broadcast
     const activeEmployees = await prisma.user.findMany({
-      where: { isActive: true },
+      where: { isActive: true, ...nonDemoUsersWhere },
       select: { email: true, firstName: true, lastName: true },
     });
 

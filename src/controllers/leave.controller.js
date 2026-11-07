@@ -1,5 +1,6 @@
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
+const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
 const {
   createInAppNotification,
   broadcastInAppNotification,
@@ -411,7 +412,7 @@ const applyLeave = async (req, res) => {
 
       // 3. Dispatch Email to HR administrators
       const hrAdmins = await prisma.user.findMany({
-        where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true },
+        where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true, ...nonDemoUsersWhere },
         select: { email: true },
       });
       const adminEmails = hrAdmins.map((a) => a.email);
@@ -517,7 +518,9 @@ const getCompanyLeaveRequests = async (req, res) => {
   try {
     const { status } = req.query;
 
-    const whereClause = {};
+    const whereClause = {
+      ...nonDemoRelationWhere,
+    };
     if (status) {
       whereClause.status = status;
     }

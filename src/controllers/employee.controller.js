@@ -2,6 +2,7 @@ const prisma = require('../config/prisma');
 const { hashPassword } = require('../utils/password');
 const { uploadToCloudinary } = require('../config/cloudinary');
 const { sendOnboardingWelcomeEmail } = require('../services/notification.service');
+const { nonDemoUsersWhere } = require('../utils/userFilters');
 
 const onboardEmployee = async (req, res) => {
   try {
@@ -225,7 +226,9 @@ const getEmployees = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const take = parseInt(limit);
 
-    const whereClause = {};
+    const whereClause = {
+      ...nonDemoUsersWhere,
+    };
 
     if (departmentId && departmentId !== 'ALL') {
       whereClause.profile = { departmentId };

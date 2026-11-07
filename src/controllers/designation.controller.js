@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { nonDemoRelationWhere } = require('../utils/userFilters');
 
 const createDesignation = async (req, res) => {
   try {
@@ -62,7 +63,7 @@ const getDesignations = async (req, res) => {
     const designations = await prisma.designation.findMany({
       include: {
         department: { select: { id: true, name: true, code: true } },
-        _count: { select: { profiles: true } },
+        _count: { select: { profiles: { where: nonDemoRelationWhere } } },
       },
       orderBy: { createdAt: 'desc' },
     });

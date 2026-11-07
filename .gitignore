@@ -30,3 +30,7 @@ client/dist/
 # Uploads & Local File Storage
 uploads/
 
+# Database Backups
+backups/
+
+

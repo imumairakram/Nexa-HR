@@ -424,7 +424,7 @@ However, the audit identified **several Critical and High-severity vulnerabiliti
 ### Finding 26 [Check 11] — Personal Email Address Committed to `.env.example`
 * **Severity:** 🔵 Informational
 * **Affected File:** [`.env.example`](file:///d:/NexaHR/.env.example#L61), line 61
-* **Explanation:** `GMAIL_HR_ADDRESS="umairdevelop@gmail.com"` was committed to `.env.example`.
+* **Explanation:** `GMAIL_HR_ADDRESS="[REDACTED_DEV_EMAIL]"` was previously committed to `.env.example`.
 * **Impact:** Minor privacy exposure of developer personal email address.
 * **Recommended Fix:** Replace with a generic template placeholder: `GMAIL_HR_ADDRESS="hr@company.com"`.
 * **Verification Steps:** Verify `.env.example` contains only placeholder values.

@@ -1,5 +1,6 @@
 const prisma = require('../config/prisma');
 const { calculateEmployeePayroll } = require('../services/payroll.service');
+const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
 const {
   createInAppNotification,
   sendPayslipEmail,
@@ -116,6 +117,7 @@ const generateMonthlyPayroll = async (req, res) => {
     const employees = await prisma.user.findMany({
       where: {
         isActive: true,
+        ...nonDemoUsersWhere,
         salaryStructure: { isNot: null },
       },
       select: { id: true },
@@ -233,7 +235,9 @@ const getCompanyPayslips = async (req, res) => {
   try {
     const { month, year, status } = req.query;
 
-    const whereClause = {};
+    const whereClause = {
+      ...nonDemoRelationWhere,
+    };
     if (month) whereClause.month = parseInt(month);
     if (year) whereClause.year = parseInt(year);
     if (status) whereClause.status = status;

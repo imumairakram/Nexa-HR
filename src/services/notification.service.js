@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const prisma = require('../config/prisma');
+const { nonDemoUsersWhere } = require('../utils/userFilters');
 
 // ====================================================
 // IN-MEMORY TEST OUTBOXES (Active when NODE_ENV === 'test')
@@ -189,7 +190,7 @@ async function broadcastInAppNotification({
   targetRoles = null, // e.g. ['EMPLOYEE', 'HR_MANAGER', 'ADMIN']
 }) {
   try {
-    const where = { isActive: true };
+    const where = { isActive: true, ...nonDemoUsersWhere };
     if (targetRoles && Array.isArray(targetRoles)) {
       where.role = { in: targetRoles };
     }

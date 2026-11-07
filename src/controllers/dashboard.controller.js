@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
 
 const getDepartmentShortName = (name, code) => {
   if (code && code.length <= 5) return code;
@@ -38,11 +39,12 @@ const getAdminDashboard = async (req, res) => {
       departmentsWithProfiles,
       monthAttendances,
     ] = await Promise.all([
-      prisma.user.count({ where: { isActive: true } }),
+      prisma.user.count({ where: { isActive: true, ...nonDemoUsersWhere } }),
       prisma.department.count(),
       prisma.attendance.findMany({
         where: {
           date: { gte: startOfToday, lte: endOfToday },
+          ...nonDemoRelationWhere,
         },
         include: {
           user: {
@@ -61,8 +63,9 @@ const getAdminDashboard = async (req, res) => {
         },
         orderBy: { checkInTime: 'desc' },
       }),
-      prisma.leaveRequest.count({ where: { status: 'PENDING' } }),
+      prisma.leaveRequest.count({ where: { status: 'PENDING', ...nonDemoRelationWhere } }),
       prisma.payslip.aggregate({
+        where: nonDemoRelationWhere,
         _sum: { grossSalary: true, netSalary: true, taxDeductions: true },
         _count: { id: true },
       }),
@@ -70,7 +73,7 @@ const getAdminDashboard = async (req, res) => {
         include: {
           profiles: {
             where: {
-              user: { isActive: true },
+              user: { isActive: true, ...nonDemoUsersWhere },
             },
             select: {
               id: true,
@@ -83,6 +86,7 @@ const getAdminDashboard = async (req, res) => {
       prisma.attendance.findMany({
         where: {
           date: { gte: thirtyDaysAgo, lte: endOfToday },
+          ...nonDemoRelationWhere,
         },
         select: {
           id: true,
@@ -285,6 +289,7 @@ const getAdminDashboard = async (req, res) => {
     let isFallbackRecent = false;
     if (logsSource.length === 0) {
       logsSource = await prisma.attendance.findMany({
+        where: nonDemoRelationWhere,
         take: 8,
         orderBy: { checkInTime: 'desc' },
         include: {

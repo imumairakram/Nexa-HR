@@ -35,6 +35,8 @@ test('Anti-PII Leak Guard - Zero real personal emails in code or client', async 
   const targetDirs = [
     path.join(rootDir, 'src'),
     path.join(rootDir, 'client', 'src'),
+    path.join(rootDir, 'scripts'),
+    path.join(rootDir, 'prisma'),
   ];
 
   const violations = [];

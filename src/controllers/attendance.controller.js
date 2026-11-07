@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
+const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
 
 /**
  * Constant-time string comparison preventing timing side-channel attacks
@@ -320,7 +321,9 @@ const getCompanyAttendance = async (req, res) => {
     const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
     const take = parseInt(limit, 10);
 
-    const whereClause = {};
+    const whereClause = {
+      ...nonDemoRelationWhere,
+    };
 
     if (date) {
       const queryDate = new Date(date);
@@ -338,6 +341,7 @@ const getCompanyAttendance = async (req, res) => {
 
     if (departmentId) {
       whereClause.user = {
+        ...whereClause.user,
         profile: {
           departmentId,
         },
@@ -406,7 +410,7 @@ const punchAllUsersToday = async (req, res) => {
     const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     const activeUsers = await prisma.user.findMany({
-      where: { isActive: true },
+      where: { isActive: true, ...nonDemoUsersWhere },
       select: { id: true, firstName: true, lastName: true, employeeCode: true },
     });
 

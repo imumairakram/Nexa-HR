@@ -625,6 +625,14 @@ const forgotPassword = async (req, res) => {
       },
     });
 
+    if (user && user.isDemo) {
+      return res.status(403).json({
+        success: false,
+        code: 'DEMO_MODE',
+        message: 'Password recovery is disabled for demo accounts.',
+      });
+    }
+
     // Timing attack & enumeration safe: Always return uniform response
     if (!user || !user.isActive) {
       const fakeDestination = deliveryChannel === 'WHATSAPP' ? '+** *** ****' : maskEmail(identifier.includes('@') ? identifier : `${identifier}@corporate.local`);
@@ -794,6 +802,14 @@ const verifyResetOtp = async (req, res) => {
         ],
       },
     });
+
+    if (user && user.isDemo) {
+      return res.status(403).json({
+        success: false,
+        code: 'DEMO_MODE',
+        message: 'Password recovery is disabled for demo accounts.',
+      });
+    }
 
     if (!user || !user.isActive) {
       return res.status(400).json({
