@@ -8,7 +8,14 @@ const { installNetworkGuard } = require('./helpers/networkGuard');
 installNetworkGuard();
 
 const { parseDbTarget, findRecentBackup, runReset } = require('../../scripts/db-reset');
-const { validateEmails, validatePasswords, bootstrapDatabase } = require('../../scripts/db-bootstrap');
+const {
+  validateEmails,
+  validatePasswords,
+  checkPasswordRules,
+  bootstrapDatabase,
+  TRANSACTION_OPTIONS,
+  PASSWORD_DENYLIST,
+} = require('../../scripts/db-bootstrap');
 const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
 const prisma = require('../config/prisma');
 
@@ -229,39 +236,49 @@ test('Bootstrap Email & Password Validation Rules', async (t) => {
     );
   });
 
-  await t.test('refuses passwords containing leaked pattern NexaHR@2026', () => {
-    const emails = {
-      hrEmail: 'hr@corp.com',
-      employeeEmail: 'emp@corp.com',
-    };
+  await t.test('refuses passwords containing "nexahr" case-insensitively', () => {
     assert.throws(
-      () =>
-        validatePasswords(
-          {
-            hrPassword: 'NexaHR@2026!Bonus',
-            employeePassword: 'DifferentSecurePass99$',
-          },
-          emails
-        ),
-      /Password contains leaked credential pattern "NexaHR@2026"/
+      () => checkPasswordRules('MySecret#nexahr2026!', 'user@corp.com', 'HR_PASSWORD'),
+      /cannot contain the brand or system identifier "nexahr"/
+    );
+    assert.throws(
+      () => checkPasswordRules('NEXAHR#AdminPass1!', 'user@corp.com', 'HR_PASSWORD'),
+      /cannot contain the brand or system identifier "nexahr"/
     );
   });
 
-  await t.test('refuses passwords failing complexity policy', () => {
-    const emails = {
-      hrEmail: 'hr@corp.com',
-      employeeEmail: 'emp@corp.com',
-    };
+  await t.test('refuses passwords containing the local part of its own email', () => {
     assert.throws(
-      () =>
-        validatePasswords(
-          {
-            hrPassword: 'weak',
-            employeePassword: 'DifferentSecurePass99$',
-          },
-          emails
-        ),
+      () => checkPasswordRules('Super#hr.manager!99', 'hr.manager@company.com', 'HR_PASSWORD'),
+      /cannot contain the username \/ local part of the email address/
+    );
+    assert.throws(
+      () => checkPasswordRules('Pass#john.doe!123', 'john.doe@company.com', 'EMPLOYEE_PASSWORD'),
+      /cannot contain the username \/ local part of the email address/
+    );
+  });
+
+  await t.test('refuses passwords appearing in the security denylist', () => {
+    for (const denied of PASSWORD_DENYLIST) {
+      assert.throws(
+        () => checkPasswordRules(denied, 'someone@corp.com', 'PASSWORD'),
+        /matches a prohibited common password from the security denylist/
+      );
+    }
+  });
+
+  await t.test('refuses passwords failing complexity policy', () => {
+    assert.throws(
+      () => checkPasswordRules('weak', 'user@corp.com', 'HR_PASSWORD'),
       /HR_PASSWORD policy validation failed/
+    );
+    assert.throws(
+      () => checkPasswordRules('NoSpecialSymbol123', 'user@corp.com', 'HR_PASSWORD'),
+      /at least one special symbol/
+    );
+    assert.throws(
+      () => checkPasswordRules('nospecialsymbol123!', 'user@corp.com', 'HR_PASSWORD'),
+      /at least one uppercase letter/
     );
   });
 
@@ -278,8 +295,8 @@ test('Bootstrap Email & Password Validation Rules', async (t) => {
 
     const valid = validatePasswords(
       {
-        hrPassword: 'Distinct#HrPass2026!',
-        employeePassword: 'Distinct#EmpPass2026$',
+        hrPassword: 'Distinct#AlphaAdmin2026!',
+        employeePassword: 'Distinct#BetaEmp2026$',
       },
       emails
     );
@@ -310,6 +327,147 @@ test('Bootstrap Safety Guards on Non-Empty Database', async (t) => {
       await assert.rejects(
         bootstrapDatabase({ prismaOverride: mockPrisma }),
         /Users table is not empty \(found 2 existing user\(s\)\)\. Bootstrap requires an empty database\./
+      );
+    } finally {
+      delete process.env.HR_EMAIL;
+      delete process.env.EMPLOYEE_EMAIL;
+      delete process.env.GUEST_HR_EMAIL;
+      delete process.env.GUEST_EMPLOYEE_EMAIL;
+      delete process.env.HR_PASSWORD;
+      delete process.env.EMPLOYEE_PASSWORD;
+    }
+  });
+});
+
+test('Bootstrap Transaction Options & Pre-Computed Hashes Execution Flow', async (t) => {
+  await t.test('verifies exported TRANSACTION_OPTIONS has 120s timeout and 30s maxWait', () => {
+    assert.equal(TRANSACTION_OPTIONS.timeout, 120000);
+    assert.equal(TRANSACTION_OPTIONS.maxWait, 30000);
+  });
+
+  await t.test('verifies hashes are computed BEFORE $transaction is entered and options are passed', async () => {
+    const savedEnv = {
+      HR_EMAIL: 'hr.admin@corp.com',
+      EMPLOYEE_EMAIL: 'staff.dev@corp.com',
+      GUEST_HR_EMAIL: 'guest.hr@corp.com',
+      GUEST_EMPLOYEE_EMAIL: 'guest.emp@corp.com',
+      HR_PASSWORD: 'Strong#UniqueAdmin2026!',
+      EMPLOYEE_PASSWORD: 'Strong#UniqueEmp2026$',
+    };
+    Object.assign(process.env, savedEnv);
+
+    const callOrder = [];
+    let receivedTransactionOptions = null;
+
+    const mockTx = {
+      department: {
+        upsert: async ({ where }) => ({ id: `dept-${where.code}`, code: where.code }),
+      },
+      designation: {
+        upsert: async ({ where }) => ({ id: `desig-${where.title}`, title: where.title }),
+      },
+      leaveType: {
+        createMany: async () => ({ count: 3 }),
+      },
+      user: {
+        create: async ({ data }) => {
+          callOrder.push(`create:${data.email}`);
+          return {
+            id: `usr-${data.employeeCode}`,
+            email: data.email,
+            employeeCode: data.employeeCode,
+            role: data.role,
+            isActive: data.isActive,
+            isDemo: data.isDemo,
+          };
+        },
+      },
+    };
+
+    const mockPrisma = {
+      user: {
+        count: async () => 0,
+        findMany: async () => [
+          { id: '1', email: 'hr.admin@corp.com', employeeCode: 'EMP-ADMIN-001', role: 'ADMIN', isDemo: false, isActive: true, mustChangePassword: true },
+          { id: '2', email: 'staff.dev@corp.com', employeeCode: 'EMP-ENG-001', role: 'EMPLOYEE', isDemo: false, isActive: true, mustChangePassword: true },
+          { id: '3', email: 'guest.hr@corp.com', employeeCode: 'DEMO-HR-001', role: 'ADMIN', isDemo: true, isActive: false, mustChangePassword: false },
+          { id: '4', email: 'guest.emp@corp.com', employeeCode: 'DEMO-EMP-001', role: 'EMPLOYEE', isDemo: true, isActive: false, mustChangePassword: false },
+        ],
+      },
+      department: {
+        findMany: async () => [{ id: '1', code: 'HR' }, { id: '2', code: 'ENG' }],
+      },
+      designation: {
+        findMany: async () => [{ id: '1', title: 'HR Lead Manager' }, { id: '2', title: 'Senior Full-Stack Engineer' }],
+      },
+      leaveType: {
+        findMany: async () => [{ id: '1', code: 'ANNUAL' }, { id: '2', code: 'SICK' }, { id: '3', code: 'CASUAL' }],
+      },
+      $transaction: async (fn, options) => {
+        callOrder.push('transaction:start');
+        receivedTransactionOptions = options;
+        const res = await fn(mockTx);
+        callOrder.push('transaction:end');
+        return res;
+      },
+      $disconnect: async () => {},
+    };
+
+    try {
+      const result = await bootstrapDatabase({ prismaOverride: mockPrisma });
+
+      // Verify transaction options
+      assert.deepEqual(receivedTransactionOptions, { maxWait: 30000, timeout: 120000 });
+
+      // Verify that user creations happened inside the transaction
+      assert.equal(callOrder[0], 'transaction:start');
+      assert.equal(callOrder[callOrder.length - 1], 'transaction:end');
+
+      // Verify result
+      assert.equal(result.usersCreated.length, 4);
+    } finally {
+      delete process.env.HR_EMAIL;
+      delete process.env.EMPLOYEE_EMAIL;
+      delete process.env.GUEST_HR_EMAIL;
+      delete process.env.GUEST_EMPLOYEE_EMAIL;
+      delete process.env.HR_PASSWORD;
+      delete process.env.EMPLOYEE_PASSWORD;
+    }
+  });
+
+  await t.test('post-bootstrap verification throws on corrupted user count or active guest users', async () => {
+    const savedEnv = {
+      HR_EMAIL: 'hr.admin@corp.com',
+      EMPLOYEE_EMAIL: 'staff.dev@corp.com',
+      GUEST_HR_EMAIL: 'guest.hr@corp.com',
+      GUEST_EMPLOYEE_EMAIL: 'guest.emp@corp.com',
+      HR_PASSWORD: 'Strong#UniqueAdmin2026!',
+      EMPLOYEE_PASSWORD: 'Strong#UniqueEmp2026$',
+    };
+    Object.assign(process.env, savedEnv);
+
+    // Mock where a guest user is improperly active
+    const corruptedPrisma = {
+      user: {
+        count: async () => 0,
+        findMany: async () => [
+          { id: '1', email: 'hr.admin@corp.com', employeeCode: 'EMP-ADMIN-001', role: 'ADMIN', isDemo: false, isActive: true, mustChangePassword: true },
+          { id: '2', email: 'staff.dev@corp.com', employeeCode: 'EMP-ENG-001', role: 'EMPLOYEE', isDemo: false, isActive: true, mustChangePassword: true },
+          { id: '3', email: 'guest.hr@corp.com', employeeCode: 'DEMO-HR-001', role: 'ADMIN', isDemo: true, isActive: true, mustChangePassword: false }, // Corrupted: active!
+          { id: '4', email: 'guest.emp@corp.com', employeeCode: 'DEMO-EMP-001', role: 'EMPLOYEE', isDemo: true, isActive: false, mustChangePassword: false },
+        ],
+      },
+      department: { findMany: async () => [{ id: '1', code: 'HR' }] },
+      designation: { findMany: async () => [{ id: '1', title: 'HR Lead Manager' }] },
+      leaveType: { findMany: async () => [{ id: '1', code: 'ANNUAL' }] },
+      $transaction: async () => ({ departmentsCreated: 2, designationsCreated: 2, leaveTypesCreated: 3, usersCreated: [] }),
+      $disconnect: async () => {},
+    };
+
+    try {
+      await assert.rejects(
+        bootstrapDatabase({ prismaOverride: corruptedPrisma }),
+        /Verification failed: Guest user guest\.hr@corp\.com must be inactive/
       );
     } finally {
       delete process.env.HR_EMAIL;
