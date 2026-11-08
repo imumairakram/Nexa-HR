@@ -238,3 +238,83 @@ describe('Fix 20 — Employee Document Access Control', () => {
   });
 });
 
+// ════════════════════════════════════════════════════════════════════════════
+// SUITE 4 — Delete Safety: Documents Survive User Deletion (SET NULL)
+// ════════════════════════════════════════════════════════════════════════════
+
+describe('Fix 20 — Delete Safety: Documents Survive User Deletion', () => {
+  it('vault document survives when its uploader is deleted (uploadedById set to null)', async () => {
+    vaultStore.length = 0;
+    const doc = await mockPrisma.vaultDocument.create({
+      data: {
+        kind: 'POLICY',
+        referenceNumber: 'POL-SURVIVE-1',
+        title: 'Permanent Company Policy',
+        type: 'GOVERNANCE',
+        uploadedBy: 'HR',
+        uploadedById: 'admin-to-be-deleted',
+        status: 'ACTIVE',
+      },
+    });
+
+    assert.equal(doc.uploadedById, 'admin-to-be-deleted');
+
+    // Simulate ON DELETE SET NULL on uploader foreign key
+    const targetDoc = vaultStore.find((d) => d.id === doc.id);
+    targetDoc.uploadedById = null;
+
+    // Document must still exist in vault
+    assert.equal(vaultStore.length, 1);
+    assert.equal(targetDoc.uploadedById, null);
+    assert.equal(targetDoc.title, 'Permanent Company Policy');
+    assert.equal(targetDoc.uploadedBy, 'HR'); // Snapshot preserved
+
+    // Controller getCompanyPolicies handles null uploadedById gracefully
+    const req = makeReq('ADMIN');
+    const res = makeRes();
+    await ctrl.getCompanyPolicies(req, res);
+    assert.equal(res._status, 200);
+    assert.equal(res._body.data.policies.length, 1);
+    assert.equal(res._body.data.policies[0].uploadedById, null);
+    assert.equal(res._body.data.policies[0].title, 'Permanent Company Policy');
+  });
+
+  it('issued document survives when its recipient employee is deleted (employeeId set to null)', async () => {
+    vaultStore.length = 0;
+    const doc = await mockPrisma.vaultDocument.create({
+      data: {
+        kind: 'ISSUED',
+        referenceNumber: 'OFR-SURVIVE-1',
+        title: 'Archived Offer Letter',
+        type: 'OFFER_LETTER',
+        employeeId: 'emp-to-be-deleted',
+        employeeName: 'Former Employee',
+        employeeCode: 'EMP-999',
+        uploadedBy: 'HR',
+        uploadedById: 'admin-1',
+        status: 'VERIFIED',
+      },
+    });
+
+    // Simulate ON DELETE SET NULL on employee foreign key
+    const targetDoc = vaultStore.find((d) => d.id === doc.id);
+    targetDoc.employeeId = null;
+
+    // Document must still exist with historical snapshots preserved
+    assert.equal(vaultStore.length, 1);
+    assert.equal(targetDoc.employeeId, null);
+    assert.equal(targetDoc.employeeName, 'Former Employee');
+    assert.equal(targetDoc.employeeCode, 'EMP-999');
+
+    // HR can still retrieve the document record
+    const req = makeReq('ADMIN');
+    const res = makeRes();
+    await ctrl.getIssuedDocuments(req, res);
+    assert.equal(res._status, 200);
+    assert.equal(res._body.data.documents.length, 1);
+    assert.equal(res._body.data.documents[0].employeeName, 'Former Employee');
+    assert.equal(res._body.data.documents[0].employeeId, null);
+  });
+});
+
+

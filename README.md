@@ -348,7 +348,9 @@ NexaHR utilizes multi-tier optimizations to deliver sub-10ms response times and 
   * An automated background service ([`selfPing.service.js`](src/services/selfPing.service.js)) pings `/api/health` every 14 minutes, preventing free-tier container sleep spindown delays.
 
 * **HTTP Security Headers & Input Sanitization**:
-  * Helmet Content Security Policy (CSP), Strict-Transport-Security (HSTS 1-year preload), and X-Frame-Options clickjacking protection.
+  * Helmet Content Security Policy (CSP), Strict-Transport-Security (HSTS 1-year preload), and X-Frame-Options clickjacking protection on the backend.
+  * Strict Edge CSP configured in [`client/vercel.json`](client/vercel.json) enforcing `connect-src 'self' https://nexa-hr-backend-2ybt.onrender.com; img-src 'self' data: blob: https://res.cloudinary.com; font-src 'self' data:; frame-ancestors 'none'`.
+    > ⚠️ **Deployment Note**: If the backend Render service URL changes, the `connect-src` origin in `client/vercel.json` **must be updated** to match the new backend origin.
   * HttpOnly, Secure, SameSite cookies for JWT transport.
   * Deep input validation and sanitization using `express-validator` and `zod`.
 

@@ -595,11 +595,11 @@ model VaultDocument {
   notifyEmployee  Boolean           @default(true)
   uploadedBy      String?           // Role: "HR" | "EMPLOYEE"
 
-  uploadedById    String            // The user who created this record
+  uploadedById    String?           // The user who created this record (nullable for SET NULL on user deletion)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  uploader        User              @relation("VaultUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  uploader        User?             @relation("VaultUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
   issuedTo        User?             @relation("VaultIssuedTo", fields: [employeeId], references: [id], onDelete: SetNull)
 
   @@index([kind])
