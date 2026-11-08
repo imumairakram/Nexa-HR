@@ -44,6 +44,7 @@ const verifyToken = async (req, res, next) => {
           isActive: true,
           employeeCode: true,
           isDemo: true,
+          mustChangePassword: true,
         },
       });
       if (user && user.isActive) {
@@ -99,6 +100,7 @@ const verifyToken = async (req, res, next) => {
       fullName: `${user.firstName} ${user.lastName}`,
       employeeCode: user.employeeCode || null,
       isDemo: isUserDemo && isTokenDemo,
+      mustChangePassword: Boolean(user.mustChangePassword),
     };
 
     // Global mutation guard for Guest / Demo sessions:
@@ -114,7 +116,7 @@ const verifyToken = async (req, res, next) => {
       }
     }
 
-    return next();
+    return enforcePasswordChange(req, res, next);
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
@@ -189,8 +191,48 @@ const blockDemo = (req, res, next) => {
   next();
 };
 
+/**
+ * Defense-in-depth middleware to enforce password change on first login.
+ * If user.mustChangePassword === true, blocks all routes except the allowlist:
+ * - POST /api/auth/change-password (or PUT)
+ * - GET /api/auth/me
+ * - POST /api/auth/logout
+ * - GET /api/auth/config
+ * Demo sessions are unaffected (they are never mustChangePassword).
+ */
+const enforcePasswordChange = (req, res, next) => {
+  // Demo users and unauthenticated requests bypass
+  if (!req.user || req.user.isDemo) {
+    return next();
+  }
+
+  if (req.user.mustChangePassword !== true) {
+    return next();
+  }
+
+  const method = req.method.toUpperCase();
+  const rawUrl = (req.originalUrl || (req.baseUrl + req.path) || req.url || '').split('?')[0].toLowerCase().replace(/\/+$/, '');
+
+  const isAllowed =
+    ((method === 'POST' || method === 'PUT') && rawUrl.endsWith('/auth/change-password')) ||
+    (method === 'GET' && rawUrl.endsWith('/auth/me')) ||
+    (method === 'POST' && rawUrl.endsWith('/auth/logout')) ||
+    (method === 'GET' && rawUrl.endsWith('/auth/config'));
+
+  if (isAllowed) {
+    return next();
+  }
+
+  return res.status(403).json({
+    success: false,
+    code: 'PASSWORD_CHANGE_REQUIRED',
+    message: 'Password change is required before accessing application resources.',
+  });
+};
+
 module.exports = {
   verifyToken,
   blockDemo,
   enforceDemoReadonly,
+  enforcePasswordChange,
 };

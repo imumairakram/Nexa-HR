@@ -10,12 +10,11 @@ const {
   removeProfilePicture,
 } = require('../controllers/employee.controller');
 const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
-const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 const { handleUploadMiddleware } = require('../middlewares/upload.middleware');
 const cacheService = require('../services/cache.service');
 
-router.use(verifyToken, requireTenant);
+router.use(verifyToken);
 
 // Secured Profile Picture Upload & Delete Endpoints (Available to any authenticated user)
 router.post('/profile-picture', blockDemo, handleUploadMiddleware('avatar'), uploadProfilePicture);

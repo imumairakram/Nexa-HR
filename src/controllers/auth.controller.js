@@ -1048,6 +1048,14 @@ const resetPassword = async (req, res) => {
  */
 const updateMyProfile = async (req, res) => {
   try {
+    // Reject a client-supplied role on profile/self-update endpoints (mass assignment protection)
+    if (req.body && req.body.role !== undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Role modification is not permitted on profile update.',
+      });
+    }
+
     const userId = req.user.userId;
     const {
       firstName,
@@ -1227,6 +1235,14 @@ const updateMyProfile = async (req, res) => {
  */
 const changeMyPassword = async (req, res) => {
   try {
+    // Reject a client-supplied role on profile/self-update endpoints (mass assignment protection)
+    if (req.body && req.body.role !== undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Role modification is not permitted on profile update.',
+      });
+    }
+
     const userId = req.user.userId;
     const { currentPassword, newPassword, confirmPassword } = req.body;
 
@@ -1271,6 +1287,14 @@ const changeMyPassword = async (req, res) => {
       });
     }
 
+    const isReused = await comparePassword(newPassword, user.password);
+    if (isReused) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password cannot be identical to your current password.',
+      });
+    }
+
     const strength = validatePasswordStrength(newPassword, {
       email: user.email,
       currentPassword,
@@ -1293,6 +1317,9 @@ const changeMyPassword = async (req, res) => {
         mustChangePassword: false,
       },
     });
+
+    // Invalidate user authentication cache so new status is immediately reflected
+    cacheService.invalidateUser(userId);
 
     return res.status(200).json({
       success: true,

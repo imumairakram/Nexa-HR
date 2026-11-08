@@ -7,11 +7,10 @@ const {
   deleteDesignation,
 } = require('../controllers/designation.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
-const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 const cacheService = require('../services/cache.service');
 
-router.use(verifyToken, requireTenant);
+router.use(verifyToken);
 
 const canManageDesignations = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
 

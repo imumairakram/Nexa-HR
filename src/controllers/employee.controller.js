@@ -46,6 +46,19 @@ const onboardEmployee = async (req, res) => {
       });
     }
 
+    // Role escalation guard:
+    // HR_MANAGER may create only EMPLOYEE accounts. Only ADMIN may assign ADMIN or HR_MANAGER.
+    const callerRole = req.user?.role;
+    if (callerRole === 'HR_MANAGER' && role && role !== 'EMPLOYEE') {
+      return res.status(403).json({
+        success: false,
+        message: 'HR Managers are only permitted to create Employee accounts. Only an Administrator can assign Admin or HR Manager roles.',
+      });
+    }
+
+    const validRoles = callerRole === 'ADMIN' ? ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] : ['EMPLOYEE'];
+    const resolvedRole = validRoles.includes(role) ? role : 'EMPLOYEE';
+
     // Check if email already exists
     const existingEmail = await prisma.user.findFirst({
       where: { email: cleanEmail },
@@ -109,10 +122,7 @@ const onboardEmployee = async (req, res) => {
         resolvedDesigId = desig.id;
       }
 
-      // 3. Create User
-      const validRoles = ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'];
-      const resolvedRole = validRoles.includes(role) ? role : 'EMPLOYEE';
-
+      // 3. Create User with resolvedRole
       const newUser = await tx.user.create({
         data: {
           employeeCode: cleanEmpCode,
@@ -424,6 +434,59 @@ const updateEmployee = async (req, res) => {
       });
     }
 
+    const callerId = req.user?.userId;
+    const callerRole = req.user?.role;
+
+    // 1. Nobody can change their own role
+    if (callerId === id && role !== undefined && role !== existingUser.role) {
+      return res.status(403).json({
+        success: false,
+        message: 'You cannot change your own role.',
+      });
+    }
+
+    // 2. HR_MANAGER privileges: HR_MANAGER may edit only EMPLOYEE accounts
+    if (callerRole === 'HR_MANAGER') {
+      if (existingUser.role !== 'EMPLOYEE') {
+        return res.status(403).json({
+          success: false,
+          message: 'HR Managers are only permitted to edit Employee accounts.',
+        });
+      }
+      if (role !== undefined && role !== 'EMPLOYEE') {
+        return res.status(403).json({
+          success: false,
+          message: 'Only an Administrator can assign or promote accounts to Admin or HR Manager roles.',
+        });
+      }
+    }
+
+    // 3. Only ADMIN may assign or change the roles ADMIN and HR_MANAGER
+    if (callerRole !== 'ADMIN' && role !== undefined && ['ADMIN', 'HR_MANAGER'].includes(role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only an Administrator may assign ADMIN or HR_MANAGER roles.',
+      });
+    }
+
+    // 4. The last active ADMIN can never be demoted or deactivated
+    if (existingUser.role === 'ADMIN') {
+      const isDemoting = role !== undefined && role !== 'ADMIN';
+      const isDeactivating = isActive !== undefined && (isActive === false || isActive === 'false' || isActive === 0);
+
+      if (isDemoting || isDeactivating) {
+        const activeAdminCount = await prisma.user.count({
+          where: { role: 'ADMIN', isActive: true, isDemo: false },
+        });
+        if (existingUser.isActive && activeAdminCount <= 1) {
+          return res.status(403).json({
+            success: false,
+            message: 'The last active Administrator cannot be demoted or deactivated.',
+          });
+        }
+      }
+    }
+
     const updated = await prisma.$transaction(async (tx) => {
       // 1. Resolve Department if name given
       let resolvedDeptId = departmentId !== undefined ? departmentId : existingUser.profile?.departmentId;
@@ -584,6 +647,30 @@ const deleteEmployee = async (req, res) => {
         success: false,
         message: 'Employee not found.',
       });
+    }
+
+    const callerId = req.user?.userId;
+    const callerRole = req.user?.role;
+
+    // HR_MANAGER may delete only EMPLOYEE accounts
+    if (callerRole === 'HR_MANAGER' && user.role !== 'EMPLOYEE') {
+      return res.status(403).json({
+        success: false,
+        message: 'HR Managers are only permitted to delete Employee accounts.',
+      });
+    }
+
+    // The last active ADMIN can never be deleted (neither by themselves nor anyone else)
+    if (user.role === 'ADMIN' && user.isActive) {
+      const activeAdminCount = await prisma.user.count({
+        where: { role: 'ADMIN', isActive: true, isDemo: false },
+      });
+      if (activeAdminCount <= 1) {
+        return res.status(403).json({
+          success: false,
+          message: 'The last active Administrator cannot be deleted.',
+        });
+      }
     }
 
     // Delete user and cascading profiles

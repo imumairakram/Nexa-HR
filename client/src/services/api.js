@@ -169,6 +169,21 @@ async function fetchAPI(endpoint, options = {}) {
         if (data?.code === 'DEMO_MODE' || (data?.message && data.message.toLowerCase().includes('demo mode'))) {
           showDemoToast(data.message || 'Demo mode: view only. Changes are disabled.');
         }
+        if (data?.code === 'PASSWORD_CHANGE_REQUIRED') {
+          try {
+            const raw = localStorage.getItem('user');
+            if (raw) {
+              const u = JSON.parse(raw);
+              if (!u.mustChangePassword) {
+                u.mustChangePassword = true;
+                localStorage.setItem('user', JSON.stringify(u));
+              }
+            }
+          } catch (e) {}
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('user_profile_updated'));
+          }
+        }
         throw new Error(data.message || `Server error (${response.status})`);
       }
 

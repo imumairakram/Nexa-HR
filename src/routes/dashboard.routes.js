@@ -5,11 +5,10 @@ const {
   getEmployeeDashboard,
 } = require('../controllers/dashboard.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
-const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 const cacheService = require('../services/cache.service');
 
-router.use(verifyToken, requireTenant);
+router.use(verifyToken);
 
 const canAccessAdminDashboard = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
 

@@ -18,7 +18,7 @@
 <br/>
 
 <p align="center">
-  <b>NexaHR</b> is an enterprise-grade Human Resource Management System (HRMS) and Employee Self-Service (ESS) platform engineered for agility, institutional precision, and high concurrency. Powered by an intentional editorial design system (Deep Teal & Warm Slate typography), a sub-10ms user-partitioned in-memory cache architecture, an AI-driven Gmail ATS resume pipeline, zero-layout-shift shimmer loading, granular Role-Based Access Control (RBAC), authenticated CV streaming, real-time biometric hardware sync, automated tax calculation, and multi-tenant telemetry.
+  <b>NexaHR</b> is an enterprise-grade Human Resource Management System (HRMS) and Employee Self-Service (ESS) platform engineered for agility, institutional precision, and high concurrency. Powered by an intentional editorial design system (Deep Teal & Warm Slate typography), a sub-10ms user-partitioned in-memory cache architecture, an AI-driven Gmail ATS resume pipeline, zero-layout-shift shimmer loading, granular Role-Based Access Control (RBAC), authenticated CV streaming, real-time biometric hardware sync, automated tax calculation, and dedicated enterprise telemetry (Single-Tenant Architecture).
 </p>
 
 <p align="center">

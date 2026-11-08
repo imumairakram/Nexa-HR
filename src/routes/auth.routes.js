@@ -43,6 +43,7 @@ router.post('/logout', logout);
 router.get('/me', verifyToken, getMe);
 router.put('/profile', verifyToken, blockDemo, updateMyProfile);
 router.put('/change-password', verifyToken, blockDemo, changePasswordValidationRules, changeMyPassword);
+router.post('/change-password', verifyToken, blockDemo, changePasswordValidationRules, changeMyPassword);
 
 // ====================================================
 // EPHEMERAL CRYPTOGRAPHIC PASSWORD RECOVERY ROUTES

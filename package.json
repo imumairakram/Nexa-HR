@@ -1,7 +1,7 @@
 {
   "name": "nexahr-backend",
   "version": "1.0.0",
-  "description": "Multi-Tenant SaaS HRM API Backend",
+  "description": "Enterprise HRM & Payroll API Backend (Single-Tenant Architecture)",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -22,7 +22,7 @@
   "keywords": [
     "hrm",
     "saas",
-    "multi-tenant",
+    "single-tenant",
     "express",
     "prisma",
     "postgresql"

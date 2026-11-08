@@ -12,11 +12,10 @@ const {
   clearAllTransactions,
 } = require('../controllers/account.controller');
 const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
-const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 const cacheService = require('../services/cache.service');
 
-router.use(verifyToken, requireTenant);
+router.use(verifyToken);
 
 const canManageAccounts = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
 const adminOnly = checkRole('ADMIN');

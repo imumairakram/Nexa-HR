@@ -61,8 +61,8 @@ const FirstLoginPasswordModal = () => {
       return;
     }
 
-    if (form.newPassword.length < 6) {
-      setToastMsg('New password must be at least 6 characters long.');
+    if (form.newPassword.length < 10) {
+      setToastMsg('New password must be at least 10 characters long with uppercase, lowercase, digit, and symbol.');
       return;
     }
 

@@ -10,10 +10,9 @@ const {
   deleteCompanyPolicy,
 } = require('../controllers/document.controller');
 const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
-const { requireTenant } = require('../middlewares/tenant.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
 
-router.use(verifyToken, requireTenant);
+router.use(verifyToken);
 
 const canManageDocuments = checkRole('ADMIN', 'HR_MANAGER');
 
