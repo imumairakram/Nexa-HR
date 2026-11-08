@@ -41,6 +41,14 @@ const JobMatchResultSchema = z.object({
 // 2. PROVIDER-AGNOSTIC ADAPTERS (Gemini, OpenAI, Anthropic)
 // ====================================================
 
+const DEFAULT_GEMINI_FALLBACK_CHAIN = [
+  'gemini-3.8-flash',
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+];
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, process.env.NODE_ENV === 'test' ? 1 : ms));
+
 function getAIConfig() {
   const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
   const apiKey =
@@ -49,7 +57,7 @@ function getAIConfig() {
     (provider === 'openai' ? process.env.OPENAI_API_KEY : '') ||
     (provider === 'anthropic' ? process.env.ANTHROPIC_API_KEY : '');
 
-  let defaultModel = 'gemini-1.5-flash';
+  let defaultModel = 'gemini-3.8-flash';
   if (provider === 'openai') defaultModel = 'gpt-4o-mini';
   if (provider === 'anthropic') defaultModel = 'claude-3-5-sonnet-20241022';
 
@@ -59,14 +67,16 @@ function getAIConfig() {
 
 /**
  * Call Gemini REST API with automated fallback across supported model aliases
+ * Fallback chain: gemini-3.8-flash -> gemini-3.5-flash -> gemini-3.1-flash-lite
+ * - On 404: Skip immediately to the next model in the fallback chain
+ * - On 503/429: Retry with backoff, then fall back to the next model
+ * - On 400/401/403: Fail fast (throw immediately)
  */
-async function callGemini({ apiKey, model, systemPrompt, userPrompt, temperature = 0.1, inlineData = null }) {
+async function callGemini({ apiKey, model, systemPrompt, userPrompt, temperature = 0.1, inlineData = null, maxRetries = 2 }) {
+  const initialModel = model || 'gemini-3.8-flash';
   const modelsToTry = [
-    model,
-    'gemini-1.5-flash-latest',
-    'gemini-2.0-flash',
-    'gemini-1.5-pro',
-    'gemini-pro',
+    initialModel,
+    ...DEFAULT_GEMINI_FALLBACK_CHAIN,
   ].filter(Boolean);
   const uniqueModels = [...new Set(modelsToTry)];
 
@@ -90,41 +100,88 @@ async function callGemini({ apiKey, model, systemPrompt, userPrompt, temperature
   };
 
   let lastError = null;
-  for (const m of uniqueModels) {
-    try {
-      const cleanModelName = m.replace(/^models\//, '');
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModelName}:generateContent?key=${apiKey}`;
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+  for (let mIndex = 0; mIndex < uniqueModels.length; mIndex++) {
+    const currentModel = uniqueModels[mIndex];
+    const cleanModelName = currentModel.replace(/^models\//, '');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModelName}:generateContent?key=${apiKey}`;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini API error (${response.status}) on model ${cleanModelName}: ${errorText}`);
+    let attempt = 0;
+    while (attempt <= maxRetries) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const status = response.status;
+          const errorText = await response.text();
+          const apiError = new Error(`Gemini API error (${status}) on model ${cleanModelName}: ${errorText}`);
+          apiError.status = status;
+
+          // Fail fast on 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden)
+          if (status === 400 || status === 401 || status === 403) {
+            console.error(`[GEMINI ADAPTER] Fatal authentication or client error (${status}) on model ${cleanModelName}. Failing fast.`);
+            throw apiError;
+          }
+
+          // Skip to next model on 404 (Model Not Found)
+          if (status === 404) {
+            console.warn(`[GEMINI ADAPTER] Model "${currentModel}" not found (404). Skipping to next model in fallback chain...`);
+            lastError = apiError;
+            break; // break retry loop to move to next model
+          }
+
+          // Retry on 503 (Service Unavailable) or 429 (Rate Limit / Resource Exhausted)
+          if (status === 503 || status === 429) {
+            lastError = apiError;
+            if (attempt < maxRetries) {
+              attempt++;
+              const backoffMs = Math.pow(2, attempt) * 500;
+              console.warn(`[GEMINI ADAPTER] Transient error (${status}) on model ${cleanModelName}. Retrying attempt ${attempt}/${maxRetries} after ${backoffMs}ms...`);
+              await sleep(backoffMs);
+              continue; // retry current model
+            }
+            console.warn(`[GEMINI ADAPTER] Model "${cleanModelName}" exhausted retries on transient error (${status}). Falling back to next model...`);
+            break; // exhausted retries, break to next model
+          }
+
+          // Other errors (e.g. 500, 502, 504): retry or fall back
+          lastError = apiError;
+          if (status >= 500 && attempt < maxRetries) {
+            attempt++;
+            await sleep(500);
+            continue;
+          }
+          break;
+        }
+
+        const data = await response.json();
+        const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!textContent) {
+          throw new Error(`Gemini returned an empty response on model ${cleanModelName}`);
+        }
+
+        return textContent;
+      } catch (err) {
+        // If it was a fatal fast-fail error (400, 401, 403), rethrow immediately
+        if (err.status === 400 || err.status === 401 || err.status === 403) {
+          throw err;
+        }
+        lastError = err;
+        if (attempt < maxRetries) {
+          attempt++;
+          await sleep(500);
+          continue;
+        }
+        break; // break retry loop, move to next model in fallback chain
       }
-
-      const data = await response.json();
-      const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!textContent) {
-        throw new Error(`Gemini returned an empty response on model ${cleanModelName}`);
-      }
-
-      return textContent;
-    } catch (err) {
-      lastError = err;
-      // If error is 404 (model not found), try next model alias
-      if (err.message && err.message.includes('404')) {
-        console.warn(`[GEMINI ADAPTER] Model "${m}" not found (404). Trying next fallback model...`);
-        continue;
-      }
-      throw err;
     }
   }
 
-  throw lastError;
+  throw lastError || new Error('All Gemini model fallbacks exhausted without successful response.');
 }
 
 /**
@@ -523,5 +580,8 @@ module.exports = {
   evaluateDecision,
   cleanJsonOutput,
   runAI,
+  callGemini,
+  getAIConfig,
+  DEFAULT_GEMINI_FALLBACK_CHAIN,
 };
 

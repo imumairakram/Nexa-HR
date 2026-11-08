@@ -9,6 +9,9 @@ const {
   JobMatchResultSchema,
   evaluateDecision,
   cleanJsonOutput,
+  callGemini,
+  getAIConfig,
+  DEFAULT_GEMINI_FALLBACK_CHAIN,
 } = require('../services/aiScreening.service');
 const {
   extractPhoneFromText,
@@ -406,6 +409,165 @@ test('AI ATS Screening - Unit Tests', async (t) => {
     app1.status = 'ARCHIVED';
     assert.equal(countVisible(), 1);
     assert.equal(countVisible(job.id), 1);
+  });
+
+  // ====================================================
+  // 6. Gemini Model Fallback Chain & Error Handling
+  // ====================================================
+  await t.test('getAIConfig defaults to gemini-3.8-flash and exposes correct fallback chain', () => {
+    const originalModel = process.env.AI_MODEL;
+    const originalProvider = process.env.AI_PROVIDER;
+    try {
+      delete process.env.AI_MODEL;
+      delete process.env.AI_PROVIDER;
+      const config = getAIConfig();
+      assert.equal(config.model, 'gemini-3.8-flash');
+      assert.deepEqual(DEFAULT_GEMINI_FALLBACK_CHAIN, [
+        'gemini-3.8-flash',
+        'gemini-3.5-flash',
+        'gemini-3.1-flash-lite',
+      ]);
+    } finally {
+      if (originalModel) process.env.AI_MODEL = originalModel;
+      if (originalProvider) process.env.AI_PROVIDER = originalProvider;
+    }
+  });
+
+  await t.test('callGemini on 404 skips immediately to the next model in fallback chain', async () => {
+    const originalFetch = globalThis.fetch;
+    const requestedModels = [];
+
+    globalThis.fetch = async (url) => {
+      const match = url.match(/models\/([^:]+):generateContent/);
+      const modelName = match ? match[1] : '';
+      requestedModels.push(modelName);
+
+      if (modelName === 'gemini-3.8-flash') {
+        return {
+          ok: false,
+          status: 404,
+          text: async () => 'Model not found',
+        };
+      }
+
+      if (modelName === 'gemini-3.5-flash') {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            candidates: [
+              { content: { parts: [{ text: JSON.stringify({ score: 85 }) }] } },
+            ],
+          }),
+        };
+      }
+
+      return { ok: false, status: 500, text: async () => 'Unexpected model' };
+    };
+
+    try {
+      const result = await callGemini({
+        apiKey: 'test-key',
+        model: 'gemini-3.8-flash',
+        systemPrompt: 'System',
+        userPrompt: 'User',
+      });
+      assert.equal(JSON.parse(result).score, 85);
+      assert.deepEqual(requestedModels, ['gemini-3.8-flash', 'gemini-3.5-flash']);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  await t.test('callGemini on 503/429 retries with backoff and then falls back to next model', async () => {
+    const originalFetch = globalThis.fetch;
+    const calls = [];
+
+    globalThis.fetch = async (url) => {
+      const match = url.match(/models\/([^:]+):generateContent/);
+      const modelName = match ? match[1] : '';
+      calls.push(modelName);
+
+      // Model 1 fails with 503 every attempt
+      if (modelName === 'gemini-3.8-flash') {
+        return {
+          ok: false,
+          status: 503,
+          text: async () => 'Service Unavailable',
+        };
+      }
+
+      // Model 2 succeeds
+      if (modelName === 'gemini-3.5-flash') {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            candidates: [
+              { content: { parts: [{ text: JSON.stringify({ score: 92 }) }] } },
+            ],
+          }),
+        };
+      }
+
+      return { ok: false, status: 500, text: async () => 'Unknown model' };
+    };
+
+    try {
+      const result = await callGemini({
+        apiKey: 'test-key',
+        model: 'gemini-3.8-flash',
+        systemPrompt: 'System',
+        userPrompt: 'User',
+        maxRetries: 2,
+      });
+
+      assert.equal(JSON.parse(result).score, 92);
+      // gemini-3.8-flash attempted 3 times (initial + 2 retries), then gemini-3.5-flash attempted once and succeeded
+      const m38Calls = calls.filter((c) => c === 'gemini-3.8-flash').length;
+      assert.equal(m38Calls, 3);
+      assert.equal(calls[calls.length - 1], 'gemini-3.5-flash');
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  await t.test('callGemini fails fast on 400, 401, 403 without retrying or fallback', async () => {
+    const originalFetch = globalThis.fetch;
+    let callCount = 0;
+
+    for (const testStatus of [400, 401, 403]) {
+      callCount = 0;
+      globalThis.fetch = async () => {
+        callCount++;
+        return {
+          ok: false,
+          status: testStatus,
+          text: async () => `Auth/Client error ${testStatus}`,
+        };
+      };
+
+      try {
+        await assert.rejects(
+          async () => {
+            await callGemini({
+              apiKey: 'bad-key',
+              model: 'gemini-3.8-flash',
+              systemPrompt: 'System',
+              userPrompt: 'User',
+            });
+          },
+          (err) => {
+            assert.equal(err.status, testStatus);
+            return true;
+          }
+        );
+        // Must fail fast after exactly 1 call (no retries, no fallback models)
+        assert.equal(callCount, 1, `Status ${testStatus} must fail fast on first attempt`);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
   });
 });
 

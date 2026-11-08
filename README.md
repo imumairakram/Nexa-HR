@@ -280,7 +280,7 @@ flowchart TD
    * Scans email subjects, message bodies, and CV text for job codes (e.g., `JOB-101`) or matching role titles.
    * Matches candidate profiles against active job openings (`JobOpening.status === 'ACTIVE'`). Unmatched applications are safely held in the `UNMATCHED` audit queue for HR manual assignment.
 5. **Step B — Objective AI Scoring Engine (0–100)**:
-   * **Provider Agnostic**: Seamlessly operates with Google Gemini (`gemini-1.5-flash`), OpenAI (`gpt-4o-mini`), or Anthropic Claude.
+   * **Provider Agnostic**: Seamlessly operates with Google Gemini (`gemini-3.8-flash` default with automated fallback chain `gemini-3.8-flash` -> `gemini-3.5-flash` -> `gemini-3.1-flash-lite`), OpenAI (`gpt-4o-mini`), or Anthropic Claude.
    * **Prompt Injection Defense**: Untrusted CV text is encapsulated within `<untrusted_candidate_resume>` XML tags with strict system prompt boundaries.
    * **Anti-Bias & Fairness Enforcement**: Candidate names, genders, ages, races, nationalities, religions, and marital statuses are strictly excluded from the scoring prompt.
    * **Zod Schema Validation**: Evaluates candidate experience, core skills, education, and domain keywords, producing a structured JSON breakdown with recruiter strengths and identified gaps.
@@ -688,7 +688,8 @@ GMAIL_SEARCH_QUERY="is:unread has:attachment -label:NexaHR-Processed -label:Nexa
 # AI Provider Configuration (gemini | openai | anthropic)
 AI_PROVIDER="gemini"
 AI_API_KEY="your_ai_api_key"
-AI_MODEL="gemini-1.5-flash"
+# Default for Gemini is gemini-3.8-flash (fallback chain: gemini-3.8-flash -> gemini-3.5-flash -> gemini-3.1-flash-lite)
+AI_MODEL="gemini-3.8-flash"
 ATS_PASS_THRESHOLD=70
 ```
 
