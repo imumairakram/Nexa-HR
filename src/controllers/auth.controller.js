@@ -734,18 +734,54 @@ const forgotPassword = async (req, res) => {
       },
     });
 
-    // 6. Route dispatch: initiate notification dispatch in background so SMTP latency never blocks UI
+    // 6. Route dispatch: send OTP code via chosen channel
     const recipientName = `${user.firstName} ${user.lastName}`;
 
-    const dispatchPromise = (deliveryChannel === 'EMAIL')
-      ? sendEmailOTP(user.email, otp, recipientName)
-      : sendWhatsAppOTP(user.phone, otp, recipientName);
-
-    dispatchPromise.catch((err) => {
-      console.error(`[NOTIFICATION DISPATCH ERROR via ${deliveryChannel}]:`, err.message);
-    });
+    let dispatchResult = null;
+    try {
+      if (deliveryChannel === 'EMAIL') {
+        dispatchResult = await sendEmailOTP(user.email, otp, recipientName);
+      } else {
+        dispatchResult = await sendWhatsAppOTP(user.phone, otp, recipientName);
+      }
+    } catch (dispatchErr) {
+      console.error(`[NOTIFICATION DISPATCH ERROR via ${deliveryChannel}]:`, dispatchErr.message);
+      dispatchResult = { success: false, error: 'DISPATCH_ERROR', errorMessage: dispatchErr.message };
+    }
 
     const destination = deliveryChannel === 'WHATSAPP' ? maskPhone(user.phone) : maskEmail(user.email);
+
+    if (!dispatchResult || !dispatchResult.success) {
+      console.error(`[AUTH WARNING] Password recovery dispatch via ${deliveryChannel} failed:`, dispatchResult?.error || dispatchResult?.errorMessage);
+
+      if (process.env.NODE_ENV === 'production') {
+        const errorMsg = dispatchResult?.error === 'SMTP_NOT_CONFIGURED'
+          ? 'Corporate email service is not configured on the server. Please ensure SMTP_USER and SMTP_PASS environment variables are configured on Render.'
+          : (dispatchResult?.message || 'Failed to deliver verification email. Please check your email configuration or contact your system administrator.');
+
+        return res.status(503).json({
+          success: false,
+          code: dispatchResult?.error || 'DISPATCH_FAILED',
+          message: errorMsg,
+          data: {
+            destination,
+            channel: deliveryChannel,
+          },
+        });
+      }
+
+      // Non-production (dev/local without real SMTP configured): return previewOtp for developer convenience
+      return res.status(200).json({
+        success: true,
+        message: `[DEV NOTICE: SMTP dispatch simulated (${dispatchResult?.error || 'not configured'})] OTP generated.`,
+        data: {
+          destination,
+          channel: deliveryChannel,
+          expiresInMinutes: 10,
+          previewOtp: otp,
+        },
+      });
+    }
 
     return res.status(200).json({
       success: true,

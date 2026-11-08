@@ -75,23 +75,41 @@ function getMailTransporter() {
   }
 
   if (mailTransporter && !mailTransporter._isTestStub) return mailTransporter;
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT || '587', 10);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const secure = process.env.SMTP_SECURE === 'true' || port === 465;
 
-  if (host && user && pass) {
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || process.env.GMAIL_USER || '').trim();
+  const rawPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_PASS || '').trim();
+  // Strip spaces from Google App Passwords ('xxxx xxxx xxxx xxxx' -> 'xxxxxxxxxxxxxxxx')
+  const pass = rawPass.replace(/\s+/g, '');
+  const rawHost = (process.env.SMTP_HOST || (user.toLowerCase().endsWith('@gmail.com') ? 'smtp.gmail.com' : '')).trim();
+
+  if (!user || !pass) {
+    return null;
+  }
+
+  const isGmail = rawHost.toLowerCase().includes('gmail.com') || user.toLowerCase().endsWith('@gmail.com');
+
+  if (isGmail) {
     mailTransporter = nodemailer.createTransport({
-      host,
+      service: 'gmail',
+      auth: { user, pass },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+    });
+  } else if (rawHost) {
+    const port = parseInt(process.env.SMTP_PORT || '587', 10);
+    const secure = process.env.SMTP_SECURE === 'true' || port === 465;
+    mailTransporter = nodemailer.createTransport({
+      host: rawHost,
       port,
       secure,
       auth: { user, pass },
-      connectionTimeout: 8000,
-      greetingTimeout: 8000,
-      socketTimeout: 10000,
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
     });
   }
+
   return mailTransporter;
 }
 
@@ -100,12 +118,20 @@ function getMailTransporter() {
  * When using Gmail SMTP, envelope sender must strictly match SMTP_USER to avoid silent delivery drops
  */
 function getFromAddress(serviceName = 'NexaHR Security') {
-  const host = process.env.SMTP_HOST || '';
-  const emailFrom = process.env.EMAIL_FROM || process.env.SMTP_FROM || '';
-  if (host.includes('gmail.com') || emailFrom.includes('no-reply@nexahr.com') || !emailFrom) {
-    return `"${serviceName}" <${process.env.SMTP_USER}>`;
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || process.env.GMAIL_USER || '').trim();
+  const host = (process.env.SMTP_HOST || '').trim();
+  const emailFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
+
+  if (user && (host.toLowerCase().includes('gmail.com') || user.toLowerCase().endsWith('@gmail.com') || emailFrom.includes('no-reply@nexahr.com') || !emailFrom)) {
+    return `"${serviceName}" <${user}>`;
   }
-  return emailFrom;
+  if (emailFrom) {
+    return emailFrom;
+  }
+  if (user) {
+    return `"${serviceName}" <${user}>`;
+  }
+  return `"${serviceName}" <no-reply@nexahr.com>`;
 }
 
 /**
@@ -608,9 +634,7 @@ async function sendOnboardingWelcomeEmail({
 
   if (transporter && email) {
     try {
-      const from = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('no-reply@nexahr.com')
-        ? process.env.EMAIL_FROM
-        : `"NexaHR People Operations" <${process.env.SMTP_USER}>`;
+      const from = getFromAddress('NexaHR People Operations');
 
       const subject = `Welcome to NexaHR! Your Account Credentials [${employeeCode}]`;
       const text = buildWelcomeEmailText({
@@ -690,9 +714,7 @@ async function sendDocumentIssuedEmail({
 
   if (transporter && email) {
     try {
-      const from = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('no-reply@nexahr.com')
-        ? process.env.EMAIL_FROM
-        : `"NexaHR People Operations" <${process.env.SMTP_USER}>`;
+      const from = getFromAddress('NexaHR People Operations');
 
       const subject = `[Official Document Issued] ${documentTitle} - Ref: ${referenceNumber}`;
       const html = `
@@ -770,42 +792,63 @@ async function sendPasswordResetEmail({ email, name, resetUrl, expiresInHours = 
   console.log(`[NexaHR NOTIFICATION] Password reset link event dispatched to ${maskEmail(email)}.`);
 
   const transporter = getMailTransporter();
-  if (transporter) {
-    try {
-      const from = getFromAddress('NexaHR Security');
-      await transporter.sendMail({
-        from,
-        to: email,
-        subject: '[NexaHR Security] Password Reset Link',
-        html: `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
-            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 24px; border-radius: 8px; text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;">NexaHR Security</h1>
-              <p style="color: #94a3b8; margin: 6px 0 0; font-size: 13px;">Workforce Identity & Authentication</p>
-            </div>
-            <p style="font-size: 15px; color: #334155; margin-bottom: 16px;">Hello <strong>${name || 'Team Member'}</strong>,</p>
-            <p style="font-size: 14px; color: #475569; line-height: 1.6;">We received a request to reset the password for your NexaHR account. Click the button below to set a new password:</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetUrl}" style="background: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block;">Reset Password</a>
-            </div>
-            <p style="font-size: 13px; color: #64748b; line-height: 1.5;">This link will expire in <strong>${expiresInHours} hour(s)</strong>. If you did not request a password reset, you can safely ignore this email.</p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">NexaHR Enterprise Human Resource Management System</p>
-          </div>
-        `,
-      });
-    } catch (err) {
-      console.error('[EMAIL ERROR] Failed to send password reset email via SMTP:', err.message);
-    }
+  let messageId = null;
+
+  if (!transporter) {
+    console.error(`[EMAIL ERROR] SMTP transporter not configured on server (SMTP_USER/SMTP_PASS missing). Cannot dispatch reset link to ${maskEmail(email)}.`);
+    return {
+      success: false,
+      channel: 'EMAIL',
+      destination: maskEmail(email),
+      error: 'SMTP_NOT_CONFIGURED',
+      message: 'Email service is not configured on the server. Please verify SMTP credentials in server environment variables.',
+    };
   }
 
-  return {
-    success: true,
-    channel: 'EMAIL',
-    destination: maskEmail(email),
-    dispatchedAt: new Date().toISOString(),
-    message: `Password reset link dispatched to ${maskEmail(email)}.`,
-  };
+  try {
+    const from = getFromAddress('NexaHR Security');
+    const info = await transporter.sendMail({
+      from,
+      to: email,
+      subject: '[NexaHR Security] Password Reset Link',
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
+          <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 24px; border-radius: 8px; text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;">NexaHR Security</h1>
+            <p style="color: #94a3b8; margin: 6px 0 0; font-size: 13px;">Workforce Identity & Authentication</p>
+          </div>
+          <p style="font-size: 15px; color: #334155; margin-bottom: 16px;">Hello <strong>${name || 'Team Member'}</strong>,</p>
+          <p style="font-size: 14px; color: #475569; line-height: 1.6;">We received a request to reset the password for your NexaHR account. Click the button below to set a new password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" style="background: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block;">Reset Password</a>
+          </div>
+          <p style="font-size: 13px; color: #64748b; line-height: 1.5;">This link will expire in <strong>${expiresInHours} hour(s)</strong>. If you did not request a password reset, you can safely ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+          <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">NexaHR Enterprise Human Resource Management System</p>
+        </div>
+      `,
+    });
+
+    messageId = info?.messageId || null;
+    return {
+      success: true,
+      channel: 'EMAIL',
+      destination: maskEmail(email),
+      messageId,
+      dispatchedAt: new Date().toISOString(),
+      message: `Password reset link dispatched to ${maskEmail(email)}.`,
+    };
+  } catch (err) {
+    console.error('[EMAIL ERROR] Failed to send password reset email via SMTP:', err.message);
+    return {
+      success: false,
+      channel: 'EMAIL',
+      destination: maskEmail(email),
+      error: 'SMTP_DISPATCH_FAILED',
+      errorMessage: err.message,
+      message: `Failed to deliver password reset email: ${err.message}`,
+    };
+  }
 }
 
 /**
@@ -916,39 +959,53 @@ async function sendEmailOTP(email, otp, name = 'Team Member', expiryMinutes = 10
   const transporter = getMailTransporter();
   let messageId = null;
 
-  if (transporter) {
-    try {
-      const from = getFromAddress('NexaHR Security');
-      const subject = `[NexaHR] Your Verification Code: ${otp}`;
-      const text = `Your NexaHR verification code is: ${otp}. This code expires in ${expiryMinutes} minutes.\n\nSecurity Notice: If you did not initiate this recovery, please notify your HR Administrator immediately.\n\n— NexaHR Workforce Systems`;
-      const html = buildOtpEmailHtml({ name, otp, expiryMinutes });
-
-      const info = await transporter.sendMail({
-        from,
-        to: email,
-        subject,
-        text,
-        html,
-      });
-
-      messageId = info.messageId;
-      console.log(`[EMAIL SUCCESS] OTP email dispatched via SMTP to ${maskEmail(email)}. MessageId: ${messageId}`);
-    } catch (err) {
-      console.error(`[EMAIL ERROR] Failed to send email via SMTP to ${maskEmail(email)}:`, err.message);
-      // Fallback logging ensures uninterrupted flow in test/dev
-    }
-  } else {
-    console.log(`[EMAIL INFO] SMTP not configured. Simulating successful dispatch.`);
+  if (!transporter) {
+    console.error(`[EMAIL ERROR] SMTP transporter not configured on server (SMTP_USER/SMTP_PASS missing). Cannot dispatch OTP to ${maskEmail(email)}.`);
+    return {
+      success: false,
+      channel: 'EMAIL',
+      destination: maskEmail(email),
+      error: 'SMTP_NOT_CONFIGURED',
+      message: 'Email service is not configured on the server. Please verify SMTP credentials in server environment variables.',
+    };
   }
 
-  return {
-    success: true,
-    channel: 'EMAIL',
-    destination: maskEmail(email),
-    messageId,
-    dispatchedAt: timestamp,
-    message: `Security OTP successfully dispatched to corporate email ${maskEmail(email)}.`,
-  };
+  try {
+    const from = getFromAddress('NexaHR Security');
+    const subject = `[NexaHR] Your Verification Code: ${otp}`;
+    const text = `Your NexaHR verification code is: ${otp}. This code expires in ${expiryMinutes} minutes.\n\nSecurity Notice: If you did not initiate this recovery, please notify your HR Administrator immediately.\n\n— NexaHR Workforce Systems`;
+    const html = buildOtpEmailHtml({ name, otp, expiryMinutes });
+
+    const info = await transporter.sendMail({
+      from,
+      to: email,
+      subject,
+      text,
+      html,
+    });
+
+    messageId = info?.messageId || null;
+    console.log(`[EMAIL SUCCESS] OTP email dispatched via SMTP to ${maskEmail(email)}. MessageId: ${messageId}`);
+
+    return {
+      success: true,
+      channel: 'EMAIL',
+      destination: maskEmail(email),
+      messageId,
+      dispatchedAt: timestamp,
+      message: `Security OTP successfully dispatched to corporate email ${maskEmail(email)}.`,
+    };
+  } catch (err) {
+    console.error(`[EMAIL ERROR] Failed to send email via SMTP to ${maskEmail(email)}:`, err.message);
+    return {
+      success: false,
+      channel: 'EMAIL',
+      destination: maskEmail(email),
+      error: 'SMTP_DISPATCH_FAILED',
+      errorMessage: err.message,
+      message: `Failed to deliver verification email via SMTP: ${err.message}`,
+    };
+  }
 }
 
 /**
