@@ -88,6 +88,8 @@ model User {
   tickets         Ticket[]
   ticketReplies   TicketReply[]
   accountTransactions AccountTransaction[]
+  vaultUploads        VaultDocument[]       @relation("VaultUploader")
+  vaultIssuedDocs     VaultDocument[]       @relation("VaultIssuedTo")
 
   @@map("users")
 }
@@ -555,4 +557,54 @@ model RecruitmentTaxonomy {
   @@index([type])
   @@index([active])
   @@map("recruitment_taxonomies")
+}
+
+// ====================================================
+// DOCUMENT VAULT (ISSUED DOCS + COMPANY POLICIES)
+// ====================================================
+
+enum VaultDocumentKind {
+  ISSUED
+  POLICY
+}
+
+model VaultDocument {
+  id              String            @id @default(uuid())
+  kind            VaultDocumentKind // ISSUED | POLICY
+  referenceNumber String            @unique
+  title           String
+  type            String            // OFFER_LETTER, CONTRACT, NDA, GOVERNANCE, etc.
+  typeLabel       String?
+  description     String?
+  version         String?           // For policies: "v1.0 (2026)"
+  department      String?
+  issuer          String?
+  status          String            @default("VERIFIED") // VERIFIED | PENDING | DRAFT
+  size            String?
+  fileUrl         String?           // Cloudinary secure_url
+  cloudinaryId    String?           // Cloudinary public_id (for deletion)
+  mimeType        String?
+
+  // ISSUED doc fields
+  employeeId      String?           // References users.id (issued-to employee)
+  employeeName    String?
+  employeeCode    String?
+  employeeEmail   String?
+  designation     String?
+  expiryDate      DateTime?
+  notifyEmployee  Boolean           @default(true)
+  uploadedBy      String?           // Role: "HR" | "EMPLOYEE"
+
+  uploadedById    String            // The user who created this record
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  uploader        User              @relation("VaultUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  issuedTo        User?             @relation("VaultIssuedTo", fields: [employeeId], references: [id], onDelete: SetNull)
+
+  @@index([kind])
+  @@index([employeeId])
+  @@index([uploadedById])
+  @@index([createdAt])
+  @@map("vault_documents")
 }

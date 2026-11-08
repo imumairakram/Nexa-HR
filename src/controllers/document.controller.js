@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const prisma = require('../config/prisma');
 const {
   createInAppNotification,
@@ -7,124 +5,147 @@ const {
   sendDocumentIssuedEmail,
 } = require('../services/notification.service');
 
-const VAULT_FILE_PATH = path.join(__dirname, '../data/documents_vault.json');
+// ─── Type-label maps ────────────────────────────────────────────────────────
 
-// Default initial company policies (clean initial state)
-const DEFAULT_COMPANY_POLICIES = [];
+const ISSUED_TYPE_LABELS = {
+  OFFER_LETTER: 'Offer Letter',
+  CONTRACT: 'Employment Contract',
+  NDA: 'Confidentiality & NDA',
+  EXPERIENCE_LETTER: 'Experience & Relieving Letter',
+  INCREMENT_LETTER: 'Compensation Revision Letter',
+  WARNING_LETTER: 'Performance Advisory Notice',
+  CERTIFICATE: 'Professional Certificate',
+  CUSTOM: 'Official Document',
+};
 
-// Default initial issued documents (clean initial state)
-const DEFAULT_ISSUED_DOCS = [];
+const POLICY_CATEGORY_LABELS = {
+  GOVERNANCE: 'Corporate Governance',
+  BENEFITS: 'Benefits & Perks',
+  FINANCE: 'Finance & Reimbursement',
+  SECURITY: 'InfoSec & Compliance',
+  CONDUCT: 'Workplace Conduct',
+  LEAVE: 'Leave & Attendance Policy',
+};
 
-function readVaultData() {
-  try {
-    if (fs.existsSync(VAULT_FILE_PATH)) {
-      const raw = fs.readFileSync(VAULT_FILE_PATH, 'utf8');
-      const data = JSON.parse(raw);
-      return {
-        documents: Array.isArray(data.documents) ? data.documents : [],
-        policies: Array.isArray(data.policies) ? data.policies : [],
-      };
-    }
-  } catch (err) {
-    console.warn('[DOC VAULT WARNING] Failed to read vault file, initializing defaults:', err.message);
-  }
+// ─── Reference-number generator ─────────────────────────────────────────────
 
-  // Ensure directory exists
-  try {
-    const dir = path.dirname(VAULT_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const initial = {
-      documents: [],
-      policies: [],
-    };
-    fs.writeFileSync(VAULT_FILE_PATH, JSON.stringify(initial, null, 2), 'utf8');
-    return initial;
-  } catch (writeErr) {
-    console.error('[DOC VAULT ERROR] Could not create vault file:', writeErr.message);
-    return {
-      documents: [],
-      policies: [],
-    };
-  }
+function generateRef(prefix, suffix) {
+  return `NEXA-${prefix}-${suffix || new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`.toUpperCase();
 }
 
-function writeVaultData(data) {
-  try {
-    const dir = path.dirname(VAULT_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(VAULT_FILE_PATH, JSON.stringify(data, null, 2), 'utf8');
-  } catch (err) {
-    console.error('[DOC VAULT ERROR] Failed to persist vault file:', err.message);
-  }
+// ─── Helper: format a VaultDocument row for API response ────────────────────
+
+function formatDoc(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    title: row.title,
+    type: row.type,
+    typeLabel: row.typeLabel,
+    referenceNumber: row.referenceNumber,
+    description: row.description,
+    issuer: row.issuer,
+    department: row.department,
+    designation: row.designation,
+    version: row.version,
+    status: row.status,
+    size: row.size,
+    fileUrl: row.fileUrl,
+    cloudinaryId: row.cloudinaryId,
+    mimeType: row.mimeType,
+    // ISSUED fields
+    employeeId: row.employeeId,
+    employeeName: row.employeeName,
+    employeeCode: row.employeeCode,
+    employeeEmail: row.employeeEmail,
+    expiryDate: row.expiryDate,
+    uploadedBy: row.uploadedBy,
+    uploadedById: row.uploadedById,
+    issueDate: row.createdAt
+      ? new Date(row.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+      : null,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
 }
+
+function formatPolicy(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.type,
+    categoryLabel: row.typeLabel,
+    referenceNumber: row.referenceNumber,
+    description: row.description,
+    issuer: row.issuer,
+    department: row.department,
+    version: row.version,
+    status: row.status,
+    size: row.size,
+    fileUrl: row.fileUrl,
+    uploadedById: row.uploadedById,
+    updated: row.updatedAt
+      ? new Date(row.updatedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+      : null,
+    createdAt: row.createdAt,
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ISSUED DOCUMENTS
+// ════════════════════════════════════════════════════════════════════════════
 
 /**
- * Fetch all issued documents
  * GET /api/documents/issued
  */
 const getIssuedDocuments = async (req, res) => {
   try {
     const { employeeId, type, search } = req.query;
-    const vault = readVaultData();
-    let docs = vault.documents || [];
+    const userId = req.user?.id || req.user?.userId;
+    const isEmployee = req.user?.role === 'EMPLOYEE';
 
-    // If request is from normal employee, only return documents issued to them or global, or uploaded by them
-    if (req.user && req.user.role === 'EMPLOYEE') {
-      const userId = req.user.id || req.user.userId;
-      const userEmail = (req.user.email || '').toLowerCase();
-      const userEmpCode = (req.user.employeeCode || '').toLowerCase();
+    const where = { kind: 'ISSUED' };
 
-      docs = docs.filter((d) => {
-        if (d.employeeId === 'all') return true;
-        if (d.employeeId && d.employeeId === userId) return true;
-        if (userEmpCode && d.employeeCode && d.employeeCode.toLowerCase() === userEmpCode) return true;
-        if (userEmail && d.employeeEmail && d.employeeEmail.toLowerCase() === userEmail) return true;
-        return false;
-      });
+    if (isEmployee) {
+      // Employees see only docs issued to them
+      where.employeeId = userId;
     } else if (employeeId && employeeId !== 'ALL') {
-      docs = docs.filter((d) => d.employeeId === employeeId || d.employeeId === 'all');
+      where.employeeId = employeeId;
     }
 
     if (type && type !== 'ALL') {
-      docs = docs.filter((d) => d.type === type);
+      where.type = type;
     }
 
     if (search) {
       const q = search.toLowerCase().trim();
-      docs = docs.filter(
-        (d) =>
-          d.title?.toLowerCase().includes(q) ||
-          d.referenceNumber?.toLowerCase().includes(q) ||
-          d.employeeName?.toLowerCase().includes(q) ||
-          d.employeeCode?.toLowerCase().includes(q) ||
-          d.department?.toLowerCase().includes(q) ||
-          d.type?.toLowerCase().includes(q)
-      );
+      where.OR = [
+        { title:           { contains: q, mode: 'insensitive' } },
+        { referenceNumber: { contains: q, mode: 'insensitive' } },
+        { employeeName:    { contains: q, mode: 'insensitive' } },
+        { employeeCode:    { contains: q, mode: 'insensitive' } },
+        { department:      { contains: q, mode: 'insensitive' } },
+        { type:            { contains: q, mode: 'insensitive' } },
+      ];
     }
+
+    const docs = await prisma.vaultDocument.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
 
     return res.status(200).json({
       success: true,
-      data: {
-        documents: docs,
-        total: docs.length,
-      },
+      data: { documents: docs.map(formatDoc), total: docs.length },
     });
   } catch (error) {
     console.error('Error fetching issued documents:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve issued documents.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to retrieve issued documents.', error: error.message });
   }
 };
 
 /**
- * Issue a new document to an employee
  * POST /api/documents/issue
  */
 const issueDocument = async (req, res) => {
@@ -146,90 +167,54 @@ const issueDocument = async (req, res) => {
     } = req.body;
 
     if (!employeeId || !title) {
-      return res.status(400).json({
-        success: false,
-        message: 'Required fields missing: employeeId and title are mandatory.',
-      });
+      return res.status(400).json({ success: false, message: 'Required fields missing: employeeId and title are mandatory.' });
     }
 
-    // Resolve employee details from Prisma
+    const uploadedById = req.user?.id || req.user?.userId;
+
+    // Resolve employee details
     let targetUser = null;
     if (employeeId !== 'all') {
       targetUser = await prisma.user.findFirst({
-        where: {
-          OR: [{ id: employeeId }, { employeeCode: employeeId }],
-        },
-        include: {
-          profile: {
-            include: {
-              department: true,
-              designation: true,
-            },
-          },
-        },
+        where: { OR: [{ id: employeeId }, { employeeCode: employeeId }] },
+        include: { profile: { include: { department: true, designation: true } } },
       });
     }
 
-    const resolvedEmployeeName = targetUser
-      ? `${targetUser.firstName} ${targetUser.lastName}`.trim()
-      : employeeId === 'all'
-      ? 'All Active Employees'
-      : 'Company Team Member';
-
-    const resolvedEmployeeCode = targetUser?.employeeCode || (employeeId === 'all' ? 'ALL' : 'EMP-0000');
+    const resolvedName       = targetUser ? `${targetUser.firstName} ${targetUser.lastName}`.trim() : employeeId === 'all' ? 'All Active Employees' : 'Company Team Member';
+    const resolvedCode       = targetUser?.employeeCode || (employeeId === 'all' ? 'ALL' : 'EMP-0000');
     const resolvedDepartment = targetUser?.profile?.department?.name || 'Operations';
     const resolvedDesignation = targetUser?.profile?.designation?.title || 'Team Member';
-    const resolvedEmail = targetUser?.email || null;
+    const resolvedEmail      = targetUser?.email || null;
+    const resolvedTypeLabel  = typeLabel || ISSUED_TYPE_LABELS[type] || 'Official Document';
+    const refCode            = (referenceNumber || generateRef(type.substring(0, 3), resolvedCode)).toUpperCase();
 
-    // Type label resolution
-    const TYPE_LABELS = {
-      OFFER_LETTER: 'Offer Letter',
-      CONTRACT: 'Employment Contract',
-      NDA: 'Confidentiality & NDA',
-      EXPERIENCE_LETTER: 'Experience & Relieving Letter',
-      INCREMENT_LETTER: 'Compensation Revision Letter',
-      WARNING_LETTER: 'Performance Advisory Notice',
-      CERTIFICATE: 'Professional Certificate',
-      CUSTOM: 'Official Document',
-    };
+    const newDoc = await prisma.vaultDocument.create({
+      data: {
+        kind:            'ISSUED',
+        referenceNumber: refCode,
+        title:           title.trim(),
+        type,
+        typeLabel:       resolvedTypeLabel,
+        description:     description ? description.trim() : `Official ${resolvedTypeLabel} issued by ${issuer}.`,
+        issuer:          issuer.trim(),
+        department:      resolvedDepartment,
+        designation:     resolvedDesignation,
+        status:          status || 'VERIFIED',
+        size:            size || '1.8 MB',
+        fileUrl:         fileUrl || null,
+        employeeId:      targetUser ? targetUser.id : (employeeId === 'all' ? null : null),
+        employeeName:    resolvedName,
+        employeeCode:    resolvedCode,
+        employeeEmail:   resolvedEmail,
+        expiryDate:      expiryDate ? new Date(expiryDate) : null,
+        notifyEmployee:  Boolean(notifyEmployee),
+        uploadedBy:      'HR',
+        uploadedById,
+      },
+    });
 
-    const resolvedTypeLabel = typeLabel || TYPE_LABELS[type] || 'Official Document';
-    const refCode = (
-      referenceNumber || `NEXA-${type.substring(0, 3)}-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
-    ).toUpperCase();
-
-    const formattedDate = issueDate
-      ? new Date(issueDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-      : new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-
-    const newDoc = {
-      id: `DOC-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: title.trim(),
-      type,
-      typeLabel: resolvedTypeLabel,
-      referenceNumber: refCode,
-      employeeId: targetUser ? targetUser.id : employeeId,
-      employeeName: resolvedEmployeeName,
-      employeeCode: resolvedEmployeeCode,
-      employeeEmail: resolvedEmail,
-      department: resolvedDepartment,
-      designation: resolvedDesignation,
-      issueDate: formattedDate,
-      expiryDate: expiryDate || null,
-      size: size || '1.8 MB',
-      status: status || 'VERIFIED',
-      issuer: issuer.trim() || 'NexaHR People Operations',
-      description: description ? description.trim() : `Official ${resolvedTypeLabel} issued by ${issuer}.`,
-      fileUrl: fileUrl || null,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Save to Vault
-    const vault = readVaultData();
-    vault.documents = [newDoc, ...(vault.documents || [])];
-    writeVaultData(vault);
-
-    // Create in-app notification for the employee
+    // In-app notification
     if (targetUser?.id) {
       createInAppNotification({
         userId: targetUser.id,
@@ -241,182 +226,114 @@ const issueDocument = async (req, res) => {
       }).catch((e) => console.warn('Could not create in-app notification:', e.message));
     }
 
-    // Trigger email notification if employee has email and notifyEmployee is true
+    // Email notification
     if (notifyEmployee && resolvedEmail) {
       sendDocumentIssuedEmail({
         email: resolvedEmail,
-        name: resolvedEmployeeName,
+        name: resolvedName,
         documentTitle: newDoc.title,
         documentType: resolvedTypeLabel,
         referenceNumber: refCode,
         issuer: newDoc.issuer,
         portalUrl: 'https://nexa-hr-xi.vercel.app/employee/documents',
-      }).catch((emailErr) => {
-        console.error('[DOCUMENT EMAIL FAILED]', emailErr.message);
-      });
+      }).catch((e) => console.error('[DOCUMENT EMAIL FAILED]', e.message));
     }
 
     return res.status(201).json({
       success: true,
-      message: `Document "${newDoc.title}" issued successfully to ${resolvedEmployeeName}.`,
-      data: {
-        document: newDoc,
-      },
+      message: `Document "${newDoc.title}" issued successfully to ${resolvedName}.`,
+      data: { document: formatDoc(newDoc) },
     });
   } catch (error) {
     console.error('Error issuing document:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to issue document.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to issue document.', error: error.message });
   }
 };
 
 /**
- * Delete / Revoke an issued document
  * DELETE /api/documents/issued/:id
  */
 const deleteIssuedDocument = async (req, res) => {
   try {
     const { id } = req.params;
-    const vault = readVaultData();
-    const existing = vault.documents.find((d) => d.id === id);
+    const existing = await prisma.vaultDocument.findUnique({ where: { id } });
 
-    if (!existing) {
-      return res.status(404).json({
-        success: false,
-        message: 'Document record not found.',
-      });
+    if (!existing || existing.kind !== 'ISSUED') {
+      return res.status(404).json({ success: false, message: 'Document record not found.' });
     }
 
-    // Role check: If EMPLOYEE, verify ownership
-    if (req.user && req.user.role === 'EMPLOYEE') {
-      const userId = req.user.id || req.user.userId;
-      const userEmail = (req.user.email || '').toLowerCase();
-      const userEmpCode = (req.user.employeeCode || '').toLowerCase();
-      const isOwner =
-        existing.employeeId === userId ||
-        (userEmpCode && existing.employeeCode && existing.employeeCode.toLowerCase() === userEmpCode) ||
-        (userEmail && existing.employeeEmail && existing.employeeEmail.toLowerCase() === userEmail);
-
-      if (!isOwner) {
-        return res.status(403).json({
-          success: false,
-          message: 'You only have permission to delete documents belonging to your personal vault.',
-        });
+    // Role check: employees can only delete their own docs
+    if (req.user?.role === 'EMPLOYEE') {
+      const userId = req.user?.id || req.user?.userId;
+      if (existing.employeeId !== userId) {
+        return res.status(403).json({ success: false, message: 'You only have permission to delete documents belonging to your personal vault.' });
       }
     }
 
-    vault.documents = vault.documents.filter((d) => d.id !== id);
-    writeVaultData(vault);
+    await prisma.vaultDocument.delete({ where: { id } });
 
-    return res.status(200).json({
-      success: true,
-      message: `Document "${existing.title}" successfully removed from vault.`,
-    });
+    return res.status(200).json({ success: true, message: `Document "${existing.title}" successfully removed from vault.` });
   } catch (error) {
     console.error('Error deleting document:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to delete document.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to delete document.', error: error.message });
   }
 };
 
 /**
- * Upload an employee certificate or document
- * POST /api/documents/upload
+ * POST /api/documents/upload  (employee self-upload)
  */
 const uploadEmployeeDocument = async (req, res) => {
   try {
-    const {
-      title,
-      type = 'CERTIFICATE',
-      typeLabel,
-      issuer,
-      description,
-      size,
-      fileUrl,
-    } = req.body;
+    const { title, type = 'CERTIFICATE', typeLabel, issuer, description, size, fileUrl } = req.body;
 
     if (!title || !title.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Document title is required.',
-      });
+      return res.status(400).json({ success: false, message: 'Document title is required.' });
     }
 
-    const userId = req.user.id || req.user.userId;
+    const userId = req.user?.id || req.user?.userId;
 
     let user = null;
     try {
       user = await prisma.user.findUnique({
         where: { id: userId },
-        include: {
-          profile: {
-            include: {
-              department: true,
-              designation: true,
-            },
-          },
-        },
+        include: { profile: { include: { department: true, designation: true } } },
       });
     } catch (err) {
-      console.warn('Could not fetch user profile details for upload:', err.message);
+      console.warn('Could not fetch user profile for upload:', err.message);
     }
 
-    const resolvedName = user
-      ? `${user.firstName} ${user.lastName}`.trim()
-      : req.user.fullName || 'Employee';
-    const resolvedCode = user?.employeeCode || req.user.employeeCode || 'EMP';
-    const resolvedDept = user?.profile?.department?.name || 'General';
+    const resolvedName       = user ? `${user.firstName} ${user.lastName}`.trim() : req.user?.fullName || 'Employee';
+    const resolvedCode       = user?.employeeCode || req.user?.employeeCode || 'EMP';
+    const resolvedDept       = user?.profile?.department?.name || 'General';
     const resolvedDesignation = user?.profile?.designation?.title || 'Team Member';
-    const resolvedEmail = user?.email || req.user.email || null;
+    const resolvedEmail      = user?.email || req.user?.email || null;
+    const resolvedTypeLabel  = typeLabel || ISSUED_TYPE_LABELS[type] || 'Professional Certificate';
+    const prefix             = (type || 'CRT').substring(0, 3).toUpperCase();
+    const refCode            = `NEXA-${prefix}-${resolvedCode}-${Date.now().toString().slice(-4)}`.toUpperCase();
 
-    const TYPE_LABELS = {
-      CERTIFICATE: 'Professional Certificate',
-      IDENTIFICATION: 'National ID / Passport',
-      CONTRACT: 'Employment Agreement',
-      OFFER_LETTER: 'Offer Letter',
-      ACADEMIC: 'Academic Degree & Diploma',
-      TAX_FORM: 'Tax Form',
-      CUSTOM: 'Official Document',
-    };
+    const newDoc = await prisma.vaultDocument.create({
+      data: {
+        kind:            'ISSUED',
+        referenceNumber: refCode,
+        title:           title.trim(),
+        type:            type || 'CERTIFICATE',
+        typeLabel:       resolvedTypeLabel,
+        description:     description ? description.trim() : `Verified ${resolvedTypeLabel} uploaded to NexaHR vault.`,
+        issuer:          issuer ? issuer.trim() : 'Verified Self-Submission',
+        department:      resolvedDept,
+        designation:     resolvedDesignation,
+        status:          'VERIFIED',
+        size:            size || '1.4 MB',
+        fileUrl:         fileUrl || null,
+        employeeId:      userId,
+        employeeName:    resolvedName,
+        employeeCode:    resolvedCode,
+        employeeEmail:   resolvedEmail,
+        uploadedBy:      'EMPLOYEE',
+        uploadedById:    userId,
+      },
+    });
 
-    const resolvedTypeLabel = typeLabel || TYPE_LABELS[type] || 'Professional Certificate';
-    const prefix = (type || 'CRT').substring(0, 3).toUpperCase();
-    const refCode = `NEXA-${prefix}-${resolvedCode}-${Date.now().toString().slice(-4)}`;
-
-    const newDoc = {
-      id: `DOC-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: title.trim(),
-      type: type || 'CERTIFICATE',
-      typeLabel: resolvedTypeLabel,
-      referenceNumber: refCode,
-      employeeId: userId,
-      employeeName: resolvedName,
-      employeeCode: resolvedCode,
-      employeeEmail: resolvedEmail,
-      department: resolvedDept,
-      designation: resolvedDesignation,
-      issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      expiryDate: null,
-      size: size || '1.4 MB',
-      status: 'VERIFIED',
-      issuer: issuer ? issuer.trim() : 'Verified Self-Submission',
-      description: description ? description.trim() : `Verified ${resolvedTypeLabel} uploaded to NexaHR vault.`,
-      fileUrl: fileUrl || null,
-      uploadedBy: 'EMPLOYEE',
-      createdAt: new Date().toISOString(),
-    };
-
-    const vault = readVaultData();
-    vault.documents = [newDoc, ...(vault.documents || [])];
-    writeVaultData(vault);
-
-    // Notify HR & Admins
     broadcastInAppNotification({
       title: `Certificate Uploaded: ${newDoc.title}`,
       message: `${resolvedName} (${resolvedCode}) uploaded a new ${resolvedTypeLabel}.`,
@@ -428,102 +345,93 @@ const uploadEmployeeDocument = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: `Document "${newDoc.title}" successfully uploaded and verified in vault.`,
-      data: {
-        document: newDoc,
-      },
+      data: { document: formatDoc(newDoc) },
     });
   } catch (error) {
     console.error('Error uploading employee document:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to upload document.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to upload document.', error: error.message });
   }
 };
 
+// ════════════════════════════════════════════════════════════════════════════
+// COMPANY POLICIES
+// ════════════════════════════════════════════════════════════════════════════
+
 /**
- * Fetch all company policies
  * GET /api/documents/policies
  */
 const getCompanyPolicies = async (req, res) => {
   try {
-    const vault = readVaultData();
+    const policies = await prisma.vaultDocument.findMany({
+      where: { kind: 'POLICY' },
+      orderBy: { createdAt: 'desc' },
+    });
+
     return res.status(200).json({
       success: true,
-      data: {
-        policies: vault.policies || [],
-        total: (vault.policies || []).length,
-      },
+      data: { policies: policies.map(formatPolicy), total: policies.length },
     });
   } catch (error) {
     console.error('Error fetching policies:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve company policies.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to retrieve company policies.', error: error.message });
   }
 };
 
 /**
- * Publish a new company policy
  * POST /api/documents/policies
  */
 const publishCompanyPolicy = async (req, res) => {
   try {
+    // Only ADMIN and HR_MANAGER may publish policies
+    const callerRole = req.user?.role;
+    if (!['ADMIN', 'HR_MANAGER'].includes(callerRole)) {
+      return res.status(403).json({ success: false, message: 'Only ADMIN and HR_MANAGER may publish company policies.' });
+    }
+
     const {
       title,
       category = 'GOVERNANCE',
       categoryLabel,
-      version = 'v1.0 (2026)',
+      version = `v1.0 (${new Date().getFullYear()})`,
       issuer = 'NexaHR Executive Board',
       department = 'Company-Wide (All Offices)',
       description,
       size = '1.8 MB',
+      fileUrl,
       notifyAll = false,
     } = req.body;
 
     if (!title || !description) {
-      return res.status(400).json({
-        success: false,
-        message: 'Title and description are required to publish a corporate policy.',
-      });
+      return res.status(400).json({ success: false, message: 'Title and description are required to publish a corporate policy.' });
     }
 
-    const CATEGORY_LABELS = {
-      GOVERNANCE: 'Corporate Governance',
-      BENEFITS: 'Benefits & Perks',
-      FINANCE: 'Finance & Reimbursement',
-      SECURITY: 'InfoSec & Compliance',
-      CONDUCT: 'Workplace Conduct',
-      LEAVE: 'Leave & Attendance Policy',
-    };
+    const uploadedById  = req.user?.id || req.user?.userId;
+    const refCode       = generateRef(category.substring(0, 3), new Date().getFullYear()).toUpperCase();
+    const resolvedLabel = categoryLabel || POLICY_CATEGORY_LABELS[category] || 'Corporate Policy';
 
-    const newPolicy = {
-      id: `POL-${Math.floor(10 + Math.random() * 90)}`,
-      title: title.trim(),
-      category,
-      categoryLabel: categoryLabel || CATEGORY_LABELS[category] || 'Corporate Policy',
-      version: version.trim() || 'v1.0 (2026)',
-      size: size || '1.8 MB',
-      updated: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      issuer: issuer.trim() || 'NexaHR Executive Board',
-      department: department.trim() || 'Company-Wide (All Offices)',
-      description: description.trim(),
-      status: 'ACTIVE',
-      createdAt: new Date().toISOString(),
-    };
+    const newPolicy = await prisma.vaultDocument.create({
+      data: {
+        kind:            'POLICY',
+        referenceNumber: refCode,
+        title:           title.trim(),
+        type:            category,
+        typeLabel:       resolvedLabel,
+        description:     description.trim(),
+        version:         version.trim(),
+        issuer:          issuer.trim(),
+        department:      department.trim(),
+        status:          'ACTIVE',
+        size:            size || '1.8 MB',
+        fileUrl:         fileUrl || null,
+        uploadedBy:      'HR',
+        uploadedById,
+      },
+    });
 
-    const vault = readVaultData();
-    vault.policies = [newPolicy, ...(vault.policies || [])];
-    writeVaultData(vault);
-
-    // Optional notification broadcast
     if (notifyAll) {
       broadcastInAppNotification({
         title: `New Policy Published: ${newPolicy.title}`,
-        message: `An official corporate policy handbook (${newPolicy.categoryLabel}) has been published for all employees.`,
+        message: `An official corporate policy (${resolvedLabel}) has been published for all employees.`,
         type: 'info',
         category: 'GENERAL',
         link: '/employee/documents',
@@ -533,51 +441,32 @@ const publishCompanyPolicy = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: `Corporate policy "${newPolicy.title}" published successfully.`,
-      data: {
-        policy: newPolicy,
-      },
+      data: { policy: formatPolicy(newPolicy) },
     });
   } catch (error) {
     console.error('Error publishing policy:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to publish corporate policy.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to publish corporate policy.', error: error.message });
   }
 };
 
 /**
- * Delete a company policy
  * DELETE /api/documents/policies/:id
  */
 const deleteCompanyPolicy = async (req, res) => {
   try {
     const { id } = req.params;
-    const vault = readVaultData();
-    const existing = vault.policies.find((p) => p.id === id);
+    const existing = await prisma.vaultDocument.findUnique({ where: { id } });
 
-    if (!existing) {
-      return res.status(404).json({
-        success: false,
-        message: 'Policy handbook not found.',
-      });
+    if (!existing || existing.kind !== 'POLICY') {
+      return res.status(404).json({ success: false, message: 'Policy handbook not found.' });
     }
 
-    vault.policies = vault.policies.filter((p) => p.id !== id);
-    writeVaultData(vault);
+    await prisma.vaultDocument.delete({ where: { id } });
 
-    return res.status(200).json({
-      success: true,
-      message: `Policy "${existing.title}" successfully deleted.`,
-    });
+    return res.status(200).json({ success: true, message: `Policy "${existing.title}" successfully deleted.` });
   } catch (error) {
     console.error('Error deleting policy:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to delete policy.',
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: 'Failed to delete policy.', error: error.message });
   }
 };
 
