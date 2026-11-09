@@ -593,14 +593,13 @@ const EmployeeProfile = () => {
                     {formData.firstName || 'Employee'} {formData.lastName || ''}
                   </h2>
                   {formData.empCode && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-mono font-bold">
                       <span>{formData.empCode}</span>
                     </span>
                   )}
                   {formData.employmentType && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 text-xs font-semibold border border-white/10">
-                      {formData.employmentType}
+                    <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                      <span>{formData.employmentType}</span>
                     </span>
                   )}
                 </div>

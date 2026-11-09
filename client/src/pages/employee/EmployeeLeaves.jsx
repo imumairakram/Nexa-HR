@@ -359,15 +359,15 @@ const EmployeeLeaves = () => {
               Track your remaining annual vacation, medical days, and casual leave quotas. Applications are routed live for management review.
             </p>
 
-            <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold pt-1">
-              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/70 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves})</span>
               </span>
-              <span className="flex items-center text-teal-700 dark:text-teal-300 font-bold bg-teal-100/70 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{stats.approved} Leaves Approved</span>
               </span>
               {stats.pending > 0 && (
-                <span className="flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-100/70 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60 animate-pulse">
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 animate-pulse">
                   <span>{stats.pending} Request{stats.pending > 1 ? 's' : ''} Pending Review</span>
                 </span>
               )}

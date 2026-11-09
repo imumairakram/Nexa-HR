@@ -440,15 +440,13 @@ const EmployeeDashboard = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Column: Greeting & Digital Clock */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-400 text-xs font-bold border border-white/10">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{employeeShift}</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-emerald-200 text-xs font-bold border border-emerald-400/30">
-                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{currentUser?.profile?.workLocation || currentUser?.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
-              </div>
+              </span>
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight leading-tight whitespace-nowrap">

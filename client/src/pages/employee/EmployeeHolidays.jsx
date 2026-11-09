@@ -99,15 +99,16 @@ const EmployeeHolidays = () => {
                   'Official paid public holiday observed across all company offices and duty stations. Attendance engines resume normal operations on the next working morning.'}
               </p>
 
-              <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-200/70 font-medium pt-1">
-                <span className="flex items-center gap-1.5 text-emerald-100 font-semibold">
-                  <Calendar className="w-3.5 h-3.5 text-emerald-300" />
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                   <span>{featuredHoliday.displayDate} ({featuredHoliday.day})</span>
                 </span>
-                <span>•</span>
-                <span className="text-emerald-300 font-bold">Paid Non-Working Day</span>
-                <span>•</span>
-                <span className="text-emerald-200/60 font-mono">Timezone: {timezone}</span>
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span>Paid Non-Working Day</span>
+                </span>
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span>Timezone: {timezone}</span>
+                </span>
               </div>
             </div>
 

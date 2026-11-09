@@ -385,13 +385,15 @@ const EmployeeSettings = () => {
                 Timezone: <span className="font-mono font-bold text-slate-600 dark:text-slate-300">{formState.timezone}</span>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                {formatDate(new Date(), formState.dateFormat, formState.timezone)} •{' '}
-                {formatTime(new Date(), true, formState.timezone, formState.timeFormat)}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 font-mono">
+                <span>
+                  {formatDate(new Date(), formState.dateFormat, formState.timezone)} •{' '}
+                  {formatTime(new Date(), true, formState.timezone, formState.timeFormat)}
+                </span>
               </span>
-              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                {formatCurrency(150000, formState.currency)}
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 font-mono">
+                <span>{formatCurrency(150000, formState.currency)}</span>
               </span>
             </div>
           </div>
