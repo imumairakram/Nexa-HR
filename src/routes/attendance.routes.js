@@ -7,6 +7,7 @@ const {
   getMyLogs,
   getCompanyAttendance,
   punchAllUsersToday,
+  punchSelf,
 } = require('../controllers/attendance.controller');
 const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
@@ -20,8 +21,9 @@ router.post('/hardware-sync', hardwareSyncRateLimiter, hardwareSync);
 router.get('/simulate-punch/status', verifyToken, checkRole('ADMIN'), getSimulatePunchStatus);
 router.post('/simulate-punch', verifyToken, checkRole('ADMIN'), blockDemo, simulatePunch);
 
-// Employee Self-Service Logs
+// Employee Self-Service Logs & Direct Punch
 router.get('/my-logs', verifyToken, cacheService.middleware({ ttlSeconds: 60, tags: ['attendance'] }), getMyLogs);
+router.post('/punch', verifyToken, punchSelf);
 
 // Admin/HR Attendance Overview
 router.get('/', verifyToken, checkRole('ADMIN', 'HR_MANAGER'), cacheService.middleware({ ttlSeconds: 60, tags: ['attendance'] }), getCompanyAttendance);

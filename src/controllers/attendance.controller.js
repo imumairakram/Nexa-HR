@@ -466,6 +466,50 @@ const punchAllUsersToday = async (req, res) => {
   }
 };
 
+/**
+ * Employee Self-Service Attendance Punch (Web Clock-In / Clock-Out)
+ * POST /api/attendance/punch
+ */
+const punchSelf = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user.userId;
+    let employeeCode = req.user.employeeCode;
+
+    if (!employeeCode) {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { employeeCode: true, isActive: true },
+      });
+      if (!dbUser || !dbUser.employeeCode) {
+        return res.status(400).json({
+          success: false,
+          message: 'Employee record or employee code not assigned. Please contact HR.',
+        });
+      }
+      employeeCode = dbUser.employeeCode;
+    }
+
+    const { type, notes } = req.body;
+    const punchType = (type || 'IN').toUpperCase().trim();
+    const timestamp = req.body.timestamp || new Date().toISOString();
+
+    return await processAttendancePunch({
+      employeeCode,
+      timestamp,
+      type: punchType,
+      sourceNote: notes || 'Web Portal Punch',
+      res,
+    });
+  } catch (error) {
+    console.error('Error in punchSelf:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to record attendance punch.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   hardwareSync,
   simulatePunch,
@@ -473,4 +517,5 @@ module.exports = {
   getMyLogs,
   getCompanyAttendance,
   punchAllUsersToday,
+  punchSelf,
 };

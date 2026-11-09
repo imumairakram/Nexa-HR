@@ -437,6 +437,17 @@ export const api = {
     return await fetchAPI(`/attendance/my-logs${query ? `?${query}` : ''}`);
   },
 
+  punchAttendance: async (payload = {}) => {
+    return await fetchAPI('/attendance/punch', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: payload.type || 'IN',
+        timestamp: payload.timestamp || new Date().toISOString(),
+        notes: payload.notes || 'Web Portal Self-Punch',
+      }),
+    });
+  },
+
   simulatePunch: async (payload) => {
     return await fetchAPI('/attendance/simulate-punch', {
       method: 'POST',

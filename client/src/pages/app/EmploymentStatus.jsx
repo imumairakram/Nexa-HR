@@ -47,7 +47,7 @@ const getAvatarUrl = (emp) => {
       if (scoped && typeof scoped === 'string' && scoped.trim() !== '' && !scoped.includes('unsplash')) {
         return scoped;
       }
-    } catch {}
+    } catch { }
   }
   // 4. Check active session user if matches this employee
   try {
@@ -64,7 +64,7 @@ const getAvatarUrl = (emp) => {
         return scopedCurrent;
       }
     }
-  } catch {}
+  } catch { }
 
   return DEFAULT_BLANK_AVATAR;
 };
@@ -191,7 +191,7 @@ const EmploymentStatus = () => {
   const handleOpenEdit = (emp) => {
     const isProbation = emp.profile?.joiningDate && (new Date() - new Date(emp.profile.joiningDate)) < 90 * 24 * 60 * 60 * 1000;
     const defaultType = emp.profile?.employmentType || (emp.role === 'ADMIN' ? 'FULL_TIME' : (emp.isActive ? (isProbation ? 'PROBATION' : 'FULL_TIME') : 'CONTRACT'));
-    
+
     setSelectedEmp({
       id: emp.id,
       employeeCode: emp.employeeCode || `EMP-${emp.id.slice(0, 4)}`,
@@ -359,11 +359,11 @@ const EmploymentStatus = () => {
               Manage permanent full-time agreements, remote engineering contracts, shift schedules, and 90-day probationary review milestones.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/70 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{stats.total} Total Active Personnel</span>
               </span>
-              <span className="flex items-center text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{stats.probation} Contracts / Probation</span>
               </span>
             </div>
@@ -481,11 +481,10 @@ const EmploymentStatus = () => {
             <button
               type="button"
               onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                typeFilter !== 'ALL'
-                  ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
-              }`}
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${typeFilter !== 'ALL'
+                ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
+                : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
+                }`}
               title="Filter by Employment Type"
             >
               <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
@@ -493,20 +492,19 @@ const EmploymentStatus = () => {
                 {typeFilter === 'ALL'
                   ? 'Filter'
                   : typeFilter === 'FULL_TIME'
-                  ? 'Full Time'
-                  : typeFilter === 'REMOTE'
-                  ? 'Remote'
-                  : typeFilter === 'CONTRACT'
-                  ? 'Contract'
-                  : 'Probation'}
+                    ? 'Full Time'
+                    : typeFilter === 'REMOTE'
+                      ? 'Remote'
+                      : typeFilter === 'CONTRACT'
+                        ? 'Contract'
+                        : 'Probation'}
               </span>
               <span className="inline sm:hidden">
                 {typeFilter === 'ALL' ? 'Filter' : typeFilter.replace('_', ' ')}
               </span>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                  showFilterMenu ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showFilterMenu ? 'rotate-180' : ''
+                  }`}
               />
               {typeFilter !== 'ALL' && (
                 <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
@@ -539,28 +537,25 @@ const EmploymentStatus = () => {
                           setTypeFilter(key);
                           setShowFilterMenu(false);
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                        }`}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSelected
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                          }`}
                       >
                         <div className="flex items-center gap-2">
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              isSelected
-                                ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                : 'bg-slate-300 dark:bg-slate-600'
-                            }`}
+                            className={`w-1.5 h-1.5 rounded-full ${isSelected
+                              ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
+                              : 'bg-slate-300 dark:bg-slate-600'
+                              }`}
                           />
                           <span>{label}</span>
                         </div>
                         <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
-                            isSelected
-                              ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                              : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                          }`}
+                          className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSelected
+                            ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                            }`}
                         >
                           {count}
                         </span>
@@ -950,10 +945,10 @@ const EmploymentStatus = () => {
                     {selectedEmp.employmentType === 'FULL_TIME'
                       ? 'FT'
                       : selectedEmp.employmentType === 'REMOTE'
-                      ? 'RM'
-                      : selectedEmp.employmentType === 'CONTRACT'
-                      ? 'CT'
-                      : 'PR'}
+                        ? 'RM'
+                        : selectedEmp.employmentType === 'CONTRACT'
+                          ? 'CT'
+                          : 'PR'}
                   </div>
                   <div className="min-w-0">
                     <div className="font-extrabold text-slate-900 dark:text-white text-sm truncate">
@@ -965,15 +960,14 @@ const EmploymentStatus = () => {
                   </div>
                 </div>
                 <span
-                  className={`text-xs font-extrabold px-3.5 py-1.5 rounded-full border shrink-0 inline-flex items-center gap-1.5 self-start sm:self-auto ${
-                    selectedEmp.employmentType === 'FULL_TIME'
-                      ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                      : selectedEmp.employmentType === 'REMOTE'
+                  className={`text-xs font-extrabold px-3.5 py-1.5 rounded-full border shrink-0 inline-flex items-center gap-1.5 self-start sm:self-auto ${selectedEmp.employmentType === 'FULL_TIME'
+                    ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                    : selectedEmp.employmentType === 'REMOTE'
                       ? 'bg-indigo-100/80 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
                       : selectedEmp.employmentType === 'CONTRACT'
-                      ? 'bg-blue-100/80 text-blue-800 dark:bg-blue-300 border-blue-200 dark:border-blue-800'
-                      : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                  }`}
+                        ? 'bg-blue-100/80 text-blue-800 dark:bg-blue-300 border-blue-200 dark:border-blue-800'
+                        : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                    }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
                   <span>{selectedEmp.employmentType.replace('_', ' ')}</span>

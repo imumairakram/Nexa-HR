@@ -155,14 +155,12 @@ const Jobs = () => {
               Manage open positions, headhunting pipelines, compensation bands, requirements, and job postings across external talent boards.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
-                
-<span>{jobs.filter((j) => j.status === 'ACTIVE').length} Active Requisitions</span>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{jobs.filter((j) => j.status === 'ACTIVE').length} Active Requisitions</span>
               </span>
-              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                
-<span>{jobs.reduce((acc, j) => acc + j.applicants, 0)} Total Candidates</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{jobs.reduce((acc, j) => acc + j.applicants, 0)} Total Candidates</span>
               </span>
             </div>
           </div>
@@ -319,11 +317,10 @@ const Jobs = () => {
                   </span>
 
                   <span
-                    className={`text-[10px] font-extrabold px-2.5 py-1 rounded-xl uppercase ${
-                      job.status === 'ACTIVE'
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                        : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                    }`}
+                    className={`text-[10px] font-extrabold px-2.5 py-1 rounded-xl uppercase ${job.status === 'ACTIVE'
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                      : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                      }`}
                   >
                     {job.status}
                   </span>

@@ -623,9 +623,9 @@ const Attendance = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC BIOMETRIC HERO BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-300/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           {/* Left Side: Biometric Telemetry */}
@@ -639,22 +639,22 @@ const Attendance = () => {
               and monitor individual and organization-wide workforce compliance.
             </p>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{totalDaysPresent} Staff Verified This Month</span>
               </span>
-              <span className="flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{lateArrivals} Late Arrivals</span>
               </span>
-              <span className="flex items-center text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/60 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{onLeaveCount} Leave Records</span>
               </span>
             </div>
           </div>
 
           {/* Right Side: Action Card */}
-          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[260px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[260px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <Cpu className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -669,7 +669,7 @@ const Attendance = () => {
               <button
                 onClick={handleSyncHardware}
                 disabled={isSyncing}
-                className="w-full px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="w-full px-4 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>{isSyncing ? 'Syncing...' : 'Sync Biometric Logs'}</span>
@@ -682,7 +682,7 @@ const Attendance = () => {
             <button
               onClick={handleSyncHardware}
               disabled={isSyncing}
-              className="flex-1 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+              className="flex-1 py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? 'Syncing...' : 'Sync Biometric Logs'}</span>
@@ -766,12 +766,12 @@ const Attendance = () => {
       {loading ? (
         <TableSkeleton rows={6} cols={selectedEmployee === 'ALL' ? 5 : 4} />
       ) : (
-        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-emerald-950/40 overflow-hidden transition-all">
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 overflow-hidden transition-all">
           {/* Header with Title & Month Navigation Controls */}
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/40 flex items-center justify-center text-sky-600 dark:text-sky-400">
                   <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
@@ -799,7 +799,7 @@ const Attendance = () => {
                   type="button"
                   onClick={handlePrevMonth}
                   title="Previous Month"
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -811,7 +811,7 @@ const Attendance = () => {
                     onClick={() => setShowMonthMenu((prev) => !prev)}
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
                   >
-                    <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
                     <span>{selectedMonthLabel}</span>
                     <ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
@@ -835,17 +835,17 @@ const Attendance = () => {
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
-                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
                             }`}
                           >
                             <span>{mItem.label}</span>
                             {mItem.isCurrent ? (
-                              <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                              <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300">
                                 Current
                               </span>
                             ) : isSelected ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                             ) : null}
                           </button>
                         );
@@ -862,7 +862,7 @@ const Attendance = () => {
                   className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
                     isNextDisabled
                       ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-40'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer'
                   }`}
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -874,7 +874,7 @@ const Attendance = () => {
                 <button
                   type="button"
                   onClick={handleJumpToCurrent}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 cursor-pointer transition-all shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50 hover:bg-sky-100 dark:hover:bg-sky-900/40 cursor-pointer transition-all shadow-2xs"
                 >
                   <RotateCcw className="w-3 h-3" />
                   <span>Current Month</span>
@@ -915,11 +915,11 @@ const Attendance = () => {
                   onClick={() => setShowEmployeeMenu((prev) => !prev)}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
                     selectedEmployee !== 'ALL'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-emerald-300'
+                      ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
+                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-sky-300'
                   }`}
                 >
-                  <Users className="w-3.5 h-3.5 text-emerald-500" />
+                  <Users className="w-3.5 h-3.5 text-sky-500" />
                   <span className="max-w-[130px] sm:max-w-[160px] truncate">
                     {selectedEmployee === 'ALL'
                       ? 'All Employees'
@@ -938,7 +938,7 @@ const Attendance = () => {
                           value={employeeSearch}
                           onChange={(e) => setEmployeeSearch(e.target.value)}
                           placeholder="Search employee..."
-                          className="w-full pl-8 pr-2 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          className="w-full pl-8 pr-2 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
                         />
                       </div>
                     </div>
@@ -953,12 +953,12 @@ const Attendance = () => {
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all cursor-pointer ${
                           selectedEmployee === 'ALL'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-emerald-500" />
+                          <Users className="w-4 h-4 text-sky-500" />
                           <span>All Employees (Overview)</span>
                         </div>
                         <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
@@ -981,12 +981,12 @@ const Attendance = () => {
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all cursor-pointer ${
                               isSelected
-                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                             }`}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
                                 {getInitials(emp.firstName, emp.lastName)}
                               </div>
                               <div className="text-left min-w-0">
@@ -999,7 +999,7 @@ const Attendance = () => {
                               </div>
                             </div>
                             {isSelected && (
-                              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 ml-1" />
+                              <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0 ml-1" />
                             )}
                           </button>
                         );
@@ -1016,8 +1016,8 @@ const Attendance = () => {
                   onClick={() => setShowDepartmentMenu((prev) => !prev)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
                     selectedDepartment !== 'ALL'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-emerald-300'
+                      ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
+                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-sky-300'
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5 text-slate-400" />
@@ -1040,13 +1040,13 @@ const Attendance = () => {
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                         selectedDepartment === 'ALL'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
                       <span>All Departments</span>
                       {selectedDepartment === 'ALL' && (
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        <Check className="w-3.5 h-3.5 text-sky-500" />
                       )}
                     </button>
                     {departmentList.map((dept) => (
@@ -1059,13 +1059,13 @@ const Attendance = () => {
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           selectedDepartment === dept
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <span className="truncate">{dept}</span>
                         {selectedDepartment === dept && (
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <Check className="w-3.5 h-3.5 text-sky-500" />
                         )}
                       </button>
                     ))}
@@ -1081,7 +1081,7 @@ const Attendance = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search records, staff..."
-                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -1101,8 +1101,8 @@ const Attendance = () => {
                   onClick={() => setShowFilterMenu((prev) => !prev)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
                     statusFilter !== 'ALL'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300'
+                      ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
+                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300'
                   }`}
                 >
                   <Filter className="w-3.5 h-3.5" />
@@ -1116,7 +1116,7 @@ const Attendance = () => {
                       : 'Leave'}
                   </span>
                   {statusFilter !== 'ALL' ? (
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
                   ) : (
                     <ChevronDown className="w-3 h-3 text-slate-400" />
                   )}
@@ -1152,7 +1152,7 @@ const Attendance = () => {
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           statusFilter === st.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
                         }`}
                       >
@@ -1167,7 +1167,7 @@ const Attendance = () => {
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                             statusFilter === st.id
-                              ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
+                              ? 'bg-sky-200/60 dark:bg-sky-900/80 text-sky-800 dark:text-sky-200'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                           }`}
                         >
@@ -1184,7 +1184,7 @@ const Attendance = () => {
                 type="button"
                 onClick={exportToCSV}
                 title="Export filtered records to CSV"
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export</span>
@@ -1194,9 +1194,9 @@ const Attendance = () => {
 
           {/* Individual Employee Profile Header (When an employee is selected) */}
           {selectedEmployee !== 'ALL' && activeEmployeeObj && (
-            <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-50/70 via-teal-50/40 to-slate-50/60 dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-slate-800/40 border-b border-emerald-200/60 dark:border-emerald-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-4 sm:p-5 bg-gradient-to-r from-sky-50/70 via-blue-50/40 to-slate-50/60 dark:from-sky-950/40 dark:via-blue-950/20 dark:to-slate-800/40 border-b border-sky-200/60 dark:border-sky-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white font-black text-sm flex items-center justify-center shadow-md shadow-emerald-500/20 border-2 border-white dark:border-slate-800">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white font-black text-sm flex items-center justify-center shadow-md shadow-sky-500/20 border-2 border-white dark:border-slate-800">
                   {getInitials(activeEmployeeObj.firstName, activeEmployeeObj.lastName)}
                 </div>
                 <div>
@@ -1205,7 +1205,7 @@ const Attendance = () => {
                       {activeEmployeeObj.fullName ||
                         `${activeEmployeeObj.firstName} ${activeEmployeeObj.lastName}`}
                     </h4>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/60">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60">
                       {activeEmployeeObj.employeeCode}
                     </span>
                   </div>
@@ -1216,7 +1216,7 @@ const Attendance = () => {
                         'Staff'}
                     </span>
                     <span>•</span>
-                    <span className="text-emerald-700 dark:text-emerald-300 font-bold">
+                    <span className="text-sky-700 dark:text-sky-300 font-bold">
                       {activeEmployeeObj.profile?.department?.name ||
                         activeEmployeeObj.department ||
                         'Operations'}
@@ -1269,7 +1269,7 @@ const Attendance = () => {
                           {selectedEmployee === 'ALL' && (
                             <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white font-bold text-[11px] flex items-center justify-center shrink-0 border border-white dark:border-slate-800 shadow-2xs">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 border border-white dark:border-slate-800 shadow-2xs">
                                   {getInitials(log.user?.firstName, log.user?.lastName)}
                                 </div>
                                 <div className="min-w-0">
@@ -1277,7 +1277,7 @@ const Attendance = () => {
                                     type="button"
                                     onClick={() => setSelectedEmployee(log.user?.id)}
                                     title="Click to view this employee timesheet"
-                                    className="font-extrabold text-slate-900 dark:text-white text-xs block text-left hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors truncate max-w-[170px] cursor-pointer"
+                                    className="font-extrabold text-slate-900 dark:text-white text-xs block text-left hover:text-sky-600 dark:hover:text-sky-400 transition-colors truncate max-w-[170px] cursor-pointer"
                                   >
                                     {log.user?.fullName}
                                   </button>
@@ -1300,8 +1300,8 @@ const Attendance = () => {
                               <div
                                 className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${
                                   log.isToday
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 dark:border-emerald-600 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                                    : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-emerald-400/50'
+                                    ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-400 dark:border-sky-600 text-sky-600 dark:text-sky-400 shadow-xs'
+                                    : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-sky-400/50'
                                 }`}
                               >
                                 <span className="text-[9px] font-black uppercase tracking-wider leading-none">
@@ -1318,8 +1318,8 @@ const Attendance = () => {
                                     {log.formattedDate}
                                   </span>
                                   {log.isToday && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 animate-pulse">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700/60 animate-pulse">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                                       Today
                                     </span>
                                   )}
@@ -1460,7 +1460,7 @@ const Attendance = () => {
                     return (
                       <div
                         key={log.id}
-                        className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/70 space-y-3.5 shadow-xs hover:border-emerald-400/60 transition-all"
+                        className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/70 space-y-3.5 shadow-xs hover:border-sky-400/60 transition-all"
                       >
                         {/* Header: Employee/Date + Status */}
                         <div className="flex items-start justify-between gap-2">
@@ -1468,7 +1468,7 @@ const Attendance = () => {
                             <div
                               className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${
                                 log.isToday
-                                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 text-emerald-600 dark:text-emerald-400'
+                                  ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-400 text-sky-600 dark:text-sky-400'
                                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
                               }`}
                             >
@@ -1570,7 +1570,7 @@ const Attendance = () => {
             </>
           ) : (
             <div className="p-12 sm:p-16 text-center space-y-4">
-              <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center border border-sky-200/60 dark:border-sky-800/50 shadow-sm">
                 <CalendarDays className="w-8 h-8 stroke-[1.8]" />
               </div>
               <div className="space-y-1.5 max-w-md mx-auto">

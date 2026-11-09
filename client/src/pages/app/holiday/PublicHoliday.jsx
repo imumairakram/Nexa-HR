@@ -319,12 +319,12 @@ const PublicHoliday = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC PUBLIC HOLIDAY HERO BANNER (SKY-INDIGO-EMERALD AESTHETIC) */}
+      {/* 1. DYNAMIC PUBLIC HOLIDAY HERO BANNER (SKY-BLUE LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-sky-800/50 text-slate-900 dark:text-white">
         <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -top-10 left-10 w-48 h-48 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-10 left-10 w-48 h-48 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Telemetry & Holiday Highlights */}
@@ -337,16 +337,14 @@ const PublicHoliday = () => {
               Automated Islamic lunar ephemeris and gazetted statutory calendar synchronization. Real-time timezone and lunar calendar alignment ensures 100% accurate holiday schedules, automated attendance waivers, and workforce payroll compliance.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               {stats.activeToday ? (
-                <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/80 dark:bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-300 dark:border-emerald-800 animate-pulse">
-                  
-<span>Today is {stats.activeToday.name}!</span>
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 animate-pulse">
+                  <span>Today is {stats.activeToday.name}!</span>
                 </span>
               ) : nextHoliday ? (
-                <span className="flex items-center text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/70 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
-                  
-<span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
                 </span>
               ) : null}
             </div>
