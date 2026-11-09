@@ -33,7 +33,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [destination, setDestination] = useState('');
-  const [previewOtp, setPreviewOtp] = useState(null);
 
   // Password Reset State
   const [resetToken, setResetToken] = useState(null);
@@ -57,7 +56,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
       setNewPassword('');
       setConfirmPassword('');
       setResetToken(null);
-      setPreviewOtp(null);
 
       const targetEmail = initialEmail || '';
       setEmail(targetEmail);
@@ -145,9 +143,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
       });
 
       if (res && res.success) {
-        if (res.data?.previewOtp) {
-          setPreviewOtp(res.data.previewOtp);
-        }
         const dest = res.data?.destination || (channel === 'WHATSAPP' ? userInfo?.maskedPhone : (userInfo?.maskedEmail || email.trim()));
         setDestination(dest);
         setCountdown(60);
@@ -616,22 +611,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     {channel === 'WHATSAPP' ? 'WhatsApp' : 'Email'}: {destination}
                   </strong>
                 </p>
-                {previewOtp && (
-                  <div className="mt-2.5 inline-flex items-center justify-center gap-2 py-1.5 px-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 rounded-lg text-amber-800 dark:text-amber-300 text-[11px] font-medium">
-                    <span>Dev/Test Code: <strong>{previewOtp}</strong></span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const digits = String(previewOtp).split('');
-                        setOtpDigits(digits);
-                        if (otpInputRefs.current[5]) otpInputRefs.current[5].focus();
-                      }}
-                      className="underline font-bold hover:text-amber-950 dark:hover:text-amber-100 cursor-pointer ml-1"
-                    >
-                      Auto-fill
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* 6-box OTP Input */}

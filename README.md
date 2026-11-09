@@ -336,8 +336,10 @@ NexaHR utilizes multi-tier optimizations to deliver sub-10ms response times and 
 
 * **Ephemeral Multi-Channel Password Recovery**:
   * Users can recover credentials via corporate SMTP email or WhatsApp Cloud API (Twilio / Meta).
-  * 6-digit cryptographic OTPs are hashed using SHA-256 before database storage.
-  * Strictly enforced 10-minute expiration windows and maximum 5-attempt brute-force lockouts.
+  * 6-digit cryptographic OTPs are hashed using SHA-256 before database storage and verified using `crypto.timingSafeEqual` constant-time comparison to prevent timing side-channel attacks.
+  * Strictly enforced 10-minute expiration windows, maximum 5-attempt brute-force lockouts, and 60-second resend cooldowns.
+  * Zero-leak guarantee: OTPs, codes, and reset tokens are strictly excluded from API response bodies across all environments (production, staging, development, and test).
+  * To test password recovery locally, use a real inbox.
 
 * **Tiered Rate Limiting & DoS Mitigation**:
   * `authRateLimiter`: 10 requests per 15 minutes on login endpoints.
@@ -451,7 +453,7 @@ In addition to the isolated backend sandbox, NexaHR provides a completely **zero
 | **JWT & bcryptjs** | `9.0.2 / 2.4.3` | JSON Web Token session auth and password hashing |
 | **Zod** | `4.6.7` | Runtime type validation for AI screening payloads |
 | **Cloudinary** | `2.11.0` | Cloud media storage with authenticated signed CV access |
-| **Nodemailer** | `9.1.1` | Corporate SMTP email transport for OTP recovery |
+| **Nodemailer** | `10.4.0` | Corporate SMTP email transport for OTP recovery |
 | **Twilio / Meta** | `6.1.0` | WhatsApp Cloud API integration for instant OTPs |
 | **node-cron** | `4.6.0` | Autonomous background task scheduler for Gmail ingestion |
 | **pdf-parse & mammoth**| `2.4.5 / 1.13.0`| In-memory extraction of PDF and DOCX resume attachments |

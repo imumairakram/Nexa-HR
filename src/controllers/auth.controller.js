@@ -5,6 +5,7 @@ const { hashPassword, comparePassword, validatePasswordStrength } = require('../
 const { generateToken } = require('../utils/jwt');
 const { isGuestDemoActive } = require('../services/demoGuard.service');
 const cacheService = require('../services/cache.service');
+const notificationService = require('../services/notification.service');
 const {
   sendEmailOTP,
   sendWhatsAppOTP,
@@ -740,9 +741,9 @@ const forgotPassword = async (req, res) => {
     let dispatchResult = null;
     try {
       if (deliveryChannel === 'EMAIL') {
-        dispatchResult = await sendEmailOTP(user.email, otp, recipientName);
+        dispatchResult = await notificationService.sendEmailOTP(user.email, otp, recipientName);
       } else {
-        dispatchResult = await sendWhatsAppOTP(user.phone, otp, recipientName);
+        dispatchResult = await notificationService.sendWhatsAppOTP(user.phone, otp, recipientName);
       }
     } catch (dispatchErr) {
       console.error(`[NOTIFICATION DISPATCH ERROR via ${deliveryChannel}]:`, dispatchErr.message);
@@ -754,32 +755,24 @@ const forgotPassword = async (req, res) => {
     if (!dispatchResult || !dispatchResult.success) {
       console.error(`[AUTH WARNING] Password recovery dispatch via ${deliveryChannel} failed:`, dispatchResult?.error || dispatchResult?.errorMessage);
 
-      if (process.env.NODE_ENV === 'production') {
-        const errorMsg = dispatchResult?.error === 'SMTP_NOT_CONFIGURED'
-          ? 'Corporate email service is not configured on the server. Please ensure SMTP_USER and SMTP_PASS environment variables are configured on Render.'
-          : (dispatchResult?.message || 'Failed to deliver verification email. Please check your email configuration or contact your system administrator.');
-
-        return res.status(503).json({
-          success: false,
-          code: dispatchResult?.error || 'DISPATCH_FAILED',
-          message: errorMsg,
+      // Invalidate the generated OTP so no usable OTP is left behind on delivery failure
+      try {
+        await prisma.passwordResetOtp.updateMany({
+          where: {
+            userId: user.id,
+            isUsed: false,
+          },
           data: {
-            destination,
-            channel: deliveryChannel,
+            isUsed: true,
           },
         });
+      } catch (cleanupErr) {
+        console.error('[AUTH ERROR] Invalidation of failed OTP record error:', cleanupErr.message);
       }
 
-      // Non-production (dev/local without real SMTP configured): return previewOtp for developer convenience
-      return res.status(200).json({
-        success: true,
-        message: `[DEV NOTICE: SMTP dispatch simulated (${dispatchResult?.error || 'not configured'})] OTP generated.`,
-        data: {
-          destination,
-          channel: deliveryChannel,
-          expiresInMinutes: 10,
-          previewOtp: otp,
-        },
+      return res.status(503).json({
+        success: false,
+        message: 'Unable to deliver verification code. Please try again later or contact your administrator.',
       });
     }
 
@@ -790,8 +783,6 @@ const forgotPassword = async (req, res) => {
         destination,
         channel: deliveryChannel,
         expiresInMinutes: 10,
-        // Expose preview OTP in non-production environments to support automated test suites and dev diagnostics
-        ...(process.env.NODE_ENV === 'production' ? {} : { previewOtp: otp }),
       },
     });
   } catch (error) {
@@ -883,9 +874,14 @@ const verifyResetOtp = async (req, res) => {
       });
     }
 
-    // Compare SHA-256 hash of incoming OTP
-    const inputHash = crypto.createHash('sha256').update(cleanOtp).digest('hex');
-    if (inputHash !== otpRecord.otpHash) {
+    // Compare SHA-256 hash of incoming OTP using constant-time comparison
+    const inputHashBuffer = Buffer.from(crypto.createHash('sha256').update(cleanOtp).digest('hex'), 'utf8');
+    const storedHashBuffer = Buffer.from(otpRecord.otpHash, 'utf8');
+
+    const isMatch = inputHashBuffer.length === storedHashBuffer.length &&
+      crypto.timingSafeEqual(inputHashBuffer, storedHashBuffer);
+
+    if (!isMatch) {
       await prisma.passwordResetOtp.update({
         where: { id: otpRecord.id },
         data: { attempts: { increment: 1 } },
