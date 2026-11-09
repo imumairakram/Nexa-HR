@@ -182,12 +182,10 @@ const Payroll = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
-                <DollarSign className="w-3.5 h-3.5" />
+              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <span>{formatCurrency(latestBatch?.netPayable || 0)} Latest Batch Disbursed</span>
               </span>
-              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
-                <FileText className="w-3.5 h-3.5" />
+              <span className="flex items-center text-blue-700 dark:text-blue-300 font-bold bg-blue-100/60 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/60">
                 <span>{payslips.length} Payslips Stored</span>
               </span>
             </div>
@@ -341,8 +339,7 @@ const Payroll = () => {
                           <div className="font-extrabold text-slate-900 dark:text-white text-sm">{run.month}</div>
                           <div className="text-[10px] text-slate-400 font-mono mt-0.5">{run.id}</div>
                         </div>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold shrink-0">
-                          <CheckCircle2 className="w-3 h-3" />
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold shrink-0">
                           <span>{run.status}</span>
                         </span>
                       </div>
@@ -417,8 +414,7 @@ const Payroll = () => {
                         {formatCurrency(run.netPayable)}
                       </td>
                       <td className="py-4 px-4">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
-                          <CheckCircle2 className="w-3 h-3" />
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
                           <span>{run.status}</span>
                         </span>
                       </td>

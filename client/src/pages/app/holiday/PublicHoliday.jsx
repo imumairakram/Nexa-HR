@@ -339,14 +339,14 @@ const PublicHoliday = () => {
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
               {stats.activeToday ? (
-                <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/80 dark:bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-300 dark:border-emerald-800 animate-pulse">
-                  <PartyPopper className="w-3.5 h-3.5" />
-                  <span>Today is {stats.activeToday.name}!</span>
+                <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/80 dark:bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-300 dark:border-emerald-800 animate-pulse">
+                  
+<span>Today is {stats.activeToday.name}!</span>
                 </span>
               ) : nextHoliday ? (
-                <span className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/70 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
+                <span className="flex items-center text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-100/70 dark:bg-indigo-950/60 px-3 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+                  
+<span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
                 </span>
               ) : null}
             </div>
@@ -598,9 +598,9 @@ const PublicHoliday = () => {
                             {h.type}
                           </span>
                           {h.isIslamic && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center gap-1">
-                              <Moon className="w-2.5 h-2.5" />
-                              <span>{h.hijriDateText || 'Islamic Lunar'}</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center">
+                              
+<span>{h.hijriDateText || 'Islamic Lunar'}</span>
                             </span>
                           )}
                         </div>
@@ -672,9 +672,9 @@ const PublicHoliday = () => {
                               </span>
                             )}
                             {h.isIslamic && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center gap-1">
-                                <Moon className="w-2.5 h-2.5 text-emerald-500" />
-                                <span>{h.hijriDateText || 'Islamic Lunar'}</span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center">
+                                
+<span>{h.hijriDateText || 'Islamic Lunar'}</span>
                               </span>
                             )}
                           </div>
@@ -702,9 +702,9 @@ const PublicHoliday = () => {
 
                       {/* Column 4: Duty / Pay Status */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>Paid Non-Working Day</span>
+                        <span className="inline-flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
+                          
+<span>Paid Non-Working Day</span>
                         </span>
                       </td>
 
@@ -1008,9 +1008,9 @@ const PublicHoliday = () => {
                     <span>Payroll & Attendance Automation</span>
                   </div>
                   {formDateInfo.isLongWeekend && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800 animate-pulse">
-                      <Sun className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                      <span>Long Weekend Detected</span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800 animate-pulse">
+                      
+<span>Long Weekend Detected</span>
                     </span>
                   )}
                 </div>

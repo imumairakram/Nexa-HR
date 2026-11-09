@@ -688,12 +688,10 @@ const EmployeeDocuments = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <FolderOpen className="w-3.5 h-3.5" />
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <span>{personalDocs.length} Verified Personal Files</span>
               </span>
-              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
-                <BookOpen className="w-3.5 h-3.5" />
+              <span className="flex items-center text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
                 <span>{policies.length} Official Handbooks</span>
               </span>
             </div>
@@ -1101,16 +1099,13 @@ const EmployeeDocuments = () => {
                 </div>
               )}
               <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <Lock className="w-3.5 h-3.5 text-teal-500" />
+                <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
                   <span>AES-256 Cloud Vault</span>
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
                   <span>SOC-2 Type II Certified</span>
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <Zap className="w-3.5 h-3.5 text-amber-500" />
+                <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
                   <span>Tamper-Proof Audit Trail</span>
                 </span>
               </div>
@@ -1194,8 +1189,7 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
                                 <span>{doc.status || 'Verified'}</span>
                               </span>
                             </td>
@@ -1251,8 +1245,7 @@ const EmployeeDocuments = () => {
                         >
                           {typeInfo.icon}
                         </div>
-                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center">
                           <span>{doc.status || 'Verified'}</span>
                         </span>
                       </div>
@@ -1717,8 +1710,7 @@ const EmployeeDocuments = () => {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-teal-100/80 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800 flex items-center gap-1">
-                        <Lock className="w-2.5 h-2.5 text-teal-500" />
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-teal-100/80 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800 flex items-center">
                         AES-256
                       </span>
                     </div>

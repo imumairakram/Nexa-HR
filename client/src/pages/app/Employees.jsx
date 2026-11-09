@@ -99,7 +99,7 @@ const formatDob = (dobStr) => {
 const getSafeEmail = (emp) => {
   if (!emp) return '';
   const email = emp.email || '';
-  if (emp.isDemo || emp.isGuest || email.includes('@gmail.com')) {
+  if (emp.isDemo || emp.isGuest) {
     return emp.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com';
   }
   return email;
@@ -772,12 +772,10 @@ NexaHR Workforce Systems`;
             </p>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
-                <Users className="w-3.5 h-3.5" />
+              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <span>{stats.total} Total Headcount</span>
               </span>
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <span>{stats.active} Active & Verified</span>
               </span>
             </div>
@@ -1080,7 +1078,7 @@ NexaHR Workforce Systems`;
                 Active Filter:
               </span>
               {selectedDept !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
                   <span>Dept: {selectedDept}</span>
                   <button
                     type="button"

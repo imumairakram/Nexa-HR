@@ -519,17 +519,14 @@ const Helpdesk = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
-                <Zap className="w-3.5 h-3.5" />
+              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <span>Response SLA: {stats.avgSla}</span>
               </span>
-              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
-                <UserCheck className="w-3.5 h-3.5" />
+              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
                 <span>{stats.inProgress} Active Tickets Under Review</span>
               </span>
               {stats.highPriority > 0 && (
-                <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60 animate-pulse">
-                  <AlertCircle className="w-3.5 h-3.5" />
+                <span className="flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60 animate-pulse">
                   <span>{stats.highPriority} Urgent Priority</span>
                 </span>
               )}
@@ -829,7 +826,7 @@ const Helpdesk = () => {
                 Active:
               </span>
               {categoryFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
                   <span>Cat: {CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter}</span>
                   <button
                     type="button"
@@ -841,7 +838,7 @@ const Helpdesk = () => {
                 </span>
               )}
               {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
                   <span>Status: {statusFilter === 'IN_PROGRESS' ? 'Under Review' : 'Resolved'}</span>
                   <button
                     type="button"
@@ -853,7 +850,7 @@ const Helpdesk = () => {
                 </span>
               )}
               {priorityFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-300 font-bold text-[11px]">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-300 font-bold text-[11px]">
                   <span>Priority: {priorityFilter}</span>
                   <button
                     type="button"

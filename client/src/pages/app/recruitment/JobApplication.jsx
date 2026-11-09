@@ -233,13 +233,13 @@ const JobApplication = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
-                <FileText className="w-3.5 h-3.5" />
-                <span>{applications.length} Candidate Submissions</span>
+              <span className="flex items-center text-sky-700 dark:text-sky-300 font-bold bg-sky-100/60 dark:bg-sky-950/60 px-3 py-1 rounded-xl border border-sky-200 dark:border-sky-800/60">
+                
+<span>{applications.length} Candidate Submissions</span>
               </span>
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <Star className="w-3.5 h-3.5" />
-                <span>4.8 Avg Candidate Rating</span>
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+                
+<span>4.8 Avg Candidate Rating</span>
               </span>
             </div>
           </div>
@@ -400,8 +400,8 @@ const JobApplication = () => {
                       <div className="font-extrabold text-slate-900 dark:text-white text-sm">{a.name}</div>
                       <div className="text-[10px] text-slate-400 font-mono mt-0.5">{a.id}</div>
                     </div>
-                    <span className="inline-flex items-center gap-1 font-black text-amber-500 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md text-[10px] shrink-0">
-                      <Star className="w-3 h-3 fill-current" /> {a.rating}
+                    <span className="inline-flex items-center font-black text-amber-500 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md text-[10px] shrink-0">
+                      {a.rating}
                     </span>
                   </div>
 

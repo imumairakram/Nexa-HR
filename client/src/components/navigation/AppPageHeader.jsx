@@ -365,7 +365,7 @@ const AppPageHeader = ({
 
   const displayUserEmail = useMemo(() => {
     if (!currentUser?.email) return '';
-    if (currentUser?.isDemo || currentUser?.isGuest || currentUser.email.includes('@gmail.com')) {
+    if (currentUser?.isDemo || currentUser?.isGuest) {
       return currentUser.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com';
     }
     return currentUser.email;

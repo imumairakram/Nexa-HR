@@ -197,12 +197,10 @@ const EmployeePayslips = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <CalendarDays className="w-3.5 h-3.5" />
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <span>Latest Cycle: {latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year}` : 'No Records'}</span>
               </span>
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <CreditCard className="w-3.5 h-3.5" />
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <span>Net Take-Home: {formatCurrency(latestNet)}</span>
               </span>
             </div>
@@ -353,8 +351,7 @@ const EmployeePayslips = () => {
                               <div className="text-[10px] text-slate-400 font-mono">Voucher #{ps.id.slice(0, 8)}</div>
                             </div>
                           </div>
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 shrink-0">
-                            <CheckCircle2 className="w-3 h-3" />
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 shrink-0">
                             <span>PAID</span>
                           </span>
                         </div>
@@ -456,8 +453,7 @@ const EmployeePayslips = () => {
                         {formatCurrency(ps.netSalary || 0)}
                       </td>
                       <td className="py-4 px-4">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
-                          <CheckCircle2 className="w-3 h-3" />
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
                           <span>PAID</span>
                         </span>
                       </td>

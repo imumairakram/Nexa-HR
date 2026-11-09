@@ -216,7 +216,7 @@ const Profile = () => {
       id: u.id || prev.id,
       firstName: u.firstName ?? prev.firstName,
       lastName: u.lastName ?? prev.lastName,
-      email: (u?.isDemo || u?.isGuest || u?.email?.includes('@gmail.com'))
+      email: (u?.isDemo || u?.isGuest)
         ? (u.role === 'ADMIN' ? 'guest.hr@nexahr.com' : 'guest.employee@nexahr.com')
         : (u.email ?? prev.email),
       phone: u.phone ?? prev.phone,
@@ -845,8 +845,7 @@ const Profile = () => {
                   <p className="text-xs text-slate-400 font-medium">Protect your administrator & HR portal account</p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                <ShieldCheck className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+              <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                 <span>Standard Password Auth</span>
               </span>
             </div>
@@ -1004,8 +1003,7 @@ const Profile = () => {
                   <p className="text-xs text-slate-400 font-medium">Corporate salary account</p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
-                <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                 <span>Verified by HR</span>
               </span>
             </div>

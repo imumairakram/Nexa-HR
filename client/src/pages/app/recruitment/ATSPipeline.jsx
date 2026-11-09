@@ -638,17 +638,17 @@ const handleViewResume = async (candidateId) => {
               Seamlessly drag and drop candidates across 5 recruitment stages, coordinate panel interviews, review evaluations, and transition finalist hires directly into HR onboarding.
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Users className="w-3.5 h-3.5 text-sky-500" />
-                <span>{candidates.length} Total Applicants</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{candidates.length} Total Applicants</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Calendar className="w-3.5 h-3.5 text-purple-500" />
-                <span>{interviews.length} Scheduled Interviews</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{interviews.length} Scheduled Interviews</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{candidates.filter((c) => c.stage === 'HIRED').length} Hired This Month</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{candidates.filter((c) => c.stage === 'HIRED').length} Hired This Month</span>
               </span>
             </div>
           </div>
@@ -1017,8 +1017,8 @@ const handleViewResume = async (candidateId) => {
                             <td className="py-4 px-6">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold">{c.experience}</span>
-                                <span className="text-[10px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md flex items-center gap-0.5">
-                                  <Star className="w-2.5 h-2.5 fill-amber-400" /> {c.rating}
+                                <span className="text-[10px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md flex items-center">
+                                  {c.rating}
                                 </span>
                                 {(c.source === 'GMAIL' || typeof c.aiScore === 'number') && (
                                   <span
@@ -1866,9 +1866,9 @@ const handleViewResume = async (candidateId) => {
                     <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span>Candidate Screening & Pipeline Automation</span>
                   </div>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
-                    <Sparkles className="w-3 h-3 text-sky-600 dark:text-sky-400" />
-                    <span>Smart Orchestration Active</span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
+                    
+<span>Smart Orchestration Active</span>
                   </span>
                 </div>
 

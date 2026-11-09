@@ -407,25 +407,25 @@ const RecruitmentSettings = () => {
               Seamlessly manage foundational taxonomy for candidate pipelines, job requisitions, and standardized talent acquisition data models across NexaHR.
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Tag className="w-3.5 h-3.5 text-indigo-500" />
-                <span>{categories.length} Categories</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{categories.length} Categories</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Briefcase className="w-3.5 h-3.5 text-blue-500" />
-                <span>{types.length} Contract Types</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{types.length} Contract Types</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{locations.length} Locations</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{locations.length} Locations</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Code className="w-3.5 h-3.5 text-purple-500" />
-                <span>{skills.length} Skills</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{skills.length} Skills</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Clock className="w-3.5 h-3.5 text-amber-500" />
-                <span>{experiences.length} Seniority Tracks</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{experiences.length} Seniority Tracks</span>
               </span>
             </div>
           </div>
@@ -983,9 +983,9 @@ const RecruitmentSettings = () => {
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-slate-400">Proficiency:</span>
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
-                                <ShieldCheck className="w-3 h-3 text-indigo-500" />
-                                <span>{skill.proficiency}</span>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                                
+<span>{skill.proficiency}</span>
                               </span>
                             </div>
                           </div>
@@ -1045,9 +1045,9 @@ const RecruitmentSettings = () => {
                             </span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
-                              <ShieldCheck className="w-3 h-3 text-indigo-500" />
-                              <span>{skill.proficiency}</span>
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                              
+<span>{skill.proficiency}</span>
                             </span>
                           </td>
                           <td className="py-4 px-6">
@@ -1606,9 +1606,9 @@ const RecruitmentSettings = () => {
                     <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span>Master Data & System Automation</span>
                   </div>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
-                    <Sparkles className="w-3 h-3 text-sky-600 dark:text-sky-400" />
-                    <span>Live Sync</span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
+                    
+<span>Live Sync</span>
                   </span>
                 </div>
 

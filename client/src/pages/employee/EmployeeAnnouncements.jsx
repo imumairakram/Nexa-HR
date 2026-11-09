@@ -313,8 +313,7 @@ const EmployeeAnnouncements = () => {
               </p>
 
               <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 font-semibold pt-1">
-                <span className="flex items-center gap-1.5 text-emerald-300 bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-800/60">
-                  <Building2 className="w-3.5 h-3.5" />
+                <span className="flex items-center text-emerald-300 bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-800/60">
                   <span>{heroNotice.department}</span>
                 </span>
                 <span className="flex items-center gap-1.5 text-slate-400">
@@ -577,8 +576,7 @@ const EmployeeAnnouncements = () => {
                   {/* Header Row: Category Badge + Date + Author Info */}
                   <div className="flex flex-wrap items-center gap-2">
                     {item.pinned && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300/60">
-                        <Pin className="w-2.5 h-2.5" />
+                      <span className="inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300/60">
                         <span>PINNED</span>
                       </span>
                     )}

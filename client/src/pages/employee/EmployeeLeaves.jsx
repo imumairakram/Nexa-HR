@@ -360,17 +360,14 @@ const EmployeeLeaves = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/70 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <CalendarDays className="w-3.5 h-3.5" />
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/70 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <span>{totalAvailableLeaves} Days Total Available (of {totalAllowedLeaves})</span>
               </span>
-              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/70 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="flex items-center text-teal-700 dark:text-teal-300 font-bold bg-teal-100/70 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
                 <span>{stats.approved} Leaves Approved</span>
               </span>
               {stats.pending > 0 && (
-                <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-bold bg-amber-100/70 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60 animate-pulse">
-                  <Clock className="w-3.5 h-3.5" />
+                <span className="flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-100/70 dark:bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/60 animate-pulse">
                   <span>{stats.pending} Request{stats.pending > 1 ? 's' : ''} Pending Review</span>
                 </span>
               )}
@@ -781,7 +778,7 @@ const EmployeeLeaves = () => {
                         </td>
                         <td className="py-4 px-4">
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
                               req.status === 'APPROVED'
                                 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40'
                                 : req.status === 'REJECTED'
@@ -789,9 +786,6 @@ const EmployeeLeaves = () => {
                                 : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
                             }`}
                           >
-                            {req.status === 'APPROVED' && <CheckCircle2 className="w-3.5 h-3.5" />}
-                            {req.status === 'PENDING' && <Clock className="w-3.5 h-3.5" />}
-                            {req.status === 'REJECTED' && <XCircle className="w-3.5 h-3.5" />}
                             <span>{req.status}</span>
                           </span>
                         </td>

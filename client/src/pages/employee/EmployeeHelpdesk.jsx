@@ -426,12 +426,10 @@ const EmployeeHelpdesk = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-                <Zap className="w-3.5 h-3.5" />
+              <span className="flex items-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100/60 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
                 <span>Average First Response: {stats.avgSla}</span>
               </span>
-              <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
-                <UserCheck className="w-3.5 h-3.5" />
+              <span className="flex items-center text-teal-700 dark:text-teal-300 font-bold bg-teal-100/60 dark:bg-teal-950/60 px-3 py-1 rounded-xl border border-teal-200 dark:border-teal-800/60">
                 <span>{stats.inProgress} Active Tickets Under Review</span>
               </span>
             </div>
@@ -814,17 +812,12 @@ const EmployeeHelpdesk = () => {
 
                 <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
                       t.status === 'RESOLVED'
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
                         : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                     }`}
                   >
-                    {t.status === 'RESOLVED' ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    ) : (
-                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
-                    )}
                     <span>{t.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}</span>
                   </span>
 

@@ -282,8 +282,7 @@ const EmployeeHolidays = () => {
                             {h.type}
                           </span>
                           {h.isIslamic && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center gap-1">
-                              <Moon className="w-2.5 h-2.5" />
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center">
                               <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                             </span>
                           )}
@@ -356,8 +355,7 @@ const EmployeeHolidays = () => {
                               </span>
                             )}
                             {h.isIslamic && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center gap-1">
-                                <Moon className="w-2.5 h-2.5 text-emerald-500" />
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center">
                                 <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                               </span>
                             )}
@@ -371,7 +369,7 @@ const EmployeeHolidays = () => {
                       {/* Column 3: Category */}
                       <td className="py-4 px-6 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
                             h.category === 'RELIGIOUS'
                               ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200/60'
                               : h.category === 'NATIONAL'
@@ -379,15 +377,13 @@ const EmployeeHolidays = () => {
                               : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                           }`}
                         >
-                          <Calendar className="w-3 h-3" />
                           <span>{h.type}</span>
                         </span>
                       </td>
 
                       {/* Column 4: Duty / Pay Status */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                          <CheckCircle2 className="w-3 h-3" />
+                        <span className="inline-flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
                           <span>Paid Non-Working Day</span>
                         </span>
                       </td>

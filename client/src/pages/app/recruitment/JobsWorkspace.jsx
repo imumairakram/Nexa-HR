@@ -442,17 +442,17 @@ const JobsWorkspace = () => {
               Oversee corporate headcount expansion, manage job openings across all functional branches, and advance high-caliber applicants seamlessly into the ATS pipeline.
             </p>
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Briefcase className="w-3.5 h-3.5 text-sky-500" />
-                <span>{totalOpenings} Active Requisitions</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{totalOpenings} Active Requisitions</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Users className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{totalApplicants} Active Candidates Sourced</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>{totalApplicants} Active Candidates Sourced</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <Clock className="w-3.5 h-3.5 text-amber-500" />
-                <span>18 Days Avg. Time to Fill</span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                
+<span>18 Days Avg. Time to Fill</span>
               </span>
             </div>
           </div>
