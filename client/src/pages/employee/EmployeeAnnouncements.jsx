@@ -266,7 +266,7 @@ const EmployeeAnnouncements = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <CheckCircle2 className="w-4 h-4 text-teal-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -275,8 +275,8 @@ const EmployeeAnnouncements = () => {
       {/* 1. FULLY DYNAMIC HERO SPOTLIGHT BANNER WITH LIVE CONTROLS */}
       {/* ========================================================================= */}
       {heroNotice && (
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-emerald-500/30">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -333,7 +333,7 @@ const EmployeeAnnouncements = () => {
 
             {/* Right Column: Hero Interactive Actions Card */}
             <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[240px] sm:min-w-[270px] shrink-0 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center border border-emerald-400/30">
+              <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center border border-teal-400/30">
                 <Megaphone className="w-6 h-6" />
               </div>
               <div>
@@ -344,7 +344,7 @@ const EmployeeAnnouncements = () => {
               <div className="w-full space-y-2 pt-1">
                 <button
                   onClick={() => setSelectedItem(heroNotice)}
-                  className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                  className="w-full px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
                 >
                   <span>Read Full Notice</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -354,11 +354,11 @@ const EmployeeAnnouncements = () => {
                   onClick={() => toggleAcknowledge(heroNotice.id)}
                   className={`w-full px-4 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
                     heroNotice.acknowledged
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                      ? 'bg-teal-500/20 text-teal-300 border-teal-500/40'
                       : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
                   }`}
                 >
-                  <Check className={`w-3.5 h-3.5 ${heroNotice.acknowledged ? 'text-emerald-400' : 'text-slate-300'}`} />
+                  <Check className={`w-3.5 h-3.5 ${heroNotice.acknowledged ? 'text-teal-400' : 'text-slate-300'}`} />
                   <span>{heroNotice.acknowledged ? 'Acknowledged' : 'Acknowledge Notice'}</span>
                 </button>
               </div>
@@ -379,7 +379,7 @@ const EmployeeAnnouncements = () => {
               placeholder="Search circulars by keyword, department, author..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all font-medium"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium"
             />
             {searchQuery && (
               <button
@@ -400,8 +400,8 @@ const EmployeeAnnouncements = () => {
               onClick={() => setShowFilterMenu((prev) => !prev)}
               className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
                 filter !== 'ALL'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
+                  ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 shadow-teal-500/10'
+                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700/60'
               }`}
               title="Filter by Category"
             >
@@ -418,7 +418,7 @@ const EmployeeAnnouncements = () => {
                 }`}
               />
               {filter !== 'ALL' && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
               )}
             </button>
 
@@ -449,7 +449,7 @@ const EmployeeAnnouncements = () => {
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
                         }`}
                       >
@@ -457,7 +457,7 @@ const EmployeeAnnouncements = () => {
                           <span
                             className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                               isSelected
-                                ? 'bg-emerald-500 ring-2 ring-emerald-300 dark:ring-emerald-700'
+                                ? 'bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-700'
                                 : 'bg-slate-300 dark:bg-slate-600'
                             }`}
                           />
@@ -466,7 +466,7 @@ const EmployeeAnnouncements = () => {
                         <span
                           className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
                             isSelected
-                              ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
+                              ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
                               : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                           }`}
                         >
@@ -511,12 +511,12 @@ const EmployeeAnnouncements = () => {
             </span>
 
             {filter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/60 text-teal-700 dark:text-teal-300 text-[11px] font-bold">
                 Category: {CATEGORY_TABS.find((c) => c.id === filter)?.label || filter}
                 <button
                   type="button"
                   onClick={() => setFilter('ALL')}
-                  className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer p-0.5"
+                  className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer p-0.5"
                   title="Remove Filter"
                 >
                   <X className="w-3 h-3" />
@@ -564,7 +564,7 @@ const EmployeeAnnouncements = () => {
               key={item.id}
               className={`rounded-3xl p-6 sm:p-7 shadow-soft border transition-all duration-300 hover:shadow-md ${
                 item.pinned
-                  ? 'bg-gradient-to-r from-amber-500/5 via-emerald-500/5 to-white dark:to-[#1E293B] border-amber-200/80 dark:border-amber-900/50'
+                  ? 'bg-gradient-to-r from-amber-500/5 via-teal-500/5 to-white dark:to-[#1E293B] border-amber-200/80 dark:border-amber-900/50'
                   : 'bg-white dark:bg-[#1E293B] border-slate-100 dark:border-slate-800'
               }`}
             >
@@ -584,7 +584,7 @@ const EmployeeAnnouncements = () => {
                           ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
                           : item.priority === 'MEDIUM'
                           ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
-                          : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60'
+                          : 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/60'
                       }`}
                     >
                       {item.categoryLabel || item.category}
@@ -597,7 +597,7 @@ const EmployeeAnnouncements = () => {
                   {/* Notice Title */}
                   <h3
                     onClick={() => setSelectedItem(item)}
-                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors leading-snug"
+                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-colors leading-snug"
                   >
                     {item.title}
                   </h3>
@@ -614,7 +614,7 @@ const EmployeeAnnouncements = () => {
                         <button
                           key={aIdx}
                           onClick={() => handleDownloadAttachment(att)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer border border-slate-200/70 dark:border-slate-700/60"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer border border-slate-200/70 dark:border-slate-700/60"
                         >
                           <Paperclip className="w-3 h-3 text-slate-400" />
                           <span>{att.name}</span>
@@ -629,7 +629,7 @@ const EmployeeAnnouncements = () => {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setSelectedItem(item)}
-                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Read Full Notice</span>
@@ -639,11 +639,11 @@ const EmployeeAnnouncements = () => {
                         onClick={() => toggleAcknowledge(item.id)}
                         className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
                           item.acknowledged
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200'
-                            : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-500'
+                            ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200'
+                            : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-teal-500'
                         }`}
                       >
-                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-emerald-600' : 'text-slate-400'}`} />
+                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-teal-600' : 'text-slate-400'}`} />
                         <span>{item.acknowledged ? 'Acknowledged' : 'Acknowledge Notice'}</span>
                       </button>
                     </div>
@@ -671,7 +671,7 @@ const EmployeeAnnouncements = () => {
           ))
         ) : (
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center">
               <Megaphone className="w-6 h-6" />
             </div>
             <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -688,7 +688,7 @@ const EmployeeAnnouncements = () => {
                   setFilter('ALL');
                   setSearchQuery('');
                 }}
-                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-emerald-600 text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-teal-600 text-white text-xs font-bold cursor-pointer"
               >
                 Reset All Filters
               </button>
@@ -702,19 +702,19 @@ const EmployeeAnnouncements = () => {
       {/* ========================================================================= */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-emerald-950/20 dark:shadow-black/60 border border-emerald-200/70 dark:border-emerald-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-slate-50/60 dark:from-emerald-950/80 dark:via-slate-900/70 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-64 h-64 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-300/20 dark:bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/70 to-slate-50/60 dark:from-teal-950/80 dark:via-slate-900/70 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 min-w-0 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-100/70 dark:ring-emerald-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-600 via-teal-600 to-teal-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-600/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
                   <Megaphone className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100/80 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-teal-100/80 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
                       {selectedItem.categoryLabel || selectedItem.category}
                     </span>
                     <span className="text-xs text-slate-400 font-semibold">{selectedItem.date}</span>
@@ -746,7 +746,7 @@ const EmployeeAnnouncements = () => {
               {selectedItem.attachments && selectedItem.attachments.length > 0 && (
                 <div className="p-4 sm:p-5 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 space-y-2.5">
                   <div className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                    <Paperclip className="w-3.5 h-3.5 text-emerald-500" />
+                    <Paperclip className="w-3.5 h-3.5 text-teal-500" />
                     <span>Attached Documents & Forms:</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -758,7 +758,7 @@ const EmployeeAnnouncements = () => {
                         <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-2">{att.name}</span>
                         <button
                           onClick={() => handleDownloadAttachment(att)}
-                          className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
+                          className="px-3.5 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download</span>
@@ -771,7 +771,7 @@ const EmployeeAnnouncements = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 sm:px-7 py-3.5 border-t border-emerald-100/60 dark:border-emerald-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-teal-100/60 dark:border-teal-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
               <span className="text-xs text-slate-400 font-medium hidden sm:inline">
                 Official NexaHR Enterprise Broadcast
               </span>
@@ -783,8 +783,8 @@ const EmployeeAnnouncements = () => {
                   }}
                   className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
                     selectedItem.acknowledged
-                      ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white'
+                      ? 'bg-teal-600 text-white shadow-teal-600/20'
+                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white'
                   }`}
                 >
                   <Check className="w-3.5 h-3.5" />

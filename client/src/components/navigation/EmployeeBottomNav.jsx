@@ -66,9 +66,9 @@ const EmployeeBottomNav = () => {
                       navigate(item.path);
                       setIsMoreOpen(false);
                     }}
-                    className="p-3 rounded-[8px] bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:text-emerald-600 flex flex-col items-center gap-1.5 text-center transition-all cursor-pointer"
+                    className="p-3 rounded-[8px] bg-slate-50 dark:bg-slate-800/80 hover:bg-teal-50 dark:hover:bg-teal-950/60 hover:text-teal-700 dark:hover:text-teal-300 flex flex-col items-center gap-1.5 text-center transition-all cursor-pointer"
                   >
-                    <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <Icon className="w-5 h-5 text-teal-700 dark:text-teal-400" />
                     <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 leading-tight">
                       {item.label}
                     </span>

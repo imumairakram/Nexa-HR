@@ -436,8 +436,8 @@ const EmployeeAttendance = () => {
       {/* ========================================================================= */}
       {/* 1. HERO BIOMETRIC HARDWARE STATUS BANNER (EMERALD & TEAL BIOMETRIC AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-950 via-teal-950 to-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-emerald-800/40">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-teal-950 to-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-teal-800/40">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -469,7 +469,7 @@ const EmployeeAttendance = () => {
             {/* Live Clock & Date */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-emerald-400" />
+                <Clock className="w-4 h-4 text-teal-400" />
                 <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wider">
                   {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </span>
@@ -484,14 +484,14 @@ const EmployeeAttendance = () => {
           <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
             <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-300">
               <span className="flex items-center gap-1.5">
-                <Fingerprint className="w-3.5 h-3.5 text-emerald-400" />
+                <Fingerprint className="w-3.5 h-3.5 text-teal-400" />
                 <span>Today's Activity</span>
               </span>
               <span
                 className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${todayLog?.status === 'LATE'
                     ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
                     : todayLog?.status === 'PRESENT'
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                      ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40'
                       : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
                   }`}
               >
@@ -503,22 +503,22 @@ const EmployeeAttendance = () => {
             <div className="w-full grid grid-cols-2 gap-2.5 my-1">
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Punch In</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-emerald-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-teal-400 mt-0.5">
                   {todayLog?.checkIn || '--:--'}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-teal-400" />
                   <span>{todayLog?.checkIn && todayLog.checkIn !== '--:--' ? 'Recorded' : 'Pending'}</span>
                 </div>
               </div>
 
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-emerald-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-teal-400 mt-0.5">
                   {todayLog?.checkOut || '--:--'}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-teal-400" />
                   <span>{todayLog?.checkOut && todayLog.checkOut !== '--:--' ? 'Recorded' : 'Pending'}</span>
                 </div>
               </div>
@@ -526,7 +526,7 @@ const EmployeeAttendance = () => {
 
             <div className="w-full pt-2 flex items-center justify-between text-xs sm:text-sm text-slate-300 font-medium leading-normal">
               <span>Shift: 09:00 AM – 05:30 PM</span>
-              <span className="text-emerald-400 font-semibold">8.5h Standard</span>
+              <span className="text-teal-400 font-semibold">8.5h Standard</span>
             </div>
           </div>
         </div>
@@ -607,12 +607,12 @@ const EmployeeAttendance = () => {
       {loading ? (
         <TableSkeleton rows={6} cols={5} />
       ) : (
-        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-emerald-950/40 overflow-hidden transition-all">
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-teal-950/40 overflow-hidden transition-all">
           {/* Header with Title & Month Navigation Controls */}
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/50 dark:border-teal-800/40 flex items-center justify-center text-teal-700 dark:text-teal-400">
                   <CalendarDays className="w-5 h-5" />
                 </div>
                 <div>
@@ -641,7 +641,7 @@ const EmployeeAttendance = () => {
                   type="button"
                   onClick={handlePrevMonth}
                   title="Previous Month"
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-400 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -653,7 +653,7 @@ const EmployeeAttendance = () => {
                     onClick={() => setShowMonthMenu((prev) => !prev)}
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900 dark:text-white hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
                   >
-                    <Calendar className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+                    <Calendar className="w-3.5 h-3.5 text-teal-700 dark:text-teal-400" />
                     <span>{selectedMonthLabel}</span>
                     <ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
@@ -675,17 +675,17 @@ const EmployeeAttendance = () => {
                               setShowMonthMenu(false);
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSelected
-                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold'
+                                ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 font-bold'
                                 : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
                               }`}
                           >
                             <span>{mItem.label}</span>
                             {mItem.isCurrent ? (
-                              <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400">
+                              <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-400">
                                 Current
                               </span>
                             ) : isSelected ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-teal-700 dark:text-teal-400" />
                             ) : null}
                           </button>
                         );
@@ -701,7 +701,7 @@ const EmployeeAttendance = () => {
                   title={isNextDisabled ? 'Cannot navigate to future months' : 'Next Month'}
                   className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isNextDisabled
                       ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-40'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer'
                     }`}
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -713,7 +713,7 @@ const EmployeeAttendance = () => {
                 <button
                   type="button"
                   onClick={handleJumpToCurrent}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 cursor-pointer transition-all shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 border border-teal-200/80 dark:border-teal-800/50 hover:bg-teal-100 dark:hover:bg-teal-900/40 cursor-pointer transition-all shadow-2xs"
                 >
                   <RotateCcw className="w-3 h-3" />
                   <span>Current Month</span>
@@ -727,14 +727,14 @@ const EmployeeAttendance = () => {
             {/* Quick summary badges */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-900 dark:text-white shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
                 <span>{totalDaysPresent} Present</span>
               </span>
               <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-900 dark:text-white shadow-2xs">
                 <span>{totalHoursLogged.toFixed(1)} hrs</span>
               </span>
               {totalOvertime > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/50 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800/50 text-xs font-bold text-teal-700 dark:text-teal-400">
                   +{totalOvertime.toFixed(1)}h Overtime
                 </span>
               )}
@@ -755,7 +755,7 @@ const EmployeeAttendance = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search dates, hours..."
-                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -774,8 +774,8 @@ const EmployeeAttendance = () => {
                   type="button"
                   onClick={() => setShowFilterMenu((prev) => !prev)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${statusFilter !== 'ALL'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:border-emerald-300'
+                      ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-400'
+                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-400 hover:border-teal-300'
                     }`}
                 >
                   <Filter className="w-3.5 h-3.5" />
@@ -789,7 +789,7 @@ const EmployeeAttendance = () => {
                           : 'Leave'}
                   </span>
                   {statusFilter !== 'ALL' ? (
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
                   ) : (
                     <ChevronDown className="w-3 h-3 text-slate-400" />
                   )}
@@ -802,7 +802,7 @@ const EmployeeAttendance = () => {
                     </div>
                     {[
                       { id: 'ALL', label: 'All Records', count: counts.all },
-                      { id: 'PRESENT', label: 'Present', count: counts.present, dot: 'bg-emerald-500' },
+                      { id: 'PRESENT', label: 'Present', count: counts.present, dot: 'bg-teal-500' },
                       { id: 'LATE', label: 'Late Arrival', count: counts.late, dot: 'bg-amber-500' },
                       { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave, dot: 'bg-blue-500' },
                     ].map((st) => (
@@ -814,7 +814,7 @@ const EmployeeAttendance = () => {
                           setShowFilterMenu(false);
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${statusFilter === st.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold'
+                            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 font-bold'
                             : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
                           }`}
                       >
@@ -828,7 +828,7 @@ const EmployeeAttendance = () => {
                         </div>
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${statusFilter === st.id
-                              ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400'
+                              ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-400'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                             }`}
                         >
@@ -845,7 +845,7 @@ const EmployeeAttendance = () => {
                 type="button"
                 onClick={exportToCSV}
                 title="Export filtered records to CSV"
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export</span>
@@ -886,8 +886,8 @@ const EmployeeAttendance = () => {
                               {/* Date Number Badge */}
                               <div
                                 className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${log.isToday
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 dark:border-emerald-600 text-emerald-700 dark:text-emerald-400 shadow-xs'
-                                    : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-emerald-400/50'
+                                    ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-400 dark:border-teal-600 text-teal-700 dark:text-teal-400 shadow-xs'
+                                    : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-teal-400/50'
                                   }`}
                               >
                                 <span className="text-[9px] font-black uppercase tracking-wider leading-none">
@@ -904,8 +904,8 @@ const EmployeeAttendance = () => {
                                     {log.formattedDate}
                                   </span>
                                   {log.isToday && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700/60 animate-pulse">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-400 border border-teal-300 dark:border-teal-700/60 animate-pulse">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
                                       Today
                                     </span>
                                   )}
@@ -928,11 +928,11 @@ const EmployeeAttendance = () => {
                                 <span
                                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${isLate
                                       ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/70 dark:border-amber-800/40 text-amber-700 dark:text-amber-400'
-                                      : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/70 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-400'
+                                      : 'bg-teal-50/70 dark:bg-teal-950/40 border-teal-200/70 dark:border-teal-800/40 text-teal-700 dark:text-teal-400'
                                     }`}
                                 >
                                   <span
-                                    className={`w-2 h-2 rounded-full ${isLate ? 'bg-amber-500' : 'bg-emerald-500'
+                                    className={`w-2 h-2 rounded-full ${isLate ? 'bg-amber-500' : 'bg-teal-500'
                                       }`}
                                   />
                                   {log.checkIn}
@@ -974,7 +974,7 @@ const EmployeeAttendance = () => {
                                     {durationVal.toFixed(1)} hrs
                                   </span>
                                   {log.ot > 0 && (
-                                    <span className="inline-flex items-center px-1.5 py-0.2 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                                    <span className="inline-flex items-center px-1.5 py-0.2 rounded-md text-[10px] font-bold bg-teal-100 dark:bg-teal-950/80 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800/40">
                                       +{log.ot}h OT
                                     </span>
                                   )}
@@ -983,9 +983,9 @@ const EmployeeAttendance = () => {
                                 <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700/60 rounded-full overflow-hidden">
                                   <div
                                     className={`h-full rounded-full transition-all duration-500 ${log.ot > 0
-                                        ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                                        ? 'bg-gradient-to-r from-teal-500 to-teal-400'
                                         : durationVal >= 8.0
-                                          ? 'bg-emerald-500'
+                                          ? 'bg-teal-500'
                                           : isLate
                                             ? 'bg-amber-500'
                                             : 'bg-teal-500'
@@ -1001,7 +1001,7 @@ const EmployeeAttendance = () => {
                           <td className="py-4 px-6 text-right">
                             <span
                               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${log.status === 'PRESENT'
-                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/70 dark:border-emerald-800/50'
+                                  ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-400 border-teal-200/70 dark:border-teal-800/50'
                                   : isLate
                                     ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/70 dark:border-amber-800/50'
                                     : isLeave
@@ -1009,7 +1009,7 @@ const EmployeeAttendance = () => {
                                       : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/70 dark:border-rose-800/50'
                                 }`}
                             >
-                              {log.status === 'PRESENT' && <CheckCircle2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />}
+                              {log.status === 'PRESENT' && <CheckCircle2 className="w-3 h-3 text-teal-700 dark:text-teal-400" />}
                               {isLate && <AlertTriangle className="w-3 h-3 text-amber-700 dark:text-amber-400" />}
                               {isLeave && <Calendar className="w-3 h-3 text-blue-700 dark:text-blue-400" />}
                               <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status}</span>
@@ -1025,11 +1025,11 @@ const EmployeeAttendance = () => {
               {/* Table Bottom Monthly Summary Strip */}
               <div className="px-6 py-3.5 bg-slate-50/80 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
                 <div className="font-medium">
-                  Showing <span className="font-bold text-slate-900 dark:text-white">{filteredLogs.length}</span> records for <span className="font-bold text-emerald-700 dark:text-emerald-400">{selectedMonthLabel}</span>
+                  Showing <span className="font-bold text-slate-900 dark:text-white">{filteredLogs.length}</span> records for <span className="font-bold text-teal-700 dark:text-teal-400">{selectedMonthLabel}</span>
                 </div>
                 <div className="flex items-center gap-4 text-slate-600 dark:text-slate-300">
                   <span>Total Logged: <strong className="text-slate-900 dark:text-white">{totalHoursLogged.toFixed(1)} hrs</strong></span>
-                  <span>Overtime: <strong className="text-emerald-700 dark:text-emerald-400">+{totalOvertime.toFixed(1)} hrs</strong></span>
+                  <span>Overtime: <strong className="text-teal-700 dark:text-teal-400">+{totalOvertime.toFixed(1)} hrs</strong></span>
                   <span>On-Time Rate: <strong className="text-slate-900 dark:text-white">{onTimePercentage}%</strong></span>
                 </div>
               </div>
@@ -1046,14 +1046,14 @@ const EmployeeAttendance = () => {
                     return (
                       <div
                         key={log.id}
-                        className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/70 space-y-3.5 shadow-xs hover:border-emerald-400/60 transition-all"
+                        className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/70 space-y-3.5 shadow-xs hover:border-teal-400/60 transition-all"
                       >
                         {/* Header: Date + Status */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-3">
                             <div
                               className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${log.isToday
-                                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-400 text-emerald-700 dark:text-emerald-400'
+                                  ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-400 text-teal-700 dark:text-teal-400'
                                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
                                 }`}
                             >
@@ -1070,7 +1070,7 @@ const EmployeeAttendance = () => {
                                   {log.formattedDate}
                                 </span>
                                 {log.isToday && (
-                                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400">
+                                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-400">
                                     Today
                                   </span>
                                 )}
@@ -1080,7 +1080,7 @@ const EmployeeAttendance = () => {
                           </div>
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${log.status === 'PRESENT'
-                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40'
+                                ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-400 border-teal-200/60 dark:border-teal-800/40'
                                 : isLate
                                   ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
                                   : isLeave
@@ -1096,7 +1096,7 @@ const EmployeeAttendance = () => {
                         <div className="grid grid-cols-2 gap-2 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-100 dark:border-slate-800 text-center">
                           <div>
                             <div className="text-[9px] uppercase font-bold text-slate-400">Punch In</div>
-                            <div className="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-400 mt-0.5">
+                            <div className="text-xs font-bold font-mono text-teal-700 dark:text-teal-400 mt-0.5">
                               {log.checkIn}
                             </div>
                           </div>
@@ -1115,14 +1115,14 @@ const EmployeeAttendance = () => {
                               Duration: <span className="font-extrabold text-slate-900 dark:text-white">{durationVal.toFixed(1)} hrs</span>
                             </span>
                             {log.ot > 0 && (
-                              <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
+                              <span className="text-[10px] text-teal-700 dark:text-teal-400 font-bold">
                                 +{log.ot}h Overtime
                               </span>
                             )}
                           </div>
                           <div className="w-full h-1.5 bg-slate-200/70 dark:bg-slate-700/60 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-emerald-500 rounded-full"
+                              className="h-full bg-teal-500 rounded-full"
                               style={{ width: `${progressPct}%` }}
                             />
                           </div>
@@ -1160,7 +1160,7 @@ const EmployeeAttendance = () => {
                   <button
                     type="button"
                     onClick={handleJumpToCurrent}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-teal-500 text-white hover:bg-teal-600 transition-colors cursor-pointer shadow-xs"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Return to Current Month</span>

@@ -342,7 +342,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
                       : (currentUser.email || '')}
                   </p>
                 </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-teal-500 shrink-0" />
               </div>
             )}
 

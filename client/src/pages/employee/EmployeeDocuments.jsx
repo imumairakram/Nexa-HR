@@ -47,12 +47,12 @@ const getDocTypeMeta = (type = '') => {
   if (norm.includes('CONTRACT') || norm.includes('OFFER') || norm.includes('APPOINTMENT')) {
     return {
       icon: <FileCheck className="w-4 h-4" />,
-      bg: 'bg-emerald-50 dark:bg-emerald-950/60',
-      color: 'text-emerald-600 dark:text-emerald-400',
-      border: 'border-emerald-200/70 dark:border-emerald-800/60',
-      badgeBg: 'bg-emerald-50 dark:bg-emerald-950/60',
-      badgeColor: 'text-emerald-700 dark:text-emerald-300',
-      badgeBorder: 'border-emerald-200/60 dark:border-emerald-800/60',
+      bg: 'bg-teal-50 dark:bg-teal-950/60',
+      color: 'text-teal-600 dark:text-teal-400',
+      border: 'border-teal-200/70 dark:border-teal-800/60',
+      badgeBg: 'bg-teal-50 dark:bg-teal-950/60',
+      badgeColor: 'text-teal-700 dark:text-teal-300',
+      badgeBorder: 'border-teal-200/60 dark:border-teal-800/60',
     };
   }
   if (norm.includes('CERTIFICATE') || norm.includes('ACADEMIC') || norm.includes('DEGREE')) {
@@ -664,7 +664,7 @@ const EmployeeDocuments = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <CheckCircle2 className="w-4 h-4 text-teal-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -672,9 +672,9 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC DOCUMENTS HERO BANNER (AQUA-TEAL LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-300/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-teal-200/70 dark:border-teal-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Vault Telemetry */}
@@ -1070,10 +1070,10 @@ const EmployeeDocuments = () => {
           ) : filteredPersonalDocs.length === 0 ? (
             <div className="p-12 sm:p-16 text-center space-y-5">
               <div className="relative inline-flex">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-teal-500/10 via-emerald-500/15 to-teal-500/20 dark:from-teal-500/20 dark:via-emerald-500/20 dark:to-teal-500/30 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/70 dark:border-teal-700/50 shadow-xl shadow-teal-500/10">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-teal-500/10 via-teal-500/15 to-teal-500/20 dark:from-teal-500/20 dark:via-teal-500/20 dark:to-teal-500/30 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/70 dark:border-teal-700/50 shadow-xl shadow-teal-500/10">
                   <FolderLock className="w-10 h-10 stroke-[1.6]" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-teal-500 text-white flex items-center justify-center shadow-md">
                   <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
                 </div>
               </div>
@@ -1091,7 +1091,7 @@ const EmployeeDocuments = () => {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsUploadOpen(true)}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-teal-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-700 hover:to-teal-700 text-white font-extrabold text-xs shadow-lg shadow-teal-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
                     <span>Upload Document to Vault</span>
@@ -1189,7 +1189,7 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/60">
                                 <span>{doc.status || 'Verified'}</span>
                               </span>
                             </td>
@@ -1205,7 +1205,7 @@ const EmployeeDocuments = () => {
                                 </button>
                                 <button
                                   onClick={() => handleDownload(doc)}
-                                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm shadow-teal-600/20 hover:shadow-md transition-all active:scale-95"
+                                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-700 hover:to-teal-700 text-white font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm shadow-teal-600/20 hover:shadow-md transition-all active:scale-95"
                                 >
                                   <Download className="w-3 h-3" />
                                   <span>Download</span>
@@ -1245,7 +1245,7 @@ const EmployeeDocuments = () => {
                         >
                           {typeInfo.icon}
                         </div>
-                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center">
+                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60 flex items-center">
                           <span>{doc.status || 'Verified'}</span>
                         </span>
                       </div>
@@ -1357,15 +1357,15 @@ const EmployeeDocuments = () => {
                       {filteredPolicies.map((pol) => (
                         <tr
                           key={pol.id}
-                          className="hover:bg-emerald-50/30 dark:hover:bg-slate-800/50 transition-colors group"
+                          className="hover:bg-teal-50/30 dark:hover:bg-slate-800/50 transition-colors group"
                         >
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/70 dark:border-emerald-800/60 shadow-xs group-hover:scale-105 transition-transform">
+                              <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/70 dark:border-teal-800/60 shadow-xs group-hover:scale-105 transition-transform">
                                 <BookOpen className="w-4 h-4" />
                               </div>
                               <div className="min-w-0 max-w-sm lg:max-w-md">
-                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                                   {pol.title}
                                 </span>
                                 <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium line-clamp-1 mt-0.5">
@@ -1376,7 +1376,7 @@ const EmployeeDocuments = () => {
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/60">
                               {pol.categoryLabel || pol.category}
                             </span>
                           </td>
@@ -1401,7 +1401,7 @@ const EmployeeDocuments = () => {
                           <td className="py-4 px-6 text-right whitespace-nowrap">
                             <button
                               onClick={() => handleDownload(pol)}
-                              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                             >
                               <Download className="w-3.5 h-3.5" />
                               <span>Download Handbook</span>
@@ -1427,17 +1427,17 @@ const EmployeeDocuments = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60">
+                          <div className="w-9 h-9 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60">
                             <BookOpen className="w-4 h-4" />
                           </div>
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300">
                             {pol.categoryLabel || pol.category}
                           </span>
                         </div>
                         <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
                       </div>
 
-                      <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         {pol.title}
                       </h4>
 
@@ -1453,7 +1453,7 @@ const EmployeeDocuments = () => {
 
                       <button
                         onClick={() => handleDownload(pol)}
-                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download Handbook</span>
@@ -1474,12 +1474,12 @@ const EmployeeDocuments = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-teal-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
                   <Upload className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -1730,7 +1730,7 @@ const EmployeeDocuments = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                   <span>{submitting ? 'Saving...' : 'Save & Encrypt'}</span>
@@ -1748,12 +1748,12 @@ const EmployeeDocuments = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-teal-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
                   <FileText className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -1791,7 +1791,7 @@ const EmployeeDocuments = () => {
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                   <span className="text-slate-400 font-medium">Compliance Verification</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="text-teal-600 dark:text-teal-400 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>HR Verified & Encrypted</span>
                   </span>
@@ -1818,7 +1818,7 @@ const EmployeeDocuments = () => {
                   handleDownload(selectedDoc);
                   setSelectedDoc(null);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-teal-600/20 active:scale-95 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-600 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-teal-600/20 active:scale-95 transition-all"
               >
                 <Download className="w-3.5 h-3.5 stroke-[2.2]" />
                 <span>Download Secure Copy</span>

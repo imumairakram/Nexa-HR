@@ -84,8 +84,8 @@ const EmployeeHolidays = () => {
       {/* 1. DYNAMIC HERO SPOTLIGHT (LIGHT BLUE & SKY CYAN GRADIENT AESTHETIC) */}
       {/* ========================================================================= */}
       {featuredHoliday && (
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-emerald-500/30">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -94,7 +94,7 @@ const EmployeeHolidays = () => {
                 {featuredHoliday.name}
               </h2>
 
-              <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed max-w-lg font-medium">
+              <p className="text-xs sm:text-sm text-teal-100/90 leading-relaxed max-w-lg font-medium">
                 {featuredHoliday.description ||
                   'Official paid public holiday observed across all company offices and duty stations. Attendance engines resume normal operations on the next working morning.'}
               </p>
@@ -113,14 +113,14 @@ const EmployeeHolidays = () => {
             </div>
 
             {/* Right Spotlight Countdown Badge */}
-            <div className="bg-emerald-950/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/30 dark:border-emerald-700/60 shadow-2xl flex flex-col items-center text-center min-w-[200px] shrink-0">
-              <div className="text-xs font-bold text-emerald-200 uppercase tracking-wider mb-1">
+            <div className="bg-teal-950/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-teal-500/30 dark:border-teal-700/60 shadow-2xl flex flex-col items-center text-center min-w-[200px] shrink-0">
+              <div className="text-xs font-bold text-teal-200 uppercase tracking-wider mb-1">
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Status' : 'Countdown'}
               </div>
               <div
                 className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
-                    ? 'text-emerald-300'
+                    ? 'text-teal-300'
                     : 'text-white'
                 }`}
               >
@@ -129,8 +129,8 @@ const EmployeeHolidays = () => {
               <div
                 className={`text-[11px] font-semibold mt-1 px-3 py-0.5 rounded-full border ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                    : 'bg-emerald-500/25 text-emerald-100 border-emerald-400/40'
+                    ? 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+                    : 'bg-teal-500/25 text-teal-100 border-teal-400/40'
                 }`}
               >
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Active Holiday' : 'Upcoming Observance'}
@@ -152,7 +152,7 @@ const EmployeeHolidays = () => {
               onClick={() => setSelectedYear(yr)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 selectedYear === yr
-                  ? 'bg-emerald-600 text-white shadow-xs'
+                  ? 'bg-teal-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -173,7 +173,7 @@ const EmployeeHolidays = () => {
               title="Schedule Table View"
               className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -184,7 +184,7 @@ const EmployeeHolidays = () => {
               title="Calendar Grid View"
               className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'calendar'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
@@ -235,7 +235,7 @@ const EmployeeHolidays = () => {
                 Official Gazetted Holidays Schedule ({selectedYear})
               </h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Automatically calculated according to timezone: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{timezone}</span>
+                Automatically calculated according to timezone: <span className="font-mono text-teal-600 dark:text-teal-400 font-bold">{timezone}</span>
               </p>
             </div>
             <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 self-start sm:self-auto">
@@ -257,14 +257,14 @@ const EmployeeHolidays = () => {
                     <div
                       key={h.id}
                       className={`bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs transition-all flex flex-col justify-between ${
-                        h.status === 'ACTIVE_TODAY' ? 'ring-2 ring-emerald-500/40 bg-emerald-50/20' : ''
+                        h.status === 'ACTIVE_TODAY' ? 'ring-2 ring-teal-500/40 bg-teal-50/20' : ''
                       }`}
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-3">
                             <div className="w-11 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs">
-                              <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
+                              <span className="text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider">
                                 {h.monthShort}
                               </span>
                               <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
@@ -283,7 +283,7 @@ const EmployeeHolidays = () => {
                             {h.type}
                           </span>
                           {h.isIslamic && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 flex items-center">
                               <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                             </span>
                           )}
@@ -298,7 +298,7 @@ const EmployeeHolidays = () => {
 
                       <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         <span className="text-[10px] uppercase font-bold text-slate-400">{h.statusText}</span>
-                        <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">{h.countdown || 'Observed'}</span>
+                        <span className="text-xs font-extrabold text-teal-600 dark:text-teal-400">{h.countdown || 'Observed'}</span>
                       </div>
                     </div>
                   ))}
@@ -322,14 +322,14 @@ const EmployeeHolidays = () => {
                     <tr
                       key={h.id}
                       className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors group ${
-                        h.status === 'ACTIVE_TODAY' ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ''
+                        h.status === 'ACTIVE_TODAY' ? 'bg-teal-50/40 dark:bg-teal-950/20' : ''
                       }`}
                     >
                       {/* Column 1: Date & Day Badge */}
                       <td className="py-4 px-6 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="w-11 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                            <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
+                            <span className="text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider">
                               {h.monthShort}
                             </span>
                             <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
@@ -347,7 +347,7 @@ const EmployeeHolidays = () => {
                       <td className="py-4 px-6">
                         <div className="space-y-1 max-w-md">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                               {h.name}
                             </span>
                             {h.isCustom && (
@@ -356,7 +356,7 @@ const EmployeeHolidays = () => {
                               </span>
                             )}
                             {h.isIslamic && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 flex items-center">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/60 flex items-center">
                                 <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                               </span>
                             )}
@@ -384,7 +384,7 @@ const EmployeeHolidays = () => {
 
                       {/* Column 4: Duty / Pay Status */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
+                        <span className="inline-flex items-center text-xs font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-3 py-1 rounded-full border border-teal-200/60 dark:border-teal-800/60">
                           <span>Paid Non-Working Day</span>
                         </span>
                       </td>
@@ -394,7 +394,7 @@ const EmployeeHolidays = () => {
                         <span
                           className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold border ${
                             h.status === 'ACTIVE_TODAY'
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300 animate-pulse'
+                              ? 'bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border-teal-300 animate-pulse'
                               : h.status === 'UPCOMING'
                               ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border-sky-200 dark:border-sky-800'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200/80 dark:border-slate-700'
@@ -433,7 +433,7 @@ const EmployeeHolidays = () => {
                   {/* Month Header */}
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                     <h4 className="text-sm font-black text-slate-900 dark:text-white">{monthName}</h4>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-300">
                       {monthHolidays.length} Holidays
                     </span>
                   </div>

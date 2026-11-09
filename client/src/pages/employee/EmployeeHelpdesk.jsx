@@ -402,7 +402,7 @@ const EmployeeHelpdesk = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <CheckCircle2 className="w-4 h-4 text-teal-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -410,9 +410,9 @@ const EmployeeHelpdesk = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC HELPDESK HERO BANNER (ROSE-LAVENDER LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-emerald-200/70 dark:border-emerald-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-300/20 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-teal-200/70 dark:border-teal-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Telemetry Info */}
@@ -436,8 +436,8 @@ const EmployeeHelpdesk = () => {
           </div>
 
           {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-emerald-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-teal-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-teal-100 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
               <LifeBuoy className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -446,7 +446,7 @@ const EmployeeHelpdesk = () => {
             </div>
             <button
               onClick={() => setIsNewTicketOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Create New Ticket</span>
@@ -537,7 +537,7 @@ const EmployeeHelpdesk = () => {
               placeholder="Search by ticket ID, subject, assignee..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all font-medium"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium"
             />
             {searchQuery && (
               <button
@@ -558,8 +558,8 @@ const EmployeeHelpdesk = () => {
               onClick={() => setShowFilterMenu((prev) => !prev)}
               className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
                 categoryFilter !== 'ALL' || statusFilter !== 'ALL'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
+                  ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 shadow-teal-500/10'
+                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700/60'
               }`}
               title="Filter Tickets"
             >
@@ -575,7 +575,7 @@ const EmployeeHelpdesk = () => {
               </span>
               <span className="inline sm:hidden">Filter</span>
               {categoryFilter !== 'ALL' || statusFilter !== 'ALL' ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse shrink-0" />
               ) : (
                 <ChevronDown
                   className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
@@ -598,7 +598,7 @@ const EmployeeHelpdesk = () => {
                         setStatusFilter('ALL');
                         setShowFilterMenu(false);
                       }}
-                      className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
+                      className="text-[10px] text-teal-600 dark:text-teal-400 font-bold hover:underline cursor-pointer"
                     >
                       Reset All
                     </button>
@@ -622,7 +622,7 @@ const EmployeeHelpdesk = () => {
                         onClick={() => setStatusFilter(st.id)}
                         className={`px-2 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center cursor-pointer ${
                           statusFilter === st.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
+                            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-300 dark:border-teal-700'
                             : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                         }`}
                       >
@@ -655,7 +655,7 @@ const EmployeeHelpdesk = () => {
                           }}
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                             categoryFilter === cat.id
-                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                              ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
                               : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                         >
@@ -666,7 +666,7 @@ const EmployeeHelpdesk = () => {
                           <span
                             className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                               categoryFilter === cat.id
-                                ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
+                                ? 'bg-teal-200/60 dark:bg-teal-900/80 text-teal-800 dark:text-teal-200'
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                             }`}
                           >
@@ -690,24 +690,24 @@ const EmployeeHelpdesk = () => {
                 Active:
               </span>
               {categoryFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-300 font-bold text-[11px]">
                   <span>Cat: {CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter}</span>
                   <button
                     type="button"
                     onClick={() => setCategoryFilter('ALL')}
-                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
+                    className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer"
                   >
                     <X className="w-3 h-3" />
                   </button>
                 </span>
               )}
               {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-300 font-bold text-[11px]">
                   <span>Status: {statusFilter === 'IN_PROGRESS' ? 'In Progress' : 'Resolved'}</span>
                   <button
                     type="button"
                     onClick={() => setStatusFilter('ALL')}
-                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
+                    className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -734,7 +734,7 @@ const EmployeeHelpdesk = () => {
                 setCategoryFilter('ALL');
                 setStatusFilter('ALL');
               }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Reset Filters</span>
@@ -773,7 +773,7 @@ const EmployeeHelpdesk = () => {
               >
                 <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 group-hover:underline">
+                    <span className="text-xs font-mono font-black text-teal-600 dark:text-teal-400 group-hover:underline">
                       #{t.id}
                     </span>
 
@@ -801,7 +801,7 @@ const EmployeeHelpdesk = () => {
                     </span>
                   </div>
 
-                  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">
+                  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-snug">
                     {t.subject}
                   </h4>
 
@@ -814,7 +814,7 @@ const EmployeeHelpdesk = () => {
                   <span
                     className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
                       t.status === 'RESOLVED'
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
+                        ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/60 dark:border-teal-800/40'
                         : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                     }`}
                   >
@@ -846,7 +846,7 @@ const EmployeeHelpdesk = () => {
                   setStatusFilter('ALL');
                   setCategoryFilter('ALL');
                 }}
-                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-emerald-600 text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-teal-600 text-white text-xs font-bold cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -862,12 +862,12 @@ const EmployeeHelpdesk = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-rose-950/20 dark:shadow-black/60 border border-rose-200/70 dark:border-rose-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/50 dark:border-emerald-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-1/4 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 min-w-0 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-green-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-100/70 dark:ring-emerald-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-700 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
                   <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -881,11 +881,11 @@ const EmployeeHelpdesk = () => {
                     <span
                       className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 border ${
                         selectedTicket.status === 'RESOLVED'
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
+                          ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/60 dark:border-teal-800/40'
                           : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket.status === 'RESOLVED' ? 'bg-emerald-500' : 'bg-amber-500 animate-ping'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket.status === 'RESOLVED' ? 'bg-teal-500' : 'bg-amber-500 animate-ping'}`} />
                       {selectedTicket.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}
                     </span>
                   </div>
@@ -982,7 +982,7 @@ const EmployeeHelpdesk = () => {
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 border shadow-xs ${
                     selectedTicket.status === 'RESOLVED'
                       ? 'bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60'
-                      : 'bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60'
+                      : 'bg-teal-50 text-teal-700 border-teal-200/80 hover:bg-teal-100 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800/60'
                   }`}
                 >
                   {isUpdatingStatus ? (
@@ -1013,12 +1013,12 @@ const EmployeeHelpdesk = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/70 border border-rose-200/70 dark:border-rose-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-emerald-200/70 dark:border-emerald-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-green-50/60 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/70 dark:border-teal-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-green-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/30 ring-3 ring-emerald-100/80 dark:ring-emerald-950/60">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-teal-700 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/30 ring-3 ring-teal-100/80 dark:ring-teal-950/60">
                   <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -1040,7 +1040,7 @@ const EmployeeHelpdesk = () => {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateTicket} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-emerald-50/15 to-teal-50/15 dark:from-transparent dark:via-emerald-950/10 dark:to-teal-950/10">
+            <form onSubmit={handleCreateTicket} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-teal-50/15 to-teal-50/15 dark:from-transparent dark:via-teal-950/10 dark:to-teal-950/10">
               {/* Subject */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
