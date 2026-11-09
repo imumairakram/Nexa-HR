@@ -242,8 +242,24 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
   // Step 3: Reset Password
   const handleResetPassword = async (e) => {
     if (e) e.preventDefault();
-    if (!newPassword || newPassword.length < 6) {
-      setError('Password must be at least 6 characters in length.');
+    if (!newPassword || newPassword.length < 10) {
+      setError('Password must be at least 10 characters long.');
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      setError('Password must contain at least one uppercase letter (A-Z).');
+      return;
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      setError('Password must contain at least one lowercase letter (a-z).');
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      setError('Password must contain at least one digit (0-9).');
+      return;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(newPassword)) {
+      setError('Password must contain at least one special symbol (!@#$%^&*).');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -266,34 +282,15 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
         setStep(4);
         if (onSuccess) onSuccess({ email, newPassword });
       } else {
-        setError(res.message || 'Failed to update password.');
+        setError(res?.message || 'Failed to update password.');
       }
     } catch (err) {
-      console.warn('Reset password warning:', err.message);
-      setSuccessMessage('Password reset successfully!');
-      setStep(4);
-      if (onSuccess) onSuccess({ email, newPassword });
+      console.error('Reset password error:', err);
+      setError(err.message || 'Failed to update password. Please verify requirements and try again.');
     } finally {
       setLoading(false);
     }
   };
-
-  // Password Strength Calculator
-  const getPasswordStrength = () => {
-    if (!newPassword) return { score: 0, label: '', color: 'bg-slate-200' };
-    let score = 0;
-    if (newPassword.length >= 6) score++;
-    if (newPassword.length >= 8) score++;
-    if (/[0-9]/.test(newPassword)) score++;
-    if (/[^A-Za-z0-9]/.test(newPassword) || /[A-Z]/.test(newPassword)) score++;
-
-    if (score === 1) return { score: 25, label: 'Weak', color: 'bg-rose-500' };
-    if (score === 2) return { score: 50, label: 'Fair', color: 'bg-amber-500' };
-    if (score === 3) return { score: 75, label: 'Good', color: 'bg-teal-700' };
-    return { score: 100, label: 'Strong & Secure', color: 'bg-emerald-500' };
-  };
-
-  const strength = getPasswordStrength();
 
   if (!isOpen) return null;
 
@@ -711,7 +708,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       type={showNewPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter minimum 6 characters"
+                      placeholder="Min 10 chars (e.g. NexaSecure@2026)"
                       className="w-full pl-10 pr-10 py-2.5 rounded-[8px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-[#E2E1DC]/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 outline-none transition-all shadow-xs text-xs sm:text-sm"
                       required
                     />
@@ -723,22 +720,9 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-
-                  {/* Password Strength Meter */}
-                  {newPassword && (
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                        <span>Password Strength:</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">{strength.label}</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${strength.color} transition-all duration-300`}
-                          style={{ width: `${strength.score}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    Must be at least 10 characters and include uppercase, lowercase, number & symbol.
+                  </p>
                 </div>
 
                 {/* Confirm Password */}

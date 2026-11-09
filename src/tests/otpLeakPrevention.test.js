@@ -363,6 +363,8 @@ test('OTP Leak Prevention - Zero Secret Exposure Across All Environments', async
       'previewOtp',
       'devOtp',
       'testCode',
+      'getPasswordStrength',
+      'Password Strength:',
     ];
 
     for (const filePath of filesToScan) {

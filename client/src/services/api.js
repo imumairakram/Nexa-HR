@@ -184,7 +184,8 @@ async function fetchAPI(endpoint, options = {}) {
             window.dispatchEvent(new Event('user_profile_updated'));
           }
         }
-        throw new Error(data.message || `Server error (${response.status})`);
+        const errorMessage = data?.errors?.[0]?.message || data?.message || `Server error (${response.status})`;
+        throw new Error(errorMessage);
       }
 
       // Cache successful GET responses
