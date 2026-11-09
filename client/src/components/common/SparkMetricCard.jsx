@@ -375,7 +375,7 @@ const SparkMetricCard = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden rounded-[14px] p-4 sm:p-5 flex flex-col justify-between h-full min-h-[142px] transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] select-none group ${
+      className={`relative overflow-hidden rounded-[14px] p-4 sm:p-5 flex flex-col justify-between transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] select-none group ${
         isDark
           ? 'bg-[#16211E] dark:bg-[#16211E] text-[#F1F5F4] border border-[#273834] shadow-subtle hover:border-[#384E48] hover:shadow-elevated'
           : 'bg-white dark:bg-[#16211E] text-[#1C2321] dark:text-[#F1F5F4] border border-[#E2E1DC] dark:border-[#273834] shadow-subtle hover:border-[#C7C5BB] dark:hover:border-[#384E48] hover:shadow-elevated'
@@ -592,40 +592,6 @@ const SparkMetricCard = ({
             </div>
           )}
         </div>
-      </div>
-
-      {/* Bottom Section: Trend Pill Badge & Subtext */}
-      <div className="mt-auto pt-3 flex items-center justify-between gap-1.5 border-t border-transparent">
-        {resolvedBadgeText && (
-          <span
-            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[8px] text-xs font-semibold tracking-tight shadow-2xs transition-colors shrink-0 ${
-              isDark
-                ? resolvedBadgeType === 'negative'
-                  ? 'bg-rose-950/70 text-rose-400 border border-rose-800/50'
-                  : resolvedBadgeType === 'warning'
-                  ? 'bg-amber-950/70 text-amber-400 border border-amber-800/50'
-                  : resolvedBadgeType === 'neutral'
-                  ? 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
-                  : 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50'
-                : resolvedBadgeType === 'negative'
-                ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/70 dark:border-rose-800/40'
-                : resolvedBadgeType === 'warning'
-                ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-800/40'
-                : resolvedBadgeType === 'neutral'
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-                : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
-            }`}
-          >
-            {resolvedBadgeIcon === 'none' ? null : resolvedBadgeIcon === 'dot' ? (
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-            ) : resolvedBadgeType === 'negative' || resolvedBadgeIcon === 'down' ? (
-              <span className="text-xs leading-none">↘</span>
-            ) : (
-              <span className="text-xs leading-none">↗</span>
-            )}
-            <span>{resolvedBadgeText}</span>
-          </span>
-        )}
       </div>
     </div>
   );
