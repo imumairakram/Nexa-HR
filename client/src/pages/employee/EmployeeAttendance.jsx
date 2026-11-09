@@ -29,7 +29,7 @@ import {
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
-import { api, isGuestOrDemo } from '../../services/api';
+import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 
 const EmployeeAttendance = () => {
@@ -51,142 +51,6 @@ const EmployeeAttendance = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [todayLog, setTodayLog] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isPunching, setIsPunching] = useState(false);
-  const [punchSuccessMsg, setPunchSuccessMsg] = useState('');
-  const [punchErrorMsg, setPunchErrorMsg] = useState('');
-
-  const hasPunchedIn = Boolean(todayLog?.checkIn && todayLog.checkIn !== '--:--');
-  const hasPunchedOut = Boolean(todayLog?.checkOut && todayLog.checkOut !== '--:--');
-
-  const handlePunch = async (punchType) => {
-    if (isPunching) return;
-    setIsPunching(true);
-    setPunchErrorMsg('');
-    setPunchSuccessMsg('');
-
-    const now = new Date();
-    const timeStr = formatTime(now, false);
-    const todayStr = now.toISOString().split('T')[0];
-
-    try {
-      if (isGuestOrDemo()) {
-        let updatedToday;
-        if (punchType === 'IN') {
-          updatedToday = {
-            ...(todayLog || {}),
-            id: todayLog?.id || `demo-att-${Date.now()}`,
-            rawDate: now.toISOString(),
-            dateObj: now,
-            dayNum: String(now.getDate()).padStart(2, '0'),
-            monthShort: now.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
-            dayName: now.toLocaleDateString('en-US', { weekday: 'long' }),
-            isToday: true,
-            formattedDate: formatDate(now),
-            day: now.toLocaleDateString('en-US', { weekday: 'long' }),
-            checkIn: timeStr,
-            checkOut: todayLog?.checkOut || '--:--',
-            hours: todayLog?.hours || 0,
-            ot: todayLog?.ot || 0,
-            status: 'PRESENT',
-            method: 'Web Portal Self-Punch',
-            notes: 'Web Punch Verified',
-          };
-          setPunchSuccessMsg(`Punch In recorded at ${timeStr} (Verified)`);
-        } else {
-          const inDate = todayLog?.dateObj || new Date(now.getTime() - 8.5 * 3600000);
-          const diffHours = parseFloat((Math.max(0, now.getTime() - inDate.getTime()) / 3600000).toFixed(1)) || 8.5;
-          updatedToday = {
-            ...(todayLog || {}),
-            checkIn: todayLog?.checkIn || '09:00 AM',
-            checkOut: timeStr,
-            hours: diffHours,
-            ot: diffHours > 8.0 ? parseFloat((diffHours - 8.0).toFixed(1)) : 0,
-            status: todayLog?.status || 'PRESENT',
-            method: 'Web Portal Self-Punch',
-            notes: 'Web Punch (Check-Out)',
-          };
-          setPunchSuccessMsg(`Punch Out recorded at ${timeStr} (${diffHours}h logged)`);
-        }
-        setTodayLog(updatedToday);
-        setLogs((prev) => {
-          const existingIdx = prev.findIndex((l) => l.isToday || (l.rawDate || '').split('T')[0] === todayStr);
-          if (existingIdx >= 0) {
-            const next = [...prev];
-            next[existingIdx] = updatedToday;
-            return next;
-          }
-          return [updatedToday, ...prev];
-        });
-        window.dispatchEvent(new CustomEvent('nexahr_punch_updated'));
-        setTimeout(() => setPunchSuccessMsg(''), 4000);
-        return;
-      }
-
-      const res = await api.punchAttendance({
-        type: punchType,
-        timestamp: now.toISOString(),
-        notes: 'Web Portal Self-Punch',
-      });
-
-      if (res?.success) {
-        if (punchType === 'IN') {
-          setPunchSuccessMsg(`Punch In recorded at ${timeStr} (Verified)`);
-        } else {
-          setPunchSuccessMsg(`Punch Out recorded at ${timeStr} (Shift updated)`);
-        }
-        setTimeout(() => setPunchSuccessMsg(''), 4500);
-
-        // Optimistically update todayLog while reloading logs
-        if (punchType === 'IN') {
-          setTodayLog((prev) => ({
-            ...(prev || {}),
-            checkIn: timeStr,
-            status: prev?.status || 'PRESENT',
-            isToday: true,
-          }));
-        } else {
-          setTodayLog((prev) => ({
-            ...(prev || {}),
-            checkOut: timeStr,
-          }));
-        }
-
-        api.clearCache();
-        window.dispatchEvent(new CustomEvent('nexahr_punch_updated'));
-        await fetchMyAttendance(selectedMonth, selectedYear);
-      } else {
-        setPunchErrorMsg(res?.message || 'Failed to record punch.');
-        setTimeout(() => setPunchErrorMsg(''), 4000);
-      }
-    } catch (err) {
-      console.error('Punch error:', err);
-      if (err?.name === 'DemoModeError' || err?.message?.toLowerCase().includes('demo')) {
-        if (punchType === 'IN') {
-          setTodayLog((prev) => ({
-            ...(prev || {}),
-            checkIn: timeStr,
-            checkOut: prev?.checkOut || '--:--',
-            status: 'PRESENT',
-            isToday: true,
-          }));
-          setPunchSuccessMsg(`Punch In recorded at ${timeStr} (Demo session)`);
-        } else {
-          setTodayLog((prev) => ({
-            ...(prev || {}),
-            checkOut: timeStr,
-            status: prev?.status || 'PRESENT',
-          }));
-          setPunchSuccessMsg(`Punch Out recorded at ${timeStr} (Demo session)`);
-        }
-        setTimeout(() => setPunchSuccessMsg(''), 4000);
-      } else {
-        setPunchErrorMsg(err?.message || 'Failed to register punch. Please try again.');
-        setTimeout(() => setPunchErrorMsg(''), 4000);
-      }
-    } finally {
-      setIsPunching(false);
-    }
-  };
 
   // Close filter dropdown on click outside
   useEffect(() => {
@@ -335,10 +199,7 @@ const EmployeeAttendance = () => {
 
         // Find today's record matching current local date
         const todayStr = new Date().toISOString().split('T')[0];
-        const todayDateStr = new Date().toDateString();
-        const currentToday = formatted.find(
-          (l) => l.isToday || (l.dateObj && !isNaN(l.dateObj.getTime()) && l.dateObj.toDateString() === todayDateStr) || (l.rawDate || '').split('T')[0] === todayStr
-        );
+        const currentToday = formatted.find((l) => (l.rawDate || '').split('T')[0] === todayStr);
         if (currentToday) {
           setTodayLog(currentToday);
         } else {
@@ -589,7 +450,7 @@ const EmployeeAttendance = () => {
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
-              Punches are captured in real-time from office biometric gate terminals and direct web self-service. All entries are instantly verified and synchronized.
+              Punches are captured in real-time from office biometric face-recognition and fingerprint gate terminals. Manual adjustments are managed by HR.
             </p>
 
             {/* Live Clock, Office Location & Shift Details */}
@@ -652,84 +513,6 @@ const EmployeeAttendance = () => {
                 </div>
               </div>
             </div>
-
-            {/* Interactive Punch Action Button */}
-            <div className="w-full mt-2.5">
-              {!hasPunchedIn ? (
-                <button
-                  type="button"
-                  onClick={() => handlePunch('IN')}
-                  disabled={isPunching}
-                  className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {isPunching ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Recording Punch In...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Fingerprint className="w-4 h-4 text-white" />
-                      <span>Punch In Now</span>
-                    </>
-                  )}
-                </button>
-              ) : !hasPunchedOut ? (
-                <button
-                  type="button"
-                  onClick={() => handlePunch('OUT')}
-                  disabled={isPunching}
-                  className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 active:scale-[0.98] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {isPunching ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Recording Punch Out...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Clock className="w-4 h-4 text-white" />
-                      <span>Punch Out (End Shift)</span>
-                    </>
-                  )}
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 py-2 px-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Shift Complete ({todayLog?.hours || 8.5}h)</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handlePunch('OUT')}
-                    disabled={isPunching}
-                    title="Update Punch Out timestamp"
-                    className="py-2 px-3 bg-white/10 hover:bg-white/20 active:scale-[0.98] text-slate-200 text-xs font-medium rounded-xl border border-white/15 transition-all flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
-                  >
-                    {isPunching ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <RotateCcw className="w-3.5 h-3.5 text-slate-300" />
-                    )}
-                    <span>Update</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* In-Card Toast/Feedback Message */}
-            {punchSuccessMsg && (
-              <div className="w-full mt-2 py-1.5 px-3 bg-emerald-500/25 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="truncate">{punchSuccessMsg}</span>
-              </div>
-            )}
-            {punchErrorMsg && (
-              <div className="w-full mt-2 py-1.5 px-3 bg-rose-500/25 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-semibold flex items-center justify-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                <span className="truncate">{punchErrorMsg}</span>
-              </div>
-            )}
 
             <div className="w-full pt-2 flex items-center justify-between text-xs sm:text-sm text-slate-300 font-medium leading-normal">
               <span>Shift: 09:00 AM – 05:30 PM</span>
