@@ -434,9 +434,9 @@ const EmployeeAttendance = () => {
       />
 
       {/* ========================================================================= */}
-      {/* 1. HERO BIOMETRIC HARDWARE STATUS BANNER (EMERALD & TEAL BIOMETRIC AESTHETIC) */}
+      {/* 1. HERO BIOMETRIC HARDWARE STATUS BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-teal-950 to-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-teal-800/40">
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
         <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 

@@ -344,18 +344,18 @@ const EmployeeLeaves = () => {
       {/* ========================================================================= */}
       {/* 1. HERO LEAVE & TIME-OFF BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-50/90 via-teal-50/80 to-cyan-50/60 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-teal-200/70 dark:border-teal-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Leave Entitlement Info */}
           <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
               Time-Off & Leave Entitlement
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-lg font-medium">
               Track your remaining annual vacation, medical days, and casual leave quotas. Applications are routed live for management review.
             </p>
 
@@ -375,17 +375,17 @@ const EmployeeLeaves = () => {
           </div>
 
           {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 border border-teal-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[240px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+          <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[220px] sm:min-w-[240px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center">
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
-              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Planning Time Off?</div>
-              <div className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">Submit instant leave request</div>
+              <div className="text-xs font-extrabold text-white">Planning Time Off?</div>
+              <div className="text-xs text-slate-300 mt-0.5">Submit instant leave request</div>
             </div>
             <button
               onClick={() => setIsApplyOpen(true)}
-              className="w-full px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-[0.98] text-white font-bold text-xs shadow-sm shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02]"
+              className="w-full px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 active:scale-[0.98] text-white font-bold text-xs shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02]"
             >
               <span>Apply for Leave</span>
               <ArrowRight className="w-3.5 h-3.5" />
