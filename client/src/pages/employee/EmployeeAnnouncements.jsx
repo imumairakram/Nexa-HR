@@ -312,26 +312,18 @@ const EmployeeAnnouncements = () => {
                 {heroNotice.summary}
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 font-semibold pt-1">
-                <span className="flex items-center text-emerald-300 bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-800/60">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
                 <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                   <span>{heroNotice.department}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-400">
-                  <Clock className="w-3.5 h-3.5" />
                 <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                   <span>{heroNotice.readTime}</span>
                 </span>
                 {heroNotice.totalTargetCount ? (
-                  <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
                   <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                     <span>{heroNotice.acknowledgedCount || 0} / {heroNotice.totalTargetCount} Acknowledged</span>
                   </span>
                 ) : heroNotice.acknowledged ? (
-                  <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
                   <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                     <span>Acknowledged</span>
                   </span>
