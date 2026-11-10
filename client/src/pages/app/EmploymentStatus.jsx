@@ -654,183 +654,152 @@ const EmploymentStatus = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
-          {filtered.map((emp, idx) => {
-            const empType = getEffectiveType(emp);
-            const classInfo = getClassificationBadge(empType);
-            const employeeCode = emp.employeeCode || `EMP-${(emp.id || '').slice(0, 4)}`;
-
-            return (
-              <div
-                key={emp.id || idx}
-                className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] shadow-soft hover:shadow-xl hover:border-sky-300/80 dark:hover:border-sky-700/70 hover:-translate-y-1 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between"
-              >
-                {/* Ambient Sky Glow */}
-                <div className="absolute top-0 right-0 w-36 h-36 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500" />
-
-                <div className="p-6 pb-2 relative z-10">
-                  {/* 1. Header: Avatar with Status Dot + Classification Pill */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="relative inline-block">
-                      <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl ring-4 ring-sky-100/70 dark:ring-sky-950/60 shadow-sm overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                        <img
-                          src={getAvatarUrl(emp)}
-                          alt={`${emp.firstName} ${emp.lastName}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = DEFAULT_BLANK_AVATAR;
-                          }}
-                        />
-                      </div>
-                      <span
-                        className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-[#1E293B] ${classInfo.dotClass} shadow-xs flex items-center justify-center`}
-                        title={`Status: ${classInfo.label}`}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping opacity-75" />
-                      </span>
-                    </div>
-
-                    {/* Classification Status Badge & Code */}
-                    <div className="flex flex-col items-end gap-1.5">
-                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border flex items-center gap-1.5 shadow-xs ${classInfo.badgeClass}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${classInfo.dotClass}`} />
-                        <span>{classInfo.short}</span>
-                      </span>
-                      <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-700/60">
-                        {employeeCode}
-                      </span>
+          {filtered.map((emp, idx) => (
+            <div
+              key={emp.id || idx}
+              className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-[#1E293B] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between"
+            >
+              <div className="p-6 pb-2">
+                {/* 1. Header: Avatar & Top-Right Edit Button */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="relative inline-block">
+                    <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full ring-4 ring-slate-100 dark:ring-slate-800 shadow-sm overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                      <img
+                        src={getAvatarUrl(emp)}
+                        alt={`${emp.firstName} ${emp.lastName}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = DEFAULT_BLANK_AVATAR;
+                        }}
+                      />
                     </div>
                   </div>
 
-                  {/* 2. Main Dossier Info */}
-                  <div>
-                    <h3
-                      onClick={() => setSelectedEmployee(emp)}
-                      className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors"
-                    >
-                      {emp.firstName || ''} {emp.lastName || ''}
-                    </h3>
-
-                    <p className="text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-slate-200 mt-1 truncate">
-                      <span>{emp.profile?.designation?.title || emp.designationTitle || emp.role || 'Staff Member'}</span>
-                      {(emp.profile?.department?.name || emp.departmentName) && (
-                        <>
-                          <span className="text-slate-400 mx-1.5 font-normal">|</span>
-                          <span>{emp.profile?.department?.name || emp.departmentName}</span>
-                        </>
-                      )}
-                    </p>
-
-                    {/* 3. Shift Schedule Highlight Tile (Thematic Sky Blue Feature) */}
-                    <div className="mt-4 p-3 rounded-2xl bg-sky-50/70 dark:bg-sky-950/20 border border-sky-200/60 dark:border-sky-900/40 flex items-center justify-between gap-2.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 flex items-center justify-center shrink-0">
-                          <Clock className="w-4 h-4 stroke-[2.2]" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-sky-800/70 dark:text-sky-400 tracking-wider block">
-                            Assigned Shift
-                          </span>
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block">
-                            {emp.profile?.shift || 'General Morning (09:00 - 17:30)'}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(emp)}
-                        className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 shrink-0 transition-colors cursor-pointer"
-                      >
-                        Change
-                      </button>
-                    </div>
-
-                    {/* 4. Telemetry details (Office Location, Home Address, Email, Phone) */}
-                    <div className="space-y-2 mt-3.5 text-xs font-normal text-slate-600 dark:text-slate-300">
-                      <div className="flex items-center gap-2.5" title="Assigned Office Work Location">
-                        <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
-                        <span className="truncate font-semibold text-slate-800 dark:text-slate-200">
-                          {emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ & Innovation Lab'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2.5" title="Residential Home Address">
-                        <Home className="w-3.5 h-3.5 text-amber-500/80 shrink-0" />
-                        <span className="truncate text-slate-500 dark:text-slate-400">
-                          {emp.profile?.address || emp.address || 'Home Address Not Specified'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        {emp.email ? (
-                          <a
-                            href={`mailto:${emp.email}`}
-                            className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors truncate"
-                          >
-                            {emp.email}
-                          </a>
-                        ) : (
-                          <span className="text-slate-400 italic">No email provided</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        {emp.phone || emp.profile?.phone ? (
-                          <a
-                            href={`tel:${emp.phone || emp.profile?.phone}`}
-                            className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors truncate"
-                          >
-                            {emp.phone || emp.profile?.phone}
-                          </a>
-                        ) : (
-                          <span className="text-slate-400 italic">Not Provided</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  {/* Edit Button at Top Right */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenEdit(emp);
+                    }}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Update Status & Shift"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 stroke-[2.5]" />
+                  </button>
                 </div>
 
-                {/* 5. Footer: Joined Date & Rounded Action Icons */}
-                <div className="px-6 pb-6 pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between relative z-10">
-                  <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium text-slate-400">
-                    <Calendar className="w-3.5 h-3.5 text-sky-500/70 shrink-0" />
-                    <span>Joined {formatJoiningDate(emp.profile?.joiningDate || emp.joiningDate || emp.createdAt)}</span>
+                {/* 2. Main Dossier Info */}
+                <div>
+                  <h3
+                    onClick={() => setSelectedEmployee(emp)}
+                    className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors"
+                  >
+                    {emp.firstName || ''} {emp.lastName || ''}
+                  </h3>
+
+                  <p className="text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-slate-200 mt-1 truncate">
+                    <span>{emp.profile?.designation?.title || emp.designationTitle || emp.role || 'Staff Member'}</span>
+                    {(emp.profile?.department?.name || emp.departmentName) && (
+                      <>
+                        <span className="text-slate-400 mx-1.5 font-normal">|</span>
+                        <span>{emp.profile?.department?.name || emp.departmentName}</span>
+                      </>
+                    )}
+                  </p>
+
+                  <div className="space-y-1 mt-2 text-xs font-normal">
+                    <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-semibold truncate" title="Assigned Office Work Location">
+                      <Building2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span className="truncate">{emp.profile?.workLocation || emp.workLocation || 'Karachi Regional Hub'}</span>
+                    </div>
+                    {(emp.profile?.address || emp.address) && (
+                      <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[11px] truncate" title="Residential Home Address">
+                        <Home className="w-3 h-3 text-amber-500/80 shrink-0" />
+                        <span className="truncate">{emp.profile?.address || emp.address}</span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {/* Full Dossier View */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedEmployee(emp)}
-                      className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-sky-100 dark:bg-slate-800 dark:hover:bg-sky-950/60 text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60 hover:scale-105"
-                      title="Full Profile Dossier"
-                    >
-                      <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
-                    </button>
+                  <p className="text-xs sm:text-[12.5px] text-slate-600 dark:text-slate-300 leading-relaxed mt-3.5 font-normal line-clamp-4">
+                    {getEmployeeBio(emp)}
+                  </p>
 
-                    {/* Edit Shift & Status Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(emp)}
-                      className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-1.5 cursor-pointer transition-all hover:scale-105 active:scale-95"
-                      title="Update Shift & Status"
-                    >
-                      <Edit3 className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>Update</span>
-                    </button>
-
-                    {/* Remove / Archive */}
-                    <button
-                      type="button"
-                      onClick={() => setEmployeeToDelete(emp)}
-                      className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60 hover:scale-105"
-                      title="Remove Employee"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 stroke-[2.2]" />
-                    </button>
+                  <div className="space-y-2 mt-4 text-xs font-normal text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-2.5">
+                      <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {emp.email ? (
+                        <a
+                          href={`mailto:${emp.email}`}
+                          className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors truncate"
+                        >
+                          {emp.email}
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic">No email provided</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{formatDob(emp.profile?.dateOfBirth || emp.dateOfBirth || emp.dob)}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {emp.phone || emp.profile?.phone ? (
+                        <a
+                          href={`tel:${emp.phone || emp.profile?.phone}`}
+                          className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                        >
+                          {emp.phone || emp.profile?.phone}
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic">Not Provided</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
+
+              {/* 3. Footer: Joined Date & Rounded Action Icons */}
+              <div className="px-6 pb-6 pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  Joined on {formatJoiningDate(emp.profile?.joiningDate || emp.joiningDate || emp.createdAt)}
+                </span>
+
+                <div className="flex items-center gap-2">
+                  {/* Full Profile View */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedEmployee(emp)}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Full Profile Dossier"
+                  >
+                    <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
+                  </button>
+
+                  {/* Edit Shift & Status */}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(emp)}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Update Status & Shift"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 stroke-[2.2]" />
+                  </button>
+
+                  {/* Remove Employee */}
+                  <button
+                    type="button"
+                    onClick={() => setEmployeeToDelete(emp)}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                    title="Remove Employee"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 stroke-[2.2]" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

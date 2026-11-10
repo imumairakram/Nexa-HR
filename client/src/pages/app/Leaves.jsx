@@ -35,7 +35,7 @@ export const calculateLeaveDays = (req) => {
         const diff = Math.max(1, Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24)) + 1);
         return req.dayType === 'HALF' ? 0.5 : diff;
       }
-    } catch {}
+    } catch { }
   }
   const explicit = Number(req.totalDays ?? req.days);
   if (!isNaN(explicit) && explicit > 0) return explicit;
@@ -159,14 +159,14 @@ const Leaves = () => {
         prev.map((r) =>
           r.id === reqId
             ? {
-                ...r,
-                status: newStatus,
-                rejectionReason: remarksInput,
-                approvedBy: {
-                  firstName: currentUser.firstName || 'HR',
-                  lastName: currentUser.lastName || 'Management',
-                },
-              }
+              ...r,
+              status: newStatus,
+              rejectionReason: remarksInput,
+              approvedBy: {
+                firstName: currentUser.firstName || 'HR',
+                lastName: currentUser.lastName || 'Management',
+              },
+            }
             : r
         )
       );
@@ -256,7 +256,7 @@ const Leaves = () => {
           } else if (dateRange === 'THIS_YEAR') {
             matchesDate = reqDate.getFullYear() === now.getFullYear();
           }
-        } catch {}
+        } catch { }
       }
 
       return matchesSearch && matchesStatus && matchesType && matchesDate;
@@ -511,11 +511,10 @@ const Leaves = () => {
                       key={typeName}
                       type="button"
                       onClick={() => setLeaveTypeFilter(typeName)}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
-                        leaveTypeFilter === typeName
-                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
-                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
-                      }`}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${leaveTypeFilter === typeName
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                        }`}
                     >
                       {typeName === 'ALL' ? 'All Types' : typeName}
                     </button>
@@ -533,11 +532,10 @@ const Leaves = () => {
                       key={opt.key}
                       type="button"
                       onClick={() => setDateRange(opt.key)}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
-                        dateRange === opt.key
-                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
-                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
-                      }`}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${dateRange === opt.key
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                        }`}
                     >
                       {opt.label}
                     </button>
@@ -587,13 +585,12 @@ const Leaves = () => {
                             </div>
                           </div>
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase shrink-0 ${
-                              req.status === 'APPROVED'
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                                : req.status === 'REJECTED'
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase shrink-0 ${req.status === 'APPROVED'
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                              : req.status === 'REJECTED'
                                 ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                                 : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                            }`}
+                              }`}
                           >
                             {req.status}
                           </span>
@@ -682,13 +679,12 @@ const Leaves = () => {
                         </td>
                         <td className="py-4 px-4">
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                              req.status === 'APPROVED'
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                                : req.status === 'REJECTED'
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${req.status === 'APPROVED'
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                              : req.status === 'REJECTED'
                                 ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                                 : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                            }`}
+                              }`}
                           >
                             {req.status}
                           </span>
@@ -724,15 +720,15 @@ const Leaves = () => {
               </div>
             </>
           ) : (
-          <div className="p-12 text-center flex flex-col items-center justify-center">
-            <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-            <h4 className="text-base font-black text-slate-900 dark:text-white">No Leave Applications Found</h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              There are currently no leave requests matching the selected filter. Applications submitted by employees will appear here in real-time.
-            </p>
-          </div>
-        )}
-      </div>
+            <div className="p-12 text-center flex flex-col items-center justify-center">
+              <CalendarDays className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+              <h4 className="text-base font-black text-slate-900 dark:text-white">No Leave Applications Found</h4>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm">
+                There are currently no leave requests matching the selected filter. Applications submitted by employees will appear here in real-time.
+              </p>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Apply on Behalf Modal */}
