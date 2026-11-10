@@ -23,7 +23,7 @@ export const Input = ({
         className={`w-full bg-[#ECEAE4]/60 dark:bg-[#111A18] border ${
           error
             ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500'
-            : 'border-[#E2E1DC] dark:border-[#273834] focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 dark:focus:ring-teal-400/20 dark:focus:border-teal-400'
+            : 'border-[#E2E1DC] dark:border-[#273834] focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 dark:focus:ring-sky-400/20 dark:focus:border-sky-400'
         } rounded-[8px] ${
           Icon ? 'pl-9.5' : 'pl-3.5'
         } pr-3.5 py-2 text-xs font-medium text-slate-900 dark:text-[#F1F5F4] placeholder-slate-400 outline-none transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}

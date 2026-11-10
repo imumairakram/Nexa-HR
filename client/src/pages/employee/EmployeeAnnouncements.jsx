@@ -320,7 +320,7 @@ const EmployeeAnnouncements = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-400" />
+          <CheckCircle2 className="w-4 h-4 text-sky-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -329,9 +329,9 @@ const EmployeeAnnouncements = () => {
       {/* 1. FULLY DYNAMIC HERO SPOTLIGHT BANNER WITH LIVE CONTROLS */}
       {/* ========================================================================= */}
       {heroNotice && (
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             {/* Left Column: Spotlight details */}
@@ -387,7 +387,7 @@ const EmployeeAnnouncements = () => {
 
             {/* Right Column: Hero Interactive Actions Card */}
             <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[240px] sm:min-w-[270px] shrink-0 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center border border-teal-400/30">
+              <div className="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center border border-sky-400/30">
                 <Megaphone className="w-6 h-6" />
               </div>
               <div>
@@ -398,7 +398,7 @@ const EmployeeAnnouncements = () => {
               <div className="w-full space-y-2 pt-1">
                 <button
                   onClick={() => setSelectedItem(heroNotice)}
-                  className="w-full px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                  className="w-full px-5 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
                 >
                   <span>Read Full Notice</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -408,11 +408,11 @@ const EmployeeAnnouncements = () => {
                   onClick={() => toggleAcknowledge(heroNotice.id)}
                   className={`w-full px-4 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
                     heroNotice.acknowledged
-                      ? 'bg-teal-500/20 text-teal-300 border-teal-500/40'
+                      ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
                       : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
                   }`}
                 >
-                  <Check className={`w-3.5 h-3.5 ${heroNotice.acknowledged ? 'text-teal-400' : 'text-slate-300'}`} />
+                  <Check className={`w-3.5 h-3.5 ${heroNotice.acknowledged ? 'text-sky-400' : 'text-slate-300'}`} />
                   <span>{heroNotice.acknowledged ? 'Acknowledged' : 'Acknowledge Notice'}</span>
                 </button>
               </div>
@@ -472,7 +472,7 @@ const EmployeeAnnouncements = () => {
                 <button
                   type="button"
                   onClick={() => setFilter('ALL')}
-                  className="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
                 >
                   Reset
                 </button>
@@ -491,7 +491,7 @@ const EmployeeAnnouncements = () => {
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
                     }`}
                   >
@@ -499,7 +499,7 @@ const EmployeeAnnouncements = () => {
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
                         isSelected
-                          ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
+                          ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
                           : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                       }`}
                     >
@@ -525,7 +525,7 @@ const EmployeeAnnouncements = () => {
               key={item.id}
               className={`rounded-3xl p-6 sm:p-7 shadow-soft border transition-all duration-300 hover:shadow-md ${
                 item.pinned
-                  ? 'bg-gradient-to-r from-amber-500/5 via-teal-500/5 to-white dark:to-[#1E293B] border-amber-200/80 dark:border-amber-900/50'
+                  ? 'bg-gradient-to-r from-amber-500/5 via-sky-500/5 to-white dark:to-[#1E293B] border-amber-200/80 dark:border-amber-900/50'
                   : 'bg-white dark:bg-[#1E293B] border-slate-100 dark:border-slate-800'
               }`}
             >
@@ -545,7 +545,7 @@ const EmployeeAnnouncements = () => {
                           ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
                           : item.priority === 'MEDIUM'
                           ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
-                          : 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/60'
+                          : 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60'
                       }`}
                     >
                       {item.categoryLabel || item.category}
@@ -558,7 +558,7 @@ const EmployeeAnnouncements = () => {
                   {/* Notice Title */}
                   <h3
                     onClick={() => setSelectedItem(item)}
-                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-colors leading-snug"
+                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors leading-snug"
                   >
                     {item.title}
                   </h3>
@@ -575,7 +575,7 @@ const EmployeeAnnouncements = () => {
                         <button
                           key={aIdx}
                           onClick={() => handleDownloadAttachment(att)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer border border-slate-200/70 dark:border-slate-700/60"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/70 dark:border-slate-700/60"
                         >
                           <Paperclip className="w-3 h-3 text-slate-400" />
                           <span>{att.name}</span>
@@ -590,7 +590,7 @@ const EmployeeAnnouncements = () => {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setSelectedItem(item)}
-                        className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Read Full Notice</span>
@@ -600,11 +600,11 @@ const EmployeeAnnouncements = () => {
                         onClick={() => toggleAcknowledge(item.id)}
                         className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
                           item.acknowledged
-                            ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200'
-                            : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-teal-500'
+                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200'
+                            : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-sky-500'
                         }`}
                       >
-                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-teal-600' : 'text-slate-400'}`} />
+                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-sky-600' : 'text-slate-400'}`} />
                         <span>{item.acknowledged ? 'Acknowledged' : 'Acknowledge Notice'}</span>
                       </button>
                     </div>
@@ -632,7 +632,7 @@ const EmployeeAnnouncements = () => {
           ))
         ) : (
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center">
               <Megaphone className="w-6 h-6" />
             </div>
             <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -649,7 +649,7 @@ const EmployeeAnnouncements = () => {
                   setFilter('ALL');
                   setSearchQuery('');
                 }}
-                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-teal-600 text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-sky-600 text-white text-xs font-bold cursor-pointer"
               >
                 Reset All Filters
               </button>
@@ -663,19 +663,19 @@ const EmployeeAnnouncements = () => {
       {/* ========================================================================= */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/70 to-slate-50/60 dark:from-teal-950/80 dark:via-slate-900/70 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/70 to-slate-50/60 dark:from-sky-950/80 dark:via-slate-900/70 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-sky-300/20 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 min-w-0 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-600 via-teal-600 to-teal-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-600/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-600 to-sky-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-600/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
                   <Megaphone className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-teal-100/80 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-100/80 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60">
                       {selectedItem.categoryLabel || selectedItem.category}
                     </span>
                     <span className="text-xs text-slate-400 font-semibold">{selectedItem.date}</span>
@@ -707,7 +707,7 @@ const EmployeeAnnouncements = () => {
               {selectedItem.attachments && selectedItem.attachments.length > 0 && (
                 <div className="p-4 sm:p-5 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 space-y-2.5">
                   <div className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                    <Paperclip className="w-3.5 h-3.5 text-teal-500" />
+                    <Paperclip className="w-3.5 h-3.5 text-sky-500" />
                     <span>Attached Documents & Forms:</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -719,7 +719,7 @@ const EmployeeAnnouncements = () => {
                         <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-2">{att.name}</span>
                         <button
                           onClick={() => handleDownloadAttachment(att)}
-                          className="px-3.5 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
+                          className="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download</span>
@@ -732,7 +732,7 @@ const EmployeeAnnouncements = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 sm:px-7 py-3.5 border-t border-teal-100/60 dark:border-teal-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-sky-100/60 dark:border-sky-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
               <span className="text-xs text-slate-400 font-medium hidden sm:inline">
                 Official NexaHR Enterprise Broadcast
               </span>
@@ -744,8 +744,8 @@ const EmployeeAnnouncements = () => {
                   }}
                   className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
                     selectedItem.acknowledged
-                      ? 'bg-teal-600 text-white shadow-teal-600/20'
-                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white'
+                      ? 'bg-sky-600 text-white shadow-sky-600/20'
+                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white'
                   }`}
                 >
                   <Check className="w-3.5 h-3.5" />

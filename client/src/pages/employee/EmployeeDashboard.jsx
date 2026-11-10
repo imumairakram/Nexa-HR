@@ -433,9 +433,9 @@ const EmployeeDashboard = () => {
       />
 
       {/* HERO BIOMETRIC HARDWARE STATUS BANNER */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Column: Greeting & Digital Clock */}
@@ -459,7 +459,7 @@ const EmployeeDashboard = () => {
             {/* Live Clock Display */}
             <div className="flex items-center gap-4 pt-2">
               <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-teal-400" />
+                <Clock className="w-4 h-4 text-sky-400" />
                 <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wider">
                   {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </span>
@@ -479,7 +479,7 @@ const EmployeeDashboard = () => {
                   isPresent
                     ? todayStatus?.status === 'LATE'
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                      : 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
+                      : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
                     : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
                 }`}
               >
@@ -491,22 +491,22 @@ const EmployeeDashboard = () => {
             <div className="w-full grid grid-cols-2 gap-2 my-2.5">
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch In</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-teal-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-sky-400 mt-0.5">
                   {formatDbTime(todayStatus?.checkInTime)}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-teal-400" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-400" />
                   {todayStatus?.checkInTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
 
               <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-teal-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-sky-400 mt-0.5">
                   {formatDbTime(todayStatus?.checkOutTime)}
                 </div>
                 <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-teal-400" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-400" />
                   {todayStatus?.checkOutTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
@@ -600,74 +600,74 @@ const EmployeeDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={() => navigate('/employee/leaves')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-teal-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <CalendarDays className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
               Apply For Leave
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               Submit medical, casual, or annual vacation requests
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
 
         <button
           onClick={() => navigate('/employee/payslips')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-teal-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <CreditCard className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
               Download Payslip
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               View monthly salary slips, tax breakdown & benefits
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
 
         <button
           onClick={() => navigate('/employee/helpdesk')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-teal-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <LifeBuoy className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
               Helpdesk & Support
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               Raise a support ticket for IT equipment, HR or ops
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
 
         <button
           onClick={() => navigate('/employee/documents')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-teal-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <BookOpen className="w-5 h-5" />
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
               Policies & Handbook
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
               Access company code of conduct & employee perks
             </p>
           </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
+          <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-1" />
         </button>
       </div>
 
@@ -692,7 +692,7 @@ const EmployeeDashboard = () => {
 
               <button
                 onClick={() => navigate('/employee/announcements')}
-                className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer flex items-center gap-1 shrink-0"
+                className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer flex items-center gap-1 shrink-0"
               >
                 <span>View All</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -719,7 +719,7 @@ const EmployeeDashboard = () => {
                           {itemDate}
                         </span>
                       </div>
-                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                         {item.title}
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
@@ -727,7 +727,7 @@ const EmployeeDashboard = () => {
                       </p>
                       <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100/80 dark:border-slate-700/40 text-[11px] font-semibold text-slate-400">
                         <span>By {item.author || item.createdBy || 'People Operations & HR'}</span>
-                        <span className="text-teal-600 dark:text-teal-400 font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
+                        <span className="text-sky-600 dark:text-sky-400 font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
                           Read Notice →
                         </span>
                       </div>
@@ -751,7 +751,7 @@ const EmployeeDashboard = () => {
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div>
@@ -764,7 +764,7 @@ const EmployeeDashboard = () => {
 
               <button
                 onClick={() => navigate('/employee/holidays')}
-                className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer flex items-center gap-1 shrink-0"
+                className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer flex items-center gap-1 shrink-0"
               >
                 <span>Calendar</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -794,7 +794,7 @@ const EmployeeDashboard = () => {
                       className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                         holiday.countdown.includes('Today')
                           ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 animate-pulse'
-                          : 'bg-teal-100/80 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300'
+                          : 'bg-sky-100/80 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300'
                       }`}
                     >
                       {holiday.countdown}
@@ -806,15 +806,15 @@ const EmployeeDashboard = () => {
           </div>
 
           {/* Assigned Shift Schedule Card */}
-          <div className="bg-gradient-to-br from-slate-900 to-teal-950 rounded-3xl p-6 shadow-soft text-white border border-slate-800 space-y-4">
+          <div className="bg-gradient-to-br from-slate-900 to-sky-950 rounded-3xl p-6 shadow-soft text-white border border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-teal-400" />
+                <ShieldCheck className="w-4 h-4 text-sky-400" />
                 <span className="text-xs font-black uppercase tracking-wider text-slate-300">
                   Assigned Shift Schedule
                 </span>
               </div>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
                 Active Policy
               </span>
             </div>
@@ -826,7 +826,7 @@ const EmployeeDashboard = () => {
               </div>
               <div className="flex items-center justify-between py-1.5 border-b border-white/10">
                 <span className="text-slate-400">Working Hours</span>
-                <span className="font-bold text-teal-400">09:00 AM – 05:30 PM</span>
+                <span className="font-bold text-sky-400">09:00 AM – 05:30 PM</span>
               </div>
               <div className="flex items-center justify-between py-1.5 border-b border-white/10">
                 <span className="text-slate-400">Work Week</span>
@@ -847,10 +847,10 @@ const EmployeeDashboard = () => {
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full shadow-2xl shadow-slate-950/20 dark:shadow-black/60 border border-slate-200/70 dark:border-slate-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-slate-50 via-slate-100/60 to-slate-50 dark:from-slate-900/80 dark:via-slate-800/60 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute -bottom-6 left-10 w-36 h-36 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-48 h-48 bg-sky-400/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-6 left-10 w-36 h-36 bg-sky-400/10 rounded-full blur-2xl pointer-events-none" />
 
-              <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60 relative z-10">
+              <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 relative z-10">
                 {selectedAnnouncement.category || 'NOTICE'}
               </span>
 
@@ -885,7 +885,7 @@ const EmployeeDashboard = () => {
                   setSelectedAnnouncement(null);
                   navigate('/employee/announcements');
                 }}
-                className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-95 text-white text-xs font-bold cursor-pointer transition-all shadow-md shadow-teal-600/20"
+                className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold cursor-pointer transition-all shadow-md shadow-sky-600/20"
               >
                 Go to Announcements Feed
               </button>

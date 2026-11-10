@@ -173,7 +173,7 @@ const EmployeePayslips = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-400" />
+          <CheckCircle2 className="w-4 h-4 text-sky-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -181,9 +181,9 @@ const EmployeePayslips = () => {
       {/* ========================================================================= */}
       {/* 1. HERO PAYSLIP & COMPENSATION BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Payroll Overview */}
@@ -209,7 +209,7 @@ const EmployeePayslips = () => {
           {/* Right Side: Quick Download Voucher Action Card */}
           <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-2.5">
             <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Latest Net Salary</div>
-            <div className="text-2xl sm:text-3xl font-black text-teal-300 font-mono">
+            <div className="text-2xl sm:text-3xl font-black text-sky-300 font-mono">
               {formatCurrency(latestNet)}
             </div>
             <div className="text-[11px] text-slate-300 font-medium">
@@ -222,7 +222,7 @@ const EmployeePayslips = () => {
               }}
               className={`w-full mt-1 px-5 py-2.5 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all ${
                 latestSlip
-                  ? 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-600/30 cursor-pointer hover:scale-105'
+                  ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-600/30 cursor-pointer hover:scale-105'
                   : 'bg-slate-800 text-slate-500 cursor-not-allowed shadow-none'
               }`}
             >
@@ -338,12 +338,12 @@ const EmployeePayslips = () => {
                   return (
                     <div
                       key={ps.id}
-                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-teal-400/60 transition-all flex flex-col justify-between"
+                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-sky-400/60 transition-all flex flex-col justify-between"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
                               <FileText className="w-4 h-4" />
                             </div>
                             <div>
@@ -351,7 +351,7 @@ const EmployeePayslips = () => {
                               <div className="text-[10px] text-slate-400 font-mono">Voucher #{ps.id.slice(0, 8)}</div>
                             </div>
                           </div>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/60 shrink-0">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 shrink-0">
                             <span>PAID</span>
                           </span>
                         </div>
@@ -376,7 +376,7 @@ const EmployeePayslips = () => {
                           </div>
                           <div>
                             <div className="text-[9px] uppercase font-bold text-slate-400">Net Pay</div>
-                            <div className="text-xs font-black text-teal-600 dark:text-teal-400 mt-0.5">
+                            <div className="text-xs font-black text-sky-600 dark:text-sky-400 mt-0.5">
                               {formatCurrency(ps.netSalary || 0)}
                             </div>
                           </div>
@@ -386,14 +386,14 @@ const EmployeePayslips = () => {
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         <button
                           onClick={() => setSelectedPayslip(ps)}
-                          className="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-teal-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>View Slip</span>
                         </button>
                         <button
                           onClick={() => handleDownload(ps)}
-                          className="py-2 px-3 rounded-xl bg-slate-900 text-white dark:bg-teal-600 hover:bg-slate-800 dark:hover:bg-teal-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                          className="py-2 px-3 rounded-xl bg-slate-900 text-white dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download</span>
@@ -431,7 +431,7 @@ const EmployeePayslips = () => {
                     <tr key={ps.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
                       <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/60 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                          <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-sky-50 dark:group-hover:bg-sky-950/60 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                             <FileText className="w-4 h-4" />
                           </div>
                           <div>
@@ -449,11 +449,11 @@ const EmployeePayslips = () => {
                       <td className="py-4 px-4 text-rose-500 font-mono font-semibold">
                         -{formatCurrency(totalDed)}
                       </td>
-                      <td className="py-4 px-4 font-black text-teal-600 dark:text-teal-400 font-mono text-sm">
+                      <td className="py-4 px-4 font-black text-sky-600 dark:text-sky-400 font-mono text-sm">
                         {formatCurrency(ps.netSalary || 0)}
                       </td>
                       <td className="py-4 px-4">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/40">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/40">
                           <span>PAID</span>
                         </span>
                       </td>
@@ -468,7 +468,7 @@ const EmployeePayslips = () => {
                           </button>
                           <button
                             onClick={() => handleDownload(ps)}
-                            className="p-2 rounded-xl bg-slate-900 text-white dark:bg-teal-600 hover:bg-slate-800 dark:hover:bg-teal-500 transition-colors cursor-pointer shadow-xs"
+                            className="p-2 rounded-xl bg-slate-900 text-white dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-colors cursor-pointer shadow-xs"
                             title="Download Official PDF"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -499,14 +499,14 @@ const EmployeePayslips = () => {
       {/* ========================================================================= */}
       {selectedPayslip && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-teal-300/20 dark:bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-sky-300/20 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-700 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-700 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
                   <CreditCard className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -572,19 +572,19 @@ const EmployeePayslips = () => {
               </div>
 
               {/* Net Salary Highlight */}
-              <div className="p-4 sm:p-4.5 rounded-xl bg-gradient-to-r from-teal-500/10 via-teal-500/5 to-transparent border border-teal-200/60 dark:border-teal-800/40 flex items-center justify-between">
+              <div className="p-4 sm:p-4.5 rounded-xl bg-gradient-to-r from-sky-500/10 via-sky-500/5 to-transparent border border-sky-200/60 dark:border-sky-800/40 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-extrabold text-teal-700 dark:text-teal-300 uppercase tracking-wider">Net Amount Deposited</div>
+                  <div className="text-xs font-extrabold text-sky-700 dark:text-sky-300 uppercase tracking-wider">Net Amount Deposited</div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Wire Transferred to Registered Bank Account</div>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-teal-600 dark:text-teal-400 font-mono">
+                <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono">
                   {formatCurrency(selectedPayslip.netSalary || 0)}
                 </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="px-6 sm:px-7 py-3.5 border-t border-teal-100/60 dark:border-teal-900/40 flex items-center justify-end gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-sky-100/60 dark:border-sky-900/40 flex items-center justify-end gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
               <button
                 onClick={handlePrint}
                 className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 transition-colors flex items-center gap-2 cursor-pointer text-xs"
@@ -594,7 +594,7 @@ const EmployeePayslips = () => {
               </button>
               <button
                 onClick={() => handleDownload(selectedPayslip)}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md shadow-teal-600/20 text-xs"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-700 to-sky-600 hover:from-sky-600 hover:to-sky-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 text-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>Download PDF</span>

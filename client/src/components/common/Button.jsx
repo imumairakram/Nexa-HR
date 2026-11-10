@@ -25,7 +25,7 @@ export const Button = ({
 
   const variantStyles = {
     primary:
-      'bg-teal-700 hover:bg-teal-800 active:bg-teal-900 dark:bg-teal-600 dark:hover:bg-teal-500 text-white shadow-xs border border-teal-800/30 dark:border-teal-500/30',
+      'bg-sky-500 hover:bg-sky-600 active:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400 text-white shadow-xs border border-sky-600/30 dark:border-sky-400/30',
     secondary:
       'bg-white dark:bg-[#16211E] text-slate-800 dark:text-[#F1F5F4] border border-[#E2E1DC] dark:border-[#273834] hover:bg-[#ECEAE4]/60 dark:hover:bg-[#1D2C28] shadow-subtle',
     accent:
@@ -34,7 +34,7 @@ export const Button = ({
       'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-[#ECEAE4]/60 dark:hover:bg-[#1D2C28] border border-transparent',
     danger:
       'bg-rose-50 text-rose-800 border border-rose-200/80 hover:bg-rose-100 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-900/60',
-  }[variant] || 'bg-teal-700 text-white';
+  }[variant] || 'bg-sky-500 text-white';
 
   return (
     <button

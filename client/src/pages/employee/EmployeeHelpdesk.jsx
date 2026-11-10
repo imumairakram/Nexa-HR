@@ -456,7 +456,7 @@ const EmployeeHelpdesk = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-400" />
+          <CheckCircle2 className="w-4 h-4 text-sky-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -464,9 +464,9 @@ const EmployeeHelpdesk = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC HELPDESK HERO BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Telemetry Info */}
@@ -491,7 +491,7 @@ const EmployeeHelpdesk = () => {
 
           {/* Right Side: Quick Action Glassmorphic Card */}
           <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center">
               <LifeBuoy className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -500,7 +500,7 @@ const EmployeeHelpdesk = () => {
             </div>
             <button
               onClick={() => setIsNewTicketOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Create New Ticket</span>
@@ -623,7 +623,7 @@ const EmployeeHelpdesk = () => {
                 <button
                   type="button"
                   onClick={() => setCategoryFilter('ALL')}
-                  className="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
                 >
                   Reset
                 </button>
@@ -644,7 +644,7 @@ const EmployeeHelpdesk = () => {
                     onClick={() => setCategoryFilter(cat.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       categoryFilter === cat.id
-                        ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
@@ -655,7 +655,7 @@ const EmployeeHelpdesk = () => {
                     <span
                       className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                         categoryFilter === cat.id
-                          ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
+                          ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                       }`}
                     >
@@ -671,7 +671,7 @@ const EmployeeHelpdesk = () => {
           <button
             type="button"
             onClick={() => setIsNewTicketOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Ticket</span>
@@ -709,7 +709,7 @@ const EmployeeHelpdesk = () => {
               >
                 <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-black text-teal-600 dark:text-teal-400 group-hover:underline">
+                    <span className="text-xs font-mono font-black text-sky-600 dark:text-sky-400 group-hover:underline">
                       #{t.id}
                     </span>
 
@@ -737,7 +737,7 @@ const EmployeeHelpdesk = () => {
                     </span>
                   </div>
 
-                  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-snug">
+                  <h4 className="text-sm sm:text-base font-black text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
                     {t.subject}
                   </h4>
 
@@ -750,7 +750,7 @@ const EmployeeHelpdesk = () => {
                   <span
                     className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
                       t.status === 'RESOLVED'
-                        ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/60 dark:border-teal-800/40'
+                        ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60 dark:border-sky-800/40'
                         : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                     }`}
                   >
@@ -782,7 +782,7 @@ const EmployeeHelpdesk = () => {
                   setStatusFilter('ALL');
                   setCategoryFilter('ALL');
                 }}
-                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-teal-600 text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-sky-600 text-white text-xs font-bold cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -798,12 +798,12 @@ const EmployeeHelpdesk = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-rose-950/20 dark:shadow-black/60 border border-rose-200/70 dark:border-rose-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-1/4 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 min-w-0 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-700 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-700 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
                   <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -817,11 +817,11 @@ const EmployeeHelpdesk = () => {
                     <span
                       className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 border ${
                         selectedTicket.status === 'RESOLVED'
-                          ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/60 dark:border-teal-800/40'
+                          ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60 dark:border-sky-800/40'
                           : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket.status === 'RESOLVED' ? 'bg-teal-500' : 'bg-amber-500 animate-ping'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket.status === 'RESOLVED' ? 'bg-sky-500' : 'bg-amber-500 animate-ping'}`} />
                       {selectedTicket.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}
                     </span>
                   </div>
@@ -918,7 +918,7 @@ const EmployeeHelpdesk = () => {
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 border shadow-xs ${
                     selectedTicket.status === 'RESOLVED'
                       ? 'bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60'
-                      : 'bg-teal-50 text-teal-700 border-teal-200/80 hover:bg-teal-100 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800/60'
+                      : 'bg-sky-50 text-sky-700 border-sky-200/80 hover:bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/60'
                   }`}
                 >
                   {isUpdatingStatus ? (
@@ -949,12 +949,12 @@ const EmployeeHelpdesk = () => {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-rose-950/15 dark:shadow-black/70 border border-rose-200/70 dark:border-rose-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/70 dark:border-teal-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/70 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-teal-700 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/30 ring-3 ring-teal-100/80 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-700 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/30 ring-3 ring-sky-100/80 dark:ring-sky-950/60">
                   <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -976,7 +976,7 @@ const EmployeeHelpdesk = () => {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateTicket} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-teal-50/15 to-teal-50/15 dark:from-transparent dark:via-teal-950/10 dark:to-teal-950/10">
+            <form onSubmit={handleCreateTicket} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs bg-gradient-to-b from-white/40 via-sky-50/15 to-sky-50/15 dark:from-transparent dark:via-sky-950/10 dark:to-sky-950/10">
               {/* Subject */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">

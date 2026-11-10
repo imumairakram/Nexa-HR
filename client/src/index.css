@@ -213,37 +213,37 @@ html.dark {
    PORTAL THEMES (UNIFIED ON BRAND DEEP TEAL)
    ======================================================== */
 .theme-hr {
-  --portal-primary: #0F766E;
-  --portal-primary-hover: #0D9488;
-  --portal-primary-light: #F0FDFA;
-  --portal-primary-border: #CCFBF1;
+  --portal-primary: #0284C7;
+  --portal-primary-hover: #0369A1;
+  --portal-primary-light: #F0F9FF;
+  --portal-primary-border: #BAE6FD;
 }
 
 .theme-hr .soft-card:hover {
-  border-color: #99F6E4 !important;
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.06);
+  border-color: #7DD3FC !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
 }
 
 html.dark .theme-hr .soft-card:hover {
-  border-color: #115E59 !important;
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.08);
+  border-color: #0369A1 !important;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
 }
 
 .theme-employee {
-  --portal-primary: #0F766E;
-  --portal-primary-hover: #0D9488;
-  --portal-primary-light: #F0FDFA;
-  --portal-primary-border: #CCFBF1;
+  --portal-primary: #0284C7;
+  --portal-primary-hover: #0369A1;
+  --portal-primary-light: #F0F9FF;
+  --portal-primary-border: #BAE6FD;
 }
 
 .theme-employee .soft-card:hover {
-  border-color: #99F6E4 !important;
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.06);
+  border-color: #7DD3FC !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
 }
 
 html.dark .theme-employee .soft-card:hover {
-  border-color: #115E59 !important;
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.08);
+  border-color: #0369A1 !important;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
 }
 
 /* ========================================================

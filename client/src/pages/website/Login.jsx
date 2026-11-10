@@ -238,7 +238,7 @@ const Login = () => {
     <div className="flex-1 min-h-[calc(100vh/0.9)] min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex items-center justify-center p-3 sm:p-6 lg:p-8 font-sans antialiased transition-colors duration-300 relative overflow-hidden select-none">
       {/* Ambient background glows for rich aesthetic depth */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-sky-500/10 dark:bg-sky-600/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Floating Theme Toggle (top-right fixed) */}
       <button
@@ -262,11 +262,11 @@ const Login = () => {
         <div className="w-full lg:flex-1 lg:w-[48%] flex flex-col justify-between py-1 sm:py-2 px-1 sm:px-3 lg:px-6">
           {/* Top Brand Bar */}
           <div className="flex items-center justify-between">
-            <Logo />
+            <Logo variant="sky" />
 
             {/* Enterprise Security Badge */}
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
-              <Shield className={`w-3 h-3 ${loginRole === 'hr' ? 'text-sky-500 dark:text-sky-400' : 'text-emerald-500 dark:text-emerald-400'}`} />
+              <Shield className="w-3 h-3 text-sky-500 dark:text-sky-400" />
               <span>SSL Protected</span>
             </div>
           </div>
@@ -306,11 +306,11 @@ const Login = () => {
                 type="button"
                 onClick={() => handleRoleTabChange('employee')}
                 className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
-                  ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
-                <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <User className={`w-4 h-4 shrink-0 ${loginRole === 'employee' ? 'text-sky-500 dark:text-sky-400' : 'text-slate-400'}`} />
                 <span className="truncate">Employee</span>
               </button>
             </div>
@@ -336,8 +336,8 @@ const Login = () => {
               )}
 
               {resetSuccessNotification && (
-                <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold text-center border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <div className="p-3 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold text-center border border-sky-200 dark:border-sky-800/50 flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
                   <span>{resetSuccessNotification}</span>
                 </div>
               )}
@@ -349,7 +349,7 @@ const Login = () => {
                     <button
                       type="button"
                       onClick={() => handleRoleTabChange('employee')}
-                      className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+                      className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer inline-flex items-center gap-1"
                     >
                       Click here to switch to Employee tab &rarr;
                     </button>
@@ -370,7 +370,7 @@ const Login = () => {
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {loginRole === 'hr' ? 'HR Admin Work Email' : 'Employee Work Email'}{' '}
-                  <span className={loginRole === 'hr' ? 'text-sky-500 dark:text-sky-400' : 'text-emerald-500 dark:text-emerald-400'}>*</span>
+                  <span className="text-sky-500 dark:text-sky-400">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
@@ -379,7 +379,7 @@ const Login = () => {
                     placeholder="name@company.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={`w-full pl-11 pr-4 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${loginRole === 'hr' ? 'focus:ring-sky-500/20 focus:border-sky-500' : 'focus:ring-emerald-500/20 focus:border-emerald-500'} focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm`}
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
                     required
                   />
                 </div>
@@ -388,7 +388,7 @@ const Login = () => {
               {/* Password */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Password <span className={loginRole === 'hr' ? 'text-sky-500 dark:text-sky-400' : 'text-emerald-500 dark:text-emerald-400'}>*</span>
+                  Password <span className="text-sky-500 dark:text-sky-400">*</span>
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
@@ -397,7 +397,7 @@ const Login = () => {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className={`w-full pl-11 pr-11 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${loginRole === 'hr' ? 'focus:ring-sky-500/20 focus:border-sky-500' : 'focus:ring-emerald-500/20 focus:border-emerald-500'} focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm`}
+                    className="w-full pl-11 pr-11 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
                     required
                   />
                   <button
@@ -421,7 +421,7 @@ const Login = () => {
                       id="remember-me"
                       type="checkbox"
                       defaultChecked
-                      className={`w-3.5 h-3.5 rounded border-slate-300 cursor-pointer ${loginRole === 'hr' ? 'text-sky-500 focus:ring-sky-400 accent-sky-500' : 'text-emerald-600 focus:ring-emerald-500 accent-emerald-600'}`}
+                      className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer text-sky-500 focus:ring-sky-400 accent-sky-500"
                     />
                     <label htmlFor="remember-me" className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 cursor-pointer select-none">
                       Remember me
@@ -434,7 +434,7 @@ const Login = () => {
                       setResetSuccessNotification(null);
                       setIsForgotPasswordOpen(true);
                     }}
-                    className={`text-[11px] font-bold ${loginRole === 'hr' ? 'text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300'} hover:underline cursor-pointer transition-colors`}
+                    className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline cursor-pointer transition-colors"
                   >
                     Forgot Password?
                   </button>
@@ -445,11 +445,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] ${
-                  loginRole === 'hr'
-                    ? 'bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 hover:from-sky-500 hover:to-blue-600 shadow-sky-500/25'
-                    : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25'
-                }`}
+                className="w-full py-3.5 mt-2 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 hover:from-sky-500 hover:to-blue-600 shadow-sky-500/25"
               >
                 {loading ? (
                   <>
@@ -478,20 +474,10 @@ const Login = () => {
                     type="button"
                     disabled={loading}
                     onClick={() => handleGuestLogin(loginRole)}
-                    className={`w-full py-3 px-4 rounded-2xl border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm ${
-                      loginRole === 'hr'
-                        ? 'bg-sky-50/70 hover:bg-sky-100/90 dark:bg-sky-950/30 dark:hover:bg-sky-900/40 border-sky-200/80 dark:border-sky-800/60 text-sky-950 dark:text-sky-200'
-                        : 'bg-emerald-50/70 hover:bg-emerald-100/90 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/40 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200'
-                    }`}
+                    className="w-full py-3 px-4 rounded-2xl border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm bg-sky-50/70 hover:bg-sky-100/90 dark:bg-sky-950/30 dark:hover:bg-sky-900/40 border-sky-200/80 dark:border-sky-800/60 text-sky-950 dark:text-sky-200"
                   >
                     <div className="flex items-center gap-2.5 text-left">
-                      <div
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                          loginRole === 'hr'
-                            ? 'bg-sky-500 text-white shadow-sky-500/30 shadow-md'
-                            : 'bg-emerald-600 text-white shadow-emerald-600/30 shadow-md'
-                        }`}
-                      >
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-sky-500 text-white shadow-sky-500/30 shadow-md">
                         <Zap className="w-4 h-4 fill-current" />
                       </div>
                       <div>

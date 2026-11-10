@@ -210,10 +210,10 @@ const EmployeeLeaves = () => {
 
       const themes = [
         {
-          gradient: 'from-teal-500 to-teal-600',
-          badgeBg: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 border-teal-200/60',
-          iconBg: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400',
-          accentBar: 'bg-teal-500',
+          gradient: 'from-sky-500 to-sky-600',
+          badgeBg: 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border-sky-200/60',
+          iconBg: 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400',
+          accentBar: 'bg-sky-500',
         },
         {
           gradient: 'from-blue-500 to-indigo-600',
@@ -397,7 +397,7 @@ const EmployeeLeaves = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-400" />
+          <CheckCircle2 className="w-4 h-4 text-sky-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -405,9 +405,9 @@ const EmployeeLeaves = () => {
       {/* ========================================================================= */}
       {/* 1. HERO LEAVE & TIME-OFF BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Leave Entitlement Info */}
@@ -437,7 +437,7 @@ const EmployeeLeaves = () => {
 
           {/* Right Side: Quick Action Glassmorphic Card */}
           <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[220px] sm:min-w-[240px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-300 flex items-center justify-center">
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -446,7 +446,7 @@ const EmployeeLeaves = () => {
             </div>
             <button
               onClick={() => setIsApplyOpen(true)}
-              className="w-full px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 active:scale-[0.98] text-white font-bold text-xs shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02]"
+              className="w-full px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02]"
             >
               <span>Apply for Leave</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -621,12 +621,12 @@ const EmployeeLeaves = () => {
                     <div
                       key={req.id}
                       onClick={() => setSelectedReq(req)}
-                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-teal-400/60 transition-all flex flex-col justify-between cursor-pointer"
+                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-sky-400/60 transition-all flex flex-col justify-between cursor-pointer"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                            <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
                               <Layers className="w-4 h-4" />
                             </div>
                             <div>
@@ -639,7 +639,7 @@ const EmployeeLeaves = () => {
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border shrink-0 ${
                               req.status === 'APPROVED'
-                                ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 border-teal-200/60 dark:border-teal-800/40'
+                                ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border-sky-200/60 dark:border-sky-800/40'
                                 : req.status === 'REJECTED'
                                 ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
                                 : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
@@ -654,7 +654,7 @@ const EmployeeLeaves = () => {
 
                         <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
                           <span className="text-slate-500 font-medium">Duration:</span>
-                          <span className="font-extrabold text-teal-600 dark:text-teal-400">
+                          <span className="font-extrabold text-sky-600 dark:text-sky-400">
                             {formatLeaveDays(calculateLeaveDays(req))}
                           </span>
                         </div>
@@ -703,7 +703,7 @@ const EmployeeLeaves = () => {
                       >
                         <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                            <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
                               <Layers className="w-4 h-4" />
                             </div>
                             <div>
@@ -729,7 +729,7 @@ const EmployeeLeaves = () => {
                           <span
                             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
                               req.status === 'APPROVED'
-                                ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 border-teal-200/60 dark:border-teal-800/40'
+                                ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border-sky-200/60 dark:border-sky-800/40'
                                 : req.status === 'REJECTED'
                                 ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
                                 : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
@@ -740,7 +740,7 @@ const EmployeeLeaves = () => {
                         </td>
                         <td className="py-4 px-6 text-right text-slate-500 dark:text-slate-400 text-xs font-medium">
                           {req.status === 'APPROVED' ? (
-                            <span className="text-teal-600 dark:text-teal-400 font-semibold flex items-center justify-end gap-1">
+                            <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center justify-end gap-1">
                               <UserCheck className="w-3.5 h-3.5" />
                               <span>Approved by {req.approvedBy?.firstName || 'HR Lead'} {req.approvedBy?.lastName || ''}</span>
                             </span>
@@ -795,7 +795,7 @@ const EmployeeLeaves = () => {
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
@@ -821,7 +821,7 @@ const EmployeeLeaves = () => {
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${
                         selectedReq.status === 'APPROVED'
-                          ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 border border-teal-200/60'
+                          ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border border-sky-200/60'
                           : selectedReq.status === 'REJECTED'
                           ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-200/60'
                           : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200/60'
@@ -862,7 +862,7 @@ const EmployeeLeaves = () => {
                 <div className="text-[10px] text-slate-400 font-bold uppercase">Audit & Supervisor Notes</div>
                 <div className="text-slate-700 dark:text-slate-200 font-medium">
                   {selectedReq.status === 'APPROVED' ? (
-                    <span className="text-teal-600 dark:text-teal-400 font-semibold flex items-center gap-1.5">
+                    <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-1.5">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>Approved by {selectedReq.approvedBy?.firstName || 'HR Lead'} {selectedReq.approvedBy?.lastName || ''}</span>
                     </span>
@@ -882,7 +882,7 @@ const EmployeeLeaves = () => {
             <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setSelectedReq(null)}
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-700 text-white font-bold text-xs"
+                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-bold text-xs"
               >
                 Close
               </button>
@@ -896,13 +896,13 @@ const EmployeeLeaves = () => {
       {/* ========================================================================= */}
       {isApplyOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative max-h-[92vh]">
+          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative max-h-[92vh]">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-teal-200/70 dark:border-teal-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/80 to-cyan-50/60 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="px-6 py-4 border-b border-sky-200/70 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/80 to-cyan-50/60 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-600/30">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 via-sky-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-600/30">
                   <CalendarDays className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -917,7 +917,7 @@ const EmployeeLeaves = () => {
 
               <button
                 onClick={() => setIsApplyOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-teal-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent relative z-10"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-sky-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -943,15 +943,15 @@ const EmployeeLeaves = () => {
                           onClick={() => setLeaveForm({ ...leaveForm, leaveTypeId: lt.id })}
                           className={`p-3 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${
                             isSelected
-                              ? 'bg-teal-50/90 dark:bg-teal-950/50 border-teal-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-teal-500/30'
-                              : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-teal-50/50 dark:hover:bg-slate-800 hover:border-teal-300/80'
+                              ? 'bg-sky-50/90 dark:bg-sky-950/50 border-sky-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-sky-500/30'
+                              : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-sky-50/50 dark:hover:bg-slate-800 hover:border-sky-300/80'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
                               className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                                 isSelected
-                                  ? 'bg-teal-600 text-white shadow-xs'
+                                  ? 'bg-sky-600 text-white shadow-xs'
                                   : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                               }`}
                             >
@@ -968,7 +968,7 @@ const EmployeeLeaves = () => {
                           </div>
 
                           {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-800 shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-800 shrink-0" />
                           )}
                         </button>
                       );
@@ -979,7 +979,7 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.leaveTypeId}
                     onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all cursor-pointer"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all cursor-pointer"
                   >
                     <option value="">Select Leave Policy</option>
                   </select>
@@ -998,7 +998,7 @@ const EmployeeLeaves = () => {
                     onClick={() => setLeaveForm({ ...leaveForm, dayType: 'FULL' })}
                     className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       leaveForm.dayType === 'FULL'
-                        ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs'
+                        ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
                         : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                     }`}
                   >
@@ -1009,7 +1009,7 @@ const EmployeeLeaves = () => {
                     onClick={() => setLeaveForm({ ...leaveForm, dayType: 'HALF' })}
                     className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       leaveForm.dayType === 'HALF'
-                        ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs'
+                        ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
                         : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                     }`}
                   >
@@ -1022,7 +1022,7 @@ const EmployeeLeaves = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-teal-500" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
                     Start Date <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -1030,13 +1030,13 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.startDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, startDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-teal-500" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
                     End Date <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -1044,7 +1044,7 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.endDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, endDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
                   />
                 </div>
               </div>
@@ -1053,7 +1053,7 @@ const EmployeeLeaves = () => {
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5 text-teal-500" />
+                    <MessageSquare className="w-3.5 h-3.5 text-sky-500" />
                     Reason & Handover Details <span className="text-rose-500">*</span>
                   </span>
                 </label>
@@ -1063,14 +1063,14 @@ const EmployeeLeaves = () => {
                   placeholder="State context, urgent coverage contacts, and handover arrangements during absence..."
                   value={leaveForm.reason}
                   onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all resize-none leading-relaxed shadow-xs text-xs"
+                  className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all resize-none leading-relaxed shadow-xs text-xs"
                 />
               </div>
 
               {/* Live Request Preview Card */}
-              <div className="px-4 py-2.5 rounded-xl bg-teal-50/60 dark:bg-slate-900/60 border border-teal-200/70 dark:border-teal-800/60 flex items-center justify-between gap-3 shadow-xs">
+              <div className="px-4 py-2.5 rounded-xl bg-sky-50/60 dark:bg-slate-900/60 border border-sky-200/70 dark:border-sky-800/60 flex items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
                     <CalendarDays className="w-4 h-4 stroke-[2.2]" />
                   </div>
                   <div className="min-w-0">
@@ -1080,7 +1080,7 @@ const EmployeeLeaves = () => {
                     <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
                       <span>{leaveForm.startDate || 'Start'} to {leaveForm.endDate || 'End'}</span>
                       <span>•</span>
-                      <span className="text-teal-600 dark:text-teal-400 font-semibold">
+                      <span className="text-sky-600 dark:text-sky-400 font-semibold">
                         {calculateDays()} {calculateDays() === 1 ? 'Day' : 'Days'}
                       </span>
                     </div>
@@ -1107,7 +1107,7 @@ const EmployeeLeaves = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-[0.98] text-white text-xs font-bold shadow-sm shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-[1.02]"
+                  className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white text-xs font-bold shadow-sm shadow-sky-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-[1.02]"
                 >
                   {submitting ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />

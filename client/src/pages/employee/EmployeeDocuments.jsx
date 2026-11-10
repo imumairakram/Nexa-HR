@@ -48,12 +48,12 @@ const getDocTypeMeta = (type = '') => {
   if (norm.includes('CONTRACT') || norm.includes('OFFER') || norm.includes('APPOINTMENT')) {
     return {
       icon: <FileCheck className="w-4 h-4" />,
-      bg: 'bg-teal-50 dark:bg-teal-950/60',
-      color: 'text-teal-600 dark:text-teal-400',
-      border: 'border-teal-200/70 dark:border-teal-800/60',
-      badgeBg: 'bg-teal-50 dark:bg-teal-950/60',
-      badgeColor: 'text-teal-700 dark:text-teal-300',
-      badgeBorder: 'border-teal-200/60 dark:border-teal-800/60',
+      bg: 'bg-sky-50 dark:bg-sky-950/60',
+      color: 'text-sky-600 dark:text-sky-400',
+      border: 'border-sky-200/70 dark:border-sky-800/60',
+      badgeBg: 'bg-sky-50 dark:bg-sky-950/60',
+      badgeColor: 'text-sky-700 dark:text-sky-300',
+      badgeBorder: 'border-sky-200/60 dark:border-sky-800/60',
     };
   }
   if (norm.includes('CERTIFICATE') || norm.includes('ACADEMIC') || norm.includes('DEGREE')) {
@@ -91,9 +91,9 @@ const getDocTypeMeta = (type = '') => {
   }
   return {
     icon: <FileText className="w-4 h-4" />,
-    bg: 'bg-teal-50 dark:bg-teal-950/60',
-    color: 'text-teal-600 dark:text-teal-400',
-    border: 'border-teal-200/70 dark:border-teal-800/60',
+    bg: 'bg-sky-50 dark:bg-sky-950/60',
+    color: 'text-sky-600 dark:text-sky-400',
+    border: 'border-sky-200/70 dark:border-sky-800/60',
     badgeBg: 'bg-slate-100 dark:bg-slate-800',
     badgeColor: 'text-slate-700 dark:text-slate-300',
     badgeBorder: 'border-slate-200/60 dark:border-slate-700/60',
@@ -453,10 +453,10 @@ const EmployeeDocuments = () => {
   <title>${doc.title} - NexaHR Certified Employee Copy</title>
   <style>
     body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: #0f172a; margin: 40px; background: #fff; line-height: 1.6; }
-    .header { border-bottom: 3px solid #0d9488; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .brand { font-size: 28px; font-weight: 900; color: #0d9488; }
+    .header { border-bottom: 3px solid #0284c7; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .brand { font-size: 28px; font-weight: 900; color: #0284c7; }
     .subbrand { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; }
-    .badge { display: inline-block; background: #ccfbf1; color: #0f766e; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; margin-top: 20px; }
+    .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; margin-top: 20px; }
     .title { font-size: 22px; font-weight: 800; color: #0f172a; margin: 15px 0 5px 0; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 25px 0; font-size: 13px; }
     .grid-label { color: #64748b; font-weight: 600; font-size: 11px; }
@@ -734,7 +734,7 @@ const EmployeeDocuments = () => {
 
       {toastMsg && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-400" />
+          <CheckCircle2 className="w-4 h-4 text-sky-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -742,9 +742,9 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC DOCUMENTS HERO BANNER */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-teal-950 via-slate-900 to-[#071f1a] text-white p-6 sm:p-8 shadow-2xl border border-teal-500/30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Vault Telemetry */}
@@ -769,7 +769,7 @@ const EmployeeDocuments = () => {
 
           {/* Right Side: Quick Action Glassmorphic Card */}
           <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center">
               <Upload className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
@@ -778,7 +778,7 @@ const EmployeeDocuments = () => {
             </div>
             <button
               onClick={() => setIsUploadOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Upload Certificate</span>
@@ -911,7 +911,7 @@ const EmployeeDocuments = () => {
                 <button
                   type="button"
                   onClick={() => setTypeFilter('ALL')}
-                  className="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
                 >
                   Reset
                 </button>
@@ -928,7 +928,7 @@ const EmployeeDocuments = () => {
                     onClick={() => setTypeFilter(id)}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
@@ -936,7 +936,7 @@ const EmployeeDocuments = () => {
                     <span
                       className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                         isSelected
-                          ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
+                          ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                       }`}
                     >
@@ -960,7 +960,7 @@ const EmployeeDocuments = () => {
                 }}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'personal'
-                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
@@ -974,7 +974,7 @@ const EmployeeDocuments = () => {
                 }}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'policies'
-                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
@@ -990,7 +990,7 @@ const EmployeeDocuments = () => {
                 title="Table List View"
                 className={`p-1.5 rounded-full transition-all cursor-pointer ${
                   viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
@@ -1002,7 +1002,7 @@ const EmployeeDocuments = () => {
                 title="Card Grid View"
                 className={`p-1.5 rounded-full transition-all cursor-pointer ${
                   viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
@@ -1015,7 +1015,7 @@ const EmployeeDocuments = () => {
               <button
                 type="button"
                 onClick={() => setIsUploadOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Upload</span>
@@ -1045,7 +1045,7 @@ const EmployeeDocuments = () => {
               </span>
               <button
                 onClick={() => setIsUploadOpen(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
+                className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Upload</span>
@@ -1071,10 +1071,10 @@ const EmployeeDocuments = () => {
           ) : filteredPersonalDocs.length === 0 ? (
             <div className="p-12 sm:p-16 text-center space-y-5">
               <div className="relative inline-flex">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-teal-500/10 via-teal-500/15 to-teal-500/20 dark:from-teal-500/20 dark:via-teal-500/20 dark:to-teal-500/30 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/70 dark:border-teal-700/50 shadow-xl shadow-teal-500/10">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sky-500/10 via-sky-500/15 to-sky-500/20 dark:from-sky-500/20 dark:via-sky-500/20 dark:to-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-700/50 shadow-xl shadow-sky-500/10">
                   <FolderLock className="w-10 h-10 stroke-[1.6]" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-teal-500 text-white flex items-center justify-center shadow-md">
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-md">
                   <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
                 </div>
               </div>
@@ -1092,7 +1092,7 @@ const EmployeeDocuments = () => {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsUploadOpen(true)}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-700 hover:to-teal-700 text-white font-extrabold text-xs shadow-lg shadow-teal-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
                     <span>Upload Document to Vault</span>
@@ -1134,7 +1134,7 @@ const EmployeeDocuments = () => {
                         return (
                           <tr
                             key={doc.id}
-                            className="hover:bg-teal-50/30 dark:hover:bg-slate-800/50 transition-colors group"
+                            className="hover:bg-sky-50/30 dark:hover:bg-slate-800/50 transition-colors group"
                           >
                             <td className="py-4 px-6">
                               <div className="flex items-center gap-3">
@@ -1144,7 +1144,7 @@ const EmployeeDocuments = () => {
                                   {typeInfo.icon}
                                 </div>
                                 <div className="min-w-0 max-w-[240px] lg:max-w-xs">
-                                  <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                                  <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                                     {doc.title}
                                   </span>
                                   <div className="flex items-center gap-2 mt-0.5">
@@ -1190,7 +1190,7 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/60">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
                                 <span>{doc.status || 'Verified'}</span>
                               </span>
                             </td>
@@ -1199,14 +1199,14 @@ const EmployeeDocuments = () => {
                               <div className="flex items-center justify-end gap-2">
                                 <button
                                   onClick={() => setSelectedDoc(doc)}
-                                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950/60 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer shadow-xs"
+                                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer shadow-xs"
                                   title="Preview Details"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDownload(doc)}
-                                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-700 hover:to-teal-700 text-white font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm shadow-teal-600/20 hover:shadow-md transition-all active:scale-95"
+                                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm shadow-sky-600/20 hover:shadow-md transition-all active:scale-95"
                                 >
                                   <Download className="w-3 h-3" />
                                   <span>Download</span>
@@ -1246,13 +1246,13 @@ const EmployeeDocuments = () => {
                         >
                           {typeInfo.icon}
                         </div>
-                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60 flex items-center">
+                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 flex items-center">
                           <span>{doc.status || 'Verified'}</span>
                         </span>
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-1 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                           {doc.title}
                         </h4>
                         <div className="flex items-center gap-2 mt-1">
@@ -1271,7 +1271,7 @@ const EmployeeDocuments = () => {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setSelectedDoc(doc)}
-                            className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer"
                             title="Preview Details"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -1285,7 +1285,7 @@ const EmployeeDocuments = () => {
                           </button>
                           <button
                             onClick={() => handleDownload(doc)}
-                            className="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+                            className="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
                           >
                             <Download className="w-3 h-3" />
                             <span>Download</span>
@@ -1324,7 +1324,7 @@ const EmployeeDocuments = () => {
             </div>
           ) : filteredPolicies.length === 0 ? (
             <div className="p-12 sm:p-16 text-center space-y-4">
-              <div className="w-16 h-16 rounded-3xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center border border-teal-200/60 dark:border-teal-800/50 shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center border border-sky-200/60 dark:border-sky-800/50 shadow-sm">
                 <BookOpen className="w-8 h-8 stroke-[1.8]" />
               </div>
               <div className="space-y-1.5 max-w-md mx-auto">
@@ -1358,15 +1358,15 @@ const EmployeeDocuments = () => {
                       {filteredPolicies.map((pol) => (
                         <tr
                           key={pol.id}
-                          className="hover:bg-teal-50/30 dark:hover:bg-slate-800/50 transition-colors group"
+                          className="hover:bg-sky-50/30 dark:hover:bg-slate-800/50 transition-colors group"
                         >
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/70 dark:border-teal-800/60 shadow-xs group-hover:scale-105 transition-transform">
+                              <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200/70 dark:border-sky-800/60 shadow-xs group-hover:scale-105 transition-transform">
                                 <BookOpen className="w-4 h-4" />
                               </div>
                               <div className="min-w-0 max-w-sm lg:max-w-md">
-                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                                <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                                   {pol.title}
                                 </span>
                                 <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium line-clamp-1 mt-0.5">
@@ -1377,7 +1377,7 @@ const EmployeeDocuments = () => {
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/60">
+                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
                               {pol.categoryLabel || pol.category}
                             </span>
                           </td>
@@ -1402,7 +1402,7 @@ const EmployeeDocuments = () => {
                           <td className="py-4 px-6 text-right whitespace-nowrap">
                             <button
                               onClick={() => handleDownload(pol)}
-                              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                             >
                               <Download className="w-3.5 h-3.5" />
                               <span>Download Handbook</span>
@@ -1428,17 +1428,17 @@ const EmployeeDocuments = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60">
+                          <div className="w-9 h-9 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/60">
                             <BookOpen className="w-4 h-4" />
                           </div>
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
                             {pol.categoryLabel || pol.category}
                           </span>
                         </div>
                         <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
                       </div>
 
-                      <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                         {pol.title}
                       </h4>
 
@@ -1454,7 +1454,7 @@ const EmployeeDocuments = () => {
 
                       <button
                         onClick={() => handleDownload(pol)}
-                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download Handbook</span>
@@ -1473,14 +1473,14 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {isUploadOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-teal-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-teal-500/30 ring-4 ring-teal-100/70 dark:ring-teal-950/60">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
                   <Upload className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div>
@@ -1508,7 +1508,7 @@ const EmployeeDocuments = () => {
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-teal-500" />
+                      <FileText className="w-3.5 h-3.5 text-sky-500" />
                       Document Title <span className="text-rose-500">*</span>
                     </span>
                     <span className="text-[10px] text-slate-400 font-normal">
@@ -1522,14 +1522,14 @@ const EmployeeDocuments = () => {
                     placeholder="e.g. Certified Scrum Master (CSM) Certificate or Passport Scan"
                     value={uploadForm.title}
                     onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all shadow-xs"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all shadow-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Building className="w-3.5 h-3.5 text-teal-500" />
+                      <Building className="w-3.5 h-3.5 text-sky-500" />
                       Issuing Authority or Institute
                     </span>
                     <span className="text-[10px] text-slate-400 font-normal">e.g. Scrum Alliance, AWS, NADRA</span>
@@ -1539,7 +1539,7 @@ const EmployeeDocuments = () => {
                     placeholder="e.g. Scrum Alliance / Amazon Web Services / NADRA"
                     value={uploadForm.issuer}
                     onChange={(e) => setUploadForm({ ...uploadForm, issuer: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 outline-none transition-all shadow-xs"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all shadow-xs"
                   />
                 </div>
               </div>
@@ -1568,21 +1568,21 @@ const EmployeeDocuments = () => {
                         key={cat.id}
                         onClick={() => setUploadForm({ ...uploadForm, type: cat.id })}
                         className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${isSelected
-                            ? 'bg-gradient-to-br from-teal-50 to-cyan-50/50 dark:from-teal-950/50 dark:to-slate-800 border-teal-500/80 dark:border-teal-600 text-teal-950 dark:text-white shadow-sm ring-2 ring-teal-500/20'
+                            ? 'bg-gradient-to-br from-sky-50 to-cyan-50/50 dark:from-sky-950/50 dark:to-slate-800 border-sky-500/80 dark:border-sky-600 text-sky-950 dark:text-white shadow-sm ring-2 ring-sky-500/20'
                             : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
                           }`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <div
                             className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isSelected
-                                ? 'bg-teal-500 text-white shadow-xs'
+                                ? 'bg-sky-500 text-white shadow-xs'
                                 : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
                               }`}
                           >
                             <CatIcon className="w-3.5 h-3.5" />
                           </div>
                           {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-800" />
+                            <span className="w-2 h-2 rounded-full bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-800" />
                           )}
                         </div>
                         <div>
@@ -1605,7 +1605,7 @@ const EmployeeDocuments = () => {
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Upload className="w-3.5 h-3.5 text-teal-500" />
+                      <Upload className="w-3.5 h-3.5 text-sky-500" />
                       File Attachment (PDF, DOCX, PNG) <span className="text-rose-500">*</span>
                     </span>
                     <span className="text-[10px] text-slate-400 font-normal">Max size: 15 MB</span>
@@ -1638,33 +1638,33 @@ const EmployeeDocuments = () => {
 
                     <div
                       className={`p-3.5 sm:p-4 rounded-xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${uploadForm.file
-                          ? 'border-teal-500/80 bg-teal-50/50 dark:bg-teal-950/30'
-                          : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/20'
+                          ? 'border-sky-500/80 bg-sky-50/50 dark:bg-sky-950/30'
+                          : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-sky-400 dark:hover:border-sky-600 hover:bg-sky-50/20'
                         }`}
                     >
                       {uploadForm.file ? (
                         <div className="flex items-center justify-between w-full gap-3">
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-teal-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <div className="w-8 h-8 rounded-lg bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs">
                               <FileCheck className="w-4 h-4" />
                             </div>
                             <div className="text-left min-w-0">
                               <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
                                 {uploadForm.fileName || uploadForm.file.name}
                               </div>
-                              <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
+                              <div className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold mt-0.5">
                                 {uploadForm.size || `${(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB`} • Ready to Encrypt
                               </div>
                             </div>
                           </div>
 
-                          <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 text-[10px] font-bold border border-teal-200 dark:border-teal-800/60 shrink-0 shadow-xs">
+                          <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 text-[10px] font-bold border border-sky-200 dark:border-sky-800/60 shrink-0 shadow-xs">
                             Replace
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-teal-100 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center shadow-xs shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-xs shrink-0">
                             <Upload className="w-4 h-4 stroke-[2.2]" />
                           </div>
                           <div className="text-left">
@@ -1685,15 +1685,15 @@ const EmployeeDocuments = () => {
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5 text-teal-500" />
+                      <Lock className="w-3.5 h-3.5 text-sky-500" />
                       Live Preview & Record Card
                     </span>
                     <span className="text-[10px] text-slate-400 font-normal">Real-time summary</span>
                   </label>
 
-                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 via-teal-50/30 to-cyan-50/20 dark:from-slate-800/60 dark:via-teal-950/20 dark:to-slate-800/60 border border-teal-100 dark:border-slate-700/70 flex items-center justify-between gap-3 h-[62px]">
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-cyan-50/20 dark:from-slate-800/60 dark:via-sky-950/20 dark:to-slate-800/60 border border-sky-100 dark:border-slate-700/70 flex items-center justify-between gap-3 h-[62px]">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 shadow-xs border border-teal-100 dark:border-slate-600">
+                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 shadow-xs border border-sky-100 dark:border-slate-600">
                         <FileText className="w-4 h-4 stroke-[2.2]" />
                       </div>
                       <div className="min-w-0">
@@ -1703,7 +1703,7 @@ const EmployeeDocuments = () => {
                         <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
                           <span>{uploadForm.type}</span>
                           <span>•</span>
-                          <span className="text-teal-600 dark:text-teal-400 font-semibold truncate">
+                          <span className="text-sky-600 dark:text-sky-400 font-semibold truncate">
                             {uploadForm.issuer.trim() || 'Self-Submission'}
                           </span>
                         </div>
@@ -1711,7 +1711,7 @@ const EmployeeDocuments = () => {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-teal-100/80 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800 flex items-center">
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-100/80 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flex items-center">
                         AES-256
                       </span>
                     </div>
@@ -1720,7 +1720,7 @@ const EmployeeDocuments = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-teal-100/60 dark:border-teal-900/40 gap-3">
+              <div className="flex items-center justify-end pt-3 border-t border-sky-100/60 dark:border-sky-900/40 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsUploadOpen(false)}
@@ -1731,7 +1731,7 @@ const EmployeeDocuments = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 via-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-sky-600/30 hover:shadow-sky-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                   <span>{submitting ? 'Saving...' : 'Save & Encrypt'}</span>
@@ -1747,14 +1747,14 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-teal-950/20 dark:shadow-black/60 border border-teal-200/70 dark:border-teal-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
             {/* Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-teal-200/50 dark:border-teal-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-teal-50/90 via-teal-50/60 to-cyan-50/40 dark:from-teal-950/40 dark:via-teal-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 via-teal-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/25 ring-4 ring-teal-100/60 dark:ring-teal-950/50">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-100/60 dark:ring-sky-950/50">
                   <FileText className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
@@ -1777,7 +1777,7 @@ const EmployeeDocuments = () => {
 
             {/* Metadata Body */}
             <div className="px-6 sm:px-7 py-5 space-y-4 text-xs">
-              <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-slate-50 to-teal-50/30 dark:from-slate-800/50 dark:to-teal-950/20 border border-teal-100/80 dark:border-slate-800 space-y-2.5">
+              <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-slate-50 to-sky-50/30 dark:from-slate-800/50 dark:to-sky-950/20 border border-sky-100/80 dark:border-slate-800 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 font-medium">Vault Record ID</span>
                   <span className="font-mono font-bold text-slate-800 dark:text-slate-200">#{selectedDoc.id}</span>
@@ -1792,7 +1792,7 @@ const EmployeeDocuments = () => {
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                   <span className="text-slate-400 font-medium">Compliance Verification</span>
-                  <span className="text-teal-600 dark:text-teal-400 font-bold flex items-center gap-1">
+                  <span className="text-sky-600 dark:text-sky-400 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>HR Verified & Encrypted</span>
                   </span>
@@ -1807,7 +1807,7 @@ const EmployeeDocuments = () => {
             </div>
 
             {/* Footer */}
-            <div className="px-6 sm:px-7 py-3.5 border-t border-teal-100/60 dark:border-teal-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40">
+            <div className="px-6 sm:px-7 py-3.5 border-t border-sky-100/60 dark:border-sky-900/40 flex items-center justify-between gap-3 bg-white/40 dark:bg-slate-900/40">
               <button
                 onClick={() => setSelectedDoc(null)}
                 className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
@@ -1819,7 +1819,7 @@ const EmployeeDocuments = () => {
                   handleDownload(selectedDoc);
                   setSelectedDoc(null);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-600 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-teal-600/20 active:scale-95 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-600 hover:to-sky-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 active:scale-95 transition-all"
               >
                 <Download className="w-3.5 h-3.5 stroke-[2.2]" />
                 <span>Download Secure Copy</span>
