@@ -38,7 +38,8 @@ import {
 } from 'lucide-react';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
-import { EmployeeCardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
+import { EmployeeCardSkeleton } from '../../components/common/Skeleton';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { api } from '../../services/api';
 
 const DEFAULT_BLANK_AVATAR = '/blank-profile-picture.png';
@@ -162,7 +163,10 @@ const Employees = () => {
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const filterDropdownRef = useRef(null);
-  const [viewMode, setViewMode] = useState('grid');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [activeSort, setActiveSort] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [activeDateRange, setActiveDateRange] = useState('ALL');
   const [toastMsg, setToastMsg] = useState('');
   const [toastType, setToastType] = useState('success');
 
@@ -597,27 +601,98 @@ NexaHR Workforce Systems`;
   };
 
 
-  // Filtered employees
-  const filteredEmployees = employees.filter((emp) => {
-    const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase();
-    const email = (emp.email || '').toLowerCase();
-    const code = (emp.employeeCode || '').toLowerCase();
-    const desig = (emp.profile?.designation?.title || '').toLowerCase();
-    const query = searchTerm.toLowerCase();
+  // Status tabs & counts
+  const statusCounts = useMemo(() => ({
+    all: employees.length,
+    active: employees.filter((e) => e.isActive !== false).length,
+    inactive: employees.filter((e) => e.isActive === false).length,
+  }), [employees]);
 
-    const matchesSearch = fullName.includes(query) || email.includes(query) || code.includes(query) || desig.includes(query);
+  const statusTabs = [
+    { key: 'ALL', label: 'All', count: statusCounts.all },
+    { key: 'ACTIVE', label: 'Active', count: statusCounts.active },
+    { key: 'INACTIVE', label: 'Inactive', count: statusCounts.inactive },
+  ];
 
-    const empDeptName = emp.profile?.department?.name || '';
-    const matchesDept =
-      selectedDept === 'ALL' ||
-      empDeptName.toLowerCase().includes(selectedDept.toLowerCase()) ||
-      (selectedDept === 'Engineering' && empDeptName.toLowerCase().includes('eng')) ||
-      (selectedDept === 'Product & Design' && (empDeptName.toLowerCase().includes('product') || empDeptName.toLowerCase().includes('design'))) ||
-      (selectedDept === 'People Operations' && (empDeptName.toLowerCase().includes('hr') || empDeptName.toLowerCase().includes('people') || empDeptName.toLowerCase().includes('human'))) ||
-      (selectedDept === 'Finance' && (empDeptName.toLowerCase().includes('fin') || empDeptName.toLowerCase().includes('account')));
+  const sortOptions = [
+    { key: 'name', label: 'Sort: Name' },
+    { key: 'code', label: 'Sort: Code' },
+    { key: 'department', label: 'Sort: Dept' },
+    { key: 'date', label: 'Sort: Joined' },
+  ];
 
-    return matchesSearch && matchesDept;
-  });
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Time' },
+    { key: 'THIS_MONTH', label: 'Joined This Month' },
+    { key: 'THIS_YEAR', label: 'Joined 2026' },
+  ];
+
+  const dateRangeLabels = {
+    ALL: 'All Time',
+    THIS_MONTH: 'This Month',
+    THIS_YEAR: 'Year 2026',
+  };
+
+  // Filtered & Sorted employees
+  const filteredEmployees = useMemo(() => {
+    let list = employees.filter((emp) => {
+      const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase();
+      const email = (emp.email || '').toLowerCase();
+      const code = (emp.employeeCode || '').toLowerCase();
+      const desig = (emp.profile?.designation?.title || '').toLowerCase();
+      const query = searchTerm.toLowerCase();
+
+      const matchesSearch = fullName.includes(query) || email.includes(query) || code.includes(query) || desig.includes(query);
+
+      const empDeptName = emp.profile?.department?.name || '';
+      const matchesDept =
+        selectedDept === 'ALL' ||
+        empDeptName.toLowerCase().includes(selectedDept.toLowerCase()) ||
+        (selectedDept === 'Engineering' && empDeptName.toLowerCase().includes('eng')) ||
+        (selectedDept === 'Product & Design' && (empDeptName.toLowerCase().includes('product') || empDeptName.toLowerCase().includes('design'))) ||
+        (selectedDept === 'People Operations' && (empDeptName.toLowerCase().includes('hr') || empDeptName.toLowerCase().includes('people') || empDeptName.toLowerCase().includes('human'))) ||
+        (selectedDept === 'Finance' && (empDeptName.toLowerCase().includes('fin') || empDeptName.toLowerCase().includes('account')));
+
+      const matchesStatus =
+        statusFilter === 'ALL' ||
+        (statusFilter === 'ACTIVE' && emp.isActive !== false) ||
+        (statusFilter === 'INACTIVE' && emp.isActive === false);
+
+      let matchesDate = true;
+      if (activeDateRange === 'THIS_MONTH') {
+        const jDate = emp.joiningDate ? new Date(emp.joiningDate) : null;
+        const now = new Date();
+        matchesDate = jDate && jDate.getMonth() === now.getMonth() && jDate.getFullYear() === now.getFullYear();
+      } else if (activeDateRange === 'THIS_YEAR') {
+        const jDate = emp.joiningDate ? new Date(emp.joiningDate) : null;
+        matchesDate = jDate && jDate.getFullYear() === 2026;
+      }
+
+      return matchesSearch && matchesDept && matchesStatus && matchesDate;
+    });
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'name') {
+        valA = `${a.firstName || ''} ${a.lastName || ''}`.toLowerCase();
+        valB = `${b.firstName || ''} ${b.lastName || ''}`.toLowerCase();
+      } else if (activeSort === 'code') {
+        valA = (a.employeeCode || '').toLowerCase();
+        valB = (b.employeeCode || '').toLowerCase();
+      } else if (activeSort === 'department') {
+        valA = (a.profile?.department?.name || '').toLowerCase();
+        valB = (b.profile?.department?.name || '').toLowerCase();
+      } else if (activeSort === 'date') {
+        valA = new Date(a.joiningDate || 0).getTime();
+        valB = new Date(b.joiningDate || 0).getTime();
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [employees, searchTerm, selectedDept, statusFilter, activeDateRange, activeSort, sortOrder]);
 
   const stats = {
     total: employees.length,
@@ -900,245 +975,122 @@ NexaHR Workforce Systems`;
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SEARCH & FILTER TOOLBAR */}
+      {/* 2. MODERN DYNAMIC SEARCH & FILTER TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search employees by name, code, designation, or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all"
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title="Clear Search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Filter Button with Dropdown Menu */}
-          <div className="relative shrink-0" ref={filterDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                selectedDept !== 'ALL'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
-              }`}
-              title="Filter by Department"
-            >
-              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-              <span className="hidden sm:inline">
-                {selectedDept === 'ALL' ? 'Filter' : selectedDept}
-              </span>
-              <span className="inline sm:hidden">
-                {selectedDept === 'ALL' ? 'Filter' : selectedDept.split(' ')[0]}
-              </span>
-              {selectedDept !== 'ALL' ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              ) : (
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    showFilterMenu ? 'rotate-180' : ''
-                  }`}
-                />
-              )}
-            </button>
-
-            {/* Dropdown Menu */}
-            {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                <div className="flex items-center justify-between px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
-                  <span>Filter by Department</span>
-                  {selectedDept !== 'ALL' && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedDept('ALL');
-                        setShowFilterMenu(false);
-                      }}
-                      className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-0.5 max-h-64 overflow-y-auto">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedDept('ALL');
-                      setShowFilterMenu(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      selectedDept === 'ALL'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                      <span>All Departments</span>
-                    </div>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                        selectedDept === 'ALL'
-                          ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                      }`}
-                    >
-                      {employees.length}
-                    </span>
-                  </button>
-
-                  {departmentOptions.map((dept) => (
-                    <button
-                      key={dept.name}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDept(dept.name);
-                        setShowFilterMenu(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                        selectedDept === dept.name
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 truncate pr-2">
-                        {selectedDept === dept.name ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        ) : (
-                          <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
-                        )}
-                        <span className="truncate">{dept.name}</span>
-                      </div>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
-                          selectedDept === dept.name
-                            ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                        }`}
-                      >
-                        {dept.count}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* View Mode Toggle: Grid / Table */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl sm:rounded-2xl shrink-0">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
-              title="Grid View"
-            >
-              <Grid className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              className={`p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
-              title="Table View"
-            >
-              <List className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Active Filters Bar (Shown only when a filter or search is active) */}
-        {(searchTerm || selectedDept !== 'ALL') && (
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Active Filter:
+      <ModernSearchBarSection
+        statusTabs={statusTabs}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search employees by name, code, designation, or email..."
+        searchHint="dept:engineering"
+        filterTags={
+          selectedDept !== 'ALL'
+            ? [{ key: 'dept', label: `dept: ${selectedDept}` }]
+            : []
+        }
+        onRemoveTag={(tag) => {
+          if (tag.key === 'dept') setSelectedDept('ALL');
+        }}
+        dateRangeLabel={dateRangeLabels[activeDateRange] || 'All Time'}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={activeDateRange}
+        onDateRangeChange={setActiveDateRange}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={selectedDept !== 'ALL' ? 1 : 0}
+        filterContent={
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Department Filter
               </span>
               {selectedDept !== 'ALL' && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                  <span>Dept: {selectedDept}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDept('ALL')}
-                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
-                    title="Remove Department Filter"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDept('ALL')}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
               )}
-              {searchTerm && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
-                  <span className="truncate max-w-[150px]">"{searchTerm}"</span>
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm('')}
-                    className="hover:text-slate-900 dark:hover:text-white cursor-pointer"
-                    title="Clear Search"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              <span className="text-slate-400 text-[11px]">
-                ({filteredEmployees.length} of {employees.length} shown)
-              </span>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedDept('ALL');
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset Filters</span>
-            </button>
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              <button
+                type="button"
+                onClick={() => setSelectedDept('ALL')}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  selectedDept === 'ALL'
+                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                  <span>All Departments</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                  {employees.length}
+                </span>
+              </button>
+              {departmentOptions.map((dept) => (
+                <button
+                  key={dept.name}
+                  type="button"
+                  onClick={() => setSelectedDept(dept.name)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    selectedDept === dept.name
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate pr-2">
+                    {selectedDept === dept.name ? (
+                      <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                    ) : (
+                      <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
+                    )}
+                    <span className="truncate">{dept.name}</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0">
+                    {dept.count}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
+        }
+        actionButton={
+          <button
+            type="button"
+            onClick={() => {
+              setOnboardForm({
+                ...initialOnboardState,
+                departmentName: departments[0]?.name || '',
+                designationTitle: designations[0]?.title || '',
+              });
+              setOnboardTab('basic');
+              setIsOnboardOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Add Employee</span>
+          </button>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 3. EMPLOYEES GRID / TABLE */}
       {/* ========================================================================= */}
       {loading ? (
-        <>
-          <div className="md:hidden">
-            <EmployeeCardSkeleton count={6} />
-          </div>
-          <div className="hidden md:block">
-            {viewMode === 'grid' ? (
-              <EmployeeCardSkeleton count={6} />
-            ) : (
-              <TableSkeleton rows={6} cols={6} />
-            )}
-          </div>
-        </>
+        <EmployeeCardSkeleton count={6} />
       ) : filteredEmployees.length === 0 ? (
         <div className="p-12 sm:p-16 text-center space-y-4 bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
           <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/50 shadow-sm">
@@ -1168,7 +1120,7 @@ NexaHR Workforce Systems`;
         </div>
       ) : (
         <>
-          <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
           {filteredEmployees.map((emp, idx) => (
             <div
               key={emp.id || idx}
@@ -1316,100 +1268,7 @@ NexaHR Workforce Systems`;
             </div>
           ))}
         </div>
-        {viewMode === 'table' && (
-          <div className="hidden md:block bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-6">Employee</th>
-                  <th className="py-3.5 px-4">Department & Designation</th>
-                  <th className="py-3.5 px-4">Role ACL</th>
-                  <th className="py-3.5 px-4">Compensation</th>
-                  <th className="py-3.5 px-4">Location</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {filteredEmployees.map((emp, idx) => (
-                  <tr key={emp.id || idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={getAvatarUrl(emp)}
-                          alt=""
-                          className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0"
-                          onError={(e) => {
-                            e.target.src = DEFAULT_BLANK_AVATAR;
-                          }}
-                        />
-                        <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white">
-                            {emp.firstName} {emp.lastName}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono">{emp.employeeCode}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-slate-800 dark:text-slate-200">
-                        {emp.profile?.designation?.title || 'Staff'}
-                      </div>
-                      <div className="text-[10px] text-slate-400">{emp.profile?.department?.name || 'Engineering'}</div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                        {emp.role}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 font-bold text-emerald-600 dark:text-emerald-400">
-                      {formatSalary(emp.salaryStructure, emp.profile?.salary)}
-                    </td>
-                    <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-bold text-xs flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
-                          <Building2 className="w-3 h-3 text-sky-500 shrink-0" />
-                          <span>{emp.profile?.workLocation || emp.workLocation || 'Islamabad HQ'}</span>
-                        </span>
-                        {emp.profile?.address && (
-                          <span className="text-[11px] text-slate-400 truncate max-w-[170px] flex items-center gap-1" title={`Residential: ${emp.profile.address}`}>
-                            <Home className="w-2.5 h-2.5 text-amber-500/70 shrink-0" />
-                            <span>{emp.profile.address}</span>
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleOpenEdit(emp)}
-                          className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 hover:bg-sky-500 hover:text-white cursor-pointer transition-all"
-                          title="Edit Profile"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setSelectedEmployee(emp)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => setEmployeeToDelete(emp)}
-                          className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 hover:bg-rose-600 hover:text-white cursor-pointer transition-all"
-                          title="Remove Employee"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        )}
+        
       </>
       )}
 

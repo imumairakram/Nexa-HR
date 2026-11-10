@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
@@ -68,6 +69,8 @@ const Attendance = () => {
   const filterDropdownRef = useRef(null);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [employees, setEmployees] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -370,9 +373,17 @@ const Attendance = () => {
     });
   }, [employees, employeeSearch]);
 
-  // Client-side filtering across search query and status
+  // Sort options
+  const sortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'hours', label: 'Sort: Hours Logged' },
+    { key: 'overtime', label: 'Sort: Overtime' },
+    { key: 'employee', label: 'Sort: Employee' },
+  ];
+
+  // Client-side filtering & sorting across search query, status, and sort criteria
   const filteredLogs = useMemo(() => {
-    return logs.filter((item) => {
+    let list = logs.filter((item) => {
       // 1. Employee Filter
       if (selectedEmployee !== 'ALL') {
         const itemUserId = item.user?.id || item.userId;
@@ -431,7 +442,29 @@ const Attendance = () => {
 
       return true;
     });
-  }, [logs, selectedEmployee, selectedDepartment, statusFilter, searchQuery]);
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.rawDate || a.date || 0).getTime();
+        valB = new Date(b.rawDate || b.date || 0).getTime();
+      } else if (activeSort === 'hours') {
+        valA = parseFloat(a.totalHours || 0);
+        valB = parseFloat(b.totalHours || 0);
+      } else if (activeSort === 'overtime') {
+        valA = parseFloat(a.ot || 0);
+        valB = parseFloat(b.ot || 0);
+      } else if (activeSort === 'employee') {
+        valA = (a.user?.fullName || '').toLowerCase();
+        valB = (b.user?.fullName || '').toLowerCase();
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [logs, selectedEmployee, selectedDepartment, statusFilter, searchQuery, activeSort, sortOrder]);
 
   // Counts for status filter dropdown
   const counts = useMemo(() => {
@@ -766,7 +799,7 @@ const Attendance = () => {
       {loading ? (
         <TableSkeleton rows={6} cols={selectedEmployee === 'ALL' ? 5 : 4} />
       ) : (
-        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 overflow-hidden transition-all">
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all">
           {/* Header with Title & Month Navigation Controls */}
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -791,405 +824,165 @@ const Attendance = () => {
                 </div>
               </div>
             </div>
-
-            {/* Month Navigator Toolbar */}
-            <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
-                <button
-                  type="button"
-                  onClick={handlePrevMonth}
-                  title="Previous Month"
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-
-                {/* Month Picker Button & Dropdown */}
-                <div className="relative" ref={monthDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setShowMonthMenu((prev) => !prev)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer"
-                  >
-                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
-                    <span>{selectedMonthLabel}</span>
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
-                  </button>
-
-                  {showMonthMenu && (
-                    <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-56 max-h-72 overflow-y-auto bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
-                      <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                        Select Month & Year
-                      </div>
-                      {pastMonthsList.map((mItem) => {
-                        const isSelected =
-                          mItem.month === selectedMonth && mItem.year === selectedYear;
-                        return (
-                          <button
-                            key={`${mItem.year}-${mItem.month}`}
-                            type="button"
-                            onClick={() => {
-                              setSelectedMonth(mItem.month);
-                              setSelectedYear(mItem.year);
-                              setShowMonthMenu(false);
-                            }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                            }`}
-                          >
-                            <span>{mItem.label}</span>
-                            {mItem.isCurrent ? (
-                              <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300">
-                                Current
-                              </span>
-                            ) : isSelected ? (
-                              <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                            ) : null}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleNextMonth}
-                  disabled={isNextDisabled}
-                  title={isNextDisabled ? 'Cannot navigate to future months' : 'Next Month'}
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
-                    isNextDisabled
-                      ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-40'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer'
-                  }`}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Quick Jump to Current Month Button */}
-              {!isCurrentMonth && (
-                <button
-                  type="button"
-                  onClick={handleJumpToCurrent}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50 hover:bg-sky-100 dark:hover:bg-sky-900/40 cursor-pointer transition-all shadow-2xs"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Current Month</span>
-                </button>
-              )}
-            </div>
           </div>
 
-          {/* Action Toolbar & Summary Strip */}
-          <div className="px-5 sm:px-6 py-3.5 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            {/* Quick summary badges */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>{counts.present} Present</span>
-              </span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-2xs">
-                <span>{totalHoursLogged.toFixed(1)} hrs</span>
-              </span>
-              {totalOvertime > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/50 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                  +{totalOvertime.toFixed(1)}h OT
-                </span>
-              )}
-              {counts.late > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/50 text-xs font-bold text-amber-700 dark:text-amber-300">
-                  {counts.late} Late
-                </span>
-              )}
-            </div>
-
-            {/* Filter Controls: Employee Dropdown + Department + Search + Status Filter + Export */}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* HR Employee Selector Dropdown */}
-              <div className="relative" ref={employeeDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowEmployeeMenu((prev) => !prev)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
-                    selectedEmployee !== 'ALL'
-                      ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-sky-300'
-                  }`}
-                >
-                  <Users className="w-3.5 h-3.5 text-sky-500" />
-                  <span className="max-w-[130px] sm:max-w-[160px] truncate">
-                    {selectedEmployee === 'ALL'
-                      ? 'All Employees'
-                      : activeEmployeeObj?.fullName || 'Employee'}
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
-
-                {showEmployeeMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-72 max-h-80 overflow-y-auto bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          value={employeeSearch}
-                          onChange={(e) => setEmployeeSearch(e.target.value)}
-                          placeholder="Search employee..."
-                          className="w-full pl-8 pr-2 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="pt-1.5 space-y-1">
-                      {/* Option 1: All Employees */}
+          {/* Modern Dynamic Search & Filtering Section */}
+          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40">
+            <ModernSearchBarSection
+              statusTabs={[
+                { key: 'ALL', label: 'All Records', count: counts.all },
+                { key: 'PRESENT', label: 'Present', count: counts.present },
+                { key: 'LATE', label: 'Late', count: counts.late },
+                { key: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
+              ]}
+              activeStatus={statusFilter}
+              onStatusChange={setStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search records, employee name, employee code, notes..."
+              searchHint="status:late"
+              filterTags={[
+                ...(selectedEmployee !== 'ALL' && activeEmployeeObj
+                  ? [{ key: 'employee', label: `staff: ${activeEmployeeObj.fullName || activeEmployeeObj.firstName}` }]
+                  : []),
+                ...(selectedDepartment !== 'ALL'
+                  ? [{ key: 'department', label: `dept: ${selectedDepartment}` }]
+                  : []),
+              ]}
+              onRemoveTag={(tag) => {
+                if (tag.key === 'employee') setSelectedEmployee('ALL');
+                if (tag.key === 'department') setSelectedDepartment('ALL');
+              }}
+              dateRangeLabel={selectedMonthLabel}
+              dateRangeOptions={pastMonthsList.map((m) => ({
+                key: `${m.year}-${m.month}`,
+                label: m.label,
+              }))}
+              activeDateRange={`${selectedYear}-${selectedMonth}`}
+              onDateRangeChange={(val) => {
+                const [y, m] = val.split('-').map(Number);
+                setSelectedYear(y);
+                setSelectedMonth(m);
+              }}
+              sortOptions={sortOptions}
+              activeSort={activeSort}
+              sortOrder={sortOrder}
+              onSortChange={(key, order) => {
+                setActiveSort(key);
+                setSortOrder(order);
+              }}
+              filterCount={
+                (selectedEmployee !== 'ALL' ? 1 : 0) +
+                (selectedDepartment !== 'ALL' ? 1 : 0)
+              }
+              filterContent={
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      Attendance Filters
+                    </span>
+                    {(selectedEmployee !== 'ALL' || selectedDepartment !== 'ALL') && (
                       <button
                         type="button"
                         onClick={() => {
                           setSelectedEmployee('ALL');
-                          setShowEmployeeMenu(false);
+                          setSelectedDepartment('ALL');
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                        className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                      >
+                        Reset All
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Employee Filter */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      Staff Member
+                    </label>
+                    <div className="space-y-1 max-h-40 overflow-y-auto">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedEmployee('ALL')}
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
                           selectedEmployee === 'ALL'
                             ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-sky-500" />
-                          <span>All Employees (Overview)</span>
-                        </div>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
-                          {employees.length || '15'}
-                        </span>
+                        <span>All Employees</span>
+                        {selectedEmployee === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
                       </button>
-
-                      {/* Employee List */}
-                      {filteredEmployeesList.map((emp) => {
+                      {employees.map((emp) => {
                         const isSelected = selectedEmployee === emp.id || selectedEmployee === emp.employeeCode;
-                        const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || 'Employee';
-                        const dept = emp.profile?.department?.name || emp.department || 'Operations';
                         return (
                           <button
                             key={emp.id}
                             type="button"
-                            onClick={() => {
-                              setSelectedEmployee(emp.id);
-                              setShowEmployeeMenu(false);
-                            }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                            onClick={() => setSelectedEmployee(emp.id)}
+                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
                               isSelected
                                 ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                             }`}
                           >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
-                                {getInitials(emp.firstName, emp.lastName)}
-                              </div>
-                              <div className="text-left min-w-0">
-                                <div className="font-bold text-slate-800 dark:text-slate-100 truncate">
-                                  {fullName}
-                                </div>
-                                <div className="text-[10px] text-slate-400 font-mono truncate">
-                                  {emp.employeeCode} • {dept}
-                                </div>
-                              </div>
-                            </div>
-                            {isSelected && (
-                              <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0 ml-1" />
-                            )}
+                            <span className="truncate">{emp.firstName} {emp.lastName}</span>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
                           </button>
                         );
                       })}
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* Department Filter Dropdown */}
-              <div className="relative" ref={departmentDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowDepartmentMenu((prev) => !prev)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
-                    selectedDepartment !== 'ALL'
-                      ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-sky-300'
-                  }`}
-                >
-                  <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="max-w-[110px] truncate">
-                    {selectedDepartment === 'ALL' ? 'All Depts' : selectedDepartment}
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
-
-                {showDepartmentMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                  {/* Department Filter */}
+                  <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                       Department
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedDepartment('ALL');
-                        setShowDepartmentMenu(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                        selectedDepartment === 'ALL'
-                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <span>All Departments</span>
-                      {selectedDepartment === 'ALL' && (
-                        <Check className="w-3.5 h-3.5 text-sky-500" />
-                      )}
-                    </button>
-                    {departmentList.map((dept) => (
+                    </label>
+                    <div className="space-y-1 max-h-36 overflow-y-auto">
                       <button
-                        key={dept}
                         type="button"
-                        onClick={() => {
-                          setSelectedDepartment(dept);
-                          setShowDepartmentMenu(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          selectedDepartment === dept
+                        onClick={() => setSelectedDepartment('ALL')}
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                          selectedDepartment === 'ALL'
                             ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                       >
-                        <span className="truncate">{dept}</span>
-                        {selectedDepartment === dept && (
-                          <Check className="w-3.5 h-3.5 text-sky-500" />
-                        )}
+                        <span>All Departments</span>
+                        {selectedDepartment === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
                       </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Search Bar */}
-              <div className="relative flex-1 sm:w-auto min-w-[160px]">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search records, staff..."
-                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-
-              {/* Status Filter Button with Dropdown Menu */}
-              <div className="relative" ref={filterDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowFilterMenu((prev) => !prev)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
-                    statusFilter !== 'ALL'
-                      ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300'
-                  }`}
-                >
-                  <Filter className="w-3.5 h-3.5" />
-                  <span>
-                    {statusFilter === 'ALL'
-                      ? 'Filter'
-                      : statusFilter === 'PRESENT'
-                      ? 'Present'
-                      : statusFilter === 'LATE'
-                      ? 'Late'
-                      : 'Leave'}
-                  </span>
-                  {statusFilter !== 'ALL' ? (
-                    <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
-                  )}
-                </button>
-
-                {showFilterMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Filter by Status
-                    </div>
-                    {[
-                      { id: 'ALL', label: 'All Records', count: counts.all },
-                      {
-                        id: 'PRESENT',
-                        label: 'Present',
-                        count: counts.present,
-                        dot: 'bg-emerald-500',
-                      },
-                      { id: 'LATE', label: 'Late Arrival', count: counts.late, dot: 'bg-amber-500' },
-                      {
-                        id: 'ON_LEAVE',
-                        label: 'On Leave',
-                        count: counts.leave,
-                        dot: 'bg-indigo-500',
-                      },
-                    ].map((st) => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => {
-                          setStatusFilter(st.id);
-                          setShowFilterMenu(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          statusFilter === st.id
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {st.dot ? (
-                            <span className={`w-2 h-2 rounded-full ${st.dot}`} />
-                          ) : (
-                            <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
-                          )}
-                          <span>{st.label}</span>
-                        </div>
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                            statusFilter === st.id
-                              ? 'bg-sky-200/60 dark:bg-sky-900/80 text-sky-800 dark:text-sky-200'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                      {departmentList.map((dept) => (
+                        <button
+                          key={dept}
+                          type="button"
+                          onClick={() => setSelectedDepartment(dept)}
+                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                            selectedDepartment === dept
+                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          {st.count}
-                        </span>
-                      </button>
-                    ))}
+                          <span className="truncate">{dept}</span>
+                          {selectedDepartment === dept && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                )}
-              </div>
-
-              {/* Export Button */}
-              <button
-                type="button"
-                onClick={exportToCSV}
-                title="Export filtered records to CSV"
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export</span>
-              </button>
-            </div>
+                </div>
+              }
+              actionButton={
+                <button
+                  type="button"
+                  onClick={exportToCSV}
+                  title="Export filtered records to CSV"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
+                </button>
+              }
+            />
           </div>
 
           {/* Individual Employee Profile Header (When an employee is selected) */}
@@ -1582,7 +1375,7 @@ const Attendance = () => {
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                   {searchQuery || statusFilter !== 'ALL' || selectedDepartment !== 'ALL'
                     ? 'Try clearing your filters or choosing a different employee, department, or month.'
-                    : `No attendance records logged for ${selectedMonthLabel}. Use the month navigation above to view other periods.`}
+                    : `No attendance records logged for ${selectedMonthLabel}. Select another month from the time range filter to view records.`}
                 </p>
               </div>
               {(searchQuery ||

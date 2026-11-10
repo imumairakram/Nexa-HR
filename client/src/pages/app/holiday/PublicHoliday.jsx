@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
 import {
   CalendarDays,
   Plus,
@@ -14,6 +15,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Check,
   Grid,
   List,
@@ -106,8 +108,31 @@ const PublicHoliday = () => {
   const [selectedYear, setSelectedYear] = useState(currentYearNow);
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'calendar'
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const filterDropdownRef = useRef(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+
+  // Close filter dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target)
+      ) {
+        setShowFilterMenu(false);
+      }
+    };
+    if (showFilterMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showFilterMenu]);
 
   // Custom Holiday Form State
   const [form, setForm] = useState({
@@ -173,9 +198,52 @@ const PublicHoliday = () => {
     return getLiveHijriDate(new Date(), timezone, 0);
   }, [timezone, holidaysRefreshKey]);
 
-  // Filter holidays by search
+  // Filter Options & Counts
+  const filterOptions = useMemo(() => {
+    const counts = {
+      ALL: allHolidays.length,
+      'Gazetted National': allHolidays.filter((h) => h.type === 'Gazetted National').length,
+      'Gazetted Religious': allHolidays.filter((h) => h.type === 'Gazetted Religious').length,
+      'Bank Holiday': allHolidays.filter((h) => h.type === 'Bank Holiday').length,
+      'Company Recognized': allHolidays.filter((h) => h.type === 'Company Recognized').length,
+      'Optional Holiday': allHolidays.filter((h) => h.type === 'Optional Holiday').length,
+      UPCOMING: allHolidays.filter((h) => h.status === 'UPCOMING' || h.status === 'ACTIVE_TODAY').length,
+      CUSTOM: allHolidays.filter((h) => h.isCustom).length,
+    };
+    return [
+      { id: 'ALL', label: 'All Holidays', count: counts.ALL, icon: CalendarDays },
+      { id: 'Gazetted National', label: 'Gazetted National', count: counts['Gazetted National'], icon: Landmark },
+      { id: 'Gazetted Religious', label: 'Gazetted Religious', count: counts['Gazetted Religious'], icon: Moon },
+      { id: 'Bank Holiday', label: 'Bank Holidays', count: counts['Bank Holiday'], icon: Building2 },
+      { id: 'Company Recognized', label: 'Company Special', count: counts['Company Recognized'], icon: Star },
+      { id: 'Optional Holiday', label: 'Optional / Festive', count: counts['Optional Holiday'], icon: PartyPopper },
+      { id: 'UPCOMING', label: 'Upcoming Only', count: counts.UPCOMING, icon: Clock },
+      { id: 'CUSTOM', label: 'Custom Added', count: counts.CUSTOM, icon: Plus },
+    ];
+  }, [allHolidays]);
+
+  // Sort & Filter Options
+  const sortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'name', label: 'Sort: Title' },
+    { key: 'duration', label: 'Sort: Days' },
+  ];
+
+  // Filter holidays by search, category, and sorting
   const filteredHolidays = useMemo(() => {
-    return allHolidays.filter((h) => {
+    let list = allHolidays.filter((h) => {
+      // Category / Type filter
+      if (categoryFilter !== 'ALL') {
+        if (categoryFilter === 'UPCOMING') {
+          if (h.status !== 'UPCOMING' && h.status !== 'ACTIVE_TODAY') return false;
+        } else if (categoryFilter === 'CUSTOM') {
+          if (!h.isCustom) return false;
+        } else {
+          if (h.type !== categoryFilter) return false;
+        }
+      }
+
+      // Search query filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchName = h.name.toLowerCase().includes(query);
@@ -187,7 +255,26 @@ const PublicHoliday = () => {
       }
       return true;
     });
-  }, [allHolidays, searchQuery]);
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.date || a.startDate || 0).getTime();
+        valB = new Date(b.date || b.startDate || 0).getTime();
+      } else if (activeSort === 'name') {
+        valA = (a.name || '').toLowerCase();
+        valB = (b.name || '').toLowerCase();
+      } else if (activeSort === 'duration') {
+        valA = a.durationDays || a.daysCount || 1;
+        valB = b.durationDays || b.daysCount || 1;
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [allHolidays, searchQuery, categoryFilter, activeSort, sortOrder]);
 
   const availableYears = useMemo(() => getAvailableYears(), []);
 
@@ -437,96 +524,135 @@ const PublicHoliday = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. UNIFIED COMMAND & CONTROLS TOOLBAR */}
+      {/* 3. MODERN DYNAMIC SEARCH & FILTER COMMAND BAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-3.5">
-        {/* Row 1: Search Bar + View Toggle & Add Holiday Button */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder={`Search ${selectedYear} holidays by title, day, hijri date, or category...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-9 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All', count: filterOptions.find((f) => f.id === 'ALL')?.count || allHolidays.length },
+          { key: 'Gazetted National', label: 'Gazetted National', count: filterOptions.find((f) => f.id === 'Gazetted National')?.count || 0 },
+          { key: 'Gazetted Religious', label: 'Religious', count: filterOptions.find((f) => f.id === 'Gazetted Religious')?.count || 0 },
+          { key: 'Bank Holiday', label: 'Bank', count: filterOptions.find((f) => f.id === 'Bank Holiday')?.count || 0 },
+          { key: 'UPCOMING', label: 'Upcoming', count: filterOptions.find((f) => f.id === 'UPCOMING')?.count || 0 },
+        ]}
+        activeStatus={categoryFilter}
+        onStatusChange={setCategoryFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={`Search ${selectedYear} holidays by title, day, hijri date, or category...`}
+        searchHint="type:gazetted"
+        filterTags={[
+          ...(categoryFilter !== 'ALL' && !['Gazetted National', 'Gazetted Religious', 'Bank Holiday', 'UPCOMING'].includes(categoryFilter)
+            ? [{ key: 'category', label: `type: ${categoryFilter}` }]
+            : []),
+          { key: 'year', label: `year: ${selectedYear}` },
+        ]}
+        onRemoveTag={(tag) => {
+          if (tag.key === 'category') setCategoryFilter('ALL');
+          if (tag.key === 'year') setSelectedYear(currentYearNow);
+        }}
+        dateRangeLabel={`Year ${selectedYear}`}
+        dateRangeOptions={availableYears.map((yr) => ({
+          key: String(yr),
+          label: yr === currentYearNow ? `${yr} • Current` : String(yr),
+        }))}
+        activeDateRange={String(selectedYear)}
+        onDateRangeChange={(yrStr) => setSelectedYear(Number(yrStr))}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={categoryFilter !== 'ALL' ? 1 : 0}
+        filterContent={
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Filter by Category & Status
+              </span>
+              {categoryFilter !== 'ALL' && (
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('ALL')}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className="p-1 space-y-0.5 max-h-72 overflow-y-auto">
+              {filterOptions.map(({ id, label, count, icon: ItemIcon }) => {
+                const isSelected = categoryFilter === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setCategoryFilter(id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate pr-2">
+                      <ItemIcon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                      <span className="truncate">{label}</span>
+                    </div>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
+                        isSelected
+                          ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-
-          <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto">
-            {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl">
+        }
+        actionButton={
+          <div className="flex items-center gap-2">
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-full border border-slate-200/80 dark:border-slate-700/80">
               <button
+                type="button"
                 onClick={() => setViewMode('list')}
                 title="Table List View"
-                className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
                   viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
-                <List className="w-4 h-4" />
+                <List className="w-3.5 h-3.5" />
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('calendar')}
                 title="12-Month Calendar Grid View"
-                className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
                   viewMode === 'calendar'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
-                <Grid className="w-4 h-4" />
+                <Grid className="w-3.5 h-3.5" />
               </button>
             </div>
-
-            {/* Add Holiday Button */}
             <button
+              type="button"
               onClick={() => setIsAddOpen(true)}
-              className="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-md shadow-sky-500/20 cursor-pointer transition-all hover:scale-105"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
               <span>Add Holiday</span>
             </button>
           </div>
-        </div>
-
-        {/* Row 2: Year Selector Timeline Rail */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl overflow-x-auto w-full sm:w-auto">
-            {availableYears.map((yr) => (
-              <button
-                key={yr}
-                onClick={() => setSelectedYear(yr)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                  selectedYear === yr
-                    ? 'bg-sky-500 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <span>{yr}</span>
-                {yr === currentYearNow && (
-                  <span className={`ml-1 text-[9px] font-extrabold ${selectedYear === yr ? 'text-blue-100' : 'text-blue-600 dark:text-blue-400'}`}>
-                    • Now
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <span className="hidden md:inline text-xs text-slate-400 font-semibold shrink-0">
-            {filteredHolidays.length} Observances in {selectedYear}
-          </span>
-        </div>
-      </div>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. VIEW MODE: TABULAR LIST VIEW */}
@@ -548,9 +674,21 @@ const PublicHoliday = () => {
           </div>
 
           {filteredHolidays.length === 0 ? (
-            <div className="p-12 text-center text-slate-400 space-y-2">
+            <div className="p-12 text-center text-slate-400 space-y-3">
               <Calendar className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600" />
-              <p className="text-sm font-semibold">No holidays match the search query for {selectedYear}.</p>
+              <p className="text-sm font-semibold">No holidays match the filter or search query for {selectedYear}.</p>
+              {(categoryFilter !== 'ALL' || searchQuery) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryFilter('ALL');
+                    setSearchQuery('');
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 text-xs font-bold hover:bg-sky-100 dark:hover:bg-sky-900/60 border border-sky-200/80 dark:border-sky-800/60 transition-colors cursor-pointer"
+                >
+                  Clear Filters & Search
+                </button>
+              )}
             </div>
           ) : (
             <>
@@ -752,7 +890,7 @@ const PublicHoliday = () => {
               const monthNum = mIdx + 1;
               const daysInMonth = new Date(selectedYear, monthNum, 0).getDate();
               const firstDayOfWeek = new Date(selectedYear, mIdx, 1).getDay(); // 0 = Sun, 1 = Mon...
-              const monthHolidays = allHolidays.filter((h) => h.month === monthNum);
+              const monthHolidays = filteredHolidays.filter((h) => h.month === monthNum);
 
               return (
                 <div

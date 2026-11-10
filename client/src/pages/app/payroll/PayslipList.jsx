@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
 import { TableSkeleton } from '../../../components/common/Skeleton';
 import {
   FileText,
@@ -27,6 +28,12 @@ const PayslipList = () => {
   const [payslips, setPayslips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [sortKey, setSortKey] = useState('amount');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [dateRange, setDateRange] = useState('ALL');
+  const [minAmount, setMinAmount] = useState(null);
+  const [deptFilter, setDeptFilter] = useState('ALL');
   const [selectedSlip, setSelectedSlip] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -94,11 +101,87 @@ const PayslipList = () => {
     }));
   }, [payslips]);
 
-  const filtered = payslips.filter((p) =>
-    p.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    return payslips
+      .filter((p) => {
+        const query = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          !query ||
+          p.employee.toLowerCase().includes(query) ||
+          p.code.toLowerCase().includes(query) ||
+          p.id.toLowerCase().includes(query) ||
+          p.dept.toLowerCase().includes(query);
+
+        const matchesStatus =
+          statusFilter === 'ALL' ||
+          (p.status && p.status.toUpperCase() === statusFilter.toUpperCase());
+
+        const matchesDept = deptFilter === 'ALL' || p.dept === deptFilter;
+
+        const matchesAmount = !minAmount || p.net >= minAmount;
+
+        return matchesSearch && matchesStatus && matchesDept && matchesAmount;
+      })
+      .sort((a, b) => {
+        let diff = 0;
+        if (sortKey === 'amount') {
+          diff = b.net - a.net;
+        } else if (sortKey === 'gross') {
+          diff = b.gross - a.gross;
+        } else if (sortKey === 'employee') {
+          diff = a.employee.localeCompare(b.employee);
+        } else if (sortKey === 'date') {
+          diff = new Date(b.date) - new Date(a.date);
+        }
+        return sortOrder === 'asc' ? -diff : diff;
+      });
+  }, [payslips, searchQuery, statusFilter, deptFilter, minAmount, sortKey, sortOrder]);
+
+  const statusTabs = useMemo(() => {
+    const paidCount = payslips.filter((p) => (p.status || '').toUpperCase() === 'PAID').length;
+    const pendingCount = payslips.filter((p) => (p.status || '').toUpperCase() === 'PENDING').length;
+    return [
+      { key: 'ALL', label: 'All', count: payslips.length },
+      { key: 'PAID', label: 'Paid', count: paidCount },
+      { key: 'PENDING', label: 'Pending', count: pendingCount },
+      { key: 'OVERDUE', label: 'Overdue', count: 0 },
+      { key: 'DRAFT', label: 'Draft', count: 0 },
+    ];
+  }, [payslips]);
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Cycles' },
+    { key: 'THIS_MONTH', label: 'Oct 1 – Oct 31, 2026' },
+    { key: 'LAST_MONTH', label: 'Sep 1 – Sep 30, 2026' },
+    { key: 'THIS_YEAR', label: 'Fiscal Year 2026' },
+  ];
+
+  const dateRangeLabel = useMemo(() => {
+    if (dateRange === 'THIS_MONTH') return 'Oct 1 – Oct 31, 2026';
+    if (dateRange === 'LAST_MONTH') return 'Sep 1 – Sep 30, 2026';
+    if (dateRange === 'THIS_YEAR') return 'Fiscal Year 2026';
+    return 'All Cycles';
+  }, [dateRange]);
+
+  const sortOptions = [
+    { key: 'amount', label: 'Amount' },
+    { key: 'gross', label: 'Gross' },
+    { key: 'date', label: 'Disbursed Date' },
+    { key: 'employee', label: 'Staff Name' },
+  ];
+
+  const filterTags = useMemo(() => {
+    const tags = [];
+    if (minAmount) {
+      tags.push({ key: 'amount', label: 'amount', value: `>${minAmount}` });
+    }
+    if (deptFilter !== 'ALL') {
+      tags.push({ key: 'dept', label: 'dept', value: deptFilter });
+    }
+    return tags;
+  }, [minAmount, deptFilter]);
+
+  const filterCount = (minAmount ? 1 : 0) + (deptFilter !== 'ALL' ? 1 : 0);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -228,6 +311,96 @@ const PayslipList = () => {
           presetWave="wave4"
           dataPoints={avgSparkData}
           loading={loading}
+        />
+      </div>
+
+      {/* Modern Dynamic Search & Filter Section */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800">
+        <ModernSearchBarSection
+          statusTabs={statusTabs}
+          activeStatus={statusFilter}
+          onStatusChange={setStatusFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search payouts by employee name, code, or voucher..."
+          searchHint='Try "status:overdue"'
+          filterTags={filterTags}
+          onRemoveTag={(key) => {
+            if (key === 'amount') setMinAmount(null);
+            if (key === 'dept') setDeptFilter('ALL');
+          }}
+          dateRangeLabel={dateRangeLabel}
+          dateRangeOptions={dateRangeOptions}
+          activeDateRange={dateRange}
+          onDateRangeChange={setDateRange}
+          sortOptions={sortOptions}
+          activeSort={sortKey}
+          sortOrder={sortOrder}
+          onSortChange={(key, order) => {
+            setSortKey(key);
+            setSortOrder(order);
+          }}
+          filterCount={filterCount}
+          filterContent={
+            <div className="space-y-3.5">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                  Minimum Net Payout
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[null, 1000, 2500, 5000].map((amt) => (
+                    <button
+                      key={amt || 'any'}
+                      type="button"
+                      onClick={() => setMinAmount(amt)}
+                      className={`px-2 py-1.5 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer ${
+                        minAmount === amt
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                      }`}
+                    >
+                      {amt ? `>${amt}` : 'Any'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                  Department
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {['ALL', ...new Set(payslips.map((p) => p.dept))].map((dept) => (
+                    <button
+                      key={dept}
+                      type="button"
+                      onClick={() => setDeptFilter(dept)}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                        deptFilter === dept
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                      }`}
+                    >
+                      {dept}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {filterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMinAmount(null);
+                    setDeptFilter('ALL');
+                  }}
+                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+                >
+                  Reset All Filters
+                </button>
+              )}
+            </div>
+          }
         />
       </div>
 

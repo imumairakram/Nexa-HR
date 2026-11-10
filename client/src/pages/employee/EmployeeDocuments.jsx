@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { TableSkeleton, DocumentCardSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -153,6 +154,9 @@ const EmployeeDocuments = () => {
   const [activeTab, setActiveTab] = useState('personal'); // 'personal' | 'policies'
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'grid'
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [activeDateRange, setActiveDateRange] = useState('ALL');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const filterDropdownRef = useRef(null);
@@ -498,11 +502,41 @@ const EmployeeDocuments = () => {
     showToast(`Downloaded verified document: ${doc.title}`);
   };
 
-  // Filtered documents (100% null-safe)
+  // Sort & Date Options
+  const sortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'title', label: 'Sort: Title' },
+    { key: 'size', label: 'Sort: Size' },
+  ];
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Time' },
+    { key: 'THIS_MONTH', label: 'This Month' },
+    { key: 'THIS_YEAR', label: 'Year 2026' },
+  ];
+
+  const dateRangeLabels = {
+    ALL: 'All Time',
+    THIS_MONTH: 'This Month',
+    THIS_YEAR: 'Year 2026',
+  };
+
+  // Filtered documents (100% null-safe with dynamic sorting)
   const filteredPersonalDocs = useMemo(() => {
-    return personalDocs.filter((d) => {
+    let list = personalDocs.filter((d) => {
       const matchesType = typeFilter === 'ALL' || d.type === typeFilter;
       if (!matchesType) return false;
+
+      let matchesDate = true;
+      if (activeDateRange === 'THIS_MONTH') {
+        const itemDate = new Date(d.uploadDate || d.date || d.createdAt || Date.now());
+        const now = new Date();
+        matchesDate = itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+      } else if (activeDateRange === 'THIS_YEAR') {
+        const itemDate = new Date(d.uploadDate || d.date || d.createdAt || Date.now());
+        matchesDate = itemDate.getFullYear() === 2026;
+      }
+      if (!matchesDate) return false;
 
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase().trim();
@@ -521,10 +555,29 @@ const EmployeeDocuments = () => {
         typeLabel.includes(q)
       );
     });
-  }, [personalDocs, searchQuery, typeFilter]);
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.uploadDate || a.date || a.createdAt || 0).getTime();
+        valB = new Date(b.uploadDate || b.date || b.createdAt || 0).getTime();
+      } else if (activeSort === 'title') {
+        valA = (a.title || '').toLowerCase();
+        valB = (b.title || '').toLowerCase();
+      } else if (activeSort === 'size') {
+        valA = parseFloat(a.size || 0);
+        valB = parseFloat(b.size || 0);
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [personalDocs, searchQuery, typeFilter, activeDateRange, activeSort, sortOrder]);
 
   const filteredPolicies = useMemo(() => {
-    return policies.filter((p) => {
+    let list = policies.filter((p) => {
       const matchesType = typeFilter === 'ALL' || p.category === typeFilter;
       if (!matchesType) return false;
 
@@ -545,7 +598,24 @@ const EmployeeDocuments = () => {
         description.includes(q)
       );
     });
-  }, [policies, searchQuery, typeFilter]);
+
+    list.sort((a, b) => {
+      let valA = (a.title || '').toLowerCase();
+      let valB = (b.title || '').toLowerCase();
+      if (activeSort === 'date') {
+        valA = new Date(a.lastUpdated || a.effectiveDate || 0).getTime();
+        valB = new Date(b.lastUpdated || b.effectiveDate || 0).getTime();
+      } else if (activeSort === 'size') {
+        valA = parseFloat(a.size || 0);
+        valB = parseFloat(b.size || 0);
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [policies, searchQuery, typeFilter, activeSort, sortOrder]);
 
   const personalDocTypes = useMemo(() => [
     { id: 'ALL', label: 'All Documents' },
@@ -787,242 +857,173 @@ const EmployeeDocuments = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. REPOSITORY TABS & SEARCH CONTROLS */}
+      {/* 3. MODERN DYNAMIC REPOSITORY SEARCH & FILTER COMMAND BAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Navigation Category Tabs */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl shrink-0">
-            <button
-              onClick={() => {
-                setActiveTab('personal');
-                setTypeFilter('ALL');
-              }}
-              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                activeTab === 'personal'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <FolderOpen className="w-3.5 h-3.5" />
-              <span>Personal Vault ({personalDocs.length})</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveTab('policies');
-                setTypeFilter('ALL');
-              }}
-              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                activeTab === 'policies'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Company Policies ({policies.length})</span>
-            </button>
-          </div>
-
-          {/* Search, Filter & View Mode Controls */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:max-w-md sm:ml-auto">
-            <div className="relative flex-1 min-w-0">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                placeholder={activeTab === 'personal' ? 'Search documents by title or issuer...' : 'Search policies by title, category...'}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                  title="Clear Search"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Filter Button with Dropdown Menu */}
-            <div className="relative shrink-0" ref={filterDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setShowFilterMenu((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                  typeFilter !== 'ALL'
-                    ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 shadow-teal-500/10'
-                    : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700/60'
-                }`}
-                title="Filter Documents"
-              >
-                <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                <span className="hidden sm:inline">
-                  {typeFilter === 'ALL'
-                    ? 'Filter'
-                    : activeFilterOptions.find((o) => o.id === typeFilter)?.label || typeFilter}
-                </span>
-                <span className="inline sm:hidden">
-                  {typeFilter === 'ALL' ? 'Filter' : 'Filtered'}
-                </span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    showFilterMenu ? 'rotate-180' : ''
-                  }`}
-                />
-                {typeFilter !== 'ALL' && (
-                  <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-                )}
-              </button>
-
-              {/* Dropdown Menu */}
-              {showFilterMenu && (
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
-                    <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      {activeTab === 'personal' ? 'Document Type' : 'Policy Category'}
-                    </div>
-                  </div>
-
-                  <div className="p-1 space-y-0.5 max-h-60 overflow-y-auto">
-                    {activeFilterOptions.map(({ id, label }) => {
-                      const isSelected = typeFilter === id;
-                      const count = filterCounts[id] ?? 0;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => {
-                            setTypeFilter(id);
-                            setShowFilterMenu(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate pr-2">
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                isSelected
-                                  ? 'bg-teal-500 ring-2 ring-teal-300 dark:ring-teal-700'
-                                  : 'bg-slate-300 dark:bg-slate-600'
-                              }`}
-                            />
-                            <span className="truncate">{label}</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
-                              isSelected
-                                ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
-                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                            }`}
-                          >
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {typeFilter !== 'ALL' && (
-                    <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-700/60 p-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTypeFilter('ALL');
-                          setShowFilterMenu(false);
-                        }}
-                        className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>Reset Filter</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl shrink-0">
-              <button
-                onClick={() => setViewMode('list')}
-                title="Table List View"
-                className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                title="Card Grid View"
-                className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Active Filter Badges */}
-        {(typeFilter !== 'ALL' || searchQuery) && (
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              Active:
-            </span>
-
-            {typeFilter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/60 text-teal-700 dark:text-teal-300 text-[11px] font-bold">
-                {activeTab === 'personal' ? 'Type' : 'Category'}: {activeFilterOptions.find((o) => o.id === typeFilter)?.label || typeFilter}
+      <ModernSearchBarSection
+        statusTabs={
+          activeTab === 'personal'
+            ? [
+                { key: 'ALL', label: 'All Documents', count: personalDocs.length },
+                { key: 'CONTRACT', label: 'Contracts', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('CONTRACT')).length },
+                { key: 'CERTIFICATE', label: 'Certificates', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('CERTIFICATE')).length },
+                { key: 'ID', label: 'IDs & Identity', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('ID') || (d.type || '').toUpperCase().includes('PASSPORT')).length },
+              ]
+            : [
+                { key: 'ALL', label: 'All Policies', count: policies.length },
+                { key: 'GOVERNANCE', label: 'Governance', count: policies.filter((p) => p.category === 'GOVERNANCE').length },
+                { key: 'SECURITY', label: 'Security', count: policies.filter((p) => p.category === 'SECURITY').length },
+                { key: 'WORKPLACE', label: 'Workplace', count: policies.filter((p) => p.category === 'WORKPLACE').length },
+              ]
+        }
+        activeStatus={typeFilter}
+        onStatusChange={setTypeFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={activeTab === 'personal' ? 'Search documents by title or issuer...' : 'Search policies by title, category...'}
+        searchHint={activeTab === 'personal' ? 'type:contract' : 'cat:security'}
+        filterTags={
+          typeFilter !== 'ALL' && !['CONTRACT', 'CERTIFICATE', 'ID', 'GOVERNANCE', 'SECURITY', 'WORKPLACE'].includes(typeFilter)
+            ? [{ key: 'filter', label: `filter: ${typeFilter.toLowerCase()}` }]
+            : []
+        }
+        onRemoveTag={(tag) => {
+          if (tag.key === 'filter') setTypeFilter('ALL');
+        }}
+        dateRangeLabel={dateRangeLabels[activeDateRange] || 'All Time'}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={activeDateRange}
+        onDateRangeChange={setActiveDateRange}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={typeFilter !== 'ALL' ? 1 : 0}
+        filterContent={
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                {activeTab === 'personal' ? 'Document Type' : 'Policy Category'}
+              </span>
+              {typeFilter !== 'ALL' && (
                 <button
                   type="button"
                   onClick={() => setTypeFilter('ALL')}
-                  className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer p-0.5"
-                  title="Remove Filter"
+                  className="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
                 >
-                  <X className="w-3 h-3" />
+                  Reset
                 </button>
-              </span>
-            )}
-
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
-                "{searchQuery}"
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
-                  title="Clear Search"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={() => {
-                setTypeFilter('ALL');
-                setSearchQuery('');
-              }}
-              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
-            >
-              Reset Filters
-            </button>
+              )}
+            </div>
+            <div className="space-y-0.5 max-h-56 overflow-y-auto">
+              {activeFilterOptions.map(({ id, label }) => {
+                const isSelected = typeFilter === id;
+                const count = filterCounts[id] ?? 0;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setTypeFilter(id)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>{label}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        isSelected
+                          ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
-      </div>
+        }
+        actionButton={
+          <div className="flex items-center gap-2">
+            {/* Vault Switch Toggle */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('personal');
+                  setTypeFilter('ALL');
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeTab === 'personal'
+                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                Vault ({personalDocs.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('policies');
+                  setTypeFilter('ALL');
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeTab === 'policies'
+                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                Policies ({policies.length})
+              </button>
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                title="Table List View"
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Card Grid View"
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <Grid className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Upload Button */}
+            {activeTab === 'personal' && (
+              <button
+                type="button"
+                onClick={() => setIsUploadOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Upload</span>
+              </button>
+            )}
+          </div>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. DOCUMENTS CONTENT VIEW (PERSONAL VAULT OR COMPANY POLICIES) */}

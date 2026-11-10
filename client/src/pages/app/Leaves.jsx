@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { broadcastAppEvent, subscribeAppEvent } from '../../utils/crossTabSync';
@@ -53,20 +54,11 @@ const Leaves = () => {
   const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/leaves/requests'));
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const filterDropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Close filter dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
-        setShowFilterMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const [sortKey, setSortKey] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [dateRange, setDateRange] = useState('ALL');
+  const [leaveTypeFilter, setLeaveTypeFilter] = useState('ALL');
   const [selectedReq, setSelectedReq] = useState(null);
   const [remarksInput, setRemarksInput] = useState('');
   const [isApplyOpen, setIsApplyOpen] = useState(false);
@@ -230,16 +222,58 @@ const Leaves = () => {
     }
   };
 
-  const filtered = requests.filter((r) => {
-    const empName = `${r.user?.firstName || ''} ${r.user?.lastName || ''}`.toLowerCase();
-    const reason = (r.reason || '').toLowerCase();
-    const type = (r.leaveType?.name || '').toLowerCase();
-    const query = searchQuery.toLowerCase();
+  const filtered = requests
+    .filter((r) => {
+      const empName = `${r.user?.firstName || ''} ${r.user?.lastName || ''}`.toLowerCase();
+      const empCode = (r.user?.employeeCode || '').toLowerCase();
+      const reason = (r.reason || '').toLowerCase();
+      const type = (r.leaveType?.name || '').toLowerCase();
+      const query = searchQuery.toLowerCase().trim();
 
-    const matchesSearch = empName.includes(query) || reason.includes(query) || type.includes(query);
-    const matchesStatus = statusFilter === 'ALL' || r.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+      const matchesSearch =
+        !query ||
+        empName.includes(query) ||
+        empCode.includes(query) ||
+        reason.includes(query) ||
+        type.includes(query);
+
+      const matchesStatus = statusFilter === 'ALL' || r.status === statusFilter;
+      const matchesType = leaveTypeFilter === 'ALL' || (r.leaveType?.name || '') === leaveTypeFilter;
+
+      let matchesDate = true;
+      if (dateRange !== 'ALL' && r.startDate) {
+        try {
+          const reqDate = new Date(r.startDate);
+          const now = new Date();
+          if (dateRange === 'THIS_MONTH') {
+            matchesDate =
+              reqDate.getFullYear() === now.getFullYear() && reqDate.getMonth() === now.getMonth();
+          } else if (dateRange === 'LAST_MONTH') {
+            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            matchesDate =
+              reqDate.getFullYear() === lastMonth.getFullYear() &&
+              reqDate.getMonth() === lastMonth.getMonth();
+          } else if (dateRange === 'THIS_YEAR') {
+            matchesDate = reqDate.getFullYear() === now.getFullYear();
+          }
+        } catch {}
+      }
+
+      return matchesSearch && matchesStatus && matchesType && matchesDate;
+    })
+    .sort((a, b) => {
+      let diff = 0;
+      if (sortKey === 'date') {
+        diff = new Date(b.startDate || b.createdAt || 0) - new Date(a.startDate || a.createdAt || 0);
+      } else if (sortKey === 'days') {
+        diff = calculateLeaveDays(b) - calculateLeaveDays(a);
+      } else if (sortKey === 'employee') {
+        const nameA = `${a.user?.firstName || ''} ${a.user?.lastName || ''}`.trim();
+        const nameB = `${b.user?.firstName || ''} ${b.user?.lastName || ''}`.trim();
+        diff = nameA.localeCompare(nameB);
+      }
+      return sortOrder === 'asc' ? -diff : diff;
+    });
 
   const stats = {
     total: requests.length,
@@ -247,6 +281,46 @@ const Leaves = () => {
     approved: requests.filter((r) => r.status === 'APPROVED').length,
     rejected: requests.filter((r) => r.status === 'REJECTED').length,
   };
+
+  const statusTabs = [
+    { key: 'ALL', label: 'All', count: stats.total },
+    { key: 'APPROVED', label: 'Approved', count: stats.approved },
+    { key: 'PENDING', label: 'Pending', count: stats.pending },
+    { key: 'REJECTED', label: 'Declined', count: stats.rejected },
+  ];
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Dates' },
+    { key: 'THIS_MONTH', label: 'This Month' },
+    { key: 'LAST_MONTH', label: 'Last Month' },
+    { key: 'THIS_YEAR', label: 'This Year' },
+  ];
+
+  const dateRangeLabel = (() => {
+    if (dateRange === 'THIS_MONTH') {
+      const now = new Date();
+      return `${now.toLocaleString('en-US', { month: 'short' })} 1 – ${now.toLocaleString('en-US', { month: 'short' })} ${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}, ${now.getFullYear()}`;
+    }
+    if (dateRange === 'LAST_MONTH') return 'Last Month';
+    if (dateRange === 'THIS_YEAR') return `Year ${new Date().getFullYear()}`;
+    return 'All Dates';
+  })();
+
+  const sortOptions = [
+    { key: 'date', label: 'Date' },
+    { key: 'days', label: 'Duration' },
+    { key: 'employee', label: 'Employee' },
+  ];
+
+  const filterTags = [];
+  if (leaveTypeFilter !== 'ALL') {
+    filterTags.push({ key: 'leaveType', label: 'type', value: leaveTypeFilter });
+  }
+  if (dateRange !== 'ALL') {
+    filterTags.push({ key: 'dateRange', label: 'range', value: dateRange.replace('_', ' ').toLowerCase() });
+  }
+
+  const filterCount = (leaveTypeFilter !== 'ALL' ? 1 : 0) + (dateRange !== 'ALL' ? 1 : 0);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -388,198 +462,105 @@ const Leaves = () => {
         />
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search leave requests by employee name, leave type, or reason..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all font-medium"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title="Clear Search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Filter Button with Dropdown Menu */}
-          <div className="relative shrink-0" ref={filterDropdownRef}>
+      {/* Modern Dynamic Search & Filter Section */}
+      <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-5 shadow-soft border border-slate-100 dark:border-slate-800">
+        <ModernSearchBarSection
+          statusTabs={statusTabs}
+          activeStatus={statusFilter}
+          onStatusChange={setStatusFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search leave requests by employee name, code, or reason..."
+          searchHint='Try "status:pending"'
+          filterTags={filterTags}
+          onRemoveTag={(key) => {
+            if (key === 'leaveType') setLeaveTypeFilter('ALL');
+            if (key === 'dateRange') setDateRange('ALL');
+          }}
+          dateRangeLabel={dateRangeLabel}
+          dateRangeOptions={dateRangeOptions}
+          activeDateRange={dateRange}
+          onDateRangeChange={setDateRange}
+          sortOptions={sortOptions}
+          activeSort={sortKey}
+          sortOrder={sortOrder}
+          onSortChange={(key, order) => {
+            setSortKey(key);
+            setSortOrder(order);
+          }}
+          filterCount={filterCount}
+          actionButton={
             <button
-              type="button"
-              onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                statusFilter !== 'ALL'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
-              }`}
-              title="Filter by Status"
+              onClick={handleOpenApplyModal}
+              className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-sm shadow-sky-500/20 cursor-pointer shrink-0 transition-all hover:scale-105 active:scale-95"
             >
-              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-              <span className="hidden sm:inline">
-                {statusFilter === 'ALL'
-                  ? 'Filter'
-                  : statusFilter === 'PENDING'
-                  ? 'Pending'
-                  : statusFilter === 'APPROVED'
-                  ? 'Approved'
-                  : 'Declined'}
-              </span>
-              <span className="inline sm:hidden">
-                {statusFilter === 'ALL'
-                  ? 'Filter'
-                  : statusFilter === 'PENDING'
-                  ? 'Pending'
-                  : statusFilter === 'APPROVED'
-                  ? 'Approved'
-                  : 'Declined'}
-              </span>
-              {statusFilter !== 'ALL' ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              ) : (
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    showFilterMenu ? 'rotate-180' : ''
-                  }`}
-                />
-              )}
+              <Plus className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Apply on Behalf</span>
+              <span className="inline sm:hidden">Apply</span>
             </button>
-
-            {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                <div className="flex items-center justify-between px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
-                  <span>Filter by Status</span>
-                  {statusFilter !== 'ALL' && (
+          }
+          filterContent={
+            <div className="space-y-3.5">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                  Leave Type
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {['ALL', ...new Set(leaveTypes.map((t) => t.name))].map((typeName) => (
                     <button
+                      key={typeName}
                       type="button"
-                      onClick={() => {
-                        setStatusFilter('ALL');
-                        setShowFilterMenu(false);
-                      }}
-                      className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-0.5">
-                  {[
-                    { key: 'ALL', label: 'All Requests', count: stats.total, dot: 'bg-slate-400' },
-                    { key: 'PENDING', label: 'Pending Review', count: stats.pending, dot: 'bg-amber-500' },
-                    { key: 'APPROVED', label: 'Approved', count: stats.approved, dot: 'bg-emerald-500' },
-                    { key: 'REJECTED', label: 'Declined', count: stats.rejected, dot: 'bg-rose-500' },
-                  ].map((item) => (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => {
-                        setStatusFilter(item.key);
-                        setShowFilterMenu(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                        statusFilter === item.key
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                      onClick={() => setLeaveTypeFilter(typeName)}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                        leaveTypeFilter === typeName
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${item.dot}`} />
-                        <span>{item.label}</span>
-                      </div>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                          statusFilter === item.key
-                            ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                        }`}
-                      >
-                        {item.count}
-                      </span>
+                      {typeName === 'ALL' ? 'All Types' : typeName}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
 
-          <button
-            onClick={handleOpenApplyModal}
-            className="px-3.5 sm:px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl sm:rounded-2xl flex items-center gap-1.5 sm:gap-2 shadow-sm shadow-emerald-600/20 cursor-pointer shrink-0 transition-all hover:scale-102"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Apply on Behalf</span>
-            <span className="inline sm:hidden">Apply</span>
-          </button>
-        </div>
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                  Date Range
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {dateRangeOptions.map((opt) => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setDateRange(opt.key)}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                        dateRange === opt.key
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-        {/* Active Filters Bar */}
-        {(searchQuery || statusFilter !== 'ALL') && (
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Active Filter:
-              </span>
-              {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                  <span>
-                    Status:{' '}
-                    {statusFilter === 'PENDING'
-                      ? 'Pending'
-                      : statusFilter === 'APPROVED'
-                      ? 'Approved'
-                      : 'Declined'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setStatusFilter('ALL')}
-                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
+              {filterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLeaveTypeFilter('ALL');
+                    setDateRange('ALL');
+                  }}
+                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+                >
+                  Reset All Filters
+                </button>
               )}
-              {searchQuery && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
-                  <span className="truncate max-w-[150px]">"{searchQuery}"</span>
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="hover:text-slate-900 dark:hover:text-white cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              <span className="text-slate-400 text-[11px]">
-                ({filtered.length} of {stats.total} shown)
-              </span>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setStatusFilter('ALL');
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset Filters</span>
-            </button>
-          </div>
-        )}
+          }
+        />
       </div>
-
       {/* Requests Table */}
       {loading ? (
         <TableSkeleton rows={6} cols={6} />

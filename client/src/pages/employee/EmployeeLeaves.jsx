@@ -22,6 +22,7 @@ import {
   ChevronDown,
   RotateCcw,
 } from 'lucide-react';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
@@ -62,6 +63,10 @@ const EmployeeLeaves = () => {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const filterDropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortKey, setSortKey] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [dateRange, setDateRange] = useState('ALL');
+  const [typeFilter, setTypeFilter] = useState('ALL');
 
   // Close filter dropdown on click outside
   useEffect(() => {
@@ -250,29 +255,85 @@ const EmployeeLeaves = () => {
   }), [requests]);
 
   const filteredRequests = useMemo(() => {
-    return requests.filter((r) => {
-      const type = (r.leaveType?.name || '').toLowerCase();
-      const reason = (r.reason || '').toLowerCase();
-      const remarks = (r.rejectionReason || '').toLowerCase();
-      const approver = `${r.approvedBy?.firstName || ''} ${r.approvedBy?.lastName || ''}`.toLowerCase();
-      const query = searchQuery.toLowerCase().trim();
+    return requests
+      .filter((r) => {
+        const query = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          !query ||
+          (r.leaveType?.name && r.leaveType.name.toLowerCase().includes(query)) ||
+          (r.reason && r.reason.toLowerCase().includes(query)) ||
+          (r.startDate && r.startDate.includes(query)) ||
+          (r.endDate && r.endDate.includes(query));
 
-      const durationStr = `${calculateLeaveDays(r)} day`;
-      const matchesSearch =
-        !query ||
-        type.includes(query) ||
-        reason.includes(query) ||
-        remarks.includes(query) ||
-        approver.includes(query) ||
-        durationStr.includes(query) ||
-        (r.id && r.id.toLowerCase().includes(query)) ||
-        (r.startDate && r.startDate.includes(query)) ||
-        (r.endDate && r.endDate.includes(query));
+        const matchesStatus = statusFilter === 'ALL' || r.status === statusFilter;
+        const matchesType = typeFilter === 'ALL' || (r.leaveType?.name || '') === typeFilter;
 
-      const matchesStatus = statusFilter === 'ALL' || r.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [requests, searchQuery, statusFilter]);
+        let matchesDate = true;
+        if (dateRange !== 'ALL' && r.startDate) {
+          try {
+            const reqDate = new Date(r.startDate);
+            const now = new Date();
+            if (dateRange === 'THIS_MONTH') {
+              matchesDate = reqDate.getFullYear() === now.getFullYear() && reqDate.getMonth() === now.getMonth();
+            } else if (dateRange === 'LAST_MONTH') {
+              const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+              matchesDate = reqDate.getFullYear() === lastMonth.getFullYear() && reqDate.getMonth() === lastMonth.getMonth();
+            } else if (dateRange === 'THIS_YEAR') {
+              matchesDate = reqDate.getFullYear() === now.getFullYear();
+            }
+          } catch {}
+        }
+
+        return matchesSearch && matchesStatus && matchesType && matchesDate;
+      })
+      .sort((a, b) => {
+        let diff = 0;
+        if (sortKey === 'date') {
+          diff = new Date(b.startDate || b.createdAt || 0) - new Date(a.startDate || a.createdAt || 0);
+        } else if (sortKey === 'days') {
+          diff = calculateLeaveDays(b) - calculateLeaveDays(a);
+        } else if (sortKey === 'policy') {
+          diff = (a.leaveType?.name || '').localeCompare(b.leaveType?.name || '');
+        }
+        return sortOrder === 'asc' ? -diff : diff;
+      });
+  }, [requests, searchQuery, statusFilter, typeFilter, dateRange, sortKey, sortOrder]);
+
+  const statusTabs = useMemo(() => [
+    { key: 'ALL', label: 'All', count: stats.total },
+    { key: 'APPROVED', label: 'Approved', count: stats.approved },
+    { key: 'PENDING', label: 'Pending', count: stats.pending },
+    { key: 'REJECTED', label: 'Declined', count: stats.rejected },
+  ], [stats]);
+
+  const sortOptions = [
+    { key: 'date', label: 'Date' },
+    { key: 'days', label: 'Duration' },
+    { key: 'policy', label: 'Policy' },
+  ];
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Dates' },
+    { key: 'THIS_MONTH', label: 'This Month' },
+    { key: 'LAST_MONTH', label: 'Last Month' },
+    { key: 'THIS_YEAR', label: 'This Year' },
+  ];
+
+  const dateRangeLabel = useMemo(() => {
+    if (dateRange === 'THIS_MONTH') return 'This Month';
+    if (dateRange === 'LAST_MONTH') return 'Last Month';
+    if (dateRange === 'THIS_YEAR') return 'This Year';
+    return 'All Dates';
+  }, [dateRange]);
+
+  const filterTags = useMemo(() => {
+    const tags = [];
+    if (typeFilter !== 'ALL') tags.push({ key: 'type', label: 'policy', value: typeFilter });
+    if (dateRange !== 'ALL') tags.push({ key: 'date', label: 'range', value: dateRange.replace('_', ' ').toLowerCase() });
+    return tags;
+  }, [typeFilter, dateRange]);
+
+  const filterCount = (typeFilter !== 'ALL' ? 1 : 0) + (dateRange !== 'ALL' ? 1 : 0);
 
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
   const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
@@ -483,184 +544,72 @@ const EmployeeLeaves = () => {
             </div>
           </div>
 
-          {/* Quick Search Toolbar */}
-          <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 space-y-2.5">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="relative flex-1 min-w-0">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search leave requests by policy, reason, schedule, or approver..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all font-medium"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                    title="Clear Search"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Filter Button with Dropdown Menu */}
-              <div className="relative shrink-0" ref={filterDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowFilterMenu((prev) => !prev)}
-                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                    statusFilter !== 'ALL'
-                      ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300'
-                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300'
-                  }`}
-                  title="Filter by Status"
-                >
-                  <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                  <span className="hidden sm:inline">
-                    {statusFilter === 'ALL'
-                      ? 'Filter'
-                      : statusFilter === 'PENDING'
-                      ? 'Pending'
-                      : statusFilter === 'APPROVED'
-                      ? 'Approved'
-                      : 'Declined'}
-                  </span>
-                  <span className="inline sm:hidden">
-                    {statusFilter === 'ALL'
-                      ? 'Filter'
-                      : statusFilter === 'PENDING'
-                      ? 'Pending'
-                      : statusFilter === 'APPROVED'
-                      ? 'Approved'
-                      : 'Declined'}
-                  </span>
-                  {statusFilter !== 'ALL' ? (
-                    <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse shrink-0" />
-                  ) : (
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                        showFilterMenu ? 'rotate-180' : ''
-                      }`}
-                    />
-                  )}
-                </button>
-
-                {showFilterMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="flex items-center justify-between px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
-                      <span>Filter by Status</span>
-                      {statusFilter !== 'ALL' && (
+          {/* Modern Dynamic Search & Filter Section */}
+          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20">
+            <ModernSearchBarSection
+              statusTabs={statusTabs}
+              activeStatus={statusFilter}
+              onStatusChange={setStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search leave requests by policy, reason, or date..."
+              searchHint='Try "status:pending"'
+              filterTags={filterTags}
+              onRemoveTag={(key) => {
+                if (key === 'type') setTypeFilter('ALL');
+                if (key === 'date') setDateRange('ALL');
+              }}
+              dateRangeLabel={dateRangeLabel}
+              dateRangeOptions={dateRangeOptions}
+              activeDateRange={dateRange}
+              onDateRangeChange={setDateRange}
+              sortOptions={sortOptions}
+              activeSort={sortKey}
+              sortOrder={sortOrder}
+              onSortChange={(key, order) => {
+                setSortKey(key);
+                setSortOrder(order);
+              }}
+              filterCount={filterCount}
+              filterContent={
+                <div className="space-y-3.5">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                      Leave Policy
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {['ALL', ...new Set(leaveTypes.map((t) => t.name))].map((typeName) => (
                         <button
+                          key={typeName}
                           type="button"
-                          onClick={() => {
-                            setStatusFilter('ALL');
-                            setShowFilterMenu(false);
-                          }}
-                          className="text-[10px] text-teal-600 dark:text-teal-400 font-bold hover:underline cursor-pointer"
-                        >
-                          Reset
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="space-y-0.5">
-                      {[
-                        { key: 'ALL', label: 'All Requests', count: stats.total, dot: 'bg-slate-400' },
-                        { key: 'PENDING', label: 'Pending Review', count: stats.pending, dot: 'bg-amber-500' },
-                        { key: 'APPROVED', label: 'Approved', count: stats.approved, dot: 'bg-teal-500' },
-                        { key: 'REJECTED', label: 'Declined', count: stats.rejected, dot: 'bg-rose-500' },
-                      ].map((item) => (
-                        <button
-                          key={item.key}
-                          type="button"
-                          onClick={() => {
-                            setStatusFilter(item.key);
-                            setShowFilterMenu(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            statusFilter === item.key
-                              ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                          onClick={() => setTypeFilter(typeName)}
+                          className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                            typeFilter === typeName
+                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                              : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                           }`}
                         >
-                          <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${item.dot}`} />
-                            <span>{item.label}</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                              statusFilter === item.key
-                                ? 'bg-teal-200/60 dark:bg-teal-900/80 text-teal-800 dark:text-teal-200'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                            }`}
-                          >
-                            {item.count}
-                          </span>
+                          {typeName === 'ALL' ? 'All Policies' : typeName}
                         </button>
                       ))}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Active Filter Strip */}
-            {(searchQuery || statusFilter !== 'ALL') && (
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Active:
-                  </span>
-                  {statusFilter !== 'ALL' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-300 font-bold text-[11px]">
-                      <span>
-                        Status:{' '}
-                        {statusFilter === 'PENDING'
-                          ? 'Pending'
-                          : statusFilter === 'APPROVED'
-                          ? 'Approved'
-                          : 'Declined'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setStatusFilter('ALL')}
-                        className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  )}
-                  {searchQuery && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
-                      <span className="truncate max-w-[150px]">"{searchQuery}"</span>
-                      <button
-                        type="button"
-                        onClick={() => setSearchQuery('')}
-                        className="hover:text-slate-900 dark:hover:text-white cursor-pointer"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
+                  {filterCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTypeFilter('ALL');
+                        setDateRange('ALL');
+                      }}
+                      className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+                    >
+                      Reset All Filters
+                    </button>
                   )}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setStatusFilter('ALL');
-                  }}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-colors"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Reset Filters</span>
-                </button>
-              </div>
-            )}
+              }
+            />
           </div>
 
           {filteredRequests.length > 0 ? (

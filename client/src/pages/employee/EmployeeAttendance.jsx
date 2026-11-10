@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
@@ -49,6 +50,8 @@ const EmployeeAttendance = () => {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const filterDropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [todayLog, setTodayLog] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -221,8 +224,15 @@ const EmployeeAttendance = () => {
     fetchMyAttendance(selectedMonth, selectedYear);
   }, [selectedMonth, selectedYear, timezone]);
 
+  // Sort Options
+  const sortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'hours', label: 'Sort: Hours Logged' },
+    { key: 'overtime', label: 'Sort: Overtime' },
+  ];
+
   const filteredLogs = useMemo(() => {
-    return logs.filter((item) => {
+    let list = logs.filter((item) => {
       if (statusFilter !== 'ALL') {
         if (statusFilter === 'PRESENT' && item.status !== 'PRESENT') return false;
         if (statusFilter === 'LATE' && item.status !== 'LATE') return false;
@@ -242,7 +252,26 @@ const EmployeeAttendance = () => {
       }
       return true;
     });
-  }, [logs, statusFilter, searchQuery]);
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.rawDate || a.date || 0).getTime();
+        valB = new Date(b.rawDate || b.date || 0).getTime();
+      } else if (activeSort === 'hours') {
+        valA = parseFloat(a.totalHours || 0);
+        valB = parseFloat(b.totalHours || 0);
+      } else if (activeSort === 'overtime') {
+        valA = parseFloat(a.ot || 0);
+        valB = parseFloat(b.ot || 0);
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [logs, statusFilter, searchQuery, activeSort, sortOrder]);
 
   const counts = useMemo(() => {
     return {
@@ -722,135 +751,94 @@ const EmployeeAttendance = () => {
             </div>
           </div>
 
-          {/* Action Toolbar & Summary Strip */}
-          <div className="px-5 sm:px-6 py-3.5 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            {/* Quick summary badges */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-900 dark:text-white shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                <span>{totalDaysPresent} Present</span>
-              </span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-900 dark:text-white shadow-2xs">
-                <span>{totalHoursLogged.toFixed(1)} hrs</span>
-              </span>
-              {totalOvertime > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800/50 text-xs font-bold text-teal-700 dark:text-teal-400">
-                  +{totalOvertime.toFixed(1)}h Overtime
-                </span>
-              )}
-              {lateArrivals > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/50 text-xs font-bold text-amber-700 dark:text-amber-400">
-                  {lateArrivals} Late
-                </span>
-              )}
-            </div>
-
-            {/* Right actions: Search + Filter + Export */}
-            <div className="flex items-center gap-2">
-              {/* Search Bar */}
-              <div className="relative flex-1 sm:w-auto min-w-[180px]">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search dates, hours..."
-                  className="w-full pl-8 pr-7 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-
-              {/* Filter Button with Dropdown Menu */}
-              <div className="relative" ref={filterDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowFilterMenu((prev) => !prev)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${statusFilter !== 'ALL'
-                      ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-400'
-                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-400 hover:border-teal-300'
-                    }`}
-                >
-                  <Filter className="w-3.5 h-3.5" />
-                  <span>
-                    {statusFilter === 'ALL'
-                      ? 'Filter'
-                      : statusFilter === 'PRESENT'
-                        ? 'Present'
-                        : statusFilter === 'LATE'
-                          ? 'Late'
-                          : 'Leave'}
-                  </span>
-                  {statusFilter !== 'ALL' ? (
-                    <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
-                  )}
-                </button>
-
-                {showFilterMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Filter by Status
-                    </div>
+          {/* Modern Dynamic Attendance Searchbar Section */}
+          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40">
+            <ModernSearchBarSection
+              statusTabs={[
+                { key: 'ALL', label: 'All Records', count: counts.all },
+                { key: 'PRESENT', label: 'Present', count: counts.present },
+                { key: 'LATE', label: 'Late Arrival', count: counts.late },
+                { key: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
+              ]}
+              activeStatus={statusFilter}
+              onStatusChange={setStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search work date, hours, punch notes..."
+              searchHint="status:late"
+              dateRangeLabel={selectedMonthLabel}
+              dateRangeOptions={pastMonthsList.map((m) => ({
+                key: `${m.year}-${m.month}`,
+                label: m.label,
+              }))}
+              activeDateRange={`${selectedYear}-${selectedMonth}`}
+              onDateRangeChange={(val) => {
+                const [y, m] = val.split('-').map(Number);
+                setSelectedYear(y);
+                setSelectedMonth(m);
+              }}
+              sortOptions={sortOptions}
+              activeSort={activeSort}
+              sortOrder={sortOrder}
+              onSortChange={(key, order) => {
+                setActiveSort(key);
+                setSortOrder(order);
+              }}
+              filterCount={statusFilter !== 'ALL' ? 1 : 0}
+              filterContent={
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      Attendance Status
+                    </span>
+                    {statusFilter !== 'ALL' && (
+                      <button
+                        type="button"
+                        onClick={() => setStatusFilter('ALL')}
+                        className="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-1">
                     {[
                       { id: 'ALL', label: 'All Records', count: counts.all },
-                      { id: 'PRESENT', label: 'Present', count: counts.present, dot: 'bg-teal-500' },
-                      { id: 'LATE', label: 'Late Arrival', count: counts.late, dot: 'bg-amber-500' },
-                      { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave, dot: 'bg-blue-500' },
+                      { id: 'PRESENT', label: 'Present', count: counts.present },
+                      { id: 'LATE', label: 'Late Arrival', count: counts.late },
+                      { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
                     ].map((st) => (
                       <button
                         key={st.id}
                         type="button"
-                        onClick={() => {
-                          setStatusFilter(st.id);
-                          setShowFilterMenu(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${statusFilter === st.id
-                            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 font-bold'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                          }`}
+                        onClick={() => setStatusFilter(st.id)}
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                          statusFilter === st.id
+                            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
                       >
-                        <div className="flex items-center gap-2">
-                          {st.dot ? (
-                            <span className={`w-2 h-2 rounded-full ${st.dot}`} />
-                          ) : (
-                            <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
-                          )}
-                          <span>{st.label}</span>
-                        </div>
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${statusFilter === st.id
-                              ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-400'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                            }`}
-                        >
+                        <span>{st.label}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
                           {st.count}
                         </span>
                       </button>
                     ))}
                   </div>
-                )}
-              </div>
-
-              {/* Export Button */}
-              <button
-                type="button"
-                onClick={exportToCSV}
-                title="Export filtered records to CSV"
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export</span>
-              </button>
-            </div>
+                </div>
+              }
+              actionButton={
+                <button
+                  type="button"
+                  onClick={exportToCSV}
+                  title="Export filtered records to CSV"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
+                </button>
+              }
+            />
           </div>
 
           {/* Table / Timeline Data Grid */}

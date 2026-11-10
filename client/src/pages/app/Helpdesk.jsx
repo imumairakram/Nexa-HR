@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { HelpdeskTicketSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -65,6 +66,9 @@ const Helpdesk = () => {
   const [isUpdatingMeta, setIsUpdatingMeta] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [activeDateRange, setActiveDateRange] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
@@ -338,8 +342,28 @@ const Helpdesk = () => {
   /**
    * Filter tickets based on search, status, category, and priority
    */
+  // Helpdesk Sort & Date Options
+  const sortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'priority', label: 'Sort: Priority' },
+    { key: 'employee', label: 'Sort: Staff Name' },
+    { key: 'id', label: 'Sort: Ticket ID' },
+  ];
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Time' },
+    { key: 'THIS_WEEK', label: 'This Week' },
+    { key: 'THIS_MONTH', label: 'This Month' },
+  ];
+
+  const dateRangeLabels = {
+    ALL: 'All Time',
+    THIS_WEEK: 'This Week',
+    THIS_MONTH: 'This Month',
+  };
+
   const filteredTickets = useMemo(() => {
-    return tickets.filter((t) => {
+    let list = tickets.filter((t) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -350,13 +374,55 @@ const Helpdesk = () => {
         t.description?.toLowerCase().includes(q) ||
         t.assignedTo?.toLowerCase().includes(q);
 
-      const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
+      let matchesStatus = true;
+      if (statusFilter === 'IN_PROGRESS') {
+        matchesStatus = t.status === 'IN_PROGRESS' || t.status === 'OPEN';
+      } else if (statusFilter === 'RESOLVED') {
+        matchesStatus = t.status === 'RESOLVED';
+      } else if (statusFilter === 'URGENT') {
+        matchesStatus = t.priority === 'HIGH' && t.status !== 'RESOLVED';
+      }
+
       const matchesCat = categoryFilter === 'ALL' || t.category === categoryFilter;
       const matchesPriority = priorityFilter === 'ALL' || t.priority === priorityFilter;
 
-      return matchesSearch && matchesStatus && matchesCat && matchesPriority;
+      let matchesDate = true;
+      if (activeDateRange === 'THIS_WEEK') {
+        const tDate = new Date(t.createdDate || t.createdAt || Date.now()).getTime();
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        matchesDate = tDate >= sevenDaysAgo;
+      } else if (activeDateRange === 'THIS_MONTH') {
+        const tDate = new Date(t.createdDate || t.createdAt || Date.now());
+        const now = new Date();
+        matchesDate = tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+      }
+
+      return matchesSearch && matchesStatus && matchesCat && matchesPriority && matchesDate;
     });
-  }, [tickets, searchQuery, statusFilter, categoryFilter, priorityFilter]);
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.createdDate || a.createdAt || 0).getTime();
+        valB = new Date(b.createdDate || b.createdAt || 0).getTime();
+      } else if (activeSort === 'priority') {
+        const pMap = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+        valA = pMap[a.priority] || 0;
+        valB = pMap[b.priority] || 0;
+      } else if (activeSort === 'employee') {
+        valA = (a.userName || '').toLowerCase();
+        valB = (b.userName || '').toLowerCase();
+      } else if (activeSort === 'id') {
+        valA = (a.id || '').toLowerCase();
+        valB = (b.id || '').toLowerCase();
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [tickets, searchQuery, statusFilter, categoryFilter, priorityFilter, activeDateRange, activeSort, sortOrder]);
 
   /**
    * Telemetry KPI statistics computed dynamically from real database records
@@ -625,272 +691,156 @@ const Helpdesk = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SEARCH & CATEGORY FILTER TOOLBAR */}
+      {/* 3. MODERN DYNAMIC SEARCH & FILTER TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search by ticket ID, employee, email, subject, or assignee..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all font-medium"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title="Clear Search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Filter Button with Dropdown Menu */}
-          <div className="relative shrink-0" ref={filterDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                categoryFilter !== 'ALL' || statusFilter !== 'ALL' || priorityFilter !== 'ALL'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700/60'
-              }`}
-              title="Filter Tickets"
-            >
-              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-              <span className="hidden sm:inline">
-                {categoryFilter !== 'ALL'
-                  ? CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter
-                  : statusFilter !== 'ALL'
-                  ? statusFilter === 'IN_PROGRESS'
-                    ? 'Under Review'
-                    : 'Resolved'
-                  : priorityFilter !== 'ALL'
-                  ? priorityFilter
-                  : 'Filter'}
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All', count: tickets.length },
+          { key: 'IN_PROGRESS', label: 'Under Review', count: tickets.filter((t) => t.status !== 'RESOLVED').length },
+          { key: 'RESOLVED', label: 'Resolved', count: tickets.filter((t) => t.status === 'RESOLVED').length },
+          { key: 'URGENT', label: 'Urgent', count: tickets.filter((t) => t.priority === 'HIGH' && t.status !== 'RESOLVED').length },
+        ]}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search by ticket ID, employee, email, subject, or assignee..."
+        searchHint="priority:high"
+        filterTags={[
+          ...(categoryFilter !== 'ALL'
+            ? [{ key: 'category', label: `cat: ${CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter}` }]
+            : []),
+          ...(priorityFilter !== 'ALL'
+            ? [{ key: 'priority', label: `priority: ${priorityFilter.toLowerCase()}` }]
+            : []),
+        ]}
+        onRemoveTag={(tag) => {
+          if (tag.key === 'category') setCategoryFilter('ALL');
+          if (tag.key === 'priority') setPriorityFilter('ALL');
+        }}
+        dateRangeLabel={dateRangeLabels[activeDateRange] || 'All Time'}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={activeDateRange}
+        onDateRangeChange={setActiveDateRange}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={
+          (categoryFilter !== 'ALL' ? 1 : 0) +
+          (priorityFilter !== 'ALL' ? 1 : 0)
+        }
+        filterContent={
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Ticket Filters
               </span>
-              <span className="inline sm:hidden">Filter</span>
-              {categoryFilter !== 'ALL' || statusFilter !== 'ALL' || priorityFilter !== 'ALL' ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              ) : (
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    showFilterMenu ? 'rotate-180' : ''
-                  }`}
-                />
-              )}
-            </button>
-
-            {/* Dropdown Menu */}
-            {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2">
-                <div className="flex items-center justify-between px-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1">
-                  <span>Filter Tickets</span>
-                  {(categoryFilter !== 'ALL' || statusFilter !== 'ALL' || priorityFilter !== 'ALL') && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCategoryFilter('ALL');
-                        setStatusFilter('ALL');
-                        setPriorityFilter('ALL');
-                        setShowFilterMenu(false);
-                      }}
-                      className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
-                    >
-                      Reset All
-                    </button>
-                  )}
-                </div>
-
-                {/* Status Section */}
-                <div>
-                  <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Status
-                  </div>
-                  <div className="grid grid-cols-3 gap-1">
-                    {[
-                      { id: 'ALL', label: 'All' },
-                      { id: 'IN_PROGRESS', label: 'Review' },
-                      { id: 'RESOLVED', label: 'Resolved' },
-                    ].map((st) => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => setStatusFilter(st.id)}
-                        className={`px-2 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center cursor-pointer ${
-                          statusFilter === st.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                            : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {st.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Priority Section */}
-                <div>
-                  <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Priority
-                  </div>
-                  <div className="grid grid-cols-3 gap-1">
-                    {PRIORITY_OPTIONS.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPriorityFilter(p.id)}
-                        className={`px-2 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center cursor-pointer ${
-                          priorityFilter === p.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                            : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Category Section */}
-                <div>
-                  <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Category
-                  </div>
-                  <div className="space-y-0.5 max-h-40 overflow-y-auto">
-                    {CATEGORY_OPTIONS.map((cat) => {
-                      const Icon = cat.icon;
-                      const count =
-                        cat.id === 'ALL'
-                          ? tickets.length
-                          : tickets.filter((t) => t.category === cat.id).length;
-
-                      return (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() => {
-                            setCategoryFilter(cat.id);
-                            setShowFilterMenu(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            categoryFilter === cat.id
-                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate pr-2">
-                            <Icon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                            <span className="truncate">{cat.label}</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                              categoryFilter === cat.id
-                                ? 'bg-emerald-200/60 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                            }`}
-                          >
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Reload Data Button */}
-          <button
-            type="button"
-            onClick={() => loadData(false)}
-            title="Refresh tickets from live database"
-            className="p-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Active Filters Bar */}
-        {(searchQuery || categoryFilter !== 'ALL' || statusFilter !== 'ALL' || priorityFilter !== 'ALL') && (
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Active:
-              </span>
-              {categoryFilter !== 'ALL' && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                  <span>Cat: {CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter}</span>
-                  <button
-                    type="button"
-                    onClick={() => setCategoryFilter('ALL')}
-                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                  <span>Status: {statusFilter === 'IN_PROGRESS' ? 'Under Review' : 'Resolved'}</span>
-                  <button
-                    type="button"
-                    onClick={() => setStatusFilter('ALL')}
-                    className="hover:text-emerald-900 dark:hover:text-emerald-100 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {priorityFilter !== 'ALL' && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-300 font-bold text-[11px]">
-                  <span>Priority: {priorityFilter}</span>
-                  <button
-                    type="button"
-                    onClick={() => setPriorityFilter('ALL')}
-                    className="hover:text-amber-900 dark:hover:text-amber-100 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {searchQuery && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
-                  <span className="truncate max-w-[150px]">"{searchQuery}"</span>
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="hover:text-slate-900 dark:hover:text-white cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
+              {(categoryFilter !== 'ALL' || priorityFilter !== 'ALL') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryFilter('ALL');
+                    setPriorityFilter('ALL');
+                  }}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
               )}
             </div>
 
+            {/* Priority Options */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Priority
+              </label>
+              <div className="grid grid-cols-3 gap-1">
+                {PRIORITY_OPTIONS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setPriorityFilter(p.id)}
+                    className={`px-2 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center cursor-pointer ${
+                      priorityFilter === p.id
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Category Options */}
+            <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Category
+              </label>
+              <div className="space-y-0.5 max-h-40 overflow-y-auto">
+                {CATEGORY_OPTIONS.map((cat) => {
+                  const Icon = cat.icon;
+                  const count =
+                    cat.id === 'ALL'
+                      ? tickets.length
+                      : tickets.filter((t) => t.category === cat.id).length;
+
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setCategoryFilter(cat.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        categoryFilter === cat.id
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate pr-2">
+                        <Icon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                        <span className="truncate">{cat.label}</span>
+                      </div>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                          categoryFilter === cat.id
+                            ? 'bg-sky-100 dark:bg-sky-900/80 text-sky-700 dark:text-sky-300'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        }
+        actionButton={
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setCategoryFilter('ALL');
-                setStatusFilter('ALL');
-                setPriorityFilter('ALL');
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition-colors"
+              onClick={() => loadData(false)}
+              title="Refresh tickets"
+              className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset Filters</span>
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsNewTicketOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Log Ticket</span>
             </button>
           </div>
-        )}
-      </div>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. ENTERPRISE TICKET LIST (ADMIN VIEW WITH REAL EMPLOYEE DOSSIER) */}

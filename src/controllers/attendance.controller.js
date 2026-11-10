@@ -316,7 +316,17 @@ const getMyLogs = async (req, res) => {
  */
 const getCompanyAttendance = async (req, res) => {
   try {
-    const { date, departmentId, status, page = 1, limit = 50 } = req.query;
+    const {
+      date,
+      month,
+      year,
+      departmentId,
+      department,
+      employeeId,
+      status,
+      page = 1,
+      limit = 50,
+    } = req.query;
 
     const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
     const take = parseInt(limit, 10);
@@ -333,10 +343,24 @@ const getCompanyAttendance = async (req, res) => {
         gte: startOfDay,
         lte: endOfDay,
       };
+    } else if (month || year) {
+      const now = new Date();
+      const targetMonth = month ? parseInt(month, 10) - 1 : now.getMonth();
+      const targetYear = year ? parseInt(year, 10) : now.getFullYear();
+      const startDate = new Date(targetYear, targetMonth, 1);
+      const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
+      whereClause.date = {
+        gte: startDate,
+        lte: endDate,
+      };
     }
 
-    if (status) {
+    if (status && status !== 'ALL') {
       whereClause.status = status.toUpperCase();
+    }
+
+    if (employeeId && employeeId !== 'ALL') {
+      whereClause.userId = employeeId;
     }
 
     if (departmentId) {
@@ -344,6 +368,18 @@ const getCompanyAttendance = async (req, res) => {
         ...whereClause.user,
         profile: {
           departmentId,
+        },
+      };
+    } else if (department && department !== 'ALL') {
+      whereClause.user = {
+        ...whereClause.user,
+        profile: {
+          department: {
+            name: {
+              equals: department,
+              mode: 'insensitive',
+            },
+          },
         },
       };
     }

@@ -49,8 +49,6 @@ const DEFAULT_COMPANY_SETTINGS = {
   fiscalYearStart: 'July',
   workWeek: 'Monday - Friday (Sat/Sun Off)',
   autoClockoutHours: '12',
-  biometricPort: '8080',
-  biometricSecret: '••••••••••••••••••••••••',
 };
 
 export const RegionalSettingsProvider = ({ children }) => {

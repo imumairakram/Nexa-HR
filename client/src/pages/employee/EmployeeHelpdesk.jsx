@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { HelpdeskTicketSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -53,6 +54,9 @@ const EmployeeHelpdesk = () => {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [activeDateRange, setActiveDateRange] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
@@ -252,8 +256,27 @@ const EmployeeHelpdesk = () => {
   /**
    * Filter tickets based on search, status, and category
    */
+  // Sort & Date Options
+  const sortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'priority', label: 'Sort: Priority' },
+    { key: 'id', label: 'Sort: Ticket ID' },
+  ];
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Time' },
+    { key: 'THIS_WEEK', label: 'This Week' },
+    { key: 'THIS_MONTH', label: 'This Month' },
+  ];
+
+  const dateRangeLabels = {
+    ALL: 'All Time',
+    THIS_WEEK: 'This Week',
+    THIS_MONTH: 'This Month',
+  };
+
   const filteredTickets = useMemo(() => {
-    return tickets.filter((t) => {
+    let list = tickets.filter((t) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -265,9 +288,40 @@ const EmployeeHelpdesk = () => {
       const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
       const matchesCat = categoryFilter === 'ALL' || t.category === categoryFilter;
 
-      return matchesSearch && matchesStatus && matchesCat;
+      let matchesDate = true;
+      if (activeDateRange === 'THIS_WEEK') {
+        const tDate = new Date(t.createdDate || t.createdAt || Date.now()).getTime();
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        matchesDate = tDate >= sevenDaysAgo;
+      } else if (activeDateRange === 'THIS_MONTH') {
+        const tDate = new Date(t.createdDate || t.createdAt || Date.now());
+        const now = new Date();
+        matchesDate = tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+      }
+
+      return matchesSearch && matchesStatus && matchesCat && matchesDate;
     });
-  }, [tickets, searchQuery, statusFilter, categoryFilter]);
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.createdDate || a.createdAt || 0).getTime();
+        valB = new Date(b.createdDate || b.createdAt || 0).getTime();
+      } else if (activeSort === 'priority') {
+        const pMap = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+        valA = pMap[a.priority] || 0;
+        valB = pMap[b.priority] || 0;
+      } else if (activeSort === 'id') {
+        valA = (a.id || '').toLowerCase();
+        valB = (b.id || '').toLowerCase();
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [tickets, searchQuery, statusFilter, categoryFilter, activeDateRange, activeSort, sortOrder]);
 
   /**
    * Telemetry KPI statistics computed dynamically from real database records
@@ -525,223 +579,105 @@ const EmployeeHelpdesk = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SEARCH & CATEGORY FILTER TOOLBAR */}
+      {/* 3. MODERN DYNAMIC SEARCH & CATEGORY FILTER COMMAND BAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search by ticket ID, subject, assignee..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title="Clear Search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Filter Button with Dropdown Menu */}
-          <div className="relative shrink-0" ref={filterDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                categoryFilter !== 'ALL' || statusFilter !== 'ALL'
-                  ? 'bg-teal-50 dark:bg-teal-950/70 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 shadow-teal-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700/60'
-              }`}
-              title="Filter Tickets"
-            >
-              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-              <span className="hidden sm:inline">
-                {categoryFilter !== 'ALL'
-                  ? CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter
-                  : statusFilter !== 'ALL'
-                  ? statusFilter === 'IN_PROGRESS'
-                    ? 'In Progress'
-                    : 'Resolved'
-                  : 'Filter'}
-              </span>
-              <span className="inline sm:hidden">Filter</span>
-              {categoryFilter !== 'ALL' || statusFilter !== 'ALL' ? (
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse shrink-0" />
-              ) : (
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    showFilterMenu ? 'rotate-180' : ''
-                  }`}
-                />
-              )}
-            </button>
-
-            {/* Dropdown Menu */}
-            {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#1E293B] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2">
-                <div className="flex items-center justify-between px-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1">
-                  <span>Filter Tickets</span>
-                  {(categoryFilter !== 'ALL' || statusFilter !== 'ALL') && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCategoryFilter('ALL');
-                        setStatusFilter('ALL');
-                        setShowFilterMenu(false);
-                      }}
-                      className="text-[10px] text-teal-600 dark:text-teal-400 font-bold hover:underline cursor-pointer"
-                    >
-                      Reset All
-                    </button>
-                  )}
-                </div>
-
-                {/* Status Section */}
-                <div>
-                  <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Status
-                  </div>
-                  <div className="grid grid-cols-3 gap-1">
-                    {[
-                      { id: 'ALL', label: 'All' },
-                      { id: 'IN_PROGRESS', label: 'In Progress' },
-                      { id: 'RESOLVED', label: 'Resolved' },
-                    ].map((st) => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => setStatusFilter(st.id)}
-                        className={`px-2 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center cursor-pointer ${
-                          statusFilter === st.id
-                            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-300 dark:border-teal-700'
-                            : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {st.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Category Section */}
-                <div>
-                  <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Category
-                  </div>
-                  <div className="space-y-0.5 max-h-48 overflow-y-auto">
-                    {CATEGORY_OPTIONS.map((cat) => {
-                      const Icon = cat.icon;
-                      const count =
-                        cat.id === 'ALL'
-                          ? tickets.length
-                          : tickets.filter((t) => t.category === cat.id).length;
-
-                      return (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() => {
-                            setCategoryFilter(cat.id);
-                            setShowFilterMenu(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            categoryFilter === cat.id
-                              ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate pr-2">
-                            <Icon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                            <span className="truncate">{cat.label}</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                              categoryFilter === cat.id
-                                ? 'bg-teal-200/60 dark:bg-teal-900/80 text-teal-800 dark:text-teal-200'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                            }`}
-                          >
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Active Filters Bar */}
-        {(searchQuery || categoryFilter !== 'ALL' || statusFilter !== 'ALL') && (
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Active:
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All', count: tickets.length },
+          { key: 'IN_PROGRESS', label: 'In Progress', count: tickets.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'OPEN').length },
+          { key: 'RESOLVED', label: 'Resolved', count: tickets.filter((t) => t.status === 'RESOLVED').length },
+        ]}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search by ticket ID, subject, assignee..."
+        searchHint="status:in_progress"
+        filterTags={
+          categoryFilter !== 'ALL'
+            ? [{ key: 'category', label: `cat: ${CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter}` }]
+            : []
+        }
+        onRemoveTag={(tag) => {
+          if (tag.key === 'category') setCategoryFilter('ALL');
+        }}
+        dateRangeLabel={dateRangeLabels[activeDateRange] || 'All Time'}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={activeDateRange}
+        onDateRangeChange={setActiveDateRange}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={categoryFilter !== 'ALL' ? 1 : 0}
+        filterContent={
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Inquiry Categories
               </span>
               {categoryFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-300 font-bold text-[11px]">
-                  <span>Cat: {CATEGORY_OPTIONS.find((c) => c.id === categoryFilter)?.label || categoryFilter}</span>
-                  <button
-                    type="button"
-                    onClick={() => setCategoryFilter('ALL')}
-                    className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/50 text-teal-700 dark:text-teal-300 font-bold text-[11px]">
-                  <span>Status: {statusFilter === 'IN_PROGRESS' ? 'In Progress' : 'Resolved'}</span>
-                  <button
-                    type="button"
-                    onClick={() => setStatusFilter('ALL')}
-                    className="hover:text-teal-900 dark:hover:text-teal-100 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {searchQuery && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
-                  <span className="truncate max-w-[150px]">"{searchQuery}"</span>
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="hover:text-slate-900 dark:hover:text-white cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('ALL')}
+                  className="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
               )}
             </div>
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {CATEGORY_OPTIONS.map((cat) => {
+                const Icon = cat.icon;
+                const count =
+                  cat.id === 'ALL'
+                    ? tickets.length
+                    : tickets.filter((t) => t.category === cat.id).length;
 
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setCategoryFilter('ALL');
-                setStatusFilter('ALL');
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-colors"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset Filters</span>
-            </button>
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setCategoryFilter(cat.id)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      categoryFilter === cat.id
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate pr-2">
+                      <Icon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                      <span className="truncate">{cat.label}</span>
+                    </div>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        categoryFilter === cat.id
+                          ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
-      </div>
+        }
+        actionButton={
+          <button
+            type="button"
+            onClick={() => setIsNewTicketOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Ticket</span>
+          </button>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. ENTERPRISE TICKET LIST */}

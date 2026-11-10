@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { TableSkeleton, DocumentCardSkeleton } from '../../components/common/Skeleton';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -222,6 +223,9 @@ const Documents = () => {
   const [activeTab, setActiveTab] = useState('issued'); // 'issued' | 'policies'
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'grid'
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSort, setActiveSort] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [activeDateRange, setActiveDateRange] = useState('ALL');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [policyCategoryFilter, setPolicyCategoryFilter] = useState('ALL');
@@ -797,9 +801,28 @@ ${doc.description || 'This document serves as an official verified corporate rec
     showToast(`Generated & downloaded certified copy: ${doc.title}`);
   };
 
-  // Filtered Issued Documents
+  // Sort & Date Options
+  const docSortOptions = [
+    { key: 'date', label: 'Sort: Date' },
+    { key: 'title', label: 'Sort: Title' },
+    { key: 'employee', label: 'Sort: Staff Name' },
+  ];
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Time' },
+    { key: 'THIS_MONTH', label: 'This Month' },
+    { key: 'THIS_YEAR', label: 'Year 2026' },
+  ];
+
+  const dateRangeLabels = {
+    ALL: 'All Time',
+    THIS_MONTH: 'This Month',
+    THIS_YEAR: 'Year 2026',
+  };
+
+  // Filtered Issued Documents with sorting
   const filteredIssuedDocs = useMemo(() => {
-    return issuedDocs.filter((d) => {
+    let list = issuedDocs.filter((d) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -814,13 +837,42 @@ ${doc.description || 'This document serves as an official verified corporate rec
       const matchesDept =
         deptFilter === 'ALL' || d.department?.toLowerCase().includes(deptFilter.toLowerCase());
 
-      return matchesSearch && matchesType && matchesDept;
-    });
-  }, [issuedDocs, searchQuery, typeFilter, deptFilter]);
+      let matchesDate = true;
+      if (activeDateRange === 'THIS_MONTH') {
+        const itemDate = new Date(d.issueDate || d.createdAt || Date.now());
+        const now = new Date();
+        matchesDate = itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+      } else if (activeDateRange === 'THIS_YEAR') {
+        const itemDate = new Date(d.issueDate || d.createdAt || Date.now());
+        matchesDate = itemDate.getFullYear() === 2026;
+      }
 
-  // Filtered Policies
+      return matchesSearch && matchesType && matchesDept && matchesDate;
+    });
+
+    list.sort((a, b) => {
+      let valA, valB;
+      if (activeSort === 'date') {
+        valA = new Date(a.issueDate || a.createdAt || 0).getTime();
+        valB = new Date(b.issueDate || b.createdAt || 0).getTime();
+      } else if (activeSort === 'title') {
+        valA = (a.title || '').toLowerCase();
+        valB = (b.title || '').toLowerCase();
+      } else if (activeSort === 'employee') {
+        valA = (a.employeeName || '').toLowerCase();
+        valB = (b.employeeName || '').toLowerCase();
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [issuedDocs, searchQuery, typeFilter, deptFilter, activeDateRange, activeSort, sortOrder]);
+
+  // Filtered Policies with sorting
   const filteredPolicies = useMemo(() => {
-    return companyPolicies.filter((p) => {
+    let list = companyPolicies.filter((p) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -836,7 +888,21 @@ ${doc.description || 'This document serves as an official verified corporate rec
 
       return matchesSearch && matchesCategory;
     });
-  }, [companyPolicies, searchQuery, policyCategoryFilter]);
+
+    list.sort((a, b) => {
+      let valA = (a.title || '').toLowerCase();
+      let valB = (b.title || '').toLowerCase();
+      if (activeSort === 'date') {
+        valA = new Date(a.lastUpdated || a.effectiveDate || 0).getTime();
+        valB = new Date(b.lastUpdated || b.effectiveDate || 0).getTime();
+      }
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [companyPolicies, searchQuery, policyCategoryFilter, activeSort, sortOrder]);
 
   // Counts for filter dropdown menus
   const classificationCounts = useMemo(() => {
@@ -1133,491 +1199,266 @@ ${doc.description || 'This document serves as an official verified corporate rec
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. REPOSITORY TABS & DYNAMIC SEARCH CONTROLS */}
+      {/* 3. MODERN DYNAMIC REPOSITORY SEARCH & FILTER COMMAND BAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        {/* Row 1: Search bar + Filter button + View toggle */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder={
-                activeTab === 'issued'
-                  ? 'Search by title, employee, ref, dept...'
-                  : 'Search policies by title, category, scope...'
-              }
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title="Clear Search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Filter Button with Dropdown Menu */}
-          <div className="relative shrink-0" ref={filterDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
-                (activeTab === 'issued' && (typeFilter !== 'ALL' || deptFilter !== 'ALL')) ||
-                (activeTab === 'policies' && policyCategoryFilter !== 'ALL')
-                  ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
-                  : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
-              }`}
-              title="Filter Records"
-            >
-              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-              <span className="hidden sm:inline">
-                {activeTab === 'issued'
-                  ? typeFilter !== 'ALL' && deptFilter !== 'ALL'
-                    ? '2 Filters'
-                    : typeFilter !== 'ALL'
-                    ? CLASSIFICATION_OPTIONS.find((c) => c.id === typeFilter)?.label || typeFilter
-                    : deptFilter !== 'ALL'
-                    ? deptFilter
-                    : 'Filter'
-                  : policyCategoryFilter !== 'ALL'
-                  ? POLICY_CATEGORIES.find((c) => c.id === policyCategoryFilter)?.label || policyCategoryFilter
-                  : 'Filter'}
+      <ModernSearchBarSection
+        statusTabs={
+          activeTab === 'issued'
+            ? [
+                { key: 'ALL', label: 'All Issued', count: issuedDocs.length },
+                { key: 'OFFER_LETTER', label: 'Offer Letters', count: classificationCounts['OFFER_LETTER'] || 0 },
+                { key: 'EMPLOYMENT_CONTRACT', label: 'Contracts', count: classificationCounts['EMPLOYMENT_CONTRACT'] || 0 },
+                { key: 'EXPERIENCE_LETTER', label: 'Experience', count: classificationCounts['EXPERIENCE_LETTER'] || 0 },
+                { key: 'NDA', label: 'NDA', count: classificationCounts['NDA'] || 0 },
+              ]
+            : [
+                { key: 'ALL', label: 'All Policies', count: companyPolicies.length },
+                { key: 'GOVERNANCE', label: 'Governance', count: policyCategoryCounts['GOVERNANCE'] || 0 },
+                { key: 'SECURITY', label: 'Security', count: policyCategoryCounts['SECURITY'] || 0 },
+                { key: 'WORKPLACE', label: 'Workplace', count: policyCategoryCounts['WORKPLACE'] || 0 },
+                { key: 'COMPENSATION', label: 'Compensation', count: policyCategoryCounts['COMPENSATION'] || 0 },
+              ]
+        }
+        activeStatus={activeTab === 'issued' ? typeFilter : policyCategoryFilter}
+        onStatusChange={(st) => {
+          if (activeTab === 'issued') setTypeFilter(st);
+          else setPolicyCategoryFilter(st);
+        }}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={
+          activeTab === 'issued'
+            ? 'Search by title, employee, ref, dept...'
+            : 'Search policies by title, category, scope...'
+        }
+        searchHint={activeTab === 'issued' ? 'type:offer_letter' : 'cat:governance'}
+        filterTags={[
+          ...(activeTab === 'issued' && typeFilter !== 'ALL' && !['OFFER_LETTER', 'EMPLOYMENT_CONTRACT', 'EXPERIENCE_LETTER', 'NDA'].includes(typeFilter)
+            ? [{ key: 'type', label: `type: ${CLASSIFICATION_OPTIONS.find((c) => c.id === typeFilter)?.label || typeFilter}` }]
+            : []),
+          ...(activeTab === 'issued' && deptFilter !== 'ALL'
+            ? [{ key: 'dept', label: `dept: ${deptFilter}` }]
+            : []),
+          ...(activeTab === 'policies' && policyCategoryFilter !== 'ALL' && !['GOVERNANCE', 'SECURITY', 'WORKPLACE', 'COMPENSATION'].includes(policyCategoryFilter)
+            ? [{ key: 'policyCat', label: `cat: ${POLICY_CATEGORIES.find((c) => c.id === policyCategoryFilter)?.label || policyCategoryFilter}` }]
+            : []),
+        ]}
+        onRemoveTag={(tag) => {
+          if (tag.key === 'type') setTypeFilter('ALL');
+          if (tag.key === 'dept') setDeptFilter('ALL');
+          if (tag.key === 'policyCat') setPolicyCategoryFilter('ALL');
+        }}
+        dateRangeLabel={dateRangeLabels[activeDateRange] || 'All Time'}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={activeDateRange}
+        onDateRangeChange={setActiveDateRange}
+        sortOptions={docSortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={
+          activeTab === 'issued'
+            ? (typeFilter !== 'ALL' ? 1 : 0) + (deptFilter !== 'ALL' ? 1 : 0)
+            : (policyCategoryFilter !== 'ALL' ? 1 : 0)
+        }
+        filterContent={
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                {activeTab === 'issued' ? 'Document Filters' : 'Policy Categories'}
               </span>
               {((activeTab === 'issued' && (typeFilter !== 'ALL' || deptFilter !== 'ALL')) ||
-                (activeTab === 'policies' && policyCategoryFilter !== 'ALL')) ? (
-                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse shrink-0" />
-              ) : (
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    showFilterMenu ? 'rotate-180' : ''
-                  }`}
-                />
-              )}
-            </button>
-
-              {/* Dropdown Menu */}
-              {showFilterMenu && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
-                  {activeTab === 'issued' ? (
-                    <>
-                      {/* Classification Section */}
-                      <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
-                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                          Document Classification
-                        </div>
-                      </div>
-                      <div className="p-1 space-y-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setTypeFilter('ALL')}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            typeFilter === 'ALL'
-                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                typeFilter === 'ALL'
-                                  ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                  : 'bg-slate-300 dark:bg-slate-600'
-                              }`}
-                            />
-                            <span>All Classifications</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
-                              typeFilter === 'ALL'
-                                ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                            }`}
-                          >
-                            {classificationCounts.ALL}
-                          </span>
-                        </button>
-
-                        {CLASSIFICATION_OPTIONS.map((cat) => {
-                          const isSelected = typeFilter === cat.id;
-                          const count = classificationCounts[cat.id] ?? 0;
-                          return (
-                            <button
-                              key={cat.id}
-                              type="button"
-                              onClick={() => setTypeFilter(cat.id)}
-                              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 truncate pr-2">
-                                <span
-                                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                    isSelected
-                                      ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                      : 'bg-slate-300 dark:bg-slate-600'
-                                  }`}
-                                />
-                                <span className="truncate">{cat.label}</span>
-                              </div>
-                              <span
-                                className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
-                                  isSelected
-                                    ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                                }`}
-                              >
-                                {count}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Department Section */}
-                      {departments.length > 0 && (
-                        <>
-                          <div className="px-3.5 py-1.5 mt-1 border-t border-b border-slate-100 dark:border-slate-700/60">
-                            <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                              Department Filter
-                            </div>
-                          </div>
-                          <div className="p-1 space-y-0.5">
-                            <button
-                              type="button"
-                              onClick={() => setDeptFilter('ALL')}
-                              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                                deptFilter === 'ALL'
-                                  ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`w-1.5 h-1.5 rounded-full ${
-                                    deptFilter === 'ALL'
-                                      ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                      : 'bg-slate-300 dark:bg-slate-600'
-                                  }`}
-                                />
-                                <span>All Departments</span>
-                              </div>
-                              <span
-                                className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
-                                  deptFilter === 'ALL'
-                                    ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                                }`}
-                              >
-                                {departmentCounts.ALL}
-                              </span>
-                            </button>
-
-                            {departments.map((dept) => {
-                              const isSelected = deptFilter.toLowerCase() === dept.name.toLowerCase();
-                              const count = departmentCounts[dept.name] ?? 0;
-                              return (
-                                <button
-                                  key={dept.id}
-                                  type="button"
-                                  onClick={() => setDeptFilter(dept.name)}
-                                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                                    isSelected
-                                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2 truncate pr-2">
-                                    <span
-                                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                        isSelected
-                                          ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                          : 'bg-slate-300 dark:bg-slate-600'
-                                      }`}
-                                    />
-                                    <span className="truncate">{dept.name}</span>
-                                  </div>
-                                  <span
-                                    className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
-                                      isSelected
-                                        ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                                        : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                                    }`}
-                                  >
-                                    {count}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {/* Policy Category Section */}
-                      <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
-                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                          Policy Category
-                        </div>
-                      </div>
-                      <div className="p-1 space-y-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setPolicyCategoryFilter('ALL')}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                            policyCategoryFilter === 'ALL'
-                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                policyCategoryFilter === 'ALL'
-                                  ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                  : 'bg-slate-300 dark:bg-slate-600'
-                              }`}
-                            />
-                            <span>All Categories</span>
-                          </div>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
-                              policyCategoryFilter === 'ALL'
-                                ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                            }`}
-                          >
-                            {policyCategoryCounts.ALL}
-                          </span>
-                        </button>
-
-                        {POLICY_CATEGORIES.map((cat) => {
-                          const isSelected = policyCategoryFilter === cat.id;
-                          const count = policyCategoryCounts[cat.id] ?? 0;
-                          return (
-                            <button
-                              key={cat.id}
-                              type="button"
-                              onClick={() => setPolicyCategoryFilter(cat.id)}
-                              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 truncate pr-2">
-                                <span
-                                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                    isSelected
-                                      ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                                      : 'bg-slate-300 dark:bg-slate-600'
-                                  }`}
-                                />
-                                <span className="truncate">{cat.label}</span>
-                              </div>
-                              <span
-                                className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
-                                  isSelected
-                                    ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                                }`}
-                              >
-                                {count}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Reset Filters Option inside Dropdown */}
-                  {((activeTab === 'issued' && (typeFilter !== 'ALL' || deptFilter !== 'ALL')) ||
-                    (activeTab === 'policies' && policyCategoryFilter !== 'ALL')) && (
-                    <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-700/60 p-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (activeTab === 'issued') {
-                            setTypeFilter('ALL');
-                            setDeptFilter('ALL');
-                          } else {
-                            setPolicyCategoryFilter('ALL');
-                          }
-                          setShowFilterMenu(false);
-                        }}
-                        className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>Reset Filters</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                (activeTab === 'policies' && policyCategoryFilter !== 'ALL')) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTypeFilter('ALL');
+                    setDeptFilter('ALL');
+                    setPolicyCategoryFilter('ALL');
+                  }}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
               )}
             </div>
 
-          {/* Refresh Vault Button */}
-          <button
-            onClick={() => loadData(true)}
-            disabled={isRefreshing}
-            title="Refresh Live Data"
-            className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-all shrink-0"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
-          </button>
+            {activeTab === 'issued' ? (
+              <>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Classification
+                  </span>
+                  <div className="space-y-0.5 max-h-36 overflow-y-auto">
+                    {CLASSIFICATION_OPTIONS.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setTypeFilter(cat.id)}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                          typeFilter === cat.id
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <span className="truncate">{cat.label}</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                          {classificationCounts[cat.id] || 0}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-          {/* View Mode Toggle */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl sm:rounded-2xl shrink-0">
-            <button
-              onClick={() => setViewMode('list')}
-              title="Table List View"
-              className={`p-2 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'list'
-                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              title="Card Grid View"
-              className={`p-2 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
-            >
-              <Grid className="w-4 h-4" />
-            </button>
+                {departments.length > 0 && (
+                  <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                      Department
+                    </span>
+                    <div className="space-y-0.5 max-h-32 overflow-y-auto">
+                      <button
+                        type="button"
+                        onClick={() => setDeptFilter('ALL')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                          deptFilter === 'ALL'
+                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <span>All Departments</span>
+                        {deptFilter === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
+                      </button>
+                      {departments.map((dept) => (
+                        <button
+                          key={dept.id}
+                          type="button"
+                          onClick={() => setDeptFilter(dept.name)}
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                            deptFilter.toLowerCase() === dept.name.toLowerCase()
+                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <span className="truncate">{dept.name}</span>
+                          {deptFilter.toLowerCase() === dept.name.toLowerCase() && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="space-y-0.5 max-h-52 overflow-y-auto">
+                {POLICY_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setPolicyCategoryFilter(cat.id)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                      policyCategoryFilter === cat.id
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                      {policyCategoryCounts[cat.id] || 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        }
+        actionButton={
+          <div className="flex items-center gap-2">
+            {/* Vault Switch Toggle */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('issued');
+                  setTypeFilter('ALL');
+                  setDeptFilter('ALL');
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeTab === 'issued'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                Issued ({issuedDocs.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('policies');
+                  setPolicyCategoryFilter('ALL');
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeTab === 'policies'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                Policies ({companyPolicies.length})
+              </button>
+            </div>
 
-        {/* Row 2: Navigation Category Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl w-fit">
-          <button
-            onClick={() => {
-              setActiveTab('issued');
-              setTypeFilter('ALL');
-              setDeptFilter('ALL');
-            }}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === 'issued'
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            <FolderOpen className="w-3.5 h-3.5" />
-            <span>Issued Documents ({issuedDocs.length})</span>
-          </button>
+            {/* View Mode Toggle */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                title="Table View"
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <Grid className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
-          <button
-            onClick={() => {
-              setActiveTab('policies');
-              setPolicyCategoryFilter('ALL');
-            }}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === 'policies'
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Company Policies ({companyPolicies.length})</span>
-          </button>
-        </div>
-
-        {/* Active Filter Badges */}
-        {((activeTab === 'issued' && (typeFilter !== 'ALL' || deptFilter !== 'ALL')) ||
-          (activeTab === 'policies' && policyCategoryFilter !== 'ALL') ||
-          searchQuery) && (
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              Active:
-            </span>
-
-            {activeTab === 'issued' && typeFilter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
-                Classification: {CLASSIFICATION_OPTIONS.find((c) => c.id === typeFilter)?.label || typeFilter}
-                <button
-                  type="button"
-                  onClick={() => setTypeFilter('ALL')}
-                  className="hover:text-sky-900 dark:hover:text-sky-100 cursor-pointer p-0.5"
-                  title="Remove Filter"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
+            {/* Action Button */}
+            {activeTab === 'issued' ? (
+              <button
+                type="button"
+                onClick={() => setIsIssueModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Issue Document</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsPolicyModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Publish Policy</span>
+              </button>
             )}
-
-            {activeTab === 'issued' && deptFilter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold">
-                Dept: {deptFilter}
-                <button
-                  type="button"
-                  onClick={() => setDeptFilter('ALL')}
-                  className="hover:text-indigo-900 dark:hover:text-indigo-100 cursor-pointer p-0.5"
-                  title="Remove Filter"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {activeTab === 'policies' && policyCategoryFilter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
-                Category: {POLICY_CATEGORIES.find((c) => c.id === policyCategoryFilter)?.label || policyCategoryFilter}
-                <button
-                  type="button"
-                  onClick={() => setPolicyCategoryFilter('ALL')}
-                  className="hover:text-sky-900 dark:hover:text-sky-100 cursor-pointer p-0.5"
-                  title="Remove Filter"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
-                "{searchQuery}"
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
-                  title="Clear Search"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={() => {
-                setTypeFilter('ALL');
-                setDeptFilter('ALL');
-                setPolicyCategoryFilter('ALL');
-                setSearchQuery('');
-              }}
-              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
-            >
-              Reset Filters
-            </button>
           </div>
-        )}
-      </div>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. DOCUMENTS CONTENT VIEW */}

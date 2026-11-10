@@ -13,11 +13,8 @@ import {
   Calendar,
   Sliders,
   Building,
-  Cpu,
   RefreshCw,
   Lock,
-  Eye,
-  EyeOff,
 } from 'lucide-react';
 import { SettingsSkeleton } from '../../components/common/Skeleton';
 import { useTheme } from '../../context/ThemeContext';
@@ -46,7 +43,6 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [showSecret, setShowSecret] = useState(false);
 
   const [currentUser] = useState(() => {
     try {
@@ -96,8 +92,6 @@ const Settings = () => {
     fiscalYearStart: savedCompanySettings?.fiscalYearStart || 'July',
     workWeek: savedCompanySettings?.workWeek || 'Monday - Friday (Sat/Sun Off)',
     autoClockoutHours: savedCompanySettings?.autoClockoutHours || '12',
-    biometricPort: savedCompanySettings?.biometricPort || '8080',
-    biometricSecret: savedCompanySettings?.biometricSecret || '',
     currency,
     timezone,
     timeFormat,
@@ -117,8 +111,6 @@ const Settings = () => {
       fiscalYearStart: savedCompanySettings?.fiscalYearStart || prev.fiscalYearStart,
       workWeek: savedCompanySettings?.workWeek || prev.workWeek,
       autoClockoutHours: savedCompanySettings?.autoClockoutHours || prev.autoClockoutHours,
-      biometricPort: savedCompanySettings?.biometricPort || prev.biometricPort,
-      biometricSecret: savedCompanySettings?.biometricSecret || prev.biometricSecret,
     }));
   }, [currency, timezone, timeFormat, dateFormat, savedCompanySettings]);
 
@@ -139,8 +131,6 @@ const Settings = () => {
           fiscalYearStart: formState.fiscalYearStart,
           workWeek: formState.workWeek,
           autoClockoutHours: formState.autoClockoutHours,
-          biometricPort: formState.biometricPort,
-          biometricSecret: formState.biometricSecret,
         });
       }
       try {
@@ -473,132 +463,75 @@ const Settings = () => {
           </div>
 
           {/* ========================================================================= */}
-          {/* 4. SYSTEM ADMIN ONLY CONTROLS: ORGANIZATION PROFILE & BIOMETRIC GATEWAY */}
+          {/* 4. SYSTEM ADMIN ONLY CONTROLS: ORGANIZATION PROFILE */}
           {/* ========================================================================= */}
           {isAdmin && (
-            <>
-              {/* Category 4: Organization Details */}
-              <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                      <Building className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Organization Details</h3>
-                      <p className="text-xs text-slate-400 font-medium">Company identity and standard work schedule</p>
-                    </div>
+            <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <Building className="w-5 h-5" />
                   </div>
-                  <span className="self-start sm:self-auto text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 flex items-center">
-                    <span>System Admin Only</span>
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full text-xs">
                   <div>
-                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Legal Company Name</label>
-                    <input
-                      type="text"
-                      value={formState.companyName}
-                      onChange={(e) => setFormState({ ...formState, companyName: e.target.value })}
-                      placeholder="e.g. NexaHR Enterprise Inc."
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Corporate Domain</label>
-                    <input
-                      type="text"
-                      value={formState.domain}
-                      onChange={(e) => setFormState({ ...formState, domain: e.target.value })}
-                      placeholder="e.g. nexahr.pk"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Standard Work Week</label>
-                    <input
-                      type="text"
-                      value={formState.workWeek}
-                      onChange={(e) => setFormState({ ...formState, workWeek: e.target.value })}
-                      placeholder="e.g. Monday - Friday (Sat/Sun Off)"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Auto Clock-Out Threshold</label>
-                    <input
-                      type="text"
-                      value={`${formState.autoClockoutHours} Hours`}
-                      onChange={(e) =>
-                        setFormState({
-                          ...formState,
-                          autoClockoutHours: e.target.value.replace(/\D/g, '') || '12',
-                        })
-                      }
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                    />
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Organization Details</h3>
+                    <p className="text-xs text-slate-400 font-medium">Company identity and standard work schedule</p>
                   </div>
                 </div>
+                <span className="self-start sm:self-auto text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 flex items-center">
+                  <span>System Admin Only</span>
+                </span>
               </div>
 
-              {/* Category 5: Biometric Hardware Gateway */}
-              <div className="w-full bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                      <Cpu className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Biometric Hardware Gateway</h3>
-                      <p className="text-xs text-slate-400 font-medium">IoT turnstile sync port and webhook secret keys</p>
-                    </div>
-                  </div>
-                  <span className="self-start sm:self-auto text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 flex items-center">
-                    <span>System Admin Only</span>
-                  </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full text-xs">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Legal Company Name</label>
+                  <input
+                    type="text"
+                    value={formState.companyName}
+                    onChange={(e) => setFormState({ ...formState, companyName: e.target.value })}
+                    placeholder="e.g. NexaHR Enterprise Inc."
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                  />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full text-xs">
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Gateway Listener Port</label>
-                    <input
-                      type="text"
-                      value={formState.biometricPort}
-                      onChange={(e) => setFormState({ ...formState, biometricPort: e.target.value })}
-                      placeholder="8080"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Corporate Domain</label>
+                  <input
+                    type="text"
+                    value={formState.domain}
+                    onChange={(e) => setFormState({ ...formState, domain: e.target.value })}
+                    placeholder="e.g. nexahr.pk"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
-                      <span>Hardware Webhook Secret</span>
-                      <button
-                        type="button"
-                        onClick={() => setShowSecret(!showSecret)}
-                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1 cursor-pointer font-normal text-[11px]"
-                      >
-                        {showSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        <span>{showSecret ? 'Hide' : 'Reveal'}</span>
-                      </button>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showSecret ? 'text' : 'password'}
-                        value={formState.biometricSecret}
-                        onChange={(e) => setFormState({ ...formState, biometricSecret: e.target.value })}
-                        placeholder="Secret Key"
-                        className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Standard Work Week</label>
+                  <input
+                    type="text"
+                    value={formState.workWeek}
+                    onChange={(e) => setFormState({ ...formState, workWeek: e.target.value })}
+                    placeholder="e.g. Monday - Friday (Sat/Sun Off)"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Auto Clock-Out Threshold</label>
+                  <input
+                    type="text"
+                    value={`${formState.autoClockoutHours} Hours`}
+                    onChange={(e) =>
+                      setFormState({
+                        ...formState,
+                        autoClockoutHours: e.target.value.replace(/\D/g, '') || '12',
+                      })
+                    }
+                    className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                  />
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {/* ========================================================================= */}
