@@ -8,6 +8,7 @@ const {
   deleteEmployee,
   uploadProfilePicture,
   removeProfilePicture,
+  resendEmployeeCredentials,
 } = require('../controllers/employee.controller');
 const { verifyToken, blockDemo } = require('../middlewares/auth.middleware');
 const { checkRole } = require('../middlewares/rbac.middleware');
@@ -26,6 +27,7 @@ router.post('/', blockDemo, canManageEmployees, onboardEmployee);
 router.post('/onboard', blockDemo, canManageEmployees, onboardEmployee);
 router.get('/', canManageEmployees, cacheService.middleware({ ttlSeconds: 60, tags: ['employees'] }), getEmployees);
 router.get('/:id', verifyToken, cacheService.middleware({ ttlSeconds: 60, tags: ['employees'] }), getEmployeeById);
+router.post('/:id/resend-credentials', blockDemo, canManageEmployees, resendEmployeeCredentials);
 router.put('/:id', blockDemo, canManageEmployees, updateEmployee);
 router.patch('/:id', blockDemo, canManageEmployees, updateEmployee);
 router.delete('/:id', blockDemo, canManageEmployees, deleteEmployee);

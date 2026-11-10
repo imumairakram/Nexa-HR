@@ -238,6 +238,7 @@ const Employees = () => {
   const [deleting, setDeleting] = useState(false);
   const [createdCreds, setCreatedCreds] = useState(null);
   const [copiedCreds, setCopiedCreds] = useState(false);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
   const [onboardTab, setOnboardTab] = useState('basic'); // 'basic' | 'position' | 'salary' | 'personal'
   const [editTab, setEditTab] = useState('basic'); // 'basic' | 'position' | 'salary' | 'personal'
   const [submitting, setSubmitting] = useState(false);
@@ -410,6 +411,7 @@ const Employees = () => {
 
       // Show temporary credentials modal
       setCreatedCreds({
+        id: createdEmp?.id,
         name: `${onboardForm.firstName} ${onboardForm.lastName}`.trim(),
         email: payload.email,
         employeeCode: createdEmp?.employeeCode || payload.employeeCode,
@@ -431,6 +433,26 @@ const Employees = () => {
       showToast(err.message || 'Failed to onboard employee to database. Check email or details.', 'error');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Resend official credentials email via corporate SMTP
+  const handleResendOfficialEmail = async (creds) => {
+    if (!creds) return;
+    try {
+      setIsResendingEmail(true);
+      if (creds.id) {
+        const res = await api.resendWelcomeEmail(creds.id, { tempPassword: creds.tempPassword });
+        showToast(res?.message || `Welcome credentials email dispatched to ${creds.email}!`);
+      } else {
+        handleEmailCredentials(creds);
+      }
+    } catch (err) {
+      console.error('Resend official email error:', err);
+      showToast(err.message || 'Could not resend email automatically. Opening Gmail compose...', 'error');
+      handleEmailCredentials(creds);
+    } finally {
+      setIsResendingEmail(false);
     }
   };
 
@@ -2310,12 +2332,22 @@ NexaHR Workforce Systems`;
             <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
               <button
                 type="button"
+                disabled={isResendingEmail}
+                onClick={() => handleResendOfficialEmail(createdCreds)}
+                className="px-4 py-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/70 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold text-xs border border-sky-200 dark:border-sky-800/80 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                title="Resend automated NexaHR welcome email with credentials"
+              >
+                {isResendingEmail ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                <span>{isResendingEmail ? 'Sending Email...' : 'Resend Welcome Email'}</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => handleEmailCredentials(createdCreds)}
-                className="px-4 py-2.5 rounded-2xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/70 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs border border-blue-200 dark:border-blue-800/80 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                className="px-4 py-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 title="Open Gmail compose with pre-filled credentials"
               >
-                <Mail className="w-4 h-4" />
-                <span>Email via Gmail</span>
+                <span>Gmail Compose</span>
               </button>
 
               <button

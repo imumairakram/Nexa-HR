@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import { EmployeeCardSkeleton } from '../../components/common/Skeleton';
 import {
   Users,
@@ -25,6 +26,7 @@ import {
   Home,
   ChevronDown,
   RotateCcw,
+  Check,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -138,18 +140,15 @@ const EmploymentStatus = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const filterDropdownRef = useRef(null);
+  const [shiftFilter, setShiftFilter] = useState('ALL');
+  const [activeSort, setActiveSort] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
-        setShowFilterMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const sortOptions = [
+    { key: 'name', label: 'Name' },
+    { key: 'date', label: 'Joining Date' },
+    { key: 'code', label: 'Employee ID' },
+  ];
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
@@ -298,19 +297,53 @@ const EmploymentStatus = () => {
     }
   };
 
-  const filtered = employees.filter((emp) => {
-    const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase();
-    const email = (emp.email || '').toLowerCase();
-    const code = (emp.employeeCode || '').toLowerCase();
-    const desig = (emp.profile?.designation?.title || emp.role || '').toLowerCase();
-    const dept = (emp.profile?.department?.name || '').toLowerCase();
-    const query = searchQuery.toLowerCase();
+  const filtered = useMemo(() => {
+    return employees
+      .filter((emp) => {
+        const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase();
+        const email = (emp.email || '').toLowerCase();
+        const code = (emp.employeeCode || '').toLowerCase();
+        const desig = (emp.profile?.designation?.title || emp.role || '').toLowerCase();
+        const dept = (emp.profile?.department?.name || '').toLowerCase();
+        const shift = (emp.profile?.shift || '').toLowerCase();
+        const loc = (emp.profile?.workLocation || emp.workLocation || '').toLowerCase();
+        const query = searchQuery.toLowerCase().trim();
 
-    const matchesSearch = fullName.includes(query) || email.includes(query) || code.includes(query) || desig.includes(query) || dept.includes(query);
-    const empType = getEffectiveType(emp);
-    const matchesType = typeFilter === 'ALL' || empType === typeFilter;
-    return matchesSearch && matchesType;
-  });
+        const matchesSearch =
+          !query ||
+          fullName.includes(query) ||
+          email.includes(query) ||
+          code.includes(query) ||
+          desig.includes(query) ||
+          dept.includes(query) ||
+          shift.includes(query) ||
+          loc.includes(query);
+
+        const empType = getEffectiveType(emp);
+        const matchesType = typeFilter === 'ALL' || empType === typeFilter;
+        const matchesShift = shiftFilter === 'ALL' || shift.includes(shiftFilter.toLowerCase());
+
+        return matchesSearch && matchesType && matchesShift;
+      })
+      .sort((a, b) => {
+        let valA = '';
+        let valB = '';
+        if (activeSort === 'name') {
+          valA = `${a.firstName || ''} ${a.lastName || ''}`.toLowerCase();
+          valB = `${b.firstName || ''} ${b.lastName || ''}`.toLowerCase();
+        } else if (activeSort === 'code') {
+          valA = (a.employeeCode || '').toLowerCase();
+          valB = (b.employeeCode || '').toLowerCase();
+        } else if (activeSort === 'date') {
+          const dateA = new Date(a.profile?.joiningDate || a.createdAt || 0).getTime();
+          const dateB = new Date(b.profile?.joiningDate || b.createdAt || 0).getTime();
+          return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        }
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [employees, searchQuery, typeFilter, shiftFilter, activeSort, sortOrder]);
 
   const stats = {
     total: employees.length,
@@ -451,193 +484,157 @@ const EmploymentStatus = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. TOOLBAR & FILTER CONTROLS */}
+      {/* 3. MODERN DYNAMIC SEARCH & FILTER COMMAND BAR */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-soft border border-slate-200/80 dark:border-slate-800 space-y-3 transition-all">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search by employee name, role, ID, or department..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 transition-all font-medium"
-            />
-            {searchQuery && (
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All', count: typeCounts.ALL },
+          { key: 'FULL_TIME', label: 'Full-Time', count: typeCounts.FULL_TIME },
+          { key: 'REMOTE', label: 'Remote', count: typeCounts.REMOTE },
+          { key: 'CONTRACT', label: 'Contract', count: typeCounts.CONTRACT },
+          { key: 'PROBATION', label: 'Probation', count: typeCounts.PROBATION },
+        ]}
+        activeStatus={typeFilter}
+        onStatusChange={setTypeFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search personnel by name, role, ID, shift, department, or location..."
+        searchShortPlaceholder="Search personnel..."
+        searchHint="type:full_time"
+        filterTags={[
+          ...(typeFilter !== 'ALL'
+            ? [{ key: 'type', label: 'type', value: typeFilter.replace('_', ' ') }]
+            : []),
+          ...(shiftFilter !== 'ALL'
+            ? [{ key: 'shift', label: 'shift', value: shiftFilter }]
+            : []),
+        ]}
+        onRemoveTag={(tag) => {
+          if (tag.key === 'type') setTypeFilter('ALL');
+          if (tag.key === 'shift') setShiftFilter('ALL');
+        }}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={(typeFilter !== 'ALL' ? 1 : 0) + (shiftFilter !== 'ALL' ? 1 : 0)}
+        filterContent={
+          <div className="space-y-4">
+            {/* Classification Filter */}
+            <div>
+              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700/60 mb-2">
+                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                  Classification
+                </span>
+                {typeFilter !== 'ALL' && (
+                  <button
+                    type="button"
+                    onClick={() => setTypeFilter('ALL')}
+                    className="text-[10px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+              <div className="space-y-1">
+                {[
+                  { key: 'ALL', label: 'All Personnel', count: typeCounts.ALL },
+                  { key: 'FULL_TIME', label: 'Full-Time Permanent', count: typeCounts.FULL_TIME },
+                  { key: 'REMOTE', label: 'Remote Contract', count: typeCounts.REMOTE },
+                  { key: 'CONTRACT', label: 'Fixed Contract', count: typeCounts.CONTRACT },
+                  { key: 'PROBATION', label: 'Probationary (90 Days)', count: typeCounts.PROBATION },
+                ].map(({ key, label, count }) => {
+                  const isSelected = typeFilter === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setTypeFilter(key)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                      }`}
+                    >
+                      <span>{label}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
+                          isSelected
+                            ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Shift Filter */}
+            <div>
+              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700/60 mb-2">
+                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                  Assigned Shift
+                </span>
+                {shiftFilter !== 'ALL' && (
+                  <button
+                    type="button"
+                    onClick={() => setShiftFilter('ALL')}
+                    className="text-[10px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+              <div className="space-y-1">
+                {[
+                  { key: 'ALL', label: 'All Shifts' },
+                  { key: 'Morning', label: 'General Morning (09:00 - 17:30)' },
+                  { key: 'Evening', label: 'Evening Shift (14:00 - 22:30)' },
+                  { key: 'Night', label: 'Night Shift (22:00 - 06:30)' },
+                  { key: 'Flexible', label: 'Flexible Remote Hours' },
+                ].map(({ key, label }) => {
+                  const isSelected = shiftFilter === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setShiftFilter(key)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                      }`}
+                    >
+                      <span className="truncate">{label}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Clear all */}
+            {(typeFilter !== 'ALL' || shiftFilter !== 'ALL') && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title="Clear Search"
+                onClick={() => {
+                  setTypeFilter('ALL');
+                  setShiftFilter('ALL');
+                }}
+                className="w-full py-1.5 text-center text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
-                <X className="w-3.5 h-3.5" />
+                Clear All Filters
               </button>
             )}
           </div>
-
-          {/* Filter Button with Dropdown Menu */}
-          <div className="relative shrink-0" ref={filterDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setShowFilterMenu((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${typeFilter !== 'ALL'
-                ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
-                : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
-                }`}
-              title="Filter by Employment Type"
-            >
-              <Filter className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-              <span className="hidden sm:inline">
-                {typeFilter === 'ALL'
-                  ? 'Filter'
-                  : typeFilter === 'FULL_TIME'
-                    ? 'Full Time'
-                    : typeFilter === 'REMOTE'
-                      ? 'Remote'
-                      : typeFilter === 'CONTRACT'
-                        ? 'Contract'
-                        : 'Probation'}
-              </span>
-              <span className="inline sm:hidden">
-                {typeFilter === 'ALL' ? 'Filter' : typeFilter.replace('_', ' ')}
-              </span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showFilterMenu ? 'rotate-180' : ''
-                  }`}
-              />
-              {typeFilter !== 'ALL' && (
-                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-              )}
-            </button>
-
-            {/* Dropdown Menu */}
-            {showFilterMenu && (
-              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
-                <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
-                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                    Classification Filter
-                  </div>
-                </div>
-
-                <div className="p-1 space-y-0.5">
-                  {[
-                    { key: 'ALL', label: 'All Personnel', count: typeCounts.ALL },
-                    { key: 'FULL_TIME', label: 'Full Time', count: typeCounts.FULL_TIME },
-                    { key: 'REMOTE', label: 'Remote Contract', count: typeCounts.REMOTE },
-                    { key: 'CONTRACT', label: 'Contractor', count: typeCounts.CONTRACT },
-                    { key: 'PROBATION', label: 'Probationary', count: typeCounts.PROBATION },
-                  ].map(({ key, label, count }) => {
-                    const isSelected = typeFilter === key;
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => {
-                          setTypeFilter(key);
-                          setShowFilterMenu(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSelected
-                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                          }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${isSelected
-                              ? 'bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-700'
-                              : 'bg-slate-300 dark:bg-slate-600'
-                              }`}
-                          />
-                          <span>{label}</span>
-                        </div>
-                        <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSelected
-                            ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                            }`}
-                        >
-                          {count}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {typeFilter !== 'ALL' && (
-                  <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-700/60 p-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTypeFilter('ALL');
-                        setShowFilterMenu(false);
-                      }}
-                      className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      <span>Reset Classification Filter</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0 pl-1">
-            <span>
-              <strong className="text-slate-900 dark:text-white font-bold">{filtered.length}</strong> of {employees.length}
-            </span>
-          </div>
-        </div>
-
-        {/* Active Filter Badges */}
-        {(typeFilter !== 'ALL' || searchQuery) && (
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              Active:
-            </span>
-
-            {typeFilter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
-                Classification: {typeFilter.replace('_', ' ')}
-                <button
-                  type="button"
-                  onClick={() => setTypeFilter('ALL')}
-                  className="hover:text-sky-900 dark:hover:text-sky-100 cursor-pointer p-0.5"
-                  title="Remove Filter"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
-                "{searchQuery}"
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-0.5"
-                  title="Clear Search"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={() => {
-                setTypeFilter('ALL');
-                setSearchQuery('');
-              }}
-              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 ml-auto cursor-pointer"
-            >
-              Reset Filters
-            </button>
-          </div>
-        )}
-      </div>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. WORKFORCE EMPLOYMENT CARDS GRID */}

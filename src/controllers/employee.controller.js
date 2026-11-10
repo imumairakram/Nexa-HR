@@ -179,29 +179,42 @@ const onboardEmployee = async (req, res) => {
       return { user: newUser, profile: newProfile, salaryStructure: newSalaryStructure };
     });
 
-    // Send Welcome Email with Login Credentials to the newly onboarded employee asynchronously
+    // Send Welcome Email with Login Credentials to the newly onboarded employee
     const empFullName = `${result.user.firstName} ${result.user.lastName}`.trim();
     const deptName = result.profile?.department?.name || departmentName || 'General';
     const desigTitle = result.profile?.designation?.title || designationTitle || 'Team Member';
     const officeLocation = result.profile?.workLocation || workLocation || location || 'Headquarters';
 
-    sendOnboardingWelcomeEmail({
-      email: result.user.email,
-      name: empFullName,
-      employeeCode: result.user.employeeCode,
-      tempPassword: finalPassword,
-      role: result.user.role,
-      designation: desigTitle,
-      department: deptName,
-      workLocation: officeLocation,
-      loginUrl: 'https://nexa-hr-xi.vercel.app/',
-    }).catch((emailErr) => {
+    const originHeader = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null);
+    const portalBaseUrl = originHeader || process.env.FRONTEND_URL || 'https://nexa-hr-xi.vercel.app';
+    const portalLoginUrl = `${portalBaseUrl.replace(/\/+$/, '')}/login`;
+
+    let emailDispatch = null;
+    try {
+      emailDispatch = await sendOnboardingWelcomeEmail({
+        email: result.user.email,
+        name: empFullName,
+        employeeCode: result.user.employeeCode,
+        tempPassword: finalPassword,
+        role: result.user.role,
+        designation: desigTitle,
+        department: deptName,
+        workLocation: officeLocation,
+        loginUrl: portalLoginUrl,
+      });
+      console.log(`[ONBOARDING] Welcome email dispatched to ${result.user.email} (success=${emailDispatch?.success})`);
+    } catch (emailErr) {
       console.error('[ONBOARDING EMAIL FAILED] Could not dispatch credentials email:', emailErr.message);
-    });
+      emailDispatch = { success: false, error: emailErr.message };
+    }
+
+    const emailSentMsg = emailDispatch?.success
+      ? `Welcome email with login credentials has been sent to ${cleanEmail}.`
+      : `Account created. (Email status: ${emailDispatch?.error || 'processed'}).`;
 
     return res.status(201).json({
       success: true,
-      message: 'Employee onboarded successfully. Login credentials have been emailed to the employee.',
+      message: `Employee onboarded successfully! ${emailSentMsg}`,
       data: {
         employee: {
           id: result.user.id,
@@ -217,6 +230,7 @@ const onboardEmployee = async (req, res) => {
           profile: result.profile,
           salaryStructure: result.salaryStructure,
         },
+        emailDispatch,
       },
     });
   } catch (error) {
@@ -870,6 +884,79 @@ const removeProfilePicture = async (req, res) => {
   }
 };
 
+const resendEmployeeCredentials = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tempPassword } = req.body || {};
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        profile: {
+          include: {
+            department: true,
+            designation: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
+    }
+
+    const finalPassword = (tempPassword && tempPassword.trim()) || `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
+    const hashedPassword = await hashPassword(finalPassword);
+
+    await prisma.user.update({
+      where: { id },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: true,
+      },
+    });
+
+    const originHeader = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null);
+    const portalBaseUrl = originHeader || process.env.FRONTEND_URL || 'https://nexa-hr-xi.vercel.app';
+    const portalLoginUrl = `${portalBaseUrl.replace(/\/+$/, '')}/login`;
+
+    const empFullName = `${user.firstName} ${user.lastName}`.trim();
+    const deptName = user.profile?.department?.name || 'General';
+    const desigTitle = user.profile?.designation?.title || 'Team Member';
+    const officeLocation = user.profile?.workLocation || 'Headquarters';
+
+    const emailResult = await sendOnboardingWelcomeEmail({
+      email: user.email,
+      name: empFullName,
+      employeeCode: user.employeeCode,
+      tempPassword: finalPassword,
+      role: user.role,
+      designation: desigTitle,
+      department: deptName,
+      workLocation: officeLocation,
+      loginUrl: portalLoginUrl,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Welcome credentials email dispatched to ${user.email}.`,
+      data: {
+        email: user.email,
+        employeeCode: user.employeeCode,
+        tempPassword: finalPassword,
+        emailResult,
+      },
+    });
+  } catch (err) {
+    console.error('Error in resendEmployeeCredentials:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to resend welcome credentials.',
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   onboardEmployee,
   getEmployees,
@@ -878,5 +965,6 @@ module.exports = {
   deleteEmployee,
   uploadProfilePicture,
   removeProfilePicture,
+  resendEmployeeCredentials,
 };
 

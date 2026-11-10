@@ -538,13 +538,14 @@ const PublicHoliday = () => {
         onStatusChange={setCategoryFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder={`Search ${selectedYear} holidays by title, day, hijri date, or category...`}
+        searchPlaceholder={`Search ${selectedYear} holidays by title, day, or category...`}
+        searchShortPlaceholder="Search holidays..."
         searchHint="type:gazetted"
         filterTags={[
           ...(categoryFilter !== 'ALL' && !['Gazetted National', 'Gazetted Religious', 'Bank Holiday', 'UPCOMING'].includes(categoryFilter)
-            ? [{ key: 'category', label: `type: ${categoryFilter}` }]
+            ? [{ key: 'category', label: 'type', value: categoryFilter }]
             : []),
-          { key: 'year', label: `year: ${selectedYear}` },
+          { key: 'year', label: 'year', value: String(selectedYear) },
         ]}
         onRemoveTag={(tag) => {
           if (tag.key === 'category') setCategoryFilter('ALL');

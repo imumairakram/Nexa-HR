@@ -413,6 +413,13 @@ export const api = {
     });
   },
 
+  resendWelcomeEmail: async (employeeId, data = {}) => {
+    return await fetchAPI(`/employees/${employeeId}/resend-credentials`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   updateEmployee: async (id, data) => {
     return await fetchAPI(`/employees/${id}`, {
       method: 'PUT',

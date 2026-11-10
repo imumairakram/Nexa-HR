@@ -207,15 +207,15 @@ const NewEmployee = () => {
 
       const res = await api.onboardEmployee(payload);
       if (res?.success || res?.data?.employee) {
-        setToastMsg(`Employee ${form.firstName} ${form.lastName} successfully onboarded & saved to database!`);
+        setToastMsg(res?.message || `Employee ${form.firstName} ${form.lastName} onboarded successfully! Welcome email sent to ${form.email}.`);
         setTimeout(() => {
           navigate('/app/employees');
-        }, 1500);
+        }, 2200);
       } else {
         setToastMsg(res?.message || 'Employee onboarded successfully!');
         setTimeout(() => {
           navigate('/app/employees');
-        }, 1500);
+        }, 2200);
       }
     } catch (err) {
       console.error('Onboard error:', err);
