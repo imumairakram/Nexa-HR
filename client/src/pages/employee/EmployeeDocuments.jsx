@@ -1039,18 +1039,9 @@ const EmployeeDocuments = () => {
                 AES-256 encrypted repository of verified employment contracts, credentials, and tax filings
               </p>
             </div>
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-                {filteredPersonalDocs.length} Documents
-              </span>
-              <button
-                onClick={() => setIsUploadOpen(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
-              >
-                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Upload</span>
-              </button>
-            </div>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full self-start sm:self-auto">
+              {filteredPersonalDocs.length} Documents
+            </span>
           </div>
 
           {loading ? (

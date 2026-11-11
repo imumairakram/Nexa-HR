@@ -1474,18 +1474,9 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 Complete directory of corporate offer letters, employment contracts, and increment letters issued to workforce members
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-                {filteredIssuedDocs.length} Records
-              </span>
-              <button
-                onClick={() => setIsIssueModalOpen(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Issue Document</span>
-              </button>
-            </div>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+              {filteredIssuedDocs.length} Records
+            </span>
           </div>
 
           {loading ? (

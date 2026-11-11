@@ -699,18 +699,9 @@ const EmployeeHelpdesk = () => {
               Direct enterprise resolution queue for hardware requisitions, payroll adjustments, and amenities
             </p>
           </div>
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-              {filteredTickets.length} Tickets Found
-            </span>
-            <button
-              onClick={() => setIsNewTicketOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
-            >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>New Ticket</span>
-            </button>
-          </div>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+            {filteredTickets.length} Tickets Found
+          </span>
         </div>
 
         {loading ? (
