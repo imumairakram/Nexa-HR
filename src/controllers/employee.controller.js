@@ -34,6 +34,13 @@ const onboardEmployee = async (req, res) => {
       otherAllowances = 0,
       taxDeductions = 0,
       otherDeductions = 0,
+      bankName,
+      accountTitle,
+      accountNumber,
+      branchCode,
+      payoutMethod,
+      ntnNumber,
+      payFrequency,
     } = req.body;
 
     const finalPassword = (password && password.trim()) || 'TempPassword123!';
@@ -229,6 +236,15 @@ const onboardEmployee = async (req, res) => {
           tempPassword: finalPassword,
           profile: result.profile,
           salaryStructure: result.salaryStructure,
+          bankDetails: {
+            bankName: bankName || 'Standard Chartered Bank',
+            accountTitle: accountTitle || `${result.user.firstName} ${result.user.lastName}`.trim(),
+            accountNumber: accountNumber || `PK72SCBL000000${result.user.employeeCode?.replace(/[^0-9]/g, '') || '101'}01`,
+            branchCode: branchCode || '0142',
+            payoutMethod: payoutMethod || 'Direct Bank Transfer',
+            ntnNumber: ntnNumber || '',
+            payFrequency: payFrequency || 'Monthly',
+          },
         },
         emailDispatch,
       },

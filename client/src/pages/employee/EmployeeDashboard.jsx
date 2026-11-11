@@ -433,54 +433,54 @@ const EmployeeDashboard = () => {
       />
 
       {/* HERO BIOMETRIC HARDWARE STATUS BANNER */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           {/* Left Column: Greeting & Digital Clock */}
-          <div className="space-y-3 flex-1 min-w-0">
+          <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                 <span>{employeeShift}</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                 <span>{currentUser?.profile?.workLocation || currentUser?.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
               </span>
             </div>
 
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight leading-tight whitespace-nowrap">
+            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               {isPresent ? 'Biometric Entry Verified & Active' : 'Automated Biometric Station Active'}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-lg">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
               Attendance is recorded automatically via biometric hardware machines (Face-ID / Fingerprint).
             </p>
 
             {/* Live Clock Display */}
-            <div className="flex items-center gap-4 pt-2">
-              <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-sky-400" />
-                <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wider">
+            <div className="flex items-center gap-4 pt-1">
+              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-200/70 dark:border-slate-700/80 shadow-xs flex items-center gap-2">
+                <Clock className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                <span className="font-mono text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-wider">
                   {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </span>
               </div>
-              <span className="text-xs text-slate-400 font-medium">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                 {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
               </span>
             </div>
           </div>
 
           {/* Right Column: Automated Database Punch Card */}
-          <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-white/20 dark:border-slate-700/60 shadow-2xl flex flex-col items-center text-center min-w-[290px] sm:min-w-[340px]">
-            <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-300">
+          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
+            <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
               <span>Biometric Status</span>
               <span
                 className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
                   isPresent
                     ? todayStatus?.status === 'LATE'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                      : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                    : 'bg-slate-500/20 text-slate-300 border border-slate-500/40'
+                      ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/50'
+                      : 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50'
+                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                 }`}
               >
                 {isPresent ? (todayStatus?.status === 'LATE' ? 'Late Recorded' : 'Biometric Synced') : 'Awaiting Device Entry'}
@@ -488,25 +488,25 @@ const EmployeeDashboard = () => {
             </div>
 
             {/* In / Out Timestamps from Database */}
-            <div className="w-full grid grid-cols-2 gap-2 my-2.5">
-              <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
+            <div className="w-full grid grid-cols-2 gap-2 my-2">
+              <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-3 border border-sky-100 dark:border-slate-700/80 text-left shadow-2xs">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch In</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-sky-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-sky-600 dark:text-sky-400 mt-0.5">
                   {formatDbTime(todayStatus?.checkInTime)}
                 </div>
-                <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-400" />
+                <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-500" />
                   {todayStatus?.checkInTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
 
-              <div className="bg-black/25 rounded-2xl p-3 border border-white/5 text-left">
+              <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-3 border border-sky-100 dark:border-slate-700/80 text-left shadow-2xs">
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Device Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-sky-400 mt-0.5">
+                <div className="text-lg sm:text-xl font-mono font-black text-sky-600 dark:text-sky-400 mt-0.5">
                   {formatDbTime(todayStatus?.checkOutTime)}
                 </div>
-                <div className="text-[9px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-400" />
+                <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-500" />
                   {todayStatus?.checkOutTime ? 'Recorded' : 'Pending'}
                 </div>
               </div>
@@ -516,7 +516,7 @@ const EmployeeDashboard = () => {
             <div className="w-full pt-2">
               <button
                 onClick={() => navigate('/employee/attendance')}
-                className="w-full py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 shadow-md"
+                className="w-full py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 hover:scale-105 active:scale-95"
               >
                 <span>View Full Attendance History</span>
                 <ArrowRight className="w-3.5 h-3.5" />

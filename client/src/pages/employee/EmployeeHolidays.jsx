@@ -84,17 +84,17 @@ const EmployeeHolidays = () => {
       {/* 1. DYNAMIC HERO SPOTLIGHT (LIGHT BLUE & SKY CYAN GRADIENT AESTHETIC) */}
       {/* ========================================================================= */}
       {featuredHoliday && (
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-3 flex-1 min-w-0">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight leading-tight">
+              <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
                 {featuredHoliday.name}
               </h2>
 
-              <p className="text-xs sm:text-sm text-sky-100/90 leading-relaxed max-w-lg font-medium">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
                 {featuredHoliday.description ||
                   'Official paid public holiday observed across all company offices and duty stations. Attendance engines resume normal operations on the next working morning.'}
               </p>
@@ -113,15 +113,15 @@ const EmployeeHolidays = () => {
             </div>
 
             {/* Right Spotlight Countdown Badge */}
-            <div className="bg-sky-950/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-sky-500/30 dark:border-sky-700/60 shadow-2xl flex flex-col items-center text-center min-w-[200px] shrink-0">
-              <div className="text-xs font-bold text-sky-200 uppercase tracking-wider mb-1">
+            <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[200px] shrink-0">
+              <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Status' : 'Countdown'}
               </div>
               <div
                 className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
                     ? 'text-sky-300'
-                    : 'text-white'
+                    : 'text-slate-900 dark:text-white'
                 }`}
               >
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'TODAY' : featuredHoliday.countdown}
@@ -129,8 +129,8 @@ const EmployeeHolidays = () => {
               <div
                 className={`text-[11px] font-semibold mt-1 px-3 py-0.5 rounded-full border ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
-                    ? 'bg-sky-500/20 text-sky-300 border-sky-500/30'
-                    : 'bg-sky-500/25 text-sky-100 border-sky-400/40'
+                    ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50'
+                    : 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50'
                 }`}
               >
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Active Holiday' : 'Upcoming Observance'}

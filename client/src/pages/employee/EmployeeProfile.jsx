@@ -536,9 +536,9 @@ const EmployeeProfile = () => {
           {/* ========================================================================= */}
           {/* 1. HERO PROFILE CARD (ROYAL VIOLET / PURPLE GRADIENT AESTHETIC) */}
           {/* ========================================================================= */}
-          <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-950 via-slate-900 to-[#0c1f2e] text-white p-6 sm:p-8 shadow-2xl border border-sky-500/30">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-center gap-6">
               {/* Avatar with Camera upload button */}
@@ -562,7 +562,7 @@ const EmployeeProfile = () => {
                 </div>
                 <label
                   title="Upload New Photo"
-                  className={`absolute bottom-0 right-0 p-2.5 rounded-full bg-sky-600 hover:bg-sky-500 text-white shadow-lg cursor-pointer transition-all group-hover:scale-110 border-2 border-slate-900 ${isUploadingAvatar ? 'pointer-events-none opacity-50' : ''
+                  className={`absolute bottom-0 right-0 p-2.5 rounded-full bg-sky-500 hover:bg-sky-600 text-white shadow-lg cursor-pointer transition-all group-hover:scale-110 border-2 border-white dark:border-slate-900 ${isUploadingAvatar ? 'pointer-events-none opacity-50' : ''
                     }`}
                 >
                   <Camera className="w-3.5 h-3.5" />
@@ -589,7 +589,7 @@ const EmployeeProfile = () => {
               {/* User Details & Identity Badges */}
               <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
+                  <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
                     {formData.firstName || 'Employee'} {formData.lastName || ''}
                   </h2>
                   {formData.empCode && (
