@@ -71,7 +71,10 @@ const JobDesk = () => {
                 <span>{jobsCount} Open Positions</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{candidatesCount} Active Candidates in Pipeline</span>
+                <span>{candidatesCount} Pipeline Applicants</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{interviewsCount} Scheduled Interviews</span>
               </span>
             </div>
           </div>

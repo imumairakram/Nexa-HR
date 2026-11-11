@@ -480,6 +480,10 @@ const getEmployeeDashboard = async (req, res) => {
           designation: currentUser?.profile?.designation?.title,
           joiningDate: currentUser?.profile?.joiningDate,
           salaryStructure: currentUser?.salaryStructure,
+          profile: currentUser?.profile,
+          workLocation: currentUser?.profile?.workLocation,
+          shift: currentUser?.profile?.shift,
+          employmentType: currentUser?.profile?.employmentType,
         },
         todayClockStatus: todayAttendance
           ? {

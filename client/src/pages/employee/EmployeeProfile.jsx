@@ -151,13 +151,13 @@ const EmployeeProfile = () => {
     phone: '',
     designation: '',
     department: '',
-    workLocation: 'Islamabad HQ & Innovation Lab',
-    location: 'Islamabad HQ & Innovation Lab',
+    workLocation: '',
+    location: '',
     empCode: '',
     joinDate: '',
     employmentType: 'Full-Time / Permanent',
     reportingManager: '',
-    shift: 'General Shift (09:00 AM – 05:30 PM)',
+    shift: '',
     dob: '',
     gender: 'Male',
     bloodGroup: 'O+ Positive',
@@ -194,7 +194,7 @@ const EmployeeProfile = () => {
 
   const populateUserData = (u) => {
     const residentialAddress = u.profile?.address || u.address || '';
-    const officeLocation = u.profile?.workLocation || u.workLocation || 'Islamabad HQ & Innovation Lab';
+    const officeLocation = u.profile?.workLocation || u.workLocation || '';
     const parsedEmergency = parseEmergencyInfo(
       u.profile?.emergencyContact || u.emergencyContact,
       u.emergencyName,
@@ -710,7 +710,7 @@ const EmployeeProfile = () => {
                   <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
                   <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium" title="Assigned Office Work Location">
                     <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                    <span>{formData.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
+                    <span>{formData.workLocation || 'Corporate Office'}</span>
                   </span>
                   <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
                   <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium" title="Residential Home Address">
@@ -1043,7 +1043,7 @@ const EmployeeProfile = () => {
                       <Building2 className="w-3.5 h-3.5 text-sky-500" />
                       <span>Office Work Location</span>
                     </span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.workLocation || 'Corporate Office'}</span>
                   </div>
 
                   <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">

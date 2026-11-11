@@ -187,7 +187,10 @@ const JobBoard = () => {
                 <span>{totalCandidates} Candidates Active</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{columns.HIRED?.length || 0} Hired This Month</span>
+                <span>{columns.INTERVIEW?.length || 0} In Interview Loop</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{columns.HIRED?.length || 0} Finalist Hires</span>
               </span>
             </div>
           </div>

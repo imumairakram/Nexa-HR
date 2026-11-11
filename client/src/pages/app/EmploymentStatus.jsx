@@ -397,7 +397,13 @@ const EmploymentStatus = () => {
                 <span>{stats.total} Total Active Personnel</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{stats.probation} Contracts / Probation</span>
+                <span>{stats.fullTime} Full-Time Permanent</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{stats.probation} Probationary Reviews</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{stats.remote} Remote / Distributed</span>
               </span>
             </div>
           </div>

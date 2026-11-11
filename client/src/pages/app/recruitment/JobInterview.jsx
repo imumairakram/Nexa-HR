@@ -75,6 +75,14 @@ const JobInterview = () => {
     loadData();
   }, []);
 
+  const completedInterviews = useMemo(() => {
+    return interviews.filter((i) => (i.status || '').toUpperCase() === 'COMPLETED').length;
+  }, [interviews]);
+
+  const upcomingInterviews = useMemo(() => {
+    return interviews.filter((i) => (i.status || '').toUpperCase() === 'SCHEDULED' || !i.status).length;
+  }, [interviews]);
+
   const handleSchedule = async (e) => {
     e.preventDefault();
     if (!form.candidate.trim()) return;
@@ -208,7 +216,13 @@ const JobInterview = () => {
                 <span>{interviews.length} Scheduled Sessions</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>100% Calendar Confirmed</span>
+                <span>{upcomingInterviews} Upcoming Loops</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{completedInterviews} Completed Evaluations</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{employees.length} Active Panel Evaluators</span>
               </span>
             </div>
           </div>

@@ -425,6 +425,9 @@ const PublicHoliday = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{allHolidays.length} Observances in {selectedYear}</span>
+              </span>
               {stats.activeToday ? (
                 <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 animate-pulse">
                   <span>Today is {stats.activeToday.name}!</span>

@@ -157,10 +157,13 @@ const Jobs = () => {
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{jobs.length} Total Postings</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{jobs.filter((j) => j.status === 'ACTIVE').length} Active Requisitions</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{jobs.reduce((acc, j) => acc + j.applicants, 0)} Total Candidates</span>
+                <span>{jobs.reduce((acc, j) => acc + (j.applicants || 0), 0)} Total Candidates</span>
               </span>
             </div>
           </div>

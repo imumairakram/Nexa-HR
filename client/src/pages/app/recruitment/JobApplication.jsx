@@ -57,6 +57,17 @@ const JobApplication = () => {
     loadApplications();
   }, []);
 
+  const avgRating = useMemo(() => {
+    if (!applications.length) return '5.0';
+    const validRatings = applications.map((a) => Number(a.rating || a.score)).filter((r) => !isNaN(r) && r > 0);
+    if (!validRatings.length) return '5.0';
+    return (validRatings.reduce((sum, r) => sum + r, 0) / validRatings.length).toFixed(1);
+  }, [applications]);
+
+  const shortlistedCount = useMemo(() => {
+    return applications.filter((a) => a.stage === 'SHORTLISTED' || a.stage === 'INTERVIEW' || a.stage === 'OFFER' || a.stage === 'HIRED').length;
+  }, [applications]);
+
   // New Application Form State
   const [form, setForm] = useState({
     name: '',
@@ -237,7 +248,10 @@ const JobApplication = () => {
                 <span>{applications.length} Candidate Submissions</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>4.8 Avg Candidate Rating</span>
+                <span>{shortlistedCount} Shortlisted & Qualified</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{avgRating} Avg Candidate Rating</span>
               </span>
             </div>
           </div>

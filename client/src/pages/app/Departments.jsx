@@ -282,6 +282,9 @@ const Departments = () => {
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{totalAssignedStaff} Allocated Team Members</span>
               </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{employees.length} Total Workforce</span>
+              </span>
             </div>
           </div>
 

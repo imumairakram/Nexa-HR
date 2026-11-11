@@ -179,6 +179,10 @@ const LeavePolicy = () => {
     loadLeavePolicies();
   }, []);
 
+  const totalDaysQuota = useMemo(() => {
+    return policies.reduce((acc, p) => acc + (Number(p.days || p.daysAllowed) || 0), 0);
+  }, [policies]);
+
   const handleCreatePolicy = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.code.trim()) return;
@@ -522,7 +526,10 @@ const LeavePolicy = () => {
                 <span>{policies.length} Active Policy Tiers</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>Annual Allocation</span>
+                <span>{totalDaysQuota} Cumulative Days Entitled</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{paidPoliciesCount} Paid Allowance Categories</span>
               </span>
             </div>
           </div>

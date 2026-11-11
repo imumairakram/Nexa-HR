@@ -459,11 +459,19 @@ const Leaves = () => {
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{stats.total} Total Applications</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{stats.approved} Leaves Approved</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{stats.pending} Applications Pending Review</span>
+                <span>{stats.pending} Pending Review</span>
               </span>
+              {stats.rejected > 0 && (
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span>{stats.rejected} Declined</span>
+                </span>
+              )}
             </div>
           </div>
 

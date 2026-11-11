@@ -346,7 +346,7 @@ const NewEmployee = () => {
                 <span>{orgStats.totalEmployees} Active Staff Registered</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>&lt; 2 Minutes Average Setup</span>
+                <span>{orgStats.totalDepartments} Operating Departments</span>
               </span>
             </div>
           </div>

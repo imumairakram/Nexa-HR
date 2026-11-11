@@ -418,7 +418,8 @@ const EmployeeDashboard = () => {
     return { text: 'No Records', type: 'neutral', icon: 'dot', sub: 'No Payroll Setup' };
   }, [latestPayslip, currentUser, payslipPeriod]);
 
-  const employeeShift = currentUser?.profile?.shift || currentUser?.shift || 'General Standard Shift';
+  const employeeShift = currentUser?.profile?.shift || currentUser?.shift || 'General Shift';
+  const officeLocation = currentUser?.profile?.workLocation || currentUser?.workLocation || 'Corporate Office';
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -445,7 +446,7 @@ const EmployeeDashboard = () => {
                 <span>{employeeShift}</span>
               </span>
               <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{currentUser?.profile?.workLocation || currentUser?.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
+                <span>{officeLocation}</span>
               </span>
             </div>
 

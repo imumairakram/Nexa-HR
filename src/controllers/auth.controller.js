@@ -174,6 +174,11 @@ const login = async (req, res) => {
     // Standard database authentication flow for HR managers & Staff Employees
     const user = await prisma.user.findUnique({
       where: { email: cleanEmail },
+      include: {
+        profile: {
+          include: { department: true, designation: true },
+        },
+      },
     });
 
     if (!user) {
@@ -248,6 +253,11 @@ const login = async (req, res) => {
           mustChangePassword: user.mustChangePassword ?? false,
           isGuest: false,
           isDemo: false,
+          profile: user.profile,
+          workLocation: user.profile?.workLocation,
+          shift: user.profile?.shift,
+          department: user.profile?.department?.name,
+          designation: user.profile?.designation?.title,
         },
       },
     });
@@ -314,6 +324,11 @@ const demoLogin = async (req, res) => {
         isDemo: true,
         isActive: true,
       },
+      include: {
+        profile: {
+          include: { department: true, designation: true },
+        },
+      },
     });
 
     if (!user) {
@@ -348,6 +363,11 @@ const demoLogin = async (req, res) => {
           mustChangePassword: false,
           isDemo: true,
           isGuest: true,
+          profile: user.profile,
+          workLocation: user.profile?.workLocation,
+          shift: user.profile?.shift,
+          department: user.profile?.department?.name,
+          designation: user.profile?.designation?.title,
         },
       },
     });
@@ -386,7 +406,7 @@ const logout = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     let user = cacheService.getCachedUser(req.user.userId);
-    if (!user || !user.createdAt) {
+    if (!user || !user.createdAt || !user.profile) {
       try {
         const dbUser = await prisma.user.findUnique({
           where: { id: req.user.userId },

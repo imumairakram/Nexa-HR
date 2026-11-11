@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ChevronDown,
   Shield,
+  ShieldCheck,
   HelpCircle,
   Laptop,
   CreditCard,
@@ -586,13 +587,19 @@ const Helpdesk = () => {
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>Response SLA: {stats.avgSla}</span>
+                <span>{tickets.length} Total Inquiries</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{stats.inProgress} Active Tickets Under Review</span>
+                <span>{stats.inProgress} Under Review</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{stats.resolved} Resolved</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>SLA: {stats.avgSla}</span>
               </span>
               {stats.highPriority > 0 && (
-                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 animate-pulse">
+                <span className="flex items-center bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-xl border border-amber-200/80 dark:border-amber-800/50 animate-pulse font-bold">
                   <span>{stats.highPriority} Urgent Priority</span>
                 </span>
               )}
@@ -846,18 +853,27 @@ const Helpdesk = () => {
       {/* 4. ENTERPRISE TICKET LIST (ADMIN VIEW WITH REAL EMPLOYEE DOSSIER) */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-              Employee Inquiries & Operations Service Queue
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>Employee Inquiries & Operations Service Queue</span>
             </h3>
             <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Click any ticket card to open the conversation thread, reply to employee, and update resolution status
+              Enterprise resolution command center for workforce inquiries, IT tickets, and grievance handling
             </p>
           </div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-            {filteredTickets.length} Tickets Found
-          </span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+              {filteredTickets.length} Tickets Found
+            </span>
+            <button
+              onClick={() => setIsNewTicketOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>New Ticket</span>
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -959,29 +975,64 @@ const Helpdesk = () => {
             ))}
           </div>
         ) : (
-          <div className="p-12 text-center text-slate-400 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
-              <Search className="w-6 h-6" />
+          <div className="p-12 sm:p-16 text-center space-y-5">
+            <div className="relative inline-flex">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sky-500/10 via-sky-500/15 to-sky-500/20 dark:from-sky-500/20 dark:via-sky-500/20 dark:to-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-700/50 shadow-xl shadow-sky-500/10">
+                <LifeBuoy className="w-10 h-10 stroke-[1.6]" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-md">
+                <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+              </div>
             </div>
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">No support tickets found</h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              {searchQuery || statusFilter !== 'ALL' || categoryFilter !== 'ALL' || priorityFilter !== 'ALL'
-                ? 'Try adjusting your filters or search query.'
-                : 'No employee support inquiries are currently registered in the database.'}
-            </p>
-            {(searchQuery || statusFilter !== 'ALL' || categoryFilter !== 'ALL' || priorityFilter !== 'ALL') && (
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('ALL');
-                  setCategoryFilter('ALL');
-                  setPriorityFilter('ALL');
-                }}
-                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold cursor-pointer transition-all shadow-sm shadow-sky-500/20"
-              >
-                Reset Filters
-              </button>
+            <div className="space-y-2 max-w-lg mx-auto">
+              <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                {searchQuery || statusFilter !== 'ALL' || categoryFilter !== 'ALL' || priorityFilter !== 'ALL'
+                  ? 'No support tickets matched your search'
+                  : 'Operations Service Queue is Empty'}
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                {searchQuery || statusFilter !== 'ALL' || categoryFilter !== 'ALL' || priorityFilter !== 'ALL'
+                  ? 'No employee support inquiries match your active search or filter criteria. Try resetting filters to view all entries.'
+                  : 'All employee support inquiries and operations tickets have been attended to. New inquiries submitted across departments will appear live in this queue.'}
+              </p>
+            </div>
+            {(!searchQuery && statusFilter === 'ALL' && categoryFilter === 'ALL' && priorityFilter === 'ALL') ? (
+              <div className="pt-2">
+                <button
+                  onClick={() => setIsNewTicketOpen(true)}
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>Open Ticket on Employee Behalf</span>
+                </button>
+              </div>
+            ) : (
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('ALL');
+                    setCategoryFilter('ALL');
+                    setPriorityFilter('ALL');
+                  }}
+                  className="px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Search & Filters</span>
+                </button>
+              </div>
             )}
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
+              <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Guaranteed SLA Compliance</span>
+              </span>
+              <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Automated Thread Dispatch</span>
+              </span>
+              <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Tamper-Proof Audit History</span>
+              </span>
+            </div>
           </div>
         )}
       </div>

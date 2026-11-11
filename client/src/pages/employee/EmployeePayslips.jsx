@@ -198,6 +198,9 @@ const EmployeePayslips = () => {
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                <span>{payslips.length} Issued Statements</span>
+              </span>
+              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                 <span>Latest Cycle: {latestSlip ? `${MONTH_NAMES[latestSlip.month - 1]} ${latestSlip.year}` : 'No Records'}</span>
               </span>
               <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">

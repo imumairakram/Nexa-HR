@@ -133,14 +133,31 @@ const EmployeeAttendance = () => {
     setSelectedYear(todayDate.getFullYear());
   };
 
-  const officeLocation = useMemo(() => {
+  const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const u = JSON.parse(localStorage.getItem('user') || '{}');
-      return u?.profile?.workLocation || u?.workLocation || 'Islamabad HQ & Innovation Lab';
+      return JSON.parse(localStorage.getItem('user') || '{}');
     } catch {
-      return 'Islamabad HQ & Innovation Lab';
+      return {};
     }
+  });
+
+  const loadUserData = async () => {
+    try {
+      const res = await api.getMe();
+      if (res?.success && res.data?.user) {
+        setCurrentUser(res.data.user);
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    loadUserData();
+    window.addEventListener('user_profile_updated', loadUserData);
+    return () => window.removeEventListener('user_profile_updated', loadUserData);
   }, []);
+
+  const officeLocation = currentUser?.profile?.workLocation || currentUser?.workLocation || 'Corporate Office';
+  const employeeShift = currentUser?.profile?.shift || currentUser?.shift || 'General Shift (09:00 AM – 05:30 PM)';
 
   // Live clock updating every second
   useEffect(() => {
@@ -491,6 +508,9 @@ const EmployeeAttendance = () => {
                 <span>{lateArrivals} Late Arrivals Flagged</span>
               </span>
               <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                <span>{employeeShift}</span>
+              </span>
+              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                 <span>{officeLocation}</span>
               </span>
             </div>
@@ -554,7 +574,7 @@ const EmployeeAttendance = () => {
             </div>
 
             <div className="w-full pt-2 flex items-center justify-center text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-normal text-center">
-              <span>Shift: 09:00 AM – 05:30 PM</span>
+              <span>Shift: {employeeShift}</span>
             </div>
           </div>
         </div>

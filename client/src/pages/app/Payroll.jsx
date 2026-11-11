@@ -186,7 +186,10 @@ const Payroll = () => {
                 <span>{formatCurrency(latestBatch?.netPayable || 0)} Latest Batch Disbursed</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>{payslips.length} Payslips Stored</span>
+                <span>{latestBatch ? `${latestBatch.employeesCount} Staff Disbursed` : '0 Staff Disbursed'}</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{payslips.length} Total Payslips Generated</span>
               </span>
             </div>
           </div>

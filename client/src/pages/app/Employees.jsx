@@ -784,6 +784,9 @@ NexaHR Workforce Systems`;
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{stats.active} Active & Verified</span>
               </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{departments.length} Operating Departments</span>
+              </span>
             </div>
           </div>
 

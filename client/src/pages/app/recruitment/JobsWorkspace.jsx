@@ -443,16 +443,16 @@ const JobsWorkspace = () => {
             </p>
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                
-<span>{totalOpenings} Active Requisitions</span>
+                <span>{jobs.length} Total Postings</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                
-<span>{totalApplicants} Active Candidates Sourced</span>
+                <span>{totalOpenings} Active Requisitions</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                
-<span>18 Days Avg. Time to Fill</span>
+                <span>{totalApplicants} Active Candidates Sourced</span>
+              </span>
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span>{offerRate} Acceptance Rate</span>
               </span>
             </div>
           </div>

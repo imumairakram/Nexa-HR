@@ -322,6 +322,11 @@ const Announcement = () => {
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>{stats.pinned} High-Priority Pinned</span>
               </span>
+              {stats.events > 0 && (
+                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span>{stats.events} Company Events</span>
+                </span>
+              )}
             </div>
           </div>
 
