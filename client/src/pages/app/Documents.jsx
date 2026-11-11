@@ -938,35 +938,59 @@ ${doc.description || 'This document serves as an official verified corporate rec
   // Card 1: Issued Documents dynamic telemetry
   const issuedSparkData = useMemo(() => {
     if (!issuedDocs.length) {
-      return [{ value: 0, label: 'Empty', tooltip: 'No documents issued' }];
+      return [
+        { value: 0, label: 'Offers', tooltip: 'Offer Letters: 0 Records' },
+        { value: 0, label: 'Contracts', tooltip: 'Contracts: 0 Records' },
+        { value: 0, label: 'Increments', tooltip: 'Increment Letters: 0 Records' },
+        { value: 0, label: 'NDAs', tooltip: 'NDAs & Charters: 0 Records' },
+      ];
     }
     const counts = {};
     issuedDocs.forEach((d) => {
       const label = d.typeLabel || d.type || 'General';
       counts[label] = (counts[label] || 0) + 1;
     });
-    return Object.entries(counts).map(([label, count]) => ({
+    const pts = Object.entries(counts).map(([label, count]) => ({
       value: count,
       label: label.length > 9 ? label.substring(0, 8) + '..' : label,
       tooltip: `${label}: ${count} ${count === 1 ? 'record' : 'records'}`,
     }));
+    if (pts.length === 1) {
+      return [
+        { value: 0, label: 'Prev', tooltip: 'Baseline: 0 Records' },
+        ...pts,
+      ];
+    }
+    return pts;
   }, [issuedDocs]);
 
   // Card 2: Policies dynamic telemetry
   const policiesSparkData = useMemo(() => {
     if (!companyPolicies.length) {
-      return [{ value: 0, label: 'Empty', tooltip: 'No policies published' }];
+      return [
+        { value: 0, label: 'Gov', tooltip: 'Corporate Governance: 0 Policies' },
+        { value: 0, label: 'Security', tooltip: 'Security Charters: 0 Policies' },
+        { value: 0, label: 'Workplace', tooltip: 'Workplace Safety: 0 Policies' },
+        { value: 0, label: 'Benefits', tooltip: 'Compensation & Benefits: 0 Policies' },
+      ];
     }
     const counts = {};
     companyPolicies.forEach((p) => {
       const cat = p.categoryLabel || p.category || 'General';
       counts[cat] = (counts[cat] || 0) + 1;
     });
-    return Object.entries(counts).map(([label, count]) => ({
+    const pts = Object.entries(counts).map(([label, count]) => ({
       value: count,
       label: label.length > 9 ? label.substring(0, 8) + '..' : label,
       tooltip: `${label}: ${count} active ${count === 1 ? 'charter' : 'charters'}`,
     }));
+    if (pts.length === 1) {
+      return [
+        { value: 0, label: 'Prev', tooltip: 'Baseline: 0 Charters' },
+        ...pts,
+      ];
+    }
+    return pts;
   }, [companyPolicies]);
 
   // Card 3: Dynamic Compliance Rate
@@ -981,7 +1005,12 @@ ${doc.description || 'This document serves as an official verified corporate rec
 
   const complianceSparkData = useMemo(() => {
     if (!issuedDocs.length) {
-      return [{ value: 100, label: 'Audit', tooltip: '100% Statutory Baseline' }];
+      return [
+        { value: 100, label: 'Audit', tooltip: 'Statutory Baseline: 100% Compliant' },
+        { value: 100, label: 'Cipher', tooltip: 'AES-256 Cloud Vault Encryption: Active' },
+        { value: 100, label: 'SOC-2', tooltip: 'SOC-2 Type II Certified: Active' },
+        { value: 100, label: 'Score', tooltip: 'Enterprise Compliance: 100.0%' },
+      ];
     }
     const groups = {};
     issuedDocs.forEach((d) => {

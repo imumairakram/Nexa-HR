@@ -651,38 +651,106 @@ const EmployeeDocuments = () => {
     return counts;
   }, [activeTab, personalDocs, policies]);
 
-  // Dynamic Sparkline Data for Documents Hub
-  const personalDocsSparkData = useMemo(() => {
-    if (!personalDocs.length) {
-      return [{ value: 0, label: 'Empty', tooltip: 'No personal files in vault' }];
-    }
-    const typeCount = {};
-    personalDocs.forEach((d) => {
-      const label = d.typeLabel || d.type || 'Certificate';
-      typeCount[label] = (typeCount[label] || 0) + 1;
-    });
+  // ---------------------------------------------------------------------------
+  // Fully Functional Dynamic Sparklines & Telemetry for Documents & Policies Hub
+  // ---------------------------------------------------------------------------
 
-    return Object.entries(typeCount).map(([label, count]) => ({
-      value: count,
-      label: label.length > 8 ? label.substring(0, 7) + '..' : label,
-      tooltip: `${label}: ${count} ${count === 1 ? 'file' : 'files'}`,
-    }));
+  // Helper to reliably parse any file size string (MB, KB, Bytes)
+  const parseFileSizeInMB = (s) => {
+    if (!s) return 0;
+    if (typeof s === 'number') return isNaN(s) ? 0 : s;
+    if (typeof s !== 'string') return 0;
+    const mb = s.match(/([\d.]+)\s*MB/i);
+    if (mb) return parseFloat(mb[1]) || 0;
+    const kb = s.match(/([\d.]+)\s*KB/i);
+    if (kb) return (parseFloat(kb[1]) || 0) / 1024;
+    const b = s.match(/([\d.]+)\s*B/i);
+    if (b) return (parseFloat(b[1]) || 0) / (1024 * 1024);
+    const num = parseFloat(s);
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Card 1: Personal Vault Sparkline (Real breakdown across essential document categories)
+  const personalDocsSparkData = useMemo(() => {
+    const categories = [
+      { key: 'CONTRACT', label: 'Contract', full: 'Contracts & Employment Agreements' },
+      { key: 'CERTIFICATE', label: 'Cert', full: 'Certificates & Professional Licenses' },
+      { key: 'ID', label: 'ID/Pass', full: 'Identity Proofs & Passports' },
+      { key: 'ACADEMIC', label: 'Academic', full: 'Academic Degrees & Diplomas' },
+      { key: 'TAX_FORM', label: 'Tax', full: 'Tax Filings & Compliance Forms' },
+    ];
+
+    return categories.map((cat) => {
+      const count = personalDocs.filter((d) => {
+        const t = (d.type || '').toUpperCase();
+        if (cat.key === 'ID') return t.includes('ID') || t.includes('PASSPORT') || t.includes('CNIC');
+        if (cat.key === 'CERTIFICATE') return t.includes('CERTIFICATE') || t.includes('LICENSE');
+        if (cat.key === 'CONTRACT') return t.includes('CONTRACT') || t.includes('AGREEMENT') || t.includes('OFFER');
+        if (cat.key === 'TAX_FORM') return t.includes('TAX');
+        if (cat.key === 'ACADEMIC') return t.includes('ACADEMIC') || t.includes('DEGREE') || t.includes('DIPLOMA');
+        return t === cat.key;
+      }).length;
+      return {
+        value: count,
+        label: cat.label,
+        tooltip: `${cat.full}: ${count} ${count === 1 ? 'file' : 'files'} stored`,
+      };
+    });
   }, [personalDocs]);
 
+  const personalBadge = useMemo(() => {
+    if (personalDocs.length === 0) {
+      return { text: '0 Files', type: 'neutral', icon: 'dot', sub: 'Personal Vault Empty' };
+    }
+    const verified = personalDocs.filter((d) => (d.status || '').toUpperCase() === 'VERIFIED').length;
+    if (verified === personalDocs.length) {
+      return { text: '100% Verified', type: 'positive', icon: 'up', sub: `${personalDocs.length} Verified Files Stored` };
+    }
+    return {
+      text: `${verified}/${personalDocs.length} Verified`,
+      type: 'warning',
+      icon: 'dot',
+      sub: `${personalDocs.length - verified} Awaiting HR Verification`,
+    };
+  }, [personalDocs]);
+
+  // Card 2: Company Handbooks Sparkline (Real breakdown across policy taxonomies)
   const policiesSparkData = useMemo(() => {
-    if (!policies.length) return [{ value: 0, label: 'Empty', tooltip: 'No policies' }];
-    const counts = {};
-    policies.forEach((p) => {
-      const cat = p.categoryLabel || p.category || 'General';
-      counts[cat] = (counts[cat] || 0) + 1;
+    const policyCats = [
+      { key: 'GOVERNANCE', label: 'Gov', full: 'Corporate Governance & Ethics' },
+      { key: 'SECURITY', label: 'Security', full: 'Information Security & Privacy' },
+      { key: 'WORKPLACE', label: 'Workplace', full: 'Workplace Conduct & Safety' },
+      { key: 'COMPENSATION', label: 'Benefits', full: 'Compensation & Benefit Charters' },
+      { key: 'OPERATIONS', label: 'Ops', full: 'Standard Operating Procedures' },
+    ];
+
+    return policyCats.map((cat) => {
+      const count = policies.filter((p) => {
+        const c = (p.category || '').toUpperCase();
+        return c.includes(cat.key);
+      }).length;
+      return {
+        value: count,
+        label: cat.label,
+        tooltip: `${cat.full}: ${count} active ${count === 1 ? 'charter' : 'charters'}`,
+      };
     });
-    return Object.entries(counts).map(([label, count]) => ({
-      value: count,
-      label: label.length > 8 ? label.substring(0, 8) + '..' : label,
-      tooltip: `${label}: ${count} active policies`,
-    }));
   }, [policies]);
 
+  const policiesBadge = useMemo(() => {
+    if (policies.length === 0) {
+      return { text: '0 Policies', type: 'neutral', icon: 'dot', sub: 'No Handbooks Published' };
+    }
+    const distinctCats = new Set(policies.map((p) => p.category)).size;
+    return {
+      text: `${distinctCats} Active Categories`,
+      type: 'positive',
+      icon: 'up',
+      sub: 'Governing All Operating Divisions',
+    };
+  }, [policies]);
+
+  // Card 3: Authenticity & Compliance Sparkline
   const verifiedPersonalCount = useMemo(() => {
     return personalDocs.filter((d) => (d.status || '').toUpperCase() === 'VERIFIED').length;
   }, [personalDocs]);
@@ -694,34 +762,100 @@ const EmployeeDocuments = () => {
 
   const complianceSparkData = useMemo(() => {
     if (!personalDocs.length) {
-      return [{ value: 100, label: 'Audit', tooltip: 'Vault Clean & Compliant' }];
+      return [
+        { value: 100, label: 'Audit', tooltip: 'Statutory Baseline: 100% Compliant' },
+        { value: 100, label: 'Cipher', tooltip: 'AES-256 Vault Encryption: Active' },
+        { value: 100, label: 'SOC-2', tooltip: 'SOC-2 Type II Storage: Verified' },
+        { value: 100, label: 'Score', tooltip: 'Dossier Compliance: 100.0%' },
+      ];
     }
+    const total = personalDocs.length;
+    const verified = verifiedPersonalCount;
+    const pending = total - verified;
+    const rate = parseFloat(complianceRate) || 0;
+    const verifiedPct = Math.round((verified / total) * 100);
+    const pendingPct = Math.round((pending / total) * 100);
+
     return [
-      { value: 95, label: 'Offer', tooltip: 'Offer & Contract Verified' },
-      { value: 98, label: 'NDA', tooltip: 'Proprietary IP Assignment Verified' },
-      { value: 100, label: 'Audit', tooltip: 'Statutory Verification Complete' },
+      { value: total, label: 'Files', tooltip: `Total Vault Files: ${total} Stored` },
+      { value: verified, label: 'Verified', tooltip: `Verified & Authenticated: ${verified} Files (${verifiedPct}%)` },
+      { value: pending, label: 'Pending', tooltip: `Under Verification: ${pending} Files (${pendingPct}%)` },
+      { value: Math.round(rate), label: 'Score', tooltip: `Overall Compliance Score: ${rate}%` },
     ];
+  }, [personalDocs, verifiedPersonalCount, complianceRate]);
+
+  const complianceBadge = useMemo(() => {
+    if (personalDocs.length === 0) {
+      return { text: 'Audit Ready', type: 'positive', icon: 'up', sub: 'Baseline Clean Vault' };
+    }
+    const rate = parseFloat(complianceRate) || 0;
+    if (rate >= 90) {
+      return { text: `${rate}% Audited`, type: 'positive', icon: 'up', sub: 'All Mandatory Dossiers Verified' };
+    }
+    return {
+      text: `${verifiedPersonalCount}/${personalDocs.length} Verified`,
+      type: 'warning',
+      icon: 'down',
+      sub: `${personalDocs.length - verifiedPersonalCount} Pending Document Audits`,
+    };
+  }, [personalDocs, verifiedPersonalCount, complianceRate]);
+
+  // Card 4: Vault Storage Telemetry & Sparkline
+  const personalDocsMB = useMemo(() => {
+    return personalDocs.reduce((acc, d) => acc + parseFileSizeInMB(d.size), 0);
   }, [personalDocs]);
 
-  const totalVaultMB = useMemo(() => {
-    if (!personalDocs.length && !policies.length) return '0.0';
-    const parseSize = (s) => {
-      if (!s || typeof s !== 'string') return 0;
-      const m = s.match(/([\d.]+)\s*MB/i);
-      return m ? parseFloat(m[1]) : 0;
-    };
-    const pMB = personalDocs.reduce((acc, d) => acc + parseSize(d.size), 0);
-    const polMB = policies.reduce((acc, p) => acc + parseSize(p.size), 0);
-    return (pMB + polMB).toFixed(1);
-  }, [personalDocs, policies]);
+  const policiesMB = useMemo(() => {
+    return policies.reduce((acc, p) => acc + parseFileSizeInMB(p.size), 0);
+  }, [policies]);
 
-  const securitySparkData = useMemo(() => {
+  const totalVaultMB = useMemo(() => {
+    return (personalDocsMB + policiesMB).toFixed(1);
+  }, [personalDocsMB, policiesMB]);
+
+  const storageSparkData = useMemo(() => {
+    const pMB = Number(personalDocsMB.toFixed(1));
+    const polMB = Number(policiesMB.toFixed(1));
+    const totalMB = Number((pMB + polMB).toFixed(1));
+    const cloudQuota = 50.0;
+    const remainingQuota = Math.max(0, Number((cloudQuota - totalMB).toFixed(1)));
+
     return [
-      { value: 128, label: '2FA', tooltip: 'Multi-Factor Key Auth: Verified' },
-      { value: 192, label: 'TLS', tooltip: 'TLS 1.3 End-to-End Encryption' },
-      { value: 256, label: 'AES', tooltip: 'AES-256 Cloud Vault Encryption' },
+      {
+        value: pMB,
+        label: 'Vault',
+        tooltip: `Personal Dossier: ${pMB} MB (${personalDocs.length} ${personalDocs.length === 1 ? 'file' : 'files'})`,
+      },
+      {
+        value: polMB,
+        label: 'Charters',
+        tooltip: `Company Handbooks: ${polMB} MB (${policies.length} ${policies.length === 1 ? 'policy' : 'policies'})`,
+      },
+      {
+        value: totalMB,
+        label: 'Total',
+        tooltip: `Total Encrypted Stored: ${totalMB} MB Used`,
+      },
+      {
+        value: remainingQuota,
+        label: 'Free',
+        tooltip: `Available Cloud Space: ${remainingQuota} MB (of ${cloudQuota} MB Quota)`,
+      },
     ];
-  }, []);
+  }, [personalDocsMB, policiesMB, personalDocs.length, policies.length]);
+
+  const storageBadge = useMemo(() => {
+    const totalMB = parseFloat(totalVaultMB) || 0;
+    if (totalMB === 0) {
+      return { text: '50 MB Free', type: 'neutral', icon: 'dot', sub: 'AES-256 Cloud Allocated' };
+    }
+    return {
+      text: `${totalVaultMB} MB / 50 MB`,
+      type: 'positive',
+      icon: 'up',
+      sub: `${personalDocs.length + policies.length} Encrypted Files Stored`,
+    };
+  }, [totalVaultMB, personalDocs.length, policies.length]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
@@ -797,10 +931,10 @@ const EmployeeDocuments = () => {
           title="Personal Vault"
           value={personalDocs.length}
           unit={personalDocs.length === 1 ? 'File' : 'Files'}
-          badgeText="100% Encrypted"
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Self-Service Verified Files"
+          badgeText={personalBadge.text}
+          badgeType={personalBadge.type}
+          badgeIcon={personalBadge.icon}
+          subtext={personalBadge.sub}
           chartColor="purple"
           presetWave="wave1"
           dataPoints={personalDocsSparkData}
@@ -812,11 +946,11 @@ const EmployeeDocuments = () => {
           variant="light"
           title="Company Handbooks"
           value={policies.length}
-          unit="Policies"
-          badgeText="FY26 Certified"
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Official Governance Charters"
+          unit={policies.length === 1 ? 'Policy' : 'Policies'}
+          badgeText={policiesBadge.text}
+          badgeType={policiesBadge.type}
+          badgeIcon={policiesBadge.icon}
+          subtext={policiesBadge.sub}
           chartColor="coral"
           presetWave="wave2"
           dataPoints={policiesSparkData}
@@ -829,10 +963,10 @@ const EmployeeDocuments = () => {
           title="Compliance State"
           value={`${complianceRate}%`}
           unit="Verified"
-          badgeText={`${verifiedPersonalCount}/${personalDocs.length} Verified`}
-          badgeType={Number(complianceRate) >= 90 ? 'positive' : 'warning'}
-          badgeIcon="up"
-          subtext="Mandatory Dossiers Verified"
+          badgeText={complianceBadge.text}
+          badgeType={complianceBadge.type}
+          badgeIcon={complianceBadge.icon}
+          subtext={complianceBadge.sub}
           chartColor="amber"
           presetWave="wave3"
           dataPoints={complianceSparkData}
@@ -845,13 +979,13 @@ const EmployeeDocuments = () => {
           title="Vault Storage"
           value={totalVaultMB}
           unit="MB Stored"
-          badgeText={`${personalDocs.length + policies.length} Files`}
-          badgeType="neutral"
-          badgeIcon="dot"
-          subtext="Encrypted Cloud Repository"
+          badgeText={storageBadge.text}
+          badgeType={storageBadge.type}
+          badgeIcon={storageBadge.icon}
+          subtext={storageBadge.sub}
           chartColor="rose"
           presetWave="wave4"
-          dataPoints={securitySparkData}
+          dataPoints={storageSparkData}
           loading={loading}
         />
       </div>

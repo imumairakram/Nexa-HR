@@ -216,7 +216,7 @@ const SparkMetricCard = ({
     }
 
     return multipliers.map((mult, i) => {
-      const pointVal = Math.round((current === 0 ? (isDownTrend ? 4 - i * 0.6 : i * 0.6) : current * mult) * 10) / 10;
+      const pointVal = Math.round((current === 0 ? 0 : current * mult) * 10) / 10;
       const safePointVal = isNaN(pointVal) ? 0 : Math.max(0, pointVal);
       return {
         value: safePointVal,
@@ -266,10 +266,11 @@ const SparkMetricCard = ({
 
       let y;
       if (isFlat) {
-        const harmonicFactor = flatHarmonicOffsets[i % flatHarmonicOffsets.length] || 0.5;
-        const baselineOffset = p.value === 0 ? 0.3 : 0.5;
-        const normalizedH = baselineOffset * 0.4 + harmonicFactor * 0.6;
-        y = height - paddingBottom - normalizedH * (height - paddingTop - paddingBottom);
+        if (p.value === 0) {
+          y = height - paddingBottom - 2;
+        } else {
+          y = height / 2;
+        }
       } else {
         const range = max - min;
         const normalizedY = range !== 0 ? (p.value - min) / range : 0.5;
