@@ -159,6 +159,12 @@ const onboardEmployee = async (req, res) => {
           emergencyContact: emergencyContact ? emergencyContact.trim() : null,
           departmentId: resolvedDeptId,
           designationId: resolvedDesigId,
+          bankName: bankName ? bankName.trim() : 'Standard Chartered Bank',
+          accountTitle: accountTitle ? accountTitle.trim() : `${firstName} ${lastName}`.trim(),
+          accountNumber: accountNumber ? accountNumber.trim() : null,
+          branchCode: branchCode ? branchCode.trim() : null,
+          payoutMethod: payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer',
+          ntnNumber: ntnNumber ? ntnNumber.trim() : null,
         },
         include: {
           department: { select: { id: true, name: true, code: true } },
@@ -450,6 +456,13 @@ const updateEmployee = async (req, res) => {
       otherAllowances,
       taxDeductions,
       otherDeductions,
+      bankName,
+      accountTitle,
+      accountNumber,
+      branchCode,
+      payoutMethod,
+      taxStatus,
+      ntnNumber,
     } = req.body;
 
     const existingUser = await prisma.user.findUnique({
@@ -587,6 +600,13 @@ const updateEmployee = async (req, res) => {
       if (emergencyContact !== undefined) profileUpdates.emergencyContact = emergencyContact ? emergencyContact.trim() : null;
       if (resolvedDeptId !== undefined) profileUpdates.departmentId = resolvedDeptId || null;
       if (resolvedDesigId !== undefined) profileUpdates.designationId = resolvedDesigId || null;
+      if (bankName !== undefined) profileUpdates.bankName = bankName ? bankName.trim() : null;
+      if (accountTitle !== undefined) profileUpdates.accountTitle = accountTitle ? accountTitle.trim() : null;
+      if (accountNumber !== undefined) profileUpdates.accountNumber = accountNumber ? accountNumber.trim() : null;
+      if (branchCode !== undefined) profileUpdates.branchCode = branchCode ? branchCode.trim() : null;
+      if (payoutMethod !== undefined) profileUpdates.payoutMethod = payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer';
+      if (taxStatus !== undefined) profileUpdates.taxStatus = taxStatus ? taxStatus.trim() : null;
+      if (ntnNumber !== undefined) profileUpdates.ntnNumber = ntnNumber ? ntnNumber.trim() : null;
 
       let updatedProfile = null;
       if (existingUser.profile) {

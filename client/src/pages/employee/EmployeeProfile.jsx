@@ -29,6 +29,9 @@ import {
   Trash2,
   Building2,
   Home,
+  Edit3,
+  Copy,
+  X,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { ProfileSkeleton } from '../../components/common/Skeleton';
@@ -36,6 +39,24 @@ import { api } from '../../services/api';
 import { isDemoSessionActive, showDemoToast } from '../../demo/demoSession';
 
 const DEFAULT_AVATAR = '/blank-profile-picture.png';
+
+const BANK_OPTIONS = [
+  'Standard Chartered Bank',
+  'Habib Bank Limited (HBL)',
+  'Meezan Bank (Islamic Banking)',
+  'United Bank Limited (UBL)',
+  'MCB Bank Limited',
+  'Bank Alfalah',
+  'Allied Bank Limited (ABL)',
+  'Faysal Bank',
+  'Askari Bank',
+  'Dubai Islamic Bank',
+  'Bank of Punjab (BOP)',
+  'National Bank of Pakistan (NBP)',
+  'Soneri Bank',
+  'Nayapay / Sadapay (Fintech)',
+  'CUSTOM',
+];
 
 // Helper to reliably parse Emergency Contact string into individual fields
 const parseEmergencyInfo = (rawStr, fallbackName = '', fallbackRel = 'Parent / Guardian', fallbackPhone = '') => {
@@ -145,6 +166,7 @@ const EmployeeProfile = () => {
     emergencyPhone: '',
     // Payroll & Bank Details
     bankName: '',
+    accountTitle: '',
     accountNumber: '',
     branchCode: '',
     payoutMethod: 'Direct Bank Transfer',
@@ -152,6 +174,10 @@ const EmployeeProfile = () => {
     taxStatus: '',
     providentFund: '',
   });
+
+  const [isEditingBank, setIsEditingBank] = useState(false);
+  const [isSavingBank, setIsSavingBank] = useState(false);
+  const [copiedIban, setCopiedIban] = useState(false);
 
   // Password state
   const [passwords, setPasswords] = useState({
@@ -182,12 +208,13 @@ const EmployeeProfile = () => {
     const rawEmpType = u.profile?.employmentType || u.employmentType || 'FULL_TIME';
 
     const resolvedBank = u.bankDetails || {};
-    const bankName = resolvedBank.bankName || u.bankName || '';
-    const accountNumber = resolvedBank.accountNumber || u.accountNumber || '';
-    const branchCode = resolvedBank.branchCode || u.branchCode || '';
-    const payoutMethod = resolvedBank.payoutMethod || u.payoutMethod || 'Direct Bank Transfer';
-    const taxStatus = resolvedBank.taxStatus || u.taxStatus || '';
-    const ntnNumber = resolvedBank.ntnNumber || u.ntnNumber || '';
+    const bankName = resolvedBank.bankName || u.profile?.bankName || u.bankName || '';
+    const accountTitle = resolvedBank.accountTitle || u.profile?.accountTitle || u.accountTitle || `${u.firstName || ''} ${u.lastName || ''}`.trim();
+    const accountNumber = resolvedBank.accountNumber || u.profile?.accountNumber || u.accountNumber || '';
+    const branchCode = resolvedBank.branchCode || u.profile?.branchCode || u.branchCode || '';
+    const payoutMethod = resolvedBank.payoutMethod || u.profile?.payoutMethod || u.payoutMethod || 'Direct Bank Transfer';
+    const taxStatus = resolvedBank.taxStatus || u.profile?.taxStatus || u.taxStatus || '';
+    const ntnNumber = resolvedBank.ntnNumber || u.profile?.ntnNumber || u.ntnNumber || '';
     const providentFund = resolvedBank.providentFund || u.providentFund || '';
 
     setFormData((prev) => ({
@@ -216,6 +243,7 @@ const EmployeeProfile = () => {
       emergencyRelation: parsedEmergency.emergencyRelation || prev.emergencyRelation || 'Parent / Guardian',
       emergencyPhone: parsedEmergency.emergencyPhone || prev.emergencyPhone,
       bankName,
+      accountTitle,
       accountNumber,
       branchCode,
       payoutMethod,
@@ -403,6 +431,12 @@ const EmployeeProfile = () => {
         gender: formData.gender,
         dateOfBirth: formData.dob || null,
         emergencyContact: contactSummary,
+        bankName: formData.bankName,
+        accountTitle: formData.accountTitle,
+        accountNumber: formData.accountNumber,
+        branchCode: formData.branchCode,
+        payoutMethod: formData.payoutMethod,
+        ntnNumber: formData.ntnNumber,
       };
 
       const res = await api.updateMyProfile(updatePayload);
@@ -457,6 +491,54 @@ const EmployeeProfile = () => {
       showToast('Profile information saved successfully!');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveBank = async (e) => {
+    if (e) e.preventDefault();
+    if (isGuest) {
+      showDemoToast('Demo mode: view only. Changes are disabled.');
+      return;
+    }
+    setIsSavingBank(true);
+    try {
+      const payload = {
+        bankName: formData.bankName,
+        accountTitle: formData.accountTitle || `${formData.firstName} ${formData.lastName}`.trim(),
+        accountNumber: formData.accountNumber,
+        branchCode: formData.branchCode,
+        payoutMethod: formData.payoutMethod,
+        ntnNumber: formData.ntnNumber,
+      };
+
+      const res = await api.updateMyProfile(payload);
+      if (res?.success && res.data?.user) {
+        populateUserData(res.data.user);
+      }
+
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const updatedUser = {
+        ...storedUser,
+        bankDetails: {
+          ...(storedUser.bankDetails || {}),
+          ...payload,
+        },
+        ...payload,
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      window.dispatchEvent(new Event('user_profile_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      showToast('Corporate bank details verified & saved successfully in database!');
+      setIsEditingBank(false);
+    } catch (err) {
+      if (err.name === 'DemoModeError' || err.code === 'DEMO_MODE') {
+        showDemoToast('Demo mode: view only. Changes are disabled.');
+        return;
+      }
+      showToast(err.message || 'Failed to update bank details.');
+    } finally {
+      setIsSavingBank(false);
     }
   };
 
@@ -604,28 +686,28 @@ const EmployeeProfile = () => {
                   )}
                 </div>
 
-                <p className="text-sm font-semibold text-slate-300">
-                  {formData.designation || 'Team Member'} <span className="text-slate-500">•</span> {formData.department || 'Operations'}
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  {formData.designation || 'Team Member'} <span className="text-slate-400 dark:text-slate-500">•</span> {formData.department || 'Operations'}
                 </p>
 
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-slate-400 pt-1">
-                  <span className="flex items-center gap-1.5 text-slate-300">
-                    <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs pt-1">
+                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
+                    <Mail className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     <span>{formData.email || 'Email Not Added'}</span>
                   </span>
-                  <span className="hidden sm:inline text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5 text-slate-300">
-                    <Phone className="w-3.5 h-3.5 text-sky-400" />
+                  <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
+                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
+                    <Phone className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     <span>{formData.phone || 'Phone Not Added'}</span>
                   </span>
-                  <span className="hidden sm:inline text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5 text-slate-300" title="Assigned Office Work Location">
-                    <Building2 className="w-3.5 h-3.5 text-sky-400" />
+                  <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
+                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium" title="Assigned Office Work Location">
+                    <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     <span>{formData.workLocation || 'Islamabad HQ & Innovation Lab'}</span>
                   </span>
-                  <span className="hidden sm:inline text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5 text-slate-300" title="Residential Home Address">
-                    <Home className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
+                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium" title="Residential Home Address">
+                    <Home className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                     <span>{formData.address || 'Home Address Not Added'}</span>
                   </span>
                 </div>
@@ -964,7 +1046,7 @@ const EmployeeProfile = () => {
                 </div>
               </div>
 
-              {/* CARD 3: BANK DETAILS (VERIFIED BY HR) */}
+              {/* CARD 3: BANK DETAILS (FUNCTIONAL WITH EMPLOYEE PROFILE) */}
               <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
                   <div className="flex items-center gap-3">
@@ -973,46 +1055,226 @@ const EmployeeProfile = () => {
                     </div>
                     <div>
                       <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Bank Details</h3>
-                      <p className="text-xs text-slate-400 font-medium">Corporate salary account</p>
+                      <p className="text-xs text-slate-400 font-medium">Corporate salary disbursement account</p>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${formData.accountNumber
-                      ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border-sky-200 dark:border-sky-800/60'
-                      : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                    }`}>
-                    <span>{formData.accountNumber ? 'Verified by HR' : 'Pending Configuration'}</span>
-                  </span>
-                </div>
 
-                {/* Clean Key-Value List */}
-                <div className="space-y-3 text-xs">
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Bank Name</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Not Configured'}</span>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Account Title</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">
-                      {formData.firstName || 'Employee'} {formData.lastName || ''}
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${formData.accountNumber
+                        ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border-sky-200 dark:border-sky-800/60'
+                        : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                      }`}>
+                      <span>{formData.accountNumber ? 'Verified by HR' : 'Pending Configuration'}</span>
                     </span>
-                  </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Account / IBAN</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'Pending Configuration'}</span>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Branch Code</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || 'Not Set'}</span>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Payout Method</span>
-                    <span className="font-bold text-sky-600 dark:text-sky-400">{formData.payoutMethod || 'Direct Bank Transfer'}</span>
+                    {!isEditingBank ? (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingBank(true)}
+                        className="px-2.5 py-1 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/60 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        title="Edit Bank Details"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingBank(false)}
+                        className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        title="Cancel Editing"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        <span>Cancel</span>
+                      </button>
+                    )}
                   </div>
                 </div>
+
+                {!isEditingBank ? (
+                  /* Read-Only Clean Key-Value List with Copy & Status */
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                      <span className="text-slate-400 font-semibold">Bank Name</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Standard Chartered Bank'}</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                      <span className="text-slate-400 font-semibold">Account Title</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
+                        {formData.accountTitle || `${formData.firstName || 'Employee'} ${formData.lastName || ''}`.trim() || 'Employee Account'}
+                      </span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                      <span className="text-slate-400 font-semibold">Account / IBAN</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                          {formData.accountNumber || 'Pending Configuration'}
+                        </span>
+                        {formData.accountNumber && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(formData.accountNumber);
+                              setCopiedIban(true);
+                              showToast('Account / IBAN copied to clipboard!');
+                              setTimeout(() => setCopiedIban(false), 2000);
+                            }}
+                            className="text-slate-400 hover:text-sky-500 cursor-pointer p-0.5"
+                            title="Copy Account / IBAN"
+                          >
+                            {copiedIban ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                      <span className="text-slate-400 font-semibold">Branch Code</span>
+                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || '0142 (Corporate Wing)'}</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                      <span className="text-slate-400 font-semibold">Payout Method</span>
+                      <span className="font-bold text-sky-600 dark:text-sky-400">{formData.payoutMethod || 'Direct Bank Transfer'}</span>
+                    </div>
+
+                    {formData.ntnNumber && (
+                      <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span className="text-slate-400 font-semibold">Tax NTN / Registration</span>
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.ntnNumber}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Interactive Form Mode to update Bank Details */
+                  <form onSubmit={handleSaveBank} className="space-y-4 text-xs animate-in fade-in">
+                    <div>
+                      <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Designated Bank *</label>
+                      <select
+                        value={BANK_OPTIONS.includes(formData.bankName) ? formData.bankName : (formData.bankName ? 'CUSTOM' : 'Standard Chartered Bank')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === 'CUSTOM') {
+                            setFormData({ ...formData, bankName: '' });
+                          } else {
+                            setFormData({ ...formData, bankName: val });
+                          }
+                        }}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
+                      >
+                        {BANK_OPTIONS.map((b) => (
+                          <option key={b} value={b}>
+                            {b === 'CUSTOM' ? 'Other Commercial Bank / Financial Institution...' : b}
+                          </option>
+                        ))}
+                      </select>
+                      {(!BANK_OPTIONS.includes(formData.bankName) || formData.bankName === '') && (
+                        <input
+                          type="text"
+                          required
+                          placeholder="Enter complete bank name"
+                          value={formData.bankName}
+                          onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                          className="mt-2 w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                        Account Title (Beneficiary Name) *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder={`${formData.firstName || ''} ${formData.lastName || ''}`.trim() || 'e.g. John Doe'}
+                        value={formData.accountTitle}
+                        onChange={(e) => setFormData({ ...formData, accountTitle: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                        Account / IBAN Number *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. PK72 SCBL 0000 0012 3456 7801"
+                        value={formData.accountNumber}
+                        onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Branch Code / Routing</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 0142 (Corporate Wing)"
+                          value={formData.branchCode}
+                          onChange={(e) => setFormData({ ...formData, branchCode: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Disbursement Method</label>
+                        <select
+                          value={formData.payoutMethod || 'Direct Bank Transfer'}
+                          onChange={(e) => setFormData({ ...formData, payoutMethod: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
+                        >
+                          <option value="Direct Bank Transfer">Direct Bank Transfer (Raast / IBFT)</option>
+                          <option value="Crossed Cheque">Crossed Corporate Cheque</option>
+                          <option value="Cash Payout">Cash Payout Voucher</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Tax Registration NTN (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. NTN-9842101-7"
+                        value={formData.ntnNumber}
+                        onChange={(e) => setFormData({ ...formData, ntnNumber: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingBank(false)}
+                        className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSavingBank}
+                        className="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-sky-500/20 cursor-pointer disabled:opacity-50 transition-all"
+                      >
+                        {isSavingBank ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-3.5 h-3.5" />
+                            <span>Save Bank Details</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           </div>

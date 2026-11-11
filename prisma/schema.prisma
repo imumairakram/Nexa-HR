@@ -162,6 +162,13 @@ model EmployeeProfile {
   emergencyContact String?
   departmentId     String?
   designationId    String?
+  bankName         String?   @default("Standard Chartered Bank")
+  accountTitle     String?
+  accountNumber    String?
+  branchCode       String?
+  payoutMethod     String?   @default("Direct Bank Transfer")
+  taxStatus        String?   @default("Active Filer")
+  ntnNumber        String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 

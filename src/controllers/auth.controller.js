@@ -453,16 +453,16 @@ const getMe = async (req, res) => {
       console.warn('Reporting manager dynamic resolution notice:', mgrErr.message);
     }
 
-    // Generate dynamic Corporate Bank & Payroll details for employee
+    // Dynamic Corporate Bank & Payroll details for employee from profile with fallback
     const empNumDigits = (user.employeeCode || '101').replace(/[^0-9]/g, '').padStart(6, '0');
     const bankDetails = {
-      bankName: 'Standard Chartered Bank (Corporate Wing)',
-      accountTitle: `${user.firstName} ${user.lastName}`,
-      accountNumber: `PK72SCBL000000${empNumDigits}01`,
-      branchCode: '0142 (Corporate Wing)',
-      payoutMethod: 'Direct Bank Transfer',
-      taxStatus: 'Verified Active Filer',
-      ntnNumber: `NTN-9842${empNumDigits.slice(-3)}-7`,
+      bankName: user.profile?.bankName || 'Standard Chartered Bank',
+      accountTitle: user.profile?.accountTitle || `${user.firstName} ${user.lastName}`,
+      accountNumber: user.profile?.accountNumber || `PK72SCBL000000${empNumDigits}01`,
+      branchCode: user.profile?.branchCode || '0142 (Corporate Wing)',
+      payoutMethod: user.profile?.payoutMethod || 'Direct Bank Transfer',
+      taxStatus: user.profile?.taxStatus || 'Verified Active Filer',
+      ntnNumber: user.profile?.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`,
       providentFund: 'Enrolled (8.33% Tier)',
     };
 
@@ -1101,6 +1101,13 @@ const updateMyProfile = async (req, res) => {
       dateOfBirth,
       departmentId,
       designationId,
+      bankName,
+      accountTitle,
+      accountNumber,
+      branchCode,
+      payoutMethod,
+      taxStatus,
+      ntnNumber,
     } = req.body;
 
     const user = await prisma.user.findUnique({
@@ -1162,6 +1169,13 @@ const updateMyProfile = async (req, res) => {
       if (dateOfBirth !== undefined) profileUpdates.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
       if (departmentId !== undefined) profileUpdates.departmentId = departmentId || null;
       if (designationId !== undefined) profileUpdates.designationId = designationId || null;
+      if (bankName !== undefined) profileUpdates.bankName = bankName ? bankName.trim() : null;
+      if (accountTitle !== undefined) profileUpdates.accountTitle = accountTitle ? accountTitle.trim() : null;
+      if (accountNumber !== undefined) profileUpdates.accountNumber = accountNumber ? accountNumber.trim() : null;
+      if (branchCode !== undefined) profileUpdates.branchCode = branchCode ? branchCode.trim() : null;
+      if (payoutMethod !== undefined) profileUpdates.payoutMethod = payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer';
+      if (taxStatus !== undefined) profileUpdates.taxStatus = taxStatus ? taxStatus.trim() : null;
+      if (ntnNumber !== undefined) profileUpdates.ntnNumber = ntnNumber ? ntnNumber.trim() : null;
 
       if (user.profile) {
         await tx.employeeProfile.update({
@@ -1230,13 +1244,13 @@ const updateMyProfile = async (req, res) => {
 
     const empNumDigits = (updatedUser.employeeCode || '101').replace(/[^0-9]/g, '').padStart(6, '0');
     const bankDetails = {
-      bankName: 'Standard Chartered Bank (Corporate Wing)',
-      accountTitle: `${updatedUser.firstName} ${updatedUser.lastName}`,
-      accountNumber: `PK72SCBL000000${empNumDigits}01`,
-      branchCode: '0142 (Corporate Wing)',
-      payoutMethod: 'Direct Bank Transfer',
-      taxStatus: 'Verified Active Filer',
-      ntnNumber: `NTN-9842${empNumDigits.slice(-3)}-7`,
+      bankName: updatedUser.profile?.bankName || 'Standard Chartered Bank',
+      accountTitle: updatedUser.profile?.accountTitle || `${updatedUser.firstName} ${updatedUser.lastName}`,
+      accountNumber: updatedUser.profile?.accountNumber || `PK72SCBL000000${empNumDigits}01`,
+      branchCode: updatedUser.profile?.branchCode || '0142 (Corporate Wing)',
+      payoutMethod: updatedUser.profile?.payoutMethod || 'Direct Bank Transfer',
+      taxStatus: updatedUser.profile?.taxStatus || 'Verified Active Filer',
+      ntnNumber: updatedUser.profile?.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`,
       providentFund: 'Enrolled (8.33% Tier)',
     };
 
