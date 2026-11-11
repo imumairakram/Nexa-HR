@@ -58,7 +58,7 @@ const JobsWorkspace = () => {
     location: 'Islamabad HQ / Remote',
     type: 'Full-Time',
     experience: '3 - 5 Years',
-    salary: 'PKR 120k - 150k',
+    salary: 'PKR 120k - PKR 150k',
     status: 'ACTIVE',
     description: '',
   });
@@ -95,7 +95,7 @@ const JobsWorkspace = () => {
                     location: u.location || 'Islamabad HQ / Remote',
                     type: u.type || 'Full-Time',
                     experience: u.experience || '3+ Years',
-                    salary: u.salary || 'PKR 100k - 140k',
+                    salary: u.salary || 'PKR 100k - PKR 140k',
                     status: u.status || 'ACTIVE',
                     description: u.description || '',
                   });
@@ -174,7 +174,7 @@ const JobsWorkspace = () => {
       location: 'Islamabad HQ / Remote',
       type: 'Full-Time',
       experience: '3 - 5 Years',
-      salary: 'PKR 120k - 150k',
+      salary: 'PKR 120k - PKR 150k',
       status: 'ACTIVE',
       description: '',
     });
@@ -191,7 +191,7 @@ const JobsWorkspace = () => {
       location: job.location || 'Islamabad HQ / Remote',
       type: job.type || 'Full-Time',
       experience: job.experience || '3+ Years',
-      salary: job.salary || 'PKR 120k - 150k',
+      salary: job.salary || 'PKR 120k - PKR 150k',
       status: job.status || 'ACTIVE',
       description: job.description || '',
     });
@@ -215,7 +215,7 @@ const JobsWorkspace = () => {
         location: form.location.trim() || 'Islamabad HQ / Remote',
         type: form.type || 'Full-Time',
         experience: form.experience.trim() || '3+ Years',
-        salary: form.salary.trim() || 'PKR 100k - 140k',
+        salary: form.salary.trim() || 'PKR 100k - PKR 140k',
         status: form.status || 'ACTIVE',
         description: form.description.trim() || 'Role overview and core technical deliverable expectations.',
       };
@@ -1011,7 +1011,7 @@ const JobsWorkspace = () => {
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Compensation Range</label>
                       <input
                         type="text"
-                        placeholder="e.g. PKR 140k - 170k"
+                        placeholder="e.g. PKR 140k - PKR 170k"
                         value={form.salary}
                         onChange={(e) => setForm({ ...form, salary: e.target.value })}
                         className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"

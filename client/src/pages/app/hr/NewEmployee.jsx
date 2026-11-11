@@ -19,12 +19,11 @@ import {
   Home,
   Eye,
   EyeOff,
-  RefreshCw,
   Copy,
   Check,
+  RefreshCw,
   Key,
-  Shield,
-  Info,
+  Sparkles,
 } from 'lucide-react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
@@ -44,6 +43,8 @@ const NewEmployee = () => {
   const [dbDepartments, setDbDepartments] = useState([]);
   const [dbDesignations, setDbDesignations] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [copiedPassword, setCopiedPassword] = useState(false);
   const [orgStats, setOrgStats] = useState({
     totalEmployees: 0,
     totalDepartments: 0,
@@ -148,46 +149,33 @@ const NewEmployee = () => {
     healthInsurance: 'Comprehensive Corporate Plan',
     // Step 4
     systemRole: 'EMPLOYEE',
-    defaultPassword: `Nexa#${Math.floor(1000 + Math.random() * 9000)}@Pk`,
-    mustChangePassword: true,
+    defaultPassword: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [copiedPassword, setCopiedPassword] = useState(false);
-  const [passwordNotice, setPasswordNotice] = useState('');
-
-  const generateDefaultPassword = () => {
-    const specialChars = '@#$!&*';
-    const randSpecial1 = specialChars.charAt(Math.floor(Math.random() * specialChars.length));
-    const randSpecial2 = specialChars.charAt(Math.floor(Math.random() * specialChars.length));
-    const randNum = Math.floor(1000 + Math.random() * 9000);
-    const alphas = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-    const randAlpha = alphas.charAt(Math.floor(Math.random() * alphas.length));
-    const newPass = `Nexa${randSpecial1}${randNum}${randSpecial2}${randAlpha}k`;
+  const handleGeneratePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    const specials = ['#', '@', '!', '$', '%'];
+    const randomSpecial = specials[Math.floor(Math.random() * specials.length)];
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    let randomLetters = '';
+    for (let i = 0; i < 4; i++) {
+      randomLetters += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const newPass = `Nexa${randomSpecial}${randomLetters}${randomNum}`;
     setForm((prev) => ({ ...prev, defaultPassword: newPass }));
-    setPasswordNotice('Generated secure default password');
-    setTimeout(() => setPasswordNotice(''), 2500);
+    setToastMsg(`Generated new default password: ${newPass}`);
+    setTimeout(() => setToastMsg(''), 2500);
   };
 
-  const copyPasswordToClipboard = async () => {
+  const handleCopyPassword = () => {
     if (!form.defaultPassword) return;
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(form.defaultPassword);
-      } else {
-        const textArea = document.createElement('textarea');
-        textArea.value = form.defaultPassword;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-      }
-      setCopiedPassword(true);
-      setTimeout(() => setCopiedPassword(false), 2000);
-    } catch (e) {
-      setCopiedPassword(true);
-      setTimeout(() => setCopiedPassword(false), 2000);
-    }
+    navigator.clipboard.writeText(form.defaultPassword);
+    setCopiedPassword(true);
+    setToastMsg('Default password copied to clipboard!');
+    setTimeout(() => {
+      setCopiedPassword(false);
+      setToastMsg('');
+    }, 2500);
   };
 
   const headcountSparkData = React.useMemo(() => {
@@ -230,18 +218,19 @@ const NewEmployee = () => {
       setToastMsg('Please fill in required fields: First Name, Last Name, and Email.');
       return;
     }
+
     if (!form.defaultPassword || form.defaultPassword.trim().length < 6) {
-      setToastMsg('Please enter a valid default password (minimum 6 characters).');
+      setToastMsg('Please enter a default password with at least 6 characters.');
       return;
     }
 
     try {
       setIsSubmitting(true);
       const payload = {
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        email: form.email.trim(),
-        phone: form.phone ? form.phone.trim() : null,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
         dateOfBirth: form.dob,
         gender: form.gender,
         address: form.address ? form.address.trim() : null,
@@ -254,12 +243,11 @@ const NewEmployee = () => {
         basicSalary: parseFloat(form.baseSalary || 0),
         role: form.systemRole || 'EMPLOYEE',
         password: form.defaultPassword.trim(),
-        mustChangePassword: form.mustChangePassword,
       };
 
       const res = await api.onboardEmployee(payload);
       if (res?.success || res?.data?.employee) {
-        setToastMsg(res?.message || `Employee ${form.firstName} ${form.lastName} onboarded successfully! Welcome email with default credentials sent to ${form.email}.`);
+        setToastMsg(res?.message || `Employee ${form.firstName} ${form.lastName} onboarded successfully! Welcome email sent to ${form.email}.`);
         setTimeout(() => {
           navigate('/app/employees');
         }, 2200);
@@ -650,22 +638,14 @@ const NewEmployee = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
-                  <span>Annual Base Salary (PKR) *</span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Pakistani Rupee</span>
-                </label>
-                <div className="relative flex items-center">
-                  <div className="absolute left-3.5 text-slate-400 font-bold text-xs pointer-events-none">
-                    PKR
-                  </div>
-                  <input
-                    type="number"
-                    placeholder="e.g. 2400000"
-                    value={form.baseSalary}
-                    onChange={(e) => setForm({ ...form, baseSalary: e.target.value })}
-                    className="w-full pl-14 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                  />
-                </div>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Annual Base Salary (PKR) *</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 1800000"
+                  value={form.baseSalary}
+                  onChange={(e) => setForm({ ...form, baseSalary: e.target.value })}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                />
               </div>
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Tax Withholding Bracket</label>
@@ -698,223 +678,198 @@ const NewEmployee = () => {
         {currentStep === 4 && (
           <div className="space-y-6 text-xs animate-in fade-in">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Credentials & System Access Configuration</h3>
-              <p className="text-xs text-slate-400">Configure authentication credentials, default login password, and review employee parameters before database enrollment.</p>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Credentials & System Access Review</h3>
+              <p className="text-xs text-slate-400">Set the initial default login password, select portal permissions, and review the onboarding dossier.</p>
             </div>
 
-            {/* Interactive Default Password Configuration Card */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-sky-50/70 via-blue-50/40 to-indigo-50/30 dark:from-sky-950/30 dark:via-slate-800/60 dark:to-slate-800/40 border border-sky-200/80 dark:border-sky-800/60 space-y-5 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sky-100 dark:border-slate-700/60">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-sm">
-                    <Key className="w-4 h-4 stroke-[2.5]" />
+            {/* Default Password & Security Configuration Card */}
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-sky-50/70 via-blue-50/40 to-indigo-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-sky-100 dark:border-slate-700 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-sky-500/20">
+                    <Key className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-slate-900 dark:text-white text-sm">Default Password & Account Access</h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Initial authentication secret generated for first portal sign-in</p>
+                    <h4 className="font-extrabold text-slate-900 dark:text-white text-sm">Set Default Password & System Access</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-[11px]">Temporary credentials generated for initial employee login</p>
                   </div>
                 </div>
 
-                {passwordNotice && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold text-[11px] animate-in fade-in">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>{passwordNotice}</span>
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGeneratePassword}
+                    className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sky-600 dark:text-sky-400 border border-sky-200/80 dark:border-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Generate Strong Password</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyPassword}
+                    className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                  >
+                    {copiedPassword ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                    <span>{copiedPassword ? 'Copied!' : 'Copy'}</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Grid: Role & Default Password Input */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* System Role Selection */}
+              {/* Password Input & Role Selection */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
-                    <span>Assigned System Role *</span>
-                    <span className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold">RBAC Authorization</span>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                    Default Initial Password *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={form.defaultPassword}
+                      onChange={(e) => setForm({ ...form, defaultPassword: e.target.value })}
+                      placeholder="e.g. Nexa#2026!"
+                      className="w-full pl-10 pr-11 py-3 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold text-xs tracking-wider focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 px-1 font-medium">
+                    <span className={form.defaultPassword.length >= 6 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-amber-500 font-semibold'}>
+                      {form.defaultPassword.length >= 6 ? '✓ Meets minimum 6-character length' : '⚠ Minimum 6 characters required'}
+                    </span>
+                    <span>Dispatched via Email</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
+                    System Role & Access Tier *
                   </label>
                   <select
                     value={form.systemRole}
                     onChange={(e) => setForm({ ...form, systemRole: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
+                    className="w-full px-4 py-3 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer"
                   >
-                    <option value="EMPLOYEE">Standard Employee (Self-Service Portal, Leaves, Payslips)</option>
-                    <option value="HR_MANAGER">HR Manager (Employee Lifecycle, Attendance, Recruitment)</option>
-                    <option value="ADMIN">System Administrator (Full Global Access & System Control)</option>
+                    <option value="EMPLOYEE">EMPLOYEE (Standard Self-Service Roster)</option>
+                    <option value="HR_MANAGER">HR_MANAGER (Talent, Approvals & Operations)</option>
+                    <option value="ADMIN">ADMIN (Super Administrator)</option>
                   </select>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 font-medium">
-                    Controls view permissions, biometric device sync, and approval escalation tiers.
-                  </p>
-                </div>
-
-                {/* Default Password Input with Actions */}
-                <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
-                    <span>Set Default Employee Password *</span>
-                    <span className="text-[10px] text-slate-400 font-medium">Pre-shared or generated</span>
-                  </label>
-
-                  <div className="relative flex items-center">
-                    <div className="absolute left-3.5 text-slate-400 pointer-events-none">
-                      <Lock className="w-4 h-4" />
-                    </div>
-
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={form.defaultPassword}
-                      onChange={(e) => setForm({ ...form, defaultPassword: e.target.value })}
-                      placeholder="Enter default login password..."
-                      className="w-full pl-10 pr-24 py-3 rounded-2xl bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold text-xs tracking-wider focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
-                    />
-
-                    {/* Action icons inside the input right */}
-                    <div className="absolute right-2.5 flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        title={showPassword ? 'Hide password' : 'Show password'}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={copyPasswordToClipboard}
-                        title="Copy password to clipboard"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-slate-700 cursor-pointer transition-colors relative"
-                      >
-                        {copiedPassword ? (
-                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Actions under input: Generate & Quick Copy */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={generateDefaultPassword}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] shadow-xs cursor-pointer transition-all"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      <span>Generate Secure Password</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={copyPasswordToClipboard}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold text-[11px] cursor-pointer transition-all"
-                    >
-                      {copiedPassword ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
-                          <span className="text-emerald-600 dark:text-emerald-400">Copied to Clipboard!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-slate-400" />
-                          <span>Copy Password</span>
-                        </>
-                      )}
-                    </button>
+                  <div className="text-[10px] text-slate-400 mt-1.5 px-1 font-medium">
+                    {form.systemRole === 'EMPLOYEE' && 'Standard access to attendance, personal leaves, payslips & company docs.'}
+                    {form.systemRole === 'HR_MANAGER' && 'Elevated access to directory management, approvals & hiring pipelines.'}
+                    {form.systemRole === 'ADMIN' && 'Comprehensive platform administrative and policy management privilege.'}
                   </div>
                 </div>
               </div>
 
-              {/* Security policy & reset toggle */}
-              <div className="pt-3 border-t border-sky-100/80 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={form.mustChangePassword}
-                    onChange={(e) => setForm({ ...form, mustChangePassword: e.target.checked })}
-                    className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 dark:border-slate-600 cursor-pointer"
-                  />
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
-                    Require employee to change default password on first login
-                  </span>
-                </label>
-
-                <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Encrypted with bcrypt (Salt Rounds: 10)</span>
+              {/* Quick Preset Buttons & Security Guarantees */}
+              <div className="pt-2 border-t border-sky-100/80 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Presets:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, defaultPassword: `Nexa#${Math.floor(1000 + Math.random() * 9000)}` }));
+                      setToastMsg('Applied standard Nexa#XXXX preset');
+                      setTimeout(() => setToastMsg(''), 2000);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
+                  >
+                    Nexa#Random
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, defaultPassword: 'Nexa@2026!' }));
+                      setToastMsg('Applied standard corporate Nexa@2026! preset');
+                      setTimeout(() => setToastMsg(''), 2000);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
+                  >
+                    Nexa@2026!
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, defaultPassword: 'TempPassword123!' }));
+                      setToastMsg('Applied TempPassword123! preset');
+                      setTimeout(() => setToastMsg(''), 2000);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
+                  >
+                    TempPassword123!
+                  </button>
                 </div>
-              </div>
 
-              {/* Informative notification note */}
-              <div className="p-3.5 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-sky-200/50 dark:border-slate-700/60 flex items-start gap-2.5 text-[11px] text-slate-600 dark:text-slate-300">
-                <Info className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
-                <p className="leading-relaxed">
-                  Upon onboarding confirmation, this default password will be securely dispatched to <strong className="text-slate-900 dark:text-white font-mono">{form.email || 'the employee’s work email'}</strong> along with their single-sign-on access link.
-                </p>
+                <div className="flex items-center gap-2 text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-100/70 dark:bg-emerald-950/60 px-2.5 py-1 rounded-xl border border-emerald-200/80 dark:border-emerald-800">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Forces Password Change on 1st Login</span>
+                </div>
               </div>
             </div>
 
-            {/* Review Dossier */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 space-y-3.5">
-              <h4 className="font-extrabold text-slate-900 dark:text-white text-xs uppercase tracking-wider text-slate-400 pb-1 border-b border-slate-200/60 dark:border-slate-700">
-                Final Onboarding Dossier Review
-              </h4>
+            {/* Dossier Final Review Summary Card */}
+            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 space-y-3">
+              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider pb-1 border-b border-slate-100 dark:border-slate-700">
+                Onboarding Dossier Review
+              </div>
 
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Employee Name:</span>
                 <span className="text-slate-900 dark:text-white text-sm">{form.firstName || 'New'} {form.lastName || 'Staff'}</span>
               </div>
-              <div className="flex justify-between items-center font-bold">
-                <span className="text-slate-400">Work Email:</span>
-                <span className="text-slate-900 dark:text-white font-mono">{form.email || 'jordan.hayes@company.com'}</span>
+              <div className="flex justify-between font-bold">
+                <span className="text-slate-400">Corporate Email:</span>
+                <span className="text-slate-900 dark:text-white font-mono">{form.email || 'Not Provided'}</span>
               </div>
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Assigned Department:</span>
-                <span className="text-blue-600 dark:text-blue-400">{form.department || 'Not Selected'}</span>
+                <span className="text-blue-600 dark:text-blue-400">{form.department || 'Not Assigned'}</span>
               </div>
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Designation Role:</span>
-                <span className="text-slate-900 dark:text-white">{form.designation || 'Not Selected'}</span>
+                <span className="text-slate-900 dark:text-white">{form.designation || 'Not Assigned'}</span>
               </div>
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Office Work Location:</span>
                 <span className="text-slate-900 dark:text-white flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5 text-blue-500" />
                   {form.workLocation || 'Islamabad HQ & Innovation Lab'}
                 </span>
               </div>
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Residential Address (Home):</span>
                 <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <Home className="w-3.5 h-3.5 text-amber-500" />
                   {form.address || 'Not Provided'}
                 </span>
               </div>
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Annual Compensation:</span>
                 <span className="text-emerald-600 font-black">PKR {parseFloat(form.baseSalary || 0).toLocaleString()} / yr</span>
               </div>
-              <div className="flex justify-between items-center font-bold">
+              <div className="flex justify-between font-bold">
                 <span className="text-slate-400">System Role Authorization:</span>
                 <span className="text-purple-600 font-extrabold">{form.systemRole}</span>
               </div>
               <div className="flex justify-between items-center font-bold pt-2 border-t border-slate-200/60 dark:border-slate-700">
-                <span className="text-slate-400">Default Login Password:</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sky-600 dark:text-sky-400 font-extrabold">
-                    {showPassword ? form.defaultPassword : '••••••••••••'}
-                  </span>
+                <span className="text-slate-400">Configured Default Password:</span>
+                <div className="flex items-center gap-2 font-mono text-slate-900 dark:text-white bg-white dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <span>{showPassword ? form.defaultPassword : '••••••••••••'}</span>
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                    title={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={copyPasswordToClipboard}
-                    className="p-1 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer"
-                    title="Copy password"
+                    onClick={handleCopyPassword}
+                    className="text-slate-400 hover:text-sky-500 cursor-pointer"
+                    title="Copy default password"
                   >
                     {copiedPassword ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>

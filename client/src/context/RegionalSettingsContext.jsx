@@ -20,13 +20,13 @@ export const TIMEZONE_OPTIONS = [
 
 export const CURRENCY_OPTIONS = [
   { code: 'PKR', symbol: 'PKR ', label: 'PKR - Pakistani Rupee (Default)' },
-  { code: 'USD', symbol: '$', label: 'USD ($) - US Dollar' },
   { code: 'EUR', symbol: '€', label: 'EUR (€) - Euro' },
   { code: 'GBP', symbol: '£', label: 'GBP (£) - British Pound' },
   { code: 'AED', symbol: 'AED ', label: 'AED - UAE Dirham' },
   { code: 'SAR', symbol: 'SAR ', label: 'SAR - Saudi Riyal' },
-  { code: 'CAD', symbol: 'CA$', label: 'CAD ($) - Canadian Dollar' },
   { code: 'INR', symbol: '₹', label: 'INR (₹) - Indian Rupee' },
+  { code: 'CAD', symbol: 'CA$', label: 'CAD - Canadian Dollar' },
+  { code: 'USD', symbol: 'PKR ', label: 'PKR - Pakistani Rupee (USD replaced with PKR)' },
 ];
 
 export const DATE_FORMAT_OPTIONS = [

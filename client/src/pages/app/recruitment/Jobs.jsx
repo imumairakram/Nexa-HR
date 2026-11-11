@@ -75,7 +75,7 @@ const Jobs = () => {
         department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
         location: (form.location || '').trim() || 'Islamabad HQ / Remote',
         type: form.type || 'Full-Time',
-        salary: (form.salary || '').trim() || 'PKR 100k - 140k',
+        salary: (form.salary || '').trim() || 'PKR 100k - PKR 140k',
         status: 'ACTIVE',
       };
 
@@ -456,7 +456,7 @@ const Jobs = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. PKR 140k - 175k / Year"
+                    placeholder="e.g. PKR 140k - PKR 175k / Year"
                     value={form.salary}
                     onChange={(e) => setForm({ ...form, salary: e.target.value })}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"

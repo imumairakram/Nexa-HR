@@ -287,7 +287,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Tax Withholdings"
-          value={`-PKR ${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
+          value={`PKR ${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
           badgeText="Statutory Filing"
           badgeType="warning"
           badgeIcon="dot"
@@ -505,8 +505,7 @@ const PayslipList = () => {
                   </td>
                   <td className="py-4 px-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
-                      
-<span>{p.status}</span>
+                      <span>{p.status}</span>
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
