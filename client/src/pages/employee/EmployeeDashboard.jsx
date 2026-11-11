@@ -441,15 +441,6 @@ const EmployeeDashboard = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           {/* Left Column: Greeting & Digital Clock */}
           <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold">
-              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{employeeShift}</span>
-              </span>
-              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{officeLocation}</span>
-              </span>
-            </div>
-
             <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               {isPresent ? 'Biometric Entry Verified & Active' : 'Automated Biometric Station Active'}
             </h2>
