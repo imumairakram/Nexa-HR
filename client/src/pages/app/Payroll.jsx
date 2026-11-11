@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   CreditCard,
+  ShieldCheck,
   Banknote,
   TrendingUp,
   Download,
@@ -436,12 +437,43 @@ const Payroll = () => {
             </div>
           </>
         ) : (
-          <div className="p-12 text-center flex flex-col items-center justify-center">
-            <CreditCard className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-            <h4 className="text-base font-black text-slate-900 dark:text-white">No Payroll Runs Generated Yet</h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              Click "Run Payroll Batch" above to execute salary disbursements and compute tax deductions for your onboarded employees.
-            </p>
+          <div className="p-12 sm:p-16 text-center space-y-5">
+            <div className="relative inline-flex">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sky-500/10 via-sky-500/15 to-sky-500/20 dark:from-sky-500/20 dark:via-sky-500/20 dark:to-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-700/50 shadow-xl shadow-sky-500/10">
+                <CreditCard className="w-10 h-10 stroke-[1.6]" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-md">
+                <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+              </div>
+            </div>
+            <div className="space-y-2 max-w-lg mx-auto">
+              <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                No Payroll Runs Generated Yet
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                Execute enterprise salary disbursements, automated tax deductions, and provident fund allocations for all active staff members with 1-click batch processing.
+              </p>
+            </div>
+            <div className="pt-2">
+              <button
+                onClick={() => setIsRunModalOpen(true)}
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+                <span>Run Payroll Batch</span>
+              </button>
+            </div>
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
+              <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Automated Tax Withholding</span>
+              </span>
+              <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Batch Direct Bank Transfer</span>
+              </span>
+              <span className="flex items-center px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Cryptographic Voucher Verification</span>
+              </span>
+            </div>
           </div>
         )}
       </div>
