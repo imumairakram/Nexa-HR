@@ -19,7 +19,7 @@ export const TIMEZONE_OPTIONS = [
 ];
 
 export const CURRENCY_OPTIONS = [
-  { code: 'PKR', symbol: 'Rs. ', label: 'PKR (Rs.) - Pakistani Rupee (Default)' },
+  { code: 'PKR', symbol: 'PKR ', label: 'PKR - Pakistani Rupee (Default)' },
   { code: 'USD', symbol: '$', label: 'USD ($) - US Dollar' },
   { code: 'EUR', symbol: '€', label: 'EUR (€) - Euro' },
   { code: 'GBP', symbol: '£', label: 'GBP (£) - British Pound' },
@@ -266,7 +266,7 @@ export const RegionalSettingsProvider = ({ children }) => {
 
   const getCurrencySymbol = () => {
     const curr = CURRENCY_OPTIONS.find((c) => c.code === settings.currency);
-    return curr ? curr.symbol : 'Rs. ';
+    return curr ? curr.symbol : 'PKR ';
   };
 
   return (

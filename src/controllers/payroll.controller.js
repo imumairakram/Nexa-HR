@@ -172,7 +172,7 @@ const generateMonthlyPayroll = async (req, res) => {
         await createInAppNotification({
           userId: slip.userId,
           title: `${monthLabel} ${year} Payslip Ready`,
-          message: `Your monthly salary slip ($${Number(slip.netSalary).toLocaleString()}) is ready for download.`,
+          message: `Your monthly salary slip (PKR ${Number(slip.netSalary).toLocaleString()}) is ready for download.`,
           type: 'success',
           category: 'PAYROLL',
           link: '/employee/payslips',

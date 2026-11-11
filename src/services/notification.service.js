@@ -378,9 +378,9 @@ async function sendPayslipEmail({
   console.log(`[NexaHR EMAIL DISPATCH: PAYSLIP ISSUED] -> ${email}`);
   console.log(`Recipient: ${name}`);
   console.log(`Subject: [NexaHR Payslip Ready] ${monthStr} ${year} Salary Voucher`);
-  console.log(`Gross Earnings: $${Number(grossSalary).toLocaleString()}`);
-  console.log(`Deductions: -$${Number(deductions).toLocaleString()}`);
-  console.log(`Net Take-Home Salary: $${Number(netSalary).toLocaleString()}`);
+  console.log(`Gross Earnings: PKR ${Number(grossSalary).toLocaleString()}`);
+  console.log(`Deductions: -PKR ${Number(deductions).toLocaleString()}`);
+  console.log(`Net Take-Home Salary: PKR ${Number(netSalary).toLocaleString()}`);
   console.log(`Disbursal Date: ${payDateStr}`);
   console.log(`Payout Mode: ACH Direct Corporate Deposit`);
   console.log(`Download Slip: /employee/payslips`);

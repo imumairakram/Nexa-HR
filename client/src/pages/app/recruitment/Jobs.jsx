@@ -7,7 +7,7 @@ import {
   Search,
   Filter,
   MapPin,
-  DollarSign,
+  Banknote,
   Users,
   CheckCircle2,
   Clock,
@@ -75,7 +75,7 @@ const Jobs = () => {
         department: form.dept || (departments.length > 0 ? departments[0].name : 'Engineering & DevOps'),
         location: (form.location || '').trim() || 'Islamabad HQ / Remote',
         type: form.type || 'Full-Time',
-        salary: (form.salary || '').trim() || '$100k - $140k',
+        salary: (form.salary || '').trim() || 'PKR 100k - 140k',
         status: 'ACTIVE',
       };
 
@@ -336,7 +336,7 @@ const Jobs = () => {
                     <span>{job.location}</span>
                   </span>
                   <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                    <DollarSign className="w-3.5 h-3.5" />
+                    <Banknote className="w-3.5 h-3.5" />
                     <span>{job.salary}</span>
                   </span>
                 </div>
@@ -452,11 +452,11 @@ const Jobs = () => {
                   Annual Compensation Bracket <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Banknote className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     required
-                    placeholder="e.g. $140k - $175k / Year"
+                    placeholder="e.g. PKR 140k - 175k / Year"
                     value={form.salary}
                     onChange={(e) => setForm({ ...form, salary: e.target.value })}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
@@ -475,7 +475,7 @@ const Jobs = () => {
                       {form.title.trim() || 'Job Requisition Preview'}
                     </div>
                     <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
-                      {form.dept || 'Engineering'} • {form.location || 'HQ'} • {form.salary || '$100k+'}
+                      {form.dept || 'Engineering'} • {form.location || 'HQ'} • {form.salary || 'PKR 100k+'}
                     </div>
                   </div>
                 </div>

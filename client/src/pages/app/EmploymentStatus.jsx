@@ -124,10 +124,10 @@ const formatSalary = (salaryStructure, rawSalary) => {
   if (salaryStructure && salaryStructure.basicSalary) {
     const basic = Number(salaryStructure.basicSalary);
     const total = basic + Number(salaryStructure.housingAllowance || 0) + Number(salaryStructure.transportAllowance || 0) + Number(salaryStructure.otherAllowances || 0);
-    return `$${total.toLocaleString()} / mo`;
+    return `PKR ${total.toLocaleString()} / mo`;
   }
   if (rawSalary) {
-    if (typeof rawSalary === 'number') return `$${rawSalary.toLocaleString()} / mo`;
+    if (typeof rawSalary === 'number') return `PKR ${rawSalary.toLocaleString()} / mo`;
     return rawSalary;
   }
   return 'Not Configured';

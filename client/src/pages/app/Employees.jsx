@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Calendar,
-  DollarSign,
+  Banknote,
   ShieldCheck,
   RefreshCw,
   Eye,
@@ -145,10 +145,10 @@ const formatSalary = (salaryStructure, rawSalary) => {
   if (salaryStructure && salaryStructure.basicSalary) {
     const basic = Number(salaryStructure.basicSalary);
     const total = basic + Number(salaryStructure.housingAllowance || 0) + Number(salaryStructure.transportAllowance || 0) + Number(salaryStructure.otherAllowances || 0);
-    return `$${total.toLocaleString()} / mo`;
+    return `PKR ${total.toLocaleString()} / mo`;
   }
   if (rawSalary) {
-    if (typeof rawSalary === 'number') return `$${rawSalary.toLocaleString()} / mo`;
+    if (typeof rawSalary === 'number') return `PKR ${rawSalary.toLocaleString()} / mo`;
     return rawSalary;
   }
   return 'Not Configured';
@@ -1570,7 +1570,7 @@ NexaHR Workforce Systems`;
                     <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-purple-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                          <DollarSign className="w-5 h-5" />
+                          <Banknote className="w-5 h-5" />
                         </div>
                         <div>
                           <div className="font-extrabold text-slate-900 dark:text-white text-xs">Payroll Compensation Matrix</div>
@@ -1578,7 +1578,7 @@ NexaHR Workforce Systems`;
                         </div>
                       </div>
                       <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        Net: ${(
+                        Net: PKR {(
                           parseFloat(onboardForm.basicSalary || 0) +
                           parseFloat(onboardForm.housingAllowance || 0) +
                           parseFloat(onboardForm.transportAllowance || 0) -
@@ -1590,7 +1590,7 @@ NexaHR Workforce Systems`;
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Basic Base Salary ($/mo) <span className="text-rose-500">*</span>
+                          Basic Base Salary (PKR/mo) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="number"
@@ -1602,7 +1602,7 @@ NexaHR Workforce Systems`;
                       </div>
                       <div>
                         <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Housing Allowance ($/mo)
+                          Housing Allowance (PKR/mo)
                         </label>
                         <input
                           type="number"
@@ -1617,7 +1617,7 @@ NexaHR Workforce Systems`;
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Transport Allowance ($/mo)
+                          Transport Allowance (PKR/mo)
                         </label>
                         <input
                           type="number"
@@ -1629,7 +1629,7 @@ NexaHR Workforce Systems`;
                       </div>
                       <div>
                         <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Estimated Tax Deductions ($/mo)
+                          Estimated Tax Deductions (PKR/mo)
                         </label>
                         <input
                           type="number"
@@ -1985,7 +1985,7 @@ NexaHR Workforce Systems`;
                     <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-purple-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                          <DollarSign className="w-5 h-5" />
+                          <Banknote className="w-5 h-5" />
                         </div>
                         <div>
                           <div className="font-extrabold text-slate-900 dark:text-white text-xs">Payroll Compensation Matrix</div>
@@ -1993,7 +1993,7 @@ NexaHR Workforce Systems`;
                         </div>
                       </div>
                       <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        Net: ${(
+                        Net: PKR {(
                           parseFloat(editForm.basicSalary || 0) +
                           parseFloat(editForm.housingAllowance || 0) +
                           parseFloat(editForm.transportAllowance || 0) -
@@ -2004,7 +2004,7 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Basic Base Salary ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Basic Base Salary (PKR/mo)</label>
                         <input
                           type="number"
                           value={editForm.basicSalary || ''}
@@ -2013,7 +2013,7 @@ NexaHR Workforce Systems`;
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Housing Allowance ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Housing Allowance (PKR/mo)</label>
                         <input
                           type="number"
                           value={editForm.housingAllowance || ''}
@@ -2025,7 +2025,7 @@ NexaHR Workforce Systems`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Transport Allowance ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Transport Allowance (PKR/mo)</label>
                         <input
                           type="number"
                           value={editForm.transportAllowance || ''}
@@ -2034,7 +2034,7 @@ NexaHR Workforce Systems`;
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Tax Deductions ($/mo)</label>
+                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Tax Deductions (PKR/mo)</label>
                         <input
                           type="number"
                           value={editForm.taxDeductions || ''}

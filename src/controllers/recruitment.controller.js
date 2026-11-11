@@ -229,7 +229,7 @@ const createJobOpening = async (req, res) => {
     const finalLocation = (location || '').trim() || 'Islamabad HQ / Remote';
     const finalType = (type || '').trim() || 'Full-Time';
     const finalExperience = (experience || '').trim() || '3+ Years';
-    const finalSalary = salary && salary.trim() ? salary.trim() : '$100k - $140k';
+    const finalSalary = salary && salary.trim() ? salary.trim() : 'PKR 100k - 140k';
     const finalStatus = (status || 'ACTIVE').toUpperCase();
     const finalDescription = description && description.trim() ? description.trim() : 'Role overview and key deliverables.';
     const finalRequirements = requirements && requirements.trim() ? requirements.trim() : null;
@@ -1420,7 +1420,7 @@ const seedRecruitmentData = async (req, res) => {
         location: 'Islamabad HQ / Hybrid',
         type: 'Full Time',
         experience: '5+ Years',
-        salary: '$130,000 - $160,000',
+        salary: 'PKR 130,000 - 160,000',
         status: 'ACTIVE',
         description: 'Lead next-generation distributed HRM and payroll telemetry platforms across multi-region deployments.',
         requirements: 'Expert in React 19, Node.js, PostgreSQL, Prisma, Docker, and enterprise API security architectures.',
@@ -1438,7 +1438,7 @@ const seedRecruitmentData = async (req, res) => {
         location: 'Karachi Regional Hub',
         type: 'Full Time',
         experience: '4+ Years',
-        salary: '$110,000 - $135,000',
+        salary: 'PKR 110,000 - 135,000',
         status: 'ACTIVE',
         description: 'Spearhead our core enterprise design system with refined luxury glassmorphism, micro-interactions, and accessibility standards.',
         requirements: 'Mastery in Figma tokens, design systems, interactive prototypes, user journey telemetry, and developer handoffs.',
@@ -1456,7 +1456,7 @@ const seedRecruitmentData = async (req, res) => {
         location: 'Remote & Distributed',
         type: 'Remote',
         experience: '5+ Years',
-        salary: '$140,000 - $175,000',
+        salary: 'PKR 140,000 - 175,000',
         status: 'ACTIVE',
         description: 'Orchestrate zero-downtime CI/CD delivery pipelines, Kubernetes clusters, DDoS telemetry, and infrastructure-as-code.',
         requirements: 'Deep knowledge of AWS, Terraform, Docker, Kubernetes, Prometheus monitoring, and database clustering.',
@@ -1474,7 +1474,7 @@ const seedRecruitmentData = async (req, res) => {
         location: 'Islamabad HQ / Hybrid',
         type: 'Full Time',
         experience: '3+ Years',
-        salary: '$80,000 - $95,000',
+        salary: 'PKR 80,000 - 95,000',
         status: 'ACTIVE',
         description: 'Scale our engineering and corporate departments through active headhunting, ATS workflow automation, and candidate engagement.',
         requirements: 'Demonstrated experience in technical headhunting, pipeline velocity tracking, structured interviewing, and employer branding.',
@@ -1492,7 +1492,7 @@ const seedRecruitmentData = async (req, res) => {
         location: 'Karachi Regional Hub',
         type: 'Full Time',
         experience: '6+ Years',
-        salary: '$115,000 - $145,000',
+        salary: 'PKR 115,000 - 145,000',
         status: 'PAUSED',
         description: 'Direct multi-entity accounting audits, corporate ledger reconciliation, tax structuring, and executive financial reporting.',
         requirements: 'Chartered Accountant (CA/CPA), extensive experience with payroll telemetry, statutory compliance, and corporate governance.',
@@ -1537,7 +1537,7 @@ const seedRecruitmentData = async (req, res) => {
         rating: 4.8,
         stage: 'OFFER',
         resumeSummary: 'Proven track record designing enterprise SaaS platforms, design systems, and conducting customer research.',
-        notes: 'Offer letter prepared at upper salary band ($130,000). Pending candidate signature.',
+        notes: 'Offer letter prepared at upper salary band (PKR 130,000). Pending candidate signature.',
         tags: ['Design System', 'Figma Pro'],
         appliedDate: new Date('2026-10-14'),
       },

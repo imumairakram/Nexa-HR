@@ -4,7 +4,7 @@ import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../../components/common/Skeleton';
 import {
-  DollarSign,
+  Banknote,
   Calculator,
   CheckCircle2,
   AlertCircle,
@@ -159,7 +159,7 @@ const CalculatePayroll = () => {
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                <span>${totalNet.toLocaleString()} Total Net Disbursable</span>
+                <span>PKR {totalNet.toLocaleString()} Total Net Disbursable</span>
               </span>
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>100% Ready for Execution</span>
@@ -195,7 +195,7 @@ const CalculatePayroll = () => {
         <SparkMetricCard
           variant="dark"
           title="Total Gross Pay"
-          value={`$${totalGross.toLocaleString()}`}
+          value={`PKR ${totalGross.toLocaleString()}`}
           badgeText="Pre-Tax Base"
           badgeType="positive"
           badgeIcon="up"
@@ -210,7 +210,7 @@ const CalculatePayroll = () => {
         <SparkMetricCard
           variant="light"
           title="Tax Deductions"
-          value={`-$${totalTax.toLocaleString()}`}
+          value={`-PKR ${totalTax.toLocaleString()}`}
           badgeText="Statutory Matrix"
           badgeType="warning"
           badgeIcon="dot"
@@ -225,7 +225,7 @@ const CalculatePayroll = () => {
         <SparkMetricCard
           variant="light"
           title="Net Disbursable"
-          value={`$${totalNet.toLocaleString()}`}
+          value={`PKR ${totalNet.toLocaleString()}`}
           badgeText="Ready for Wire"
           badgeType="positive"
           badgeIcon="up"
@@ -300,22 +300,22 @@ const CalculatePayroll = () => {
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block uppercase">Base Salary</span>
-                      <span className="font-bold text-slate-800 dark:text-slate-200">${row.base.toLocaleString()}</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">PKR {row.base.toLocaleString()}</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block uppercase">Overtime</span>
-                      <span className="font-semibold text-emerald-600">+${row.overtime.toLocaleString()}</span>
+                      <span className="font-semibold text-emerald-600">+PKR {row.overtime.toLocaleString()}</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block uppercase">Tax Withheld</span>
-                      <span className="font-semibold text-rose-500">-${row.tax.toLocaleString()}</span>
+                      <span className="font-semibold text-rose-500">-PKR {row.tax.toLocaleString()}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
                     <span className="text-xs font-bold text-slate-500">Net Payable:</span>
                     <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
-                      ${row.net.toLocaleString()}
+                      PKR {row.net.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -346,11 +346,11 @@ const CalculatePayroll = () => {
                     </td>
                     <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">{row.dept}</td>
                     <td className="py-4 px-4 font-bold text-blue-600 dark:text-blue-400">{row.daysWorked}</td>
-                    <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">${row.base.toLocaleString()}</td>
-                    <td className="py-4 px-4 font-semibold text-emerald-600">+${row.overtime.toLocaleString()}</td>
-                    <td className="py-4 px-4 font-semibold text-rose-500">-${row.tax.toLocaleString()}</td>
+                    <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">PKR {row.base.toLocaleString()}</td>
+                    <td className="py-4 px-4 font-semibold text-emerald-600">+PKR {row.overtime.toLocaleString()}</td>
+                    <td className="py-4 px-4 font-semibold text-rose-500">-PKR {row.tax.toLocaleString()}</td>
                     <td className="py-4 px-4 text-right font-black text-slate-900 dark:text-white text-sm">
-                      ${row.net.toLocaleString()}
+                      PKR {row.net.toLocaleString()}
                     </td>
                   </tr>
                 ))}

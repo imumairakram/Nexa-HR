@@ -9,7 +9,7 @@ import {
   Save,
   Laptop,
   Clock,
-  DollarSign,
+  Banknote,
   Calendar,
   Sliders,
   Building,

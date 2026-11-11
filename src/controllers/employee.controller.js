@@ -133,7 +133,7 @@ const onboardEmployee = async (req, res) => {
           phone: phone ? phone.trim() : null,
           role: resolvedRole,
           isActive: true,
-          mustChangePassword: true,
+          mustChangePassword: req.body.mustChangePassword !== undefined ? Boolean(req.body.mustChangePassword) : true,
         },
       });
 

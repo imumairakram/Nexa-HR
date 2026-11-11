@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   CreditCard,
-  DollarSign,
+  Banknote,
   TrendingUp,
   Download,
   Calendar,
@@ -194,7 +194,7 @@ const Payroll = () => {
           {/* Right Side: Action Glassmorphic Card (Desktop / Tablet) */}
           <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
             <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
-              <DollarSign className="w-5 h-5 stroke-[2.5]" />
+              <Banknote className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
               <div className="text-xs font-extrabold text-slate-900 dark:text-white">Pay Run Generator</div>
@@ -355,19 +355,19 @@ const Payroll = () => {
                         <div>
                           <div className="text-[9px] uppercase font-bold text-slate-400">Gross</div>
                           <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
-                            ${run.totalGross.toLocaleString()}
+                            PKR {run.totalGross.toLocaleString()}
                           </div>
                         </div>
                         <div className="border-x border-slate-100 dark:border-slate-800">
                           <div className="text-[9px] uppercase font-bold text-slate-400">Tax</div>
                           <div className="text-xs font-bold text-rose-500 mt-0.5">
-                            -${run.totalDeductions.toLocaleString()}
+                            -PKR {run.totalDeductions.toLocaleString()}
                           </div>
                         </div>
                         <div>
                           <div className="text-[9px] uppercase font-bold text-slate-400">Net</div>
                           <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                            ${run.netPayable.toLocaleString()}
+                            PKR {run.netPayable.toLocaleString()}
                           </div>
                         </div>
                       </div>

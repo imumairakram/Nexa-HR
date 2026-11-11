@@ -632,7 +632,7 @@ const Login = () => {
                     <div className="text-slate-400">Senior Staff • 42 members</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-slate-800">$42,800/mo</div>
+                    <div className="font-bold text-slate-800">PKR 42,800/mo</div>
                     <div className="text-emerald-600 font-semibold">+4.8%</div>
                   </div>
                 </div>
@@ -643,7 +643,7 @@ const Login = () => {
                     <div className="text-slate-400">Core Team • 28 members</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-slate-800">$26,400/mo</div>
+                    <div className="font-bold text-slate-800">PKR 26,400/mo</div>
                     <div className="text-emerald-600 font-semibold">+3.2%</div>
                   </div>
                 </div>
@@ -654,7 +654,7 @@ const Login = () => {
                     <div className="text-slate-400">Global HQ • 14 members</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-slate-800">$14,200/mo</div>
+                    <div className="font-bold text-slate-800">PKR 14,200/mo</div>
                     <div className="text-emerald-600 font-semibold">+6.1%</div>
                   </div>
                 </div>

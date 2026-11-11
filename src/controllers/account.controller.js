@@ -386,7 +386,7 @@ const getTransactionStats = async (req, res) => {
     const facilitiesTotal = categoryTotals['FACILITIES'] || 0;
     const operationsTotal = categoryTotals['OPERATIONS'] || 0;
 
-    // Runway calculation based on total cash reserve assumption ($2.5M)
+    // Runway calculation based on total cash reserve assumption (PKR 2.5M)
     const monthlyBurn = totalExpenses > 0 ? totalExpenses : 0;
     const runwayMonths = monthlyBurn > 0 ? Number((2500000 / monthlyBurn).toFixed(1)) : 0;
 

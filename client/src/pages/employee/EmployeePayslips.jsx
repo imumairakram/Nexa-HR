@@ -5,7 +5,7 @@ import {
   Printer,
   Eye,
   CheckCircle2,
-  DollarSign,
+  Banknote,
   TrendingUp,
   Building,
   ShieldCheck,

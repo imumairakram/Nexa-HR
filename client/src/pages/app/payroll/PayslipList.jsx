@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   X,
   Printer,
-  DollarSign,
+  Banknote,
   Building,
   Calendar,
   RefreshCw,
@@ -272,7 +272,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Total Disbursed"
-          value={`$${payslips.reduce((acc, p) => acc + p.net, 0).toLocaleString()}`}
+          value={`PKR ${payslips.reduce((acc, p) => acc + p.net, 0).toLocaleString()}`}
           badgeText="100% Net Paid"
           badgeType="positive"
           badgeIcon="up"
@@ -287,7 +287,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Tax Withholdings"
-          value={`$${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
+          value={`-PKR ${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
           badgeText="Statutory Filing"
           badgeType="warning"
           badgeIcon="dot"
@@ -302,7 +302,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Average Net Salary"
-          value={`$${Math.round(payslips.reduce((acc, p) => acc + p.net, 0) / (payslips.length || 1)).toLocaleString()}`}
+          value={`PKR ${Math.round(payslips.reduce((acc, p) => acc + p.net, 0) / (payslips.length || 1)).toLocaleString()}`}
           badgeText="Per Employee"
           badgeType="positive"
           badgeIcon="dot"
@@ -442,19 +442,19 @@ const PayslipList = () => {
                     <div>
                       <div className="text-[9px] uppercase font-bold text-slate-400">Gross</div>
                       <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
-                        ${p.gross.toLocaleString()}
+                        PKR {p.gross.toLocaleString()}
                       </div>
                     </div>
                     <div className="border-x border-slate-100 dark:border-slate-800">
                       <div className="text-[9px] uppercase font-bold text-slate-400">Deduct</div>
                       <div className="text-xs font-bold text-rose-500 mt-0.5">
-                        -${p.deductions.toLocaleString()}
+                        -PKR {p.deductions.toLocaleString()}
                       </div>
                     </div>
                     <div>
                       <div className="text-[9px] uppercase font-bold text-slate-400">Net</div>
                       <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        ${p.net.toLocaleString()}
+                        PKR {p.net.toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -498,10 +498,10 @@ const PayslipList = () => {
                     <div className="text-[10px] text-slate-400 font-mono">{p.code} • {p.dept}</div>
                   </td>
                   <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{p.month}</td>
-                  <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">${p.gross.toLocaleString()}</td>
-                  <td className="py-4 px-4 font-medium text-rose-500">-${p.deductions.toLocaleString()}</td>
+                  <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">PKR {p.gross.toLocaleString()}</td>
+                  <td className="py-4 px-4 font-medium text-rose-500">-PKR {p.deductions.toLocaleString()}</td>
                   <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                    ${p.net.toLocaleString()}
+                    PKR {p.net.toLocaleString()}
                   </td>
                   <td className="py-4 px-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
@@ -564,15 +564,15 @@ const PayslipList = () => {
             <div className="space-y-2 text-xs">
               <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-500 dark:text-slate-400">Gross Base Salary & Allowances:</span>
-                <span className="font-bold text-slate-900 dark:text-white">${selectedSlip.gross.toLocaleString()}.00</span>
+                <span className="font-bold text-slate-900 dark:text-white">PKR {selectedSlip.gross.toLocaleString()}.00</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-500 dark:text-slate-400">Federal/State Tax & Benefits Deductions:</span>
-                <span className="font-bold text-rose-500">-${selectedSlip.deductions.toLocaleString()}.00</span>
+                <span className="font-bold text-rose-500">-PKR {selectedSlip.deductions.toLocaleString()}.00</span>
               </div>
               <div className="flex justify-between py-3 text-sm font-black bg-sky-50/80 dark:bg-sky-950/40 p-4 rounded-xl border border-sky-100 dark:border-sky-900/50">
                 <span className="text-sky-900 dark:text-sky-200">Net Take-Home Pay (ACH Direct):</span>
-                <span className="text-emerald-600 dark:text-emerald-400">${selectedSlip.net.toLocaleString()}.00</span>
+                <span className="text-emerald-600 dark:text-emerald-400">PKR {selectedSlip.net.toLocaleString()}.00</span>
               </div>
             </div>
 
