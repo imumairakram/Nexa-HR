@@ -198,7 +198,8 @@ async function fetchAPI(endpoint, options = {}) {
 
       // Invalidate cache on mutations (POST, PUT, PATCH, DELETE)
       if (!isGet && response.ok) {
-        if (endpoint.includes('/employees') || endpoint.includes('/profile')) {
+        if (endpoint.includes('/employees') || endpoint.includes('/profile') || endpoint.includes('/auth')) {
+          invalidateClientCache('/auth/me');
           invalidateClientCache('/employees');
           invalidateClientCache('/dashboard');
           invalidateClientCache('/departments');
@@ -306,10 +307,13 @@ export const api = {
   },
 
   updateMyProfile: async (profileData) => {
-    return await fetchAPI('/auth/profile', {
+    invalidateClientCache('/auth/me');
+    const res = await fetchAPI('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
     });
+    invalidateClientCache('/auth/me');
+    return res;
   },
 
   changeMyPassword: async (passwordData) => {

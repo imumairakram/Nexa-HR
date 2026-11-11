@@ -453,17 +453,16 @@ const getMe = async (req, res) => {
       console.warn('Reporting manager dynamic resolution notice:', mgrErr.message);
     }
 
-    // Dynamic Corporate Bank & Payroll details for employee from profile with fallback
-    const empNumDigits = (user.employeeCode || '101').replace(/[^0-9]/g, '').padStart(6, '0');
+    // Dynamic Corporate Bank & Payroll details for employee from profile
     const bankDetails = {
-      bankName: user.profile?.bankName || 'Standard Chartered Bank',
-      accountTitle: user.profile?.accountTitle || `${user.firstName} ${user.lastName}`,
-      accountNumber: user.profile?.accountNumber || `PK72SCBL000000${empNumDigits}01`,
-      branchCode: user.profile?.branchCode || '0142 (Corporate Wing)',
+      bankName: user.profile?.bankName || '',
+      accountTitle: user.profile?.accountTitle || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      accountNumber: user.profile?.accountNumber || '',
+      branchCode: user.profile?.branchCode || '',
       payoutMethod: user.profile?.payoutMethod || 'Direct Bank Transfer',
-      taxStatus: user.profile?.taxStatus || 'Verified Active Filer',
-      ntnNumber: user.profile?.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`,
-      providentFund: 'Enrolled (8.33% Tier)',
+      taxStatus: user.profile?.taxStatus || 'Active Filer',
+      ntnNumber: user.profile?.ntnNumber || '',
+      providentFund: user.profile?.providentFund || 'Enrolled',
     };
 
     const isDemoUser = req.user?.isDemo === true || user.isDemo === true;
@@ -1242,17 +1241,21 @@ const updateMyProfile = async (req, res) => {
       console.warn('Reporting manager dynamic resolution notice:', mgrErr.message);
     }
 
-    const empNumDigits = (updatedUser.employeeCode || '101').replace(/[^0-9]/g, '').padStart(6, '0');
     const bankDetails = {
-      bankName: updatedUser.profile?.bankName || 'Standard Chartered Bank',
-      accountTitle: updatedUser.profile?.accountTitle || `${updatedUser.firstName} ${updatedUser.lastName}`,
-      accountNumber: updatedUser.profile?.accountNumber || `PK72SCBL000000${empNumDigits}01`,
-      branchCode: updatedUser.profile?.branchCode || '0142 (Corporate Wing)',
+      bankName: updatedUser.profile?.bankName || '',
+      accountTitle: updatedUser.profile?.accountTitle || `${updatedUser.firstName || ''} ${updatedUser.lastName || ''}`.trim(),
+      accountNumber: updatedUser.profile?.accountNumber || '',
+      branchCode: updatedUser.profile?.branchCode || '',
       payoutMethod: updatedUser.profile?.payoutMethod || 'Direct Bank Transfer',
-      taxStatus: updatedUser.profile?.taxStatus || 'Verified Active Filer',
-      ntnNumber: updatedUser.profile?.ntnNumber || `NTN-9842${empNumDigits.slice(-3)}-7`,
-      providentFund: 'Enrolled (8.33% Tier)',
+      taxStatus: updatedUser.profile?.taxStatus || 'Active Filer',
+      ntnNumber: updatedUser.profile?.ntnNumber || '',
+      providentFund: updatedUser.profile?.providentFund || 'Enrolled',
     };
+
+    // Invalidate user cache and response cache so getMe and other endpoints get fresh DB data
+    cacheService.invalidateUser(userId);
+    cacheService.invalidateTags(['employees', 'profile', 'dashboard']);
+    cacheService.setCachedUser(userId, updatedUser);
 
     return res.status(200).json({
       success: true,

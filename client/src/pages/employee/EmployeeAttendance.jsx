@@ -553,9 +553,8 @@ const EmployeeAttendance = () => {
               </div>
             </div>
 
-            <div className="w-full pt-2 flex items-center justify-between text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-normal">
+            <div className="w-full pt-2 flex items-center justify-center text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-normal text-center">
               <span>Shift: 09:00 AM – 05:30 PM</span>
-              <span className="text-sky-600 dark:text-sky-400 font-semibold">8.5h Standard</span>
             </div>
           </div>
         </div>

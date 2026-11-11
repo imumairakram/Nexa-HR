@@ -40,8 +40,9 @@ import { isDemoSessionActive, showDemoToast } from '../../demo/demoSession';
 
 const BANK_OPTIONS = [
   'Standard Chartered Bank',
-  'Habib Bank Limited (HBL)',
+  'Meezan Bank',
   'Meezan Bank (Islamic Banking)',
+  'Habib Bank Limited (HBL)',
   'United Bank Limited (UBL)',
   'MCB Bank Limited',
   'Bank Alfalah',
@@ -534,11 +535,17 @@ const Profile = () => {
       const res = await api.updateMyProfile(payload);
       if (res?.success && res.data?.user) {
         populateUserData(res.data.user);
+      } else {
+        setFormData((prev) => ({ ...prev, ...payload }));
       }
 
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
       const updatedUser = {
         ...storedUser,
+        profile: {
+          ...(storedUser.profile || {}),
+          ...payload,
+        },
         bankDetails: {
           ...(storedUser.bankDetails || {}),
           ...payload,
@@ -1087,13 +1094,6 @@ const Profile = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${formData.accountNumber
-                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
-                    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                  }`}>
-                  <span>{formData.accountNumber ? 'Verified by HR' : 'Pending Configuration'}</span>
-                </span>
-
                 {!isEditingBank ? (
                   <button
                     type="button"
@@ -1123,7 +1123,7 @@ const Profile = () => {
               <div className="space-y-3 text-xs">
                 <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                   <span className="text-slate-400 font-semibold">Bank Name</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Standard Chartered Bank'}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.bankName || 'Not Configured'}</span>
                 </div>
 
                 <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
@@ -1136,7 +1136,7 @@ const Profile = () => {
                 <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                   <span className="text-slate-400 font-semibold">Account / IBAN</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'Pending Configuration'}</span>
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.accountNumber || 'Not Configured'}</span>
                     {formData.accountNumber && (
                       <button
                         type="button"
@@ -1157,7 +1157,7 @@ const Profile = () => {
 
                 <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                   <span className="text-slate-400 font-semibold">Branch Code</span>
-                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || '0142 (Corporate Wing)'}</span>
+                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || 'Not Set'}</span>
                 </div>
 
                 <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
@@ -1178,7 +1178,7 @@ const Profile = () => {
                 <div>
                   <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Designated Bank *</label>
                   <select
-                    value={BANK_OPTIONS.includes(formData.bankName) ? formData.bankName : (formData.bankName ? 'CUSTOM' : 'Standard Chartered Bank')}
+                    value={BANK_OPTIONS.includes(formData.bankName) ? formData.bankName : (formData.bankName ? 'CUSTOM' : '')}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === 'CUSTOM') {
@@ -1189,6 +1189,7 @@ const Profile = () => {
                     }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                   >
+                    <option value="">Select Designated Bank...</option>
                     {BANK_OPTIONS.map((b) => (
                       <option key={b} value={b}>
                         {b === 'CUSTOM' ? 'Other Commercial Bank / Financial Institution...' : b}

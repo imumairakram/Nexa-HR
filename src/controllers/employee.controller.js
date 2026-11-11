@@ -656,6 +656,10 @@ const updateEmployee = async (req, res) => {
       return { user: updatedUser, profile: updatedProfile, salaryStructure: updatedSalaryStructure };
     });
 
+    // Invalidate user cache and response cache so getMe and other endpoints get fresh DB data
+    cacheService.invalidateUser(id);
+    cacheService.invalidateTags(['employees', 'profile', 'dashboard']);
+
     return res.status(200).json({
       success: true,
       message: 'Employee profile updated successfully.',
