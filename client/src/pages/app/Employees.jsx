@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   UserPlus,
@@ -155,6 +156,7 @@ const formatSalary = (salaryStructure, rawSalary) => {
 };
 
 const Employees = () => {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
   const [departments, setDepartments] = useState(() => api.getCached('/departments')?.data?.departments || []);
   const [designations, setDesignations] = useState(() => api.getCached('/designations')?.data?.designations || []);
@@ -230,7 +232,6 @@ const Employees = () => {
   }, [departments, employees]);
 
   // Modals state
-  const [isOnboardOpen, setIsOnboardOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -239,7 +240,6 @@ const Employees = () => {
   const [createdCreds, setCreatedCreds] = useState(null);
   const [copiedCreds, setCopiedCreds] = useState(false);
   const [isResendingEmail, setIsResendingEmail] = useState(false);
-  const [onboardTab, setOnboardTab] = useState('basic'); // 'basic' | 'position' | 'salary' | 'personal'
   const [editTab, setEditTab] = useState('basic'); // 'basic' | 'position' | 'salary' | 'personal'
   const [submitting, setSubmitting] = useState(false);
 
@@ -285,33 +285,6 @@ const Employees = () => {
       setDeleting(false);
     }
   };
-
-  // Form State for Onboarding
-  const initialOnboardState = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    employeeCode: '',
-    password: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
-    phone: '',
-    role: 'EMPLOYEE',
-    departmentName: '',
-    designationTitle: '',
-    workLocation: 'Islamabad HQ & Innovation Lab',
-    location: 'Islamabad HQ & Innovation Lab',
-    joiningDate: new Date().toISOString().split('T')[0],
-    basicSalary: '',
-    housingAllowance: '0',
-    transportAllowance: '0',
-    taxDeductions: '0',
-    otherAllowances: '0',
-    otherDeductions: '0',
-    gender: 'Not Specified',
-    dateOfBirth: '',
-    address: '',
-    emergencyContact: '',
-  };
-  const [onboardForm, setOnboardForm] = useState(initialOnboardState);
 
   // Form State for Editing
   const [editForm, setEditForm] = useState({});
@@ -371,70 +344,6 @@ const Employees = () => {
     };
   }, []);
 
-  // Handle Onboard Submit
-  const handleOnboardSubmit = async (e) => {
-    e.preventDefault();
-    if (!onboardForm.firstName || !onboardForm.email) {
-      showToast('Please provide first name and work email.', 'error');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const tempPass = onboardForm.password.trim() || `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
-      const payload = {
-        firstName: onboardForm.firstName.trim(),
-        lastName: onboardForm.lastName ? onboardForm.lastName.trim() : '',
-        email: onboardForm.email.trim(),
-        employeeCode: onboardForm.employeeCode ? onboardForm.employeeCode.trim() : `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
-        password: tempPass,
-        phone: onboardForm.phone,
-        role: onboardForm.role || 'EMPLOYEE',
-        departmentName: onboardForm.departmentName || 'Engineering & DevOps',
-        designationTitle: onboardForm.designationTitle || 'Software Engineer',
-        address: onboardForm.address ? onboardForm.address.trim() : null,
-        workLocation: (onboardForm.workLocation || onboardForm.location || 'Islamabad HQ & Innovation Lab').trim(),
-        joiningDate: onboardForm.joiningDate || new Date().toISOString().split('T')[0],
-        basicSalary: parseFloat(onboardForm.basicSalary || 0),
-        housingAllowance: parseFloat(onboardForm.housingAllowance || 0),
-        transportAllowance: parseFloat(onboardForm.transportAllowance || 0),
-        taxDeductions: parseFloat(onboardForm.taxDeductions || 0),
-        otherAllowances: parseFloat(onboardForm.otherAllowances || 0),
-        otherDeductions: parseFloat(onboardForm.otherDeductions || 0),
-        gender: onboardForm.gender,
-        dateOfBirth: onboardForm.dateOfBirth,
-        emergencyContact: onboardForm.emergencyContact,
-      };
-
-      const res = await api.onboardEmployee(payload);
-      const createdEmp = res?.data?.employee;
-
-      // Show temporary credentials modal
-      setCreatedCreds({
-        id: createdEmp?.id,
-        name: `${onboardForm.firstName} ${onboardForm.lastName}`.trim(),
-        email: payload.email,
-        employeeCode: createdEmp?.employeeCode || payload.employeeCode,
-        tempPassword: createdEmp?.tempPassword || tempPass,
-        role: payload.role,
-      });
-
-      showToast(res?.message || `${onboardForm.firstName} ${onboardForm.lastName} onboarded successfully! Welcome email sent.`);
-      await fetchEmployeesData();
-
-      setIsOnboardOpen(false);
-      setOnboardForm({
-        ...initialOnboardState,
-        password: `Nexa#${Math.floor(1000 + Math.random() * 9000)}`,
-      });
-      setOnboardTab('basic');
-    } catch (err) {
-      console.error('Onboard error:', err);
-      showToast(err.message || 'Failed to onboard employee to database. Check email or details.', 'error');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   // Resend official credentials email via corporate SMTP
   const handleResendOfficialEmail = async (creds) => {
@@ -889,15 +798,7 @@ NexaHR Workforce Systems`;
             </div>
             <button
               type="button"
-              onClick={() => {
-                setOnboardForm({
-                  ...initialOnboardState,
-                  departmentName: departments[0]?.name || '',
-                  designationTitle: designations[0]?.title || '',
-                });
-                setOnboardTab('basic');
-                setIsOnboardOpen(true);
-              }}
+              onClick={() => navigate('/app/hr/new-employee')}
               className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -909,15 +810,7 @@ NexaHR Workforce Systems`;
           <div className="sm:hidden pt-1">
             <button
               type="button"
-              onClick={() => {
-                setOnboardForm({
-                  ...initialOnboardState,
-                  departmentName: departments[0]?.name || '',
-                  designationTitle: designations[0]?.title || '',
-                });
-                setOnboardTab('basic');
-                setIsOnboardOpen(true);
-              }}
+              onClick={() => navigate('/app/hr/new-employee')}
               className="w-full py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
@@ -1091,15 +984,7 @@ NexaHR Workforce Systems`;
         actionButton={
           <button
             type="button"
-            onClick={() => {
-              setOnboardForm({
-                ...initialOnboardState,
-                departmentName: departments[0]?.name || '',
-                designationTitle: designations[0]?.title || '',
-              });
-              setOnboardTab('basic');
-              setIsOnboardOpen(true);
-            }}
+            onClick={() => navigate('/app/hr/new-employee')}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -1295,477 +1180,7 @@ NexaHR Workforce Systems`;
       )}
 
       {/* ========================================================================= */}
-      {/* 4. MODAL: ONBOARD EMPLOYEE */}
-      {/* ========================================================================= */}
-      {isOnboardOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
-            {/* Ambient background blur orbs */}
-            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-400/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
-
-            {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/80 to-blue-50/60 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
-              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
-                  <UserPlus className="w-5 h-5 stroke-[2.2]" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                    Onboard New Team Member
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
-                    Provision employee workspace credentials, assign departmental roles & configure baseline payroll.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsOnboardOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Scrollable Container with Tabs */}
-            <div className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-5 custom-scrollbar text-xs relative z-10 bg-gradient-to-b from-white/40 via-indigo-50/15 to-purple-50/20 dark:from-transparent dark:via-indigo-950/10 dark:to-purple-950/10">
-              {/* Modal Form Segmented Stepper Tabs */}
-              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl text-xs font-bold no-scrollbar overflow-x-auto border border-slate-200/70 dark:border-slate-800/70 shrink-0">
-                {[
-                  { id: 'basic', step: '01', label: 'Identity & Access' },
-                  { id: 'position', step: '02', label: 'Position & Org' },
-                  { id: 'salary', step: '03', label: 'Compensation' },
-                  { id: 'personal', step: '04', label: 'Personal & Contact' },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setOnboardTab(tab.id)}
-                    className={`flex-1 py-2 px-3 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
-                      onboardTab === tab.id
-                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 font-bold'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium hover:bg-white/50 dark:hover:bg-slate-800/50'
-                    }`}
-                  >
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${onboardTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-800 text-slate-500'}`}>
-                      {tab.step}
-                    </span>
-                    <span>{tab.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              <form onSubmit={handleOnboardSubmit} className="space-y-4 text-xs">
-                {/* TAB 1: IDENTITY & ACCESS */}
-                {onboardTab === 'basic' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          First Name <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. John"
-                          value={onboardForm.firstName}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, firstName: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Last Name <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. Hayes"
-                          value={onboardForm.lastName}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, lastName: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Work Email <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          placeholder="jordan.h@company.com"
-                          value={onboardForm.email}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, email: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Employee Code / ID
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="EMP-108"
-                          value={onboardForm.employeeCode}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, employeeCode: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Phone Number
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="+92 300 1234567"
-                          value={onboardForm.phone}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, phone: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Role Authorization ACL
-                        </label>
-                        <select
-                          value={onboardForm.role}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, role: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
-                          <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
-                          <option value="ADMIN">ADMIN (Full System Privilege)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Tech Security Password Key Card */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-sky-50/70 via-blue-50/30 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-sky-100 dark:border-slate-700 space-y-2.5 relative overflow-hidden">
-                      <div className="flex items-center justify-between">
-                        <label className="block text-slate-900 dark:text-white font-bold text-xs flex items-center gap-2">
-                          <KeyRound className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                          <span>Enterprise Access Key / Default Password</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const rand = `Nexa#${Math.floor(1000 + Math.random() * 9000)}`;
-                            setOnboardForm({ ...onboardForm, password: rand });
-                          }}
-                          className="px-3 py-1 rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Generate Key</span>
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Nexa#8421"
-                        value={onboardForm.password}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, password: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-indigo-200 dark:border-indigo-800 text-slate-900 dark:text-indigo-300 font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-xs tracking-wider"
-                      />
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
-                        <ShieldAlert className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                        <span>Employee will be prompted to replace this default access key upon their initial sign-in.</span>
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB 2: POSITION & ORGANIZATION */}
-                {onboardTab === 'position' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Department <span className="text-rose-500">*</span>
-                        </label>
-                        <select
-                          value={onboardForm.departmentName}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, departmentName: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          {deptOptions.map((d) => (
-                            <option key={d} value={d}>
-                              {d}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Designation / Position Title <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. Senior Full-Stack Engineer"
-                          value={onboardForm.designationTitle}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, designationTitle: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
-                          <span>Assigned Office Work Location</span>
-                          <span className="text-[11px] text-slate-400 font-normal">Physical Campus / Hub</span>
-                        </label>
-                        <select
-                          value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(onboardForm.workLocation || onboardForm.location) ? (onboardForm.workLocation || onboardForm.location) : 'CUSTOM'}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val === 'CUSTOM') {
-                              setOnboardForm({ ...onboardForm, workLocation: '', location: '' });
-                            } else {
-                              setOnboardForm({ ...onboardForm, workLocation: val, location: val });
-                            }
-                          }}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs text-xs"
-                        >
-                          <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
-                          <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
-                          <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
-                          <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
-                          <option value="CUSTOM">Custom Office Campus / Branch...</option>
-                        </select>
-                        {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(onboardForm.workLocation || onboardForm.location)) && (
-                          <input
-                            type="text"
-                            placeholder="Enter custom office campus or branch name"
-                            value={onboardForm.workLocation || onboardForm.location}
-                            onChange={(e) => setOnboardForm({ ...onboardForm, workLocation: e.target.value, location: e.target.value })}
-                            className="mt-2 w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs text-xs"
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Joining Date
-                        </label>
-                        <input
-                          type="date"
-                          value={onboardForm.joiningDate}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, joiningDate: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-xs cursor-pointer"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB 3: COMPENSATION & SALARY STRUCTURE */}
-                {onboardTab === 'salary' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-purple-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                          <Banknote className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white text-xs">Payroll Compensation Matrix</div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Automatic payroll sync & payslip generation</div>
-                        </div>
-                      </div>
-                      <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        Net: PKR {(
-                          parseFloat(onboardForm.basicSalary || 0) +
-                          parseFloat(onboardForm.housingAllowance || 0) +
-                          parseFloat(onboardForm.transportAllowance || 0) -
-                          parseFloat(onboardForm.taxDeductions || 0)
-                        ).toLocaleString()} / mo
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Basic Base Salary (PKR/mo) <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="8500"
-                          value={onboardForm.basicSalary}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, basicSalary: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Housing Allowance (PKR/mo)
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="1200"
-                          value={onboardForm.housingAllowance}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, housingAllowance: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Transport Allowance (PKR/mo)
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="500"
-                          value={onboardForm.transportAllowance}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, transportAllowance: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Estimated Tax Deductions (PKR/mo)
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="950"
-                          value={onboardForm.taxDeductions}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, taxDeductions: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB 4: PERSONAL & EMERGENCY */}
-                {onboardTab === 'personal' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Gender
-                        </label>
-                        <select
-                          value={onboardForm.gender}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, gender: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Non-Binary">Non-Binary</option>
-                          <option value="Not Specified">Prefer not to say</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Date of Birth
-                        </label>
-                        <input
-                          type="date"
-                          value={onboardForm.dateOfBirth}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, dateOfBirth: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-xs cursor-pointer"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
-                          <span>Residential Street Address (Home)</span>
-                          <span className="text-[11px] text-slate-400 font-normal">Personal Residence</span>
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. House #14, Street 9, Sector F-7/2, Islamabad"
-                          value={onboardForm.address}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">
-                          Emergency Contact Info
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="John (+92 300 1234567)"
-                          value={onboardForm.emergencyContact}
-                          onChange={(e) => setOnboardForm({ ...onboardForm, emergencyContact: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Executive Form Actions Footer */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
-                  <div className="flex items-center gap-2">
-                    {onboardTab !== 'basic' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const tabs = ['basic', 'position', 'salary', 'personal'];
-                          const idx = tabs.indexOf(onboardTab);
-                          if (idx > 0) setOnboardTab(tabs[idx - 1]);
-                        }}
-                        className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors text-xs"
-                      >
-                        Previous
-                      </button>
-                    )}
-                    {onboardTab !== 'personal' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const tabs = ['basic', 'position', 'salary', 'personal'];
-                          const idx = tabs.indexOf(onboardTab);
-                          if (idx < tabs.length - 1) setOnboardTab(tabs[idx + 1]);
-                        }}
-                        className="px-5 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 cursor-pointer transition-all border border-sky-200/60 dark:border-sky-800/60 text-xs"
-                      >
-                        Next Step →
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setIsOnboardOpen(false)}
-                      className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
-                    >
-                      {submitting ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <UserPlus className="w-4 h-4 stroke-[2.5]" />
-                      )}
-                      <span>Complete Onboarding</span>
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 5. MODAL: EDIT EMPLOYEE PROFILE */}
+      {/* 4. MODAL: EDIT EMPLOYEE PROFILE */}
       {/* ========================================================================= */}
       {isEditOpen && editingEmployee && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
