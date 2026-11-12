@@ -1594,147 +1594,162 @@ const EmployeeDocuments = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. UPLOAD DOCUMENT MODAL (ULTRA PREMIUM THEMED DESIGN) */}
+      {/* 5. UPLOAD DOCUMENT MODAL (ENTERPRISE HIGH-SECURITY REDESIGNED MODAL) */}
       {/* ========================================================================= */}
       {isUploadOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/20 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
-                  <Upload className="w-5 h-5 stroke-[2.2]" />
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                {/* Glowing Upload / Shield Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <Upload className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
                     Upload to Vault
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
                     Add verified professional certificates, government IDs, and compliance records.
                   </p>
                 </div>
               </div>
 
+              {/* Close Action */}
               <button
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setIsUploadOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            {/* Form Body */}
-            <form onSubmit={handleUploadSubmit} className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs">
-              {/* Document Title & Issuing Authority Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-sky-500" />
-                      Document Title <span className="text-rose-500">*</span>
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-normal">
+            {/* Form Section */}
+            <form onSubmit={handleUploadSubmit} className="space-y-6" data-purpose="vault-upload-form">
+              {/* Row 1: Document Details (Title & Issuing Authority) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5" data-purpose="metadata-inputs">
+                {/* Input: Document Title */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase" htmlFor="doc-title">
+                      <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                      Document Title <span className="text-rose-500 ml-0.5">*</span>
+                    </label>
+                    <span className="text-[11px] font-mono font-medium text-slate-400">
                       {uploadForm.title.length}/100 chars
                     </span>
-                  </label>
+                  </div>
                   <input
+                    id="doc-title"
                     type="text"
                     required
                     maxLength={100}
                     placeholder="e.g. Certified Scrum Master (CSM) Certificate or Passport Scan"
                     value={uploadForm.title}
                     onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all shadow-xs"
+                    className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <Building className="w-3.5 h-3.5 text-sky-500" />
-                      Issuing Authority or Institute
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-normal">e.g. Scrum Alliance, AWS, NADRA</span>
-                  </label>
+                {/* Input: Issuing Authority */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase" htmlFor="issuing-authority">
+                      <Building className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                      Issuing Authority
+                    </label>
+                    <span className="text-[11px] text-slate-400">e.g. Scrum Alliance, AWS, NADRA</span>
+                  </div>
                   <input
+                    id="issuing-authority"
                     type="text"
-                    placeholder="e.g. Scrum Alliance / Amazon Web Services / NADRA"
+                    placeholder="Certifying Authority"
                     value={uploadForm.issuer}
                     onChange={(e) => setUploadForm({ ...uploadForm, issuer: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all shadow-xs"
+                    className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
                   />
                 </div>
               </div>
 
-              {/* Category Visual Selector */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                  <span>Document Classification <span className="text-rose-500">*</span></span>
-                  <span className="text-[10px] text-slate-400 font-normal">Select the file classification</span>
-                </label>
+              {/* Section 2: Document Classification Cards */}
+              <section data-purpose="classification-selector">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase flex items-center">
+                    Document Classification <span className="text-rose-500 ml-0.5">*</span>
+                  </label>
+                  <span className="text-xs text-slate-400 font-normal">Select the file classification</span>
+                </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                   {[
-                    { id: 'OFFER_LETTER', label: 'Offer Letter', icon: FileText, desc: 'Appointment & terms' },
-                    { id: 'CONTRACT', label: 'Agreement & NDA', icon: FileCheck, desc: 'Signed contracts' },
-                    { id: 'CERTIFICATE', label: 'Certificate', icon: Award, desc: 'AWS, Scrum, PMP' },
-                    { id: 'IDENTIFICATION', label: 'National ID', icon: ShieldCheck, desc: 'Passport, CNIC' },
-                    { id: 'ACADEMIC', label: 'Academic', icon: BookOpen, desc: 'Degrees & Diplomas' },
-                    { id: 'TAX_FORM', label: 'Tax Form', icon: FileSpreadsheet, desc: 'W-2, 1099' },
+                    { id: 'OFFER_LETTER', label: 'Offer Letter', desc: 'Appointment & terms', icon: FileText },
+                    { id: 'CONTRACT', label: 'Agreement & NDA', desc: 'Signed contracts', icon: FileCheck },
+                    { id: 'CERTIFICATE', label: 'Certificate', desc: 'AWS, Scrum, PMP', icon: Award },
+                    { id: 'IDENTIFICATION', label: 'National ID', desc: 'Passport, CNIC', icon: ShieldCheck },
+                    { id: 'ACADEMIC', label: 'Academic', desc: 'Degrees & Diplomas', icon: BookOpen },
+                    { id: 'TAX_FORM', label: 'Tax Form', desc: 'W-2, 1099', icon: FileSpreadsheet },
                   ].map((cat) => {
-                    const CatIcon = cat.icon;
                     const isSelected = uploadForm.type === cat.id;
+                    const CatIcon = cat.icon;
                     return (
                       <button
-                        type="button"
                         key={cat.id}
+                        type="button"
                         onClick={() => setUploadForm({ ...uploadForm, type: cat.id })}
-                        className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 relative overflow-hidden ${isSelected
-                            ? 'bg-gradient-to-br from-sky-50 to-cyan-50/50 dark:from-sky-950/50 dark:to-slate-800 border-sky-500/80 dark:border-sky-600 text-sky-950 dark:text-white shadow-sm ring-2 ring-sky-500/20'
-                            : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300'
-                          }`}
+                        className={`relative cursor-pointer flex flex-col p-3 rounded-2xl transition-all text-left group ${
+                          isSelected
+                            ? 'border-2 border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 shadow-sm ring-4 ring-sky-500/10'
+                            : 'border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800/80 hover:border-sky-300 dark:hover:border-sky-600 hover:shadow-md'
+                        }`}
                       >
-                        <div className="flex items-center justify-between w-full">
-                          <div
-                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isSelected
-                                ? 'bg-sky-500 text-white shadow-xs'
-                                : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
-                              }`}
-                          >
-                            <CatIcon className="w-3.5 h-3.5" />
-                          </div>
-                          {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-800" />
-                          )}
+                        {isSelected && (
+                          <div className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-white dark:ring-slate-900" />
+                        )}
+                        <div
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center mb-2.5 transition-colors ${
+                            isSelected
+                              ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+                              : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-sky-50 dark:group-hover:bg-sky-950/60 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                          }`}
+                        >
+                          <CatIcon className="w-4 h-4" />
                         </div>
-                        <div>
-                          <div className="font-bold text-[11px] leading-tight">
-                            {cat.label}
-                          </div>
-                          <div className="text-[10px] text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1">
-                            {cat.desc}
-                          </div>
-                        </div>
+                        <span
+                          className={`text-xs font-bold leading-tight ${
+                            isSelected ? 'text-sky-950 dark:text-white' : 'text-slate-800 dark:text-slate-200'
+                          }`}
+                        >
+                          {cat.label}
+                        </span>
+                        <span
+                          className={`text-[11px] mt-1 line-clamp-1 ${
+                            isSelected ? 'font-medium text-sky-700/80 dark:text-sky-300/80' : 'text-slate-400'
+                          }`}
+                        >
+                          {cat.desc}
+                        </span>
                       </button>
                     );
                   })}
                 </div>
-              </div>
+              </section>
 
-              {/* Styled File Upload Dropzone & Live Vault Preview Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Styled File Upload Dropzone */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <Upload className="w-3.5 h-3.5 text-sky-500" />
-                      File Attachment (PDF, DOCX, PNG) <span className="text-rose-500">*</span>
+              {/* Row 3: File Attachment & Live Preview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+                {/* Left: Upload Dropzone Area */}
+                <section data-purpose="attachment-upload">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                      <Upload className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                      File Attachment (PDF, DOCX, PNG) <span className="text-rose-500 ml-0.5">*</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 font-normal">Max size: 15 MB</span>
-                  </label>
+                    <span className="text-[11px] font-medium text-slate-400">Max size: 15 MB</span>
+                  </div>
 
                   <div className="relative">
                     <input
@@ -1762,108 +1777,126 @@ const EmployeeDocuments = () => {
                     />
 
                     <div
-                      className={`p-3.5 sm:p-4 rounded-xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center relative z-10 ${uploadForm.file
+                      className={`h-28 rounded-2xl border-2 border-dashed transition-all p-4 flex items-center justify-center text-center cursor-pointer relative z-10 group ${
+                        uploadForm.file
                           ? 'border-sky-500/80 bg-sky-50/50 dark:bg-sky-950/30'
-                          : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-sky-400 dark:hover:border-sky-600 hover:bg-sky-50/20'
-                        }`}
+                          : 'border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50 hover:bg-sky-50/30 dark:hover:bg-sky-950/30 hover:border-sky-400'
+                      }`}
                     >
                       {uploadForm.file ? (
                         <div className="flex items-center justify-between w-full gap-3">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                              <FileCheck className="w-4 h-4" />
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                              <FileCheck className="w-5 h-5" />
                             </div>
                             <div className="text-left min-w-0">
                               <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
                                 {uploadForm.fileName || uploadForm.file.name}
                               </div>
-                              <div className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold mt-0.5">
+                              <div className="text-[11px] text-sky-600 dark:text-sky-400 font-semibold mt-0.5">
                                 {uploadForm.size || `${(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB`} • Ready to Encrypt
                               </div>
                             </div>
                           </div>
-
                           <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 text-[10px] font-bold border border-sky-200 dark:border-sky-800/60 shrink-0 shadow-xs">
                             Replace
                           </span>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-xs shrink-0">
-                            <Upload className="w-4 h-4 stroke-[2.2]" />
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-center text-sky-600 dark:text-sky-400 group-hover:scale-105 group-hover:border-sky-300 transition-all shrink-0">
+                            <Upload className="w-5 h-5" />
                           </div>
                           <div className="text-left">
-                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-700 dark:group-hover:text-sky-300 transition-colors">
                               Click to browse or drag & drop document
                             </p>
-                            <p className="text-[10px] text-slate-400">
-                              PDF, Word (DOCX), PNG, JPG up to 15 MB
-                            </p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">
+                                PDF
+                              </span>
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">
+                                DOCX
+                              </span>
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">
+                                PNG, JPG
+                              </span>
+                              <span className="text-[10px] text-slate-400 ml-1">up to 15 MB</span>
+                            </div>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
-                </div>
+                </section>
 
-                {/* Live Vault Preview Card */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5 text-sky-500" />
+                {/* Right: Live Preview & Record Card */}
+                <section data-purpose="record-summary-preview">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                      <Eye className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
                       Live Preview & Record Card
                     </span>
-                    <span className="text-[10px] text-slate-400 font-normal">Real-time summary</span>
-                  </label>
+                    <span className="text-[11px] font-medium text-slate-400">Real-time summary</span>
+                  </div>
 
-                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-cyan-50/20 dark:from-slate-800/60 dark:via-sky-950/20 dark:to-slate-800/60 border border-sky-100 dark:border-slate-700/70 flex items-center justify-between gap-3 h-[62px]">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 shadow-xs border border-sky-100 dark:border-slate-600">
-                        <FileText className="w-4 h-4 stroke-[2.2]" />
+                  <div className="h-28 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/80 dark:to-slate-850/80 p-4 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {/* Document Icon Thumbnail */}
+                      <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                        <FileText className="w-6 h-6 stroke-[2]" />
                       </div>
+                      {/* Metadata content */}
                       <div className="min-w-0">
-                        <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate">
-                          {uploadForm.title.trim() || 'Untitled Vault Document'}
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                            {uploadForm.title.trim() || 'Untitled Vault Document'}
+                          </h4>
                         </div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
-                          <span>{uploadForm.type}</span>
-                          <span>•</span>
-                          <span className="text-sky-600 dark:text-sky-400 font-semibold truncate">
-                            {uploadForm.issuer.trim() || 'Self-Submission'}
+                        <div className="flex items-center gap-1.5 mt-1 text-xs">
+                          <span className="font-bold text-slate-500 dark:text-slate-400 uppercase text-[10px] tracking-wider">
+                            {uploadForm.type ? uploadForm.type.replace(/_/g, ' ') : 'CERTIFICATE'}
+                          </span>
+                          <span className="text-slate-300 dark:text-slate-600">•</span>
+                          <span className="text-sky-600 dark:text-sky-400 font-medium truncate">
+                            {uploadForm.issuer.trim() || 'Certifying Authority'}
                           </span>
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-100/80 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flex items-center">
-                        AES-256
-                      </span>
-                    </div>
                   </div>
-                </div>
+                </section>
               </div>
 
-              {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-sky-100/60 dark:border-sky-900/40 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsUploadOpen(false)}
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-sky-600/30 hover:shadow-sky-600/50 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
-                >
-                  <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                  <span>{submitting ? 'Saving...' : 'Save & Encrypt'}</span>
-                </button>
-              </div>
+              {/* Footer / Action Controls */}
+              <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4" data-purpose="modal-footer">
+                {/* Security Trust Note */}
+                <div className="flex items-center text-xs text-slate-400 dark:text-slate-400 order-2 sm:order-1">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                  <span>End-to-end encrypted storage & immutable audit logging</span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsUploadOpen(false)}
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-sm font-semibold shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>{submitting ? 'Encrypting & Saving...' : 'Save & Encrypt'}</span>
+                  </button>
+                </div>
+              </footer>
             </form>
-          </div>
+          </main>
         </div>
       )}
 
