@@ -797,7 +797,7 @@ const Attendance = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODERN DYNAMIC SEARCH & FILTERING SECTION */}
+      {/* 3. MODERN DYNAMIC ATTENDANCE SEARCHBAR COMMAND BAR */}
       {/* ========================================================================= */}
       <ModernSearchBarSection
         statusTabs={[
@@ -947,7 +947,7 @@ const Attendance = () => {
             type="button"
             onClick={exportToCSV}
             title="Export filtered records to CSV"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer whitespace-nowrap"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -978,7 +978,7 @@ const Attendance = () => {
                       </span>
                     )}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                     {selectedEmployee === 'ALL'
                       ? `Viewing organization-wide attendance records (${selectedMonthLabel})`
                       : `Viewing timesheet for ${activeEmployeeObj?.fullName || 'Selected Employee'} (${selectedMonthLabel})`}
@@ -986,6 +986,10 @@ const Attendance = () => {
                 </div>
               </div>
             </div>
+
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full self-start md:self-auto shrink-0">
+              {filteredLogs.length} Records
+            </span>
           </div>
 
           {/* Individual Employee Profile Header (When an employee is selected) */}

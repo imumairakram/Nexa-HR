@@ -1257,19 +1257,19 @@ const Helpdesk = () => {
       {/* 6. CREATE SUPPORT TICKET MODAL (WITH DYNAMIC EMPLOYEE SELECTION) */}
       {/* ========================================================================= */}
       {isNewTicketOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-4 sm:p-5 sm:px-6 transition-all max-h-[96vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             {/* Header: Icon, Titles, Close */}
-            <div className="flex items-center justify-between gap-3 mb-3 sm:mb-3.5 pb-3 sm:pb-3.5 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-md shadow-sky-500/20 ring-2 ring-sky-100 dark:ring-sky-950/50 shrink-0">
-                  <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <LifeBuoy className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Log Operations Ticket
                   </h2>
-                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     Dispatch an operations issue or employee requisition directly to support queues.
                   </p>
                 </div>
@@ -1278,18 +1278,18 @@ const Helpdesk = () => {
               <button
                 type="button"
                 onClick={() => setIsNewTicketOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateTicket} className="space-y-3 sm:space-y-3.5">
+            <form onSubmit={handleCreateTicket} className="space-y-6">
               {/* Row 1: Target Employee & Subject */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                       <User className="w-3.5 h-3.5 text-sky-500" />
                       Target Employee / Requester
                     </label>
@@ -1297,7 +1297,7 @@ const Helpdesk = () => {
                   <select
                     value={newTicketForm.employeeId}
                     onChange={(e) => setNewTicketForm((p) => ({ ...p, employeeId: e.target.value }))}
-                    className="w-full h-9 sm:h-9.5 px-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="">Logged by Me (HR Operations / Admin Desk)</option>
                     {employees.map((emp) => (
@@ -1309,12 +1309,12 @@ const Helpdesk = () => {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                       <FileText className="w-3.5 h-3.5 text-sky-500" />
                       Ticket Subject <span className="text-rose-500">*</span>
                     </label>
-                    <span className="text-[10px] sm:text-[11px] font-medium text-slate-400">
+                    <span className="text-[11px] font-medium text-slate-400">
                       {newTicketForm.subject.length}/100 chars
                     </span>
                   </div>
@@ -1327,18 +1327,18 @@ const Helpdesk = () => {
                       setNewTicketForm((p) => ({ ...p, subject: e.target.value.slice(0, 100) }))
                     }
                     placeholder="e.g. Broken Laptop Screen / Overtime Calculation Inquiry"
-                    className="w-full h-9 sm:h-9.5 px-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
               </div>
 
               {/* Row 2: Priority & Assignee Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                     Urgency Priority
                   </label>
-                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2 h-9 sm:h-9.5">
+                  <div className="grid grid-cols-3 gap-2">
                     {[
                       { id: 'LOW', label: 'Low', hint: 'Routine' },
                       { id: 'MEDIUM', label: 'Medium', hint: 'Standard' },
@@ -1350,14 +1350,14 @@ const Helpdesk = () => {
                           key={p.id}
                           type="button"
                           onClick={() => setNewTicketForm((prev) => ({ ...prev, priority: p.id }))}
-                          className={`h-full px-2 rounded-xl border text-center transition-all cursor-pointer font-bold text-xs flex flex-col justify-center ${
+                          className={`py-2 px-3 rounded-xl border text-center transition-all cursor-pointer font-bold text-xs ${
                             isSelected
-                              ? 'bg-sky-500 text-white border-sky-500 shadow-xs ring-2 ring-sky-400/30'
+                              ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
                               : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
                           }`}
                         >
-                          <div className="text-[11px] sm:text-xs leading-none">{p.label}</div>
-                          <div className={`text-[9px] font-normal mt-0.5 leading-none opacity-80 ${isSelected ? 'text-white' : 'text-slate-400'}`}>
+                          <div>{p.label}</div>
+                          <div className={`text-[10px] font-normal opacity-80 ${isSelected ? 'text-white' : 'text-slate-400'}`}>
                             {p.hint}
                           </div>
                         </button>
@@ -1367,13 +1367,13 @@ const Helpdesk = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                     Assign Support Specialist
                   </label>
                   <select
                     value={newTicketForm.assignedTo}
                     onChange={(e) => setNewTicketForm((p) => ({ ...p, assignedTo: e.target.value }))}
-                    className="w-full h-9 sm:h-9.5 px-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="NexaHR Support Team">NexaHR Support Team</option>
                     <option value="IT Operations Desk">IT Operations Desk</option>
@@ -1391,16 +1391,16 @@ const Helpdesk = () => {
 
               {/* Row 3: Ticket Classification Grid */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                     Ticket Classification <span className="text-rose-500">*</span>
                   </label>
-                  <span className="text-[10px] sm:text-[11px] font-medium text-slate-400">
+                  <span className="text-xs font-medium text-slate-400">
                     Select department routing
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                   {[
                     { id: 'IT_HARDWARE', label: 'IT & Equipment', icon: Laptop, hint: 'Hardware, bug' },
                     { id: 'PAYROLL', label: 'Payroll & Tax', icon: CreditCard, hint: 'Slip, deduction' },
@@ -1415,29 +1415,29 @@ const Helpdesk = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setNewTicketForm((p) => ({ ...p, category: cat.id }))}
-                        className={`relative p-2 sm:p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[64px] sm:min-h-[68px] ${
+                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
                           isSelected
-                            ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-xs'
+                            ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
                             : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <div
-                            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors ${
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                               isSelected
-                                ? 'bg-sky-500 text-white shadow-xs shadow-sky-500/30'
+                                ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                             }`}
                           >
-                            <IconComp className="w-3.5 h-3.5" />
+                            <IconComp className="w-4 h-4" />
                           </div>
                           {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
                           )}
                         </div>
                         <div>
                           <p
-                            className={`text-[11px] sm:text-xs font-bold leading-tight truncate ${
+                            className={`text-xs font-bold leading-tight ${
                               isSelected
                                 ? 'text-sky-700 dark:text-sky-300'
                                 : 'text-slate-800 dark:text-slate-200'
@@ -1456,56 +1456,56 @@ const Helpdesk = () => {
               </div>
 
               {/* Row 4: Two-column Description & Live Routing Preview */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 {/* Description Column */}
                 <div>
-                  <label className="block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                     Detailed Issue Description <span className="text-rose-500">*</span>
                   </label>
                   <textarea
-                    rows={2}
+                    rows={4}
                     required
                     placeholder="Provide full context, error details, or employee requisition..."
                     value={newTicketForm.description}
                     onChange={(e) =>
                       setNewTicketForm((p) => ({ ...p, description: e.target.value }))
                     }
-                    className="w-full h-20 sm:h-22 px-3 py-2 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all resize-none shadow-inner leading-relaxed"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all resize-none shadow-inner"
                   />
                 </div>
 
                 {/* Live Preview Column */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                       <Eye className="w-3.5 h-3.5 text-sky-500" />
                       Live Preview & Routing Card
                     </label>
-                    <span className="text-[10px] sm:text-[11px] font-medium text-slate-400">
+                    <span className="text-xs font-medium text-slate-400">
                       Real-time summary
                     </span>
                   </div>
 
-                  <div className="h-20 sm:h-22 p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 sm:gap-3 shadow-xs">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex items-start gap-3.5 min-h-[110px]">
+                    <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
                       <LifeBuoy className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
                         {newTicketForm.subject || 'Untitled Ticket Subject'}
                       </h4>
-                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-xs">
-                        <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           {newTicketForm.category.replace('_', ' ')}
                         </span>
                         <span className="text-slate-300 dark:text-slate-600">•</span>
-                        <span className="text-[10px] sm:text-[11px] font-bold text-sky-600 dark:text-sky-400 truncate">
+                        <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 truncate">
                           {newTicketForm.assignedTo}
                         </span>
                       </div>
-                      <div className="mt-1 flex items-center gap-1.5">
+                      <div className="mt-2.5 flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold tracking-wide uppercase ${
+                          className={`px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase ${
                             newTicketForm.priority === 'HIGH'
                               ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                               : newTicketForm.priority === 'MEDIUM'
@@ -1515,7 +1515,7 @@ const Helpdesk = () => {
                         >
                           {newTicketForm.priority} PRIORITY
                         </span>
-                        <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium truncate">
+                        <span className="text-[10px] text-slate-400 font-medium truncate">
                           Target: {newTicketForm.employeeId ? (employees.find(e => e.id === newTicketForm.employeeId)?.firstName || 'Assigned Employee') : 'HR Operations Desk'}
                         </span>
                       </div>
@@ -1525,33 +1525,33 @@ const Helpdesk = () => {
               </div>
 
               {/* Footer: Trust text + Action buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 sm:pt-3.5 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 order-2 sm:order-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   <span>Guaranteed SLA compliance & automated dispatch</span>
                 </div>
 
-                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end order-1 sm:order-2">
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                   <button
                     type="button"
                     onClick={() => setIsNewTicketOpen(false)}
-                    className="flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 sm:flex-none px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-semibold shadow-md shadow-sky-500/25 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         <span>Dispatching...</span>
                       </>
                     ) : (
                       <>
-                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <Check className="w-4 h-4 stroke-[2.5]" />
                         <span>Dispatch Support Ticket</span>
                       </>
                     )}
