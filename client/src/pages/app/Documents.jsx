@@ -1097,11 +1097,6 @@ ${doc.description || 'This document serves as an official verified corporate rec
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Vault Telemetry */}
           <div className="space-y-3 flex-1 min-w-0">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100/80 dark:bg-sky-950/80 text-sky-800 dark:text-sky-200 text-xs font-extrabold border border-sky-200/80 dark:border-sky-800/60">
-              <ShieldCheck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span>HR Document Issuance & Governance Vault</span>
-            </div>
-
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Enterprise Document Issuance & Policy Governance
             </h2>

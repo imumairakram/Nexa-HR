@@ -60,13 +60,13 @@ const getCategoryLabel = (cat) => {
 };
 
 const CATEGORY_TABS = [
-  { id: 'ALL', label: 'All Circulars' },
-  { id: 'PINNED', label: 'Pinned & Urgent' },
-  { id: 'EVENTS', label: 'Social & Events' },
-  { id: 'POLICIES', label: 'HR Policies' },
-  { id: 'BENEFITS', label: 'Benefits & Perks' },
-  { id: 'MEETINGS', label: 'Meetings & Townhalls' },
-  { id: 'OPERATIONS', label: 'Operations & IT' },
+  { id: 'ALL', label: 'All Notices', shortLabel: 'All' },
+  { id: 'PINNED', label: 'Pinned & Urgent', shortLabel: 'Pinned' },
+  { id: 'EVENTS', label: 'Social & Events', shortLabel: 'Events' },
+  { id: 'POLICIES', label: 'HR Policies', shortLabel: 'Policies' },
+  { id: 'BENEFITS', label: 'Benefits & Perks', shortLabel: 'Benefits' },
+  { id: 'MEETINGS', label: 'Meetings & Townhalls', shortLabel: 'Meetings' },
+  { id: 'OPERATIONS', label: 'Operations & IT', shortLabel: 'Operations' },
 ];
 
 const EmployeeAnnouncements = () => {
@@ -223,9 +223,9 @@ const EmployeeAnnouncements = () => {
 
   // Sort & Date options
   const sortOptions = [
-    { key: 'date', label: 'Sort: Date' },
-    { key: 'priority', label: 'Sort: Priority' },
-    { key: 'title', label: 'Sort: Title' },
+    { key: 'date', label: 'Date' },
+    { key: 'priority', label: 'Priority' },
+    { key: 'title', label: 'Title' },
   ];
 
   const dateRangeOptions = [
@@ -310,7 +310,7 @@ const EmployeeAnnouncements = () => {
   }, [announcements]);
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full max-w-full overflow-x-hidden">
       <EmployeePageHeader
         title="Company Notice Board"
         subtitle="Official executive circulars, policy amendments, benefits alerts, and corporate memos."
@@ -427,7 +427,7 @@ const EmployeeAnnouncements = () => {
       <ModernSearchBarSection
         statusTabs={CATEGORY_TABS.map((cat) => ({
           key: cat.id,
-          label: cat.label.replace(' All', ''),
+          label: cat.shortLabel || cat.label,
           count: categoryCounts[cat.id] ?? 0,
         }))}
         activeStatus={filter}

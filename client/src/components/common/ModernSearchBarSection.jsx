@@ -85,17 +85,21 @@ const ModernSearchBarSection = ({
   }, []);
 
   const activeSortOption = sortOptions.find((s) => s.key === activeSort) || sortOptions[0];
+  const sortRawLabel = activeSortOption?.label || 'Default';
+  const sortDisplayLabel = sortRawLabel.toLowerCase().startsWith('sort:')
+    ? sortRawLabel
+    : `Sort: ${sortRawLabel}`;
 
   return (
-    <div className={`space-y-2.5 sm:space-y-3 ${className}`}>
+    <div className={`space-y-2.5 sm:space-y-3 w-full max-w-full min-w-0 ${className}`}>
       {/* ========================================================================= */}
       {/* ROW 1: STATUS SEGMENTS + DATE RANGE & SORT PICKERS (+ ACTION BUTTON)      */}
       {/* ========================================================================= */}
       {(statusTabs.length > 0 || dateRangeOptions.length > 0 || sortOptions.length > 0 || actionButton) && (
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 w-full min-w-0">
           {/* Left: Segmented Status Pills */}
           {statusTabs.length > 0 && (
-            <div className="flex items-center gap-1 p-1 bg-slate-100/90 dark:bg-slate-800/80 rounded-full overflow-x-auto max-w-full scrollbar-none no-scrollbar border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+            <div className="flex items-center gap-1 p-1 bg-slate-100/90 dark:bg-slate-800/80 rounded-full overflow-x-auto max-w-full min-w-0 scrollbar-none no-scrollbar border border-slate-200/60 dark:border-slate-700/60">
               {statusTabs.map((tab) => {
                 const isSelected = activeStatus === tab.key;
                 return (
@@ -128,7 +132,7 @@ const ModernSearchBarSection = ({
           )}
 
           {/* Right: Date Range + Sort Controls + Action Button */}
-          <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto shrink-0 w-full sm:w-auto justify-between sm:justify-start">
+          <div className="flex flex-wrap items-center gap-2 max-w-full">
             {/* Date Range Picker Button */}
             {dateRangeOptions.length > 0 && (
               <div className="relative" ref={dateMenuRef}>
@@ -189,7 +193,7 @@ const ModernSearchBarSection = ({
                   className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/70 shadow-2xs transition-all cursor-pointer"
                 >
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="truncate max-w-[130px] sm:max-w-none">Sort: {activeSortOption?.label || 'Default'}</span>
+                  <span className="truncate max-w-[130px] sm:max-w-none">{sortDisplayLabel}</span>
                 </button>
 
                 {showSortMenu && (

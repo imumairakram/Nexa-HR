@@ -161,9 +161,9 @@ const Announcement = () => {
 
   // Sort Options
   const sortOptions = [
-    { key: 'date', label: 'Sort: Date' },
-    { key: 'priority', label: 'Sort: Priority' },
-    { key: 'title', label: 'Sort: Title' },
+    { key: 'date', label: 'Date' },
+    { key: 'priority', label: 'Priority' },
+    { key: 'title', label: 'Title' },
   ];
 
   const dateRangeOptions = [

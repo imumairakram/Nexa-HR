@@ -504,9 +504,9 @@ const EmployeeDocuments = () => {
 
   // Sort & Date Options
   const sortOptions = [
-    { key: 'date', label: 'Sort: Date' },
-    { key: 'title', label: 'Sort: Title' },
-    { key: 'size', label: 'Sort: Size' },
+    { key: 'date', label: 'Date' },
+    { key: 'title', label: 'Title' },
+    { key: 'size', label: 'File Size' },
   ];
 
   const dateRangeOptions = [
@@ -858,7 +858,7 @@ const EmployeeDocuments = () => {
   }, [totalVaultMB, personalDocs.length, policies.length]);
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full max-w-full overflow-x-hidden">
       <EmployeePageHeader
         title="Documents & Policies Hub"
         subtitle="Access your personal employment vault, contracts, tax certificates, and verified company compliance handbooks."
@@ -1083,16 +1083,16 @@ const EmployeeDocuments = () => {
           </div>
         }
         actionButton={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Vault Switch Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
               <button
                 type="button"
                 onClick={() => {
                   setActiveTab('personal');
                   setTypeFilter('ALL');
                 }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'personal'
                     ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -1106,7 +1106,7 @@ const EmployeeDocuments = () => {
                   setActiveTab('policies');
                   setTypeFilter('ALL');
                 }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'policies'
                     ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -1117,7 +1117,7 @@ const EmployeeDocuments = () => {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
@@ -1149,7 +1149,7 @@ const EmployeeDocuments = () => {
               <button
                 type="button"
                 onClick={() => setIsUploadOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap hover:scale-105 active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Upload</span>
