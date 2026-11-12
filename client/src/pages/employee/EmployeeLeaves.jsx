@@ -556,7 +556,7 @@ const EmployeeLeaves = () => {
         actionButton={
           <button
             type="button"
-            onClick={() => setIsApplyModalOpen(true)}
+            onClick={() => setIsApplyOpen(true)}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -791,7 +791,7 @@ const EmployeeLeaves = () => {
               {statusFilter === 'ALL' && !searchQuery ? (
                 <div className="pt-2">
                   <button
-                    onClick={() => setIsApplyModalOpen(true)}
+                    onClick={() => setIsApplyOpen(true)}
                     className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -935,79 +935,99 @@ const EmployeeLeaves = () => {
       {/* 5. APPLY MODAL (ULTRA PREMIUM THEMED DESIGN) */}
       {/* ========================================================================= */}
       {isApplyOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative max-h-[92vh]">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-sky-200/70 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/80 to-cyan-50/60 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-
-              <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 via-sky-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-600/30">
-                  <CalendarDays className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <CalendarDays className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Apply for Time-Off
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
-                    Submit leave request for supervisory evaluation and entitlement tracking.
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    Submit leave request for supervisory evaluation and quota entitlement tracking.
                   </p>
                 </div>
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsApplyOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-sky-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Form Body */}
-            <form onSubmit={handleApplySubmit} className="overflow-y-auto flex-1 px-6 py-5 space-y-4 text-xs">
-              {/* Leave Policy Classification Cards */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                  <span>Leave Policy Classification <span className="text-rose-500">*</span></span>
-                  <span className="text-xs text-slate-400 font-normal">Select leave category</span>
-                </label>
+            <form onSubmit={handleApplySubmit} className="space-y-6">
+              {/* Row 1: Leave Policy Classification Cards */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Leave Policy Classification <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-xs font-medium text-slate-400">
+                    Select leave category & quota
+                  </span>
+                </div>
 
                 {leaveTypes && leaveTypes.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                     {leaveTypes.map((lt) => {
                       const isSelected = String(leaveForm.leaveTypeId) === String(lt.id);
+                      const nameLower = (lt.name || '').toLowerCase();
+                      const IconComp = nameLower.includes('sick') || nameLower.includes('med')
+                        ? AlertCircle
+                        : nameLower.includes('casual') || nameLower.includes('personal')
+                        ? Clock
+                        : nameLower.includes('matern') || nameLower.includes('patern')
+                        ? Sparkles
+                        : nameLower.includes('unpaid')
+                        ? FileText
+                        : CalendarDays;
+
                       return (
                         <button
-                          type="button"
                           key={lt.id}
-                          onClick={() => setLeaveForm({ ...leaveForm, leaveTypeId: lt.id })}
-                          className={`p-3 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${isSelected
-                              ? 'bg-sky-50/90 dark:bg-sky-950/50 border-sky-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-sky-500/30'
-                              : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-sky-50/50 dark:hover:bg-slate-800 hover:border-sky-300/80'
-                            }`}
+                          type="button"
+                          onClick={() => setLeaveForm((p) => ({ ...p, leaveTypeId: lt.id }))}
+                          className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[96px] ${
+                            isSelected
+                              ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
+                              : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                          }`}
                         >
-                          <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${isSelected
-                                  ? 'bg-sky-600 text-white shadow-xs'
-                                  : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600'
-                                }`}
+                              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                                isSelected
+                                  ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                              }`}
                             >
-                              <CalendarDays className="w-4 h-4" />
+                              <IconComp className="w-4 h-4" />
                             </div>
-                            <div className="min-w-0">
-                              <div className="font-bold text-xs leading-tight truncate">
-                                {lt.name}
-                              </div>
-                              <div className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">
-                                {lt.daysAllowed} days annual quota
-                              </div>
-                            </div>
+                            {isSelected && (
+                              <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
+                            )}
                           </div>
-
-                          {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-sky-500 ring-2 ring-sky-300 dark:ring-sky-800 shrink-0" />
-                          )}
+                          <div>
+                            <p
+                              className={`text-xs font-bold leading-tight truncate ${
+                                isSelected
+                                  ? 'text-sky-700 dark:text-sky-300'
+                                  : 'text-slate-800 dark:text-slate-200'
+                              }`}
+                            >
+                              {lt.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-0.5 truncate">
+                              {lt.daysAllowed ? `${lt.daysAllowed} days quota` : 'Custom quota'}
+                            </p>
+                          </div>
                         </button>
                       );
                     })}
@@ -1017,141 +1037,179 @@ const EmployeeLeaves = () => {
                     required
                     value={leaveForm.leaveTypeId}
                     onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all cursor-pointer"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="">Select Leave Policy</option>
                   </select>
                 )}
               </div>
 
-              {/* Day Mode Selector (Full Day vs Half Day) */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                  <span>Duration Type</span>
-                  <span className="text-xs text-slate-400 font-normal">Full absence or partial</span>
-                </label>
-                <div className="grid grid-cols-2 gap-2 p-1 sm:p-1.5 bg-slate-100/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-                  <button
-                    type="button"
-                    onClick={() => setLeaveForm({ ...leaveForm, dayType: 'FULL' })}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${leaveForm.dayType === 'FULL'
-                        ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
-                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                      }`}
-                  >
-                    <span>Full Day</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLeaveForm({ ...leaveForm, dayType: 'HALF' })}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${leaveForm.dayType === 'HALF'
-                        ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
-                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                      }`}
-                  >
-                    <span>Half Day (0.5 Day)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Start Date & End Date Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
-                    Start Date <span className="text-rose-500">*</span>
+              {/* Row 2: Duration Type & Date Range Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Duration Type */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                    Duration Type
                   </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'FULL', label: 'Full Day', hint: 'Full absence' },
+                      { id: 'HALF', label: 'Half Day', hint: '0.5 day (partial)' },
+                    ].map((d) => {
+                      const isSelected = leaveForm.dayType === d.id;
+                      return (
+                        <button
+                          key={d.id}
+                          type="button"
+                          onClick={() => setLeaveForm((prev) => ({ ...prev, dayType: d.id }))}
+                          className={`py-2 px-3 rounded-xl border text-center transition-all cursor-pointer font-bold text-xs ${
+                            isSelected
+                              ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
+                              : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
+                          }`}
+                        >
+                          <div>{d.label}</div>
+                          <div className={`text-[10px] font-normal opacity-80 ${isSelected ? 'text-white' : 'text-slate-400'}`}>
+                            {d.hint}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-sky-500" />
+                      Start Date <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <input
                     type="date"
                     required
                     value={leaveForm.startDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, startDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
-                    End Date <span className="text-rose-500">*</span>
-                  </label>
+                {/* End Date */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-sky-500" />
+                      End Date <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <input
                     type="date"
                     required
                     value={leaveForm.endDate}
                     onChange={(e) => setLeaveForm({ ...leaveForm, endDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all cursor-pointer shadow-xs text-xs"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   />
                 </div>
               </div>
 
-              {/* Reason & Purpose Details */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5 text-sky-500" />
-                    Reason & Handover Details <span className="text-rose-500">*</span>
-                  </span>
-                </label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="State context, urgent coverage contacts, and handover arrangements during absence..."
-                  value={leaveForm.reason}
-                  onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 outline-none transition-all resize-none leading-relaxed shadow-xs text-xs"
-                />
-              </div>
-
-              {/* Live Request Preview Card */}
-              <div className="px-4 py-2.5 rounded-xl bg-sky-50/60 dark:bg-slate-900/60 border border-sky-200/70 dark:border-sky-800/60 flex items-center justify-between gap-3 shadow-xs">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-                    <CalendarDays className="w-4 h-4 stroke-[2.2]" />
+              {/* Row 3: Two-column Description & Live Routing Preview */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {/* Description Column */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <MessageSquare className="w-3.5 h-3.5 text-sky-500" />
+                      Reason & Handover Details <span className="text-rose-500">*</span>
+                    </label>
                   </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-slate-900 dark:text-white text-xs truncate">
-                      {leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="State context, urgent coverage contacts, and handover arrangements during absence..."
+                    value={leaveForm.reason}
+                    onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all resize-none shadow-inner"
+                  />
+                </div>
+
+                {/* Live Preview Column */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5 text-sky-500" />
+                      Live Preview & Record Card
+                    </label>
+                    <span className="text-xs font-medium text-slate-400">
+                      Real-time summary
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex items-start gap-3.5 min-h-[110px]">
+                    <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
+                      <CalendarDays className="w-5 h-5" />
                     </div>
-                    <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
-                      <span>{leaveForm.startDate || 'Start'} to {leaveForm.endDate || 'End'}</span>
-                      <span>•</span>
-                      <span className="text-sky-600 dark:text-sky-400 font-semibold">
-                        {calculateDays()} {calculateDays() === 1 ? 'Day' : 'Days'}
-                      </span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
+                        {leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          {leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.daysAllowed
+                            ? `${leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.daysAllowed} Days Annual Quota`
+                            : 'Standard Policy'}
+                        </span>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                        <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 truncate">
+                          {leaveForm.startDate || 'Start Date'} to {leaveForm.endDate || 'End Date'}
+                        </span>
+                      </div>
+                      <div className="mt-2.5 flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">
+                          {calculateDays()} {calculateDays() === 1 ? 'Day' : 'Days'} ({leaveForm.dayType === 'HALF' ? 'Half Day' : 'Full Day'})
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                          Pending Review
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200/70 dark:border-amber-800/60 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                    Pending Approval
-                  </span>
-                </div>
               </div>
 
-              {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-slate-100 dark:border-slate-800 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsApplyOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white text-xs font-bold shadow-sm shadow-sky-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-[1.02]"
-                >
-                  {submitting ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
-                  )}
-                  <span>Submit Request</span>
-                </button>
+              {/* Footer: Trust text + Action buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Automated quota reconciliation & multi-tier approval routing</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsApplyOpen(false)}
+                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                        <span>Submit Request</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
