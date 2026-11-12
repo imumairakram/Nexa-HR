@@ -939,6 +939,11 @@ const EmployeeDocuments = () => {
           presetWave="wave1"
           dataPoints={personalDocsSparkData}
           loading={loading}
+          onClick={() => {
+            setActiveTab('personal');
+            setTypeFilter('ALL');
+          }}
+          className="cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
         />
 
         {/* Card 2: Light Card - Handbooks & Charters */}
@@ -955,6 +960,11 @@ const EmployeeDocuments = () => {
           presetWave="wave2"
           dataPoints={policiesSparkData}
           loading={loading}
+          onClick={() => {
+            setActiveTab('policies');
+            setTypeFilter('ALL');
+          }}
+          className="cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
         />
 
         {/* Card 3: Light Card - Authenticity & Compliance */}
@@ -997,13 +1007,13 @@ const EmployeeDocuments = () => {
         statusTabs={
           activeTab === 'personal'
             ? [
-                { key: 'ALL', label: 'All Documents', count: personalDocs.length },
+                { key: 'ALL', label: 'All', count: personalDocs.length },
                 { key: 'CONTRACT', label: 'Contracts', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('CONTRACT')).length },
                 { key: 'CERTIFICATE', label: 'Certificates', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('CERTIFICATE')).length },
-                { key: 'ID', label: 'IDs & Identity', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('ID') || (d.type || '').toUpperCase().includes('PASSPORT')).length },
+                { key: 'ID', label: 'IDs', count: personalDocs.filter((d) => (d.type || '').toUpperCase().includes('ID') || (d.type || '').toUpperCase().includes('PASSPORT')).length },
               ]
             : [
-                { key: 'ALL', label: 'All Policies', count: policies.length },
+                { key: 'ALL', label: 'All', count: policies.length },
                 { key: 'GOVERNANCE', label: 'Governance', count: policies.filter((p) => p.category === 'GOVERNANCE').length },
                 { key: 'SECURITY', label: 'Security', count: policies.filter((p) => p.category === 'SECURITY').length },
                 { key: 'WORKPLACE', label: 'Workplace', count: policies.filter((p) => p.category === 'WORKPLACE').length },
@@ -1083,79 +1093,16 @@ const EmployeeDocuments = () => {
           </div>
         }
         actionButton={
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Vault Switch Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('personal');
-                  setTypeFilter('ALL');
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === 'personal'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
-              >
-                Vault ({personalDocs.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('policies');
-                  setTypeFilter('ALL');
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === 'policies'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
-              >
-                Policies ({policies.length})
-              </button>
-            </div>
-
-            {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                title="Table List View"
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <List className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                title="Card Grid View"
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <Grid className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Upload Button */}
-            {activeTab === 'personal' && (
-              <button
-                type="button"
-                onClick={() => setIsUploadOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap hover:scale-105 active:scale-95"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Upload</span>
-              </button>
-            )}
-          </div>
+          activeTab === 'personal' ? (
+            <button
+              type="button"
+              onClick={() => setIsUploadOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Upload Document</span>
+            </button>
+          ) : null
         }
       />
 
@@ -1164,7 +1111,7 @@ const EmployeeDocuments = () => {
       {/* ========================================================================= */}
       {activeTab === 'personal' && (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Personal Employment Vault & Certificates</span>
@@ -1173,9 +1120,64 @@ const EmployeeDocuments = () => {
                 AES-256 encrypted repository of verified employment contracts, credentials, and tax filings
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full self-start sm:self-auto">
-              {filteredPersonalDocs.length} Documents
-            </span>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Vault Switch Toggle */}
+              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('personal');
+                    setTypeFilter('ALL');
+                  }}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs"
+                >
+                  Vault ({personalDocs.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('policies');
+                    setTypeFilter('ALL');
+                  }}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                >
+                  Policies ({policies.length})
+                </button>
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  title="Table List View"
+                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                    viewMode === 'list'
+                      ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
+                      : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <List className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  title="Card Grid View"
+                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                    viewMode === 'grid'
+                      ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
+                      : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <Grid className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full shrink-0">
+                {filteredPersonalDocs.length} Documents
+              </span>
+            </div>
           </div>
 
           {loading ? (
@@ -1429,7 +1431,7 @@ const EmployeeDocuments = () => {
       {/* Policies Tab Content */}
       {activeTab === 'policies' && (
         <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                 Company Policies & Operating Handbooks
@@ -1438,9 +1440,36 @@ const EmployeeDocuments = () => {
                 Official enterprise charters, compliance frameworks, and employee benefit guides
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full self-start sm:self-auto">
-              {filteredPolicies.length} Handbooks
-            </span>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Vault Switch Toggle */}
+              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('personal');
+                    setTypeFilter('ALL');
+                  }}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                >
+                  Vault ({personalDocs.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('policies');
+                    setTypeFilter('ALL');
+                  }}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs"
+                >
+                  Policies ({policies.length})
+                </button>
+              </div>
+
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full shrink-0">
+                {filteredPolicies.length} Handbooks
+              </span>
+            </div>
           </div>
 
           {loading ? (
