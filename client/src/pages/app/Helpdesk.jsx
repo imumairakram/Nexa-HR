@@ -52,7 +52,7 @@ const CATEGORY_OPTIONS = [
 const PRIORITY_OPTIONS = [
   { id: 'ALL', label: 'All Priorities' },
   { id: 'HIGH', label: 'High Priority', color: 'rose' },
-  { id: 'MEDIUM', label: 'Medium Priority', color: 'amber' },
+  { id: 'MEDIUM', label: 'Medium Priority', color: 'sky' },
   { id: 'LOW', label: 'Low Priority', color: 'slate' },
 ];
 
@@ -913,7 +913,7 @@ const Helpdesk = () => {
                         t.priority === 'HIGH'
                           ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
                           : t.priority === 'MEDIUM'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
+                          ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60'
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200/60'
                       }`}
                     >
@@ -1509,7 +1509,7 @@ const Helpdesk = () => {
                             newTicketForm.priority === 'HIGH'
                               ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                               : newTicketForm.priority === 'MEDIUM'
-                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                              ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
                               : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                           }`}
                         >

@@ -730,7 +730,7 @@ const EmployeeHelpdesk = () => {
                         t.priority === 'HIGH'
                           ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
                           : t.priority === 'MEDIUM'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
+                          ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60'
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200/60'
                       }`}
                     >
@@ -1059,8 +1059,8 @@ const EmployeeHelpdesk = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-2 h-11">
                     {[
-                      { id: 'LOW', label: 'Low', badge: '24h SLA', color: 'blue' },
-                      { id: 'MEDIUM', label: 'Medium', badge: '< 8h SLA', color: 'amber' },
+                      { id: 'LOW', label: 'Low', badge: '24h SLA', color: 'slate' },
+                      { id: 'MEDIUM', label: 'Medium', badge: '< 8h SLA', color: 'sky' },
                       { id: 'HIGH', label: 'High Priority', badge: '< 4h SLA', color: 'rose' },
                     ].map((p) => {
                       const isSelected = newTicketForm.priority === p.id;
@@ -1074,8 +1074,8 @@ const EmployeeHelpdesk = () => {
                               ? p.id === 'HIGH'
                                 ? 'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs ring-2 ring-rose-500/20'
                                 : p.id === 'MEDIUM'
-                                ? 'bg-amber-50/90 dark:bg-amber-950/60 border-amber-500 text-amber-700 dark:text-amber-300 font-bold shadow-xs ring-2 ring-amber-500/20'
-                                : 'bg-sky-50/90 dark:bg-sky-950/60 border-sky-500 text-sky-700 dark:text-sky-300 font-bold shadow-xs ring-2 ring-sky-500/20'
+                                ? 'bg-sky-50/90 dark:bg-sky-950/60 border-sky-500 text-sky-700 dark:text-sky-300 font-bold shadow-xs ring-2 ring-sky-500/20'
+                                : 'bg-slate-100 dark:bg-slate-800 border-slate-400 dark:border-slate-500 text-slate-800 dark:text-slate-200 font-bold shadow-xs ring-2 ring-slate-400/20'
                               : 'bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'
                           }`}
                         >
@@ -1085,8 +1085,8 @@ const EmployeeHelpdesk = () => {
                                 p.id === 'HIGH'
                                   ? 'bg-rose-500' + (isSelected ? ' animate-pulse' : '')
                                   : p.id === 'MEDIUM'
-                                  ? 'bg-amber-500'
-                                  : 'bg-sky-500'
+                                  ? 'bg-sky-500'
+                                  : 'bg-slate-400'
                               }`}
                             />
                             <span className="text-xs font-bold truncate">{p.label}</span>
@@ -1227,8 +1227,8 @@ const EmployeeHelpdesk = () => {
                           newTicketForm.priority === 'HIGH'
                             ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 border-rose-200 dark:border-rose-800'
                             : newTicketForm.priority === 'MEDIUM'
-                            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                            : 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200 dark:border-sky-800'
+                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200 dark:border-sky-800'
+                            : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                         }`}
                       >
                         <span
@@ -1236,8 +1236,8 @@ const EmployeeHelpdesk = () => {
                             newTicketForm.priority === 'HIGH'
                               ? 'bg-rose-500 animate-pulse'
                               : newTicketForm.priority === 'MEDIUM'
-                              ? 'bg-amber-500'
-                              : 'bg-sky-500'
+                              ? 'bg-sky-500'
+                              : 'bg-slate-400'
                           }`}
                         />
                         <span>{newTicketForm.priority} Priority</span>
