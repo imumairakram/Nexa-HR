@@ -650,12 +650,102 @@ const EmployeeAttendance = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. ATTENDANCE HISTORY & TIMESHEETS CONTAINER (MATCHED TO HR/ADMIN UI) */}
+      {/* 3. MODERN DYNAMIC ATTENDANCE SEARCHBAR & FILTER SECTION */}
+      {/* ========================================================================= */}
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All Records', count: counts.all },
+          { key: 'PRESENT', label: 'Present', count: counts.present },
+          { key: 'LATE', label: 'Late', count: counts.late },
+          { key: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
+        ]}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search records, notes, punch times..."
+        searchHint="status:late"
+        dateRangeLabel={selectedMonthLabel}
+        dateRangeOptions={pastMonthsList.map((m) => ({
+          key: `${m.year}-${m.month}`,
+          label: m.label,
+        }))}
+        activeDateRange={`${selectedYear}-${selectedMonth}`}
+        onDateRangeChange={(val) => {
+          const [y, m] = val.split('-').map(Number);
+          setSelectedYear(y);
+          setSelectedMonth(m);
+        }}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={statusFilter !== 'ALL' ? 1 : 0}
+        filterContent={
+          <div className="space-y-2">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Attendance Status
+              </span>
+              {statusFilter !== 'ALL' && (
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('ALL')}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className="space-y-1">
+              {[
+                { id: 'ALL', label: 'All Records', count: counts.all },
+                { id: 'PRESENT', label: 'Present', count: counts.present },
+                { id: 'LATE', label: 'Late Arrival', count: counts.late },
+                { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
+              ].map((st) => (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => setStatusFilter(st.id)}
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                    statusFilter === st.id
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span>{st.label}</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                    {st.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        }
+        actionButton={
+          <button
+            type="button"
+            onClick={exportToCSV}
+            title="Export filtered records to CSV"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
+        }
+      />
+
+      {/* ========================================================================= */}
+      {/* 4. ATTENDANCE HISTORY & TIMESHEETS CONTAINER (MATCHED TO HR/ADMIN UI) */}
       {/* ========================================================================= */}
       {loading ? (
         <TableSkeleton rows={6} cols={4} />
       ) : (
-        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all">
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all overflow-hidden">
           {/* Header with Title */}
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -680,96 +770,6 @@ const EmployeeAttendance = () => {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Modern Dynamic Attendance Searchbar Section */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40">
-            <ModernSearchBarSection
-              statusTabs={[
-                { key: 'ALL', label: 'All Records', count: counts.all },
-                { key: 'PRESENT', label: 'Present', count: counts.present },
-                { key: 'LATE', label: 'Late', count: counts.late },
-                { key: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
-              ]}
-              activeStatus={statusFilter}
-              onStatusChange={setStatusFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Search records, notes, punch times..."
-              searchHint="status:late"
-              dateRangeLabel={selectedMonthLabel}
-              dateRangeOptions={pastMonthsList.map((m) => ({
-                key: `${m.year}-${m.month}`,
-                label: m.label,
-              }))}
-              activeDateRange={`${selectedYear}-${selectedMonth}`}
-              onDateRangeChange={(val) => {
-                const [y, m] = val.split('-').map(Number);
-                setSelectedYear(y);
-                setSelectedMonth(m);
-              }}
-              sortOptions={sortOptions}
-              activeSort={activeSort}
-              sortOrder={sortOrder}
-              onSortChange={(key, order) => {
-                setActiveSort(key);
-                setSortOrder(order);
-              }}
-              filterCount={statusFilter !== 'ALL' ? 1 : 0}
-              filterContent={
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                      Attendance Status
-                    </span>
-                    {statusFilter !== 'ALL' && (
-                      <button
-                        type="button"
-                        onClick={() => setStatusFilter('ALL')}
-                        className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
-                      >
-                        Reset
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    {[
-                      { id: 'ALL', label: 'All Records', count: counts.all },
-                      { id: 'PRESENT', label: 'Present', count: counts.present },
-                      { id: 'LATE', label: 'Late Arrival', count: counts.late },
-                      { id: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
-                    ].map((st) => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => setStatusFilter(st.id)}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                          statusFilter === st.id
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                        }`}
-                      >
-                        <span>{st.label}</span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
-                          {st.count}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              }
-              actionButton={
-                <button
-                  type="button"
-                  onClick={exportToCSV}
-                  title="Export filtered records to CSV"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export CSV</span>
-                </button>
-              }
-            />
           </div>
 
           {/* Table / Timeline Data Grid */}

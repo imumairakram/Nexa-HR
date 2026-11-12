@@ -797,12 +797,171 @@ const Attendance = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. ATTENDANCE HISTORY & TIMESHEETS CONTAINER */}
+      {/* 3. MODERN DYNAMIC SEARCH & FILTERING SECTION */}
+      {/* ========================================================================= */}
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All Records', count: counts.all },
+          { key: 'PRESENT', label: 'Present', count: counts.present },
+          { key: 'LATE', label: 'Late', count: counts.late },
+          { key: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
+        ]}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search records, employee name, employee code, notes..."
+        searchHint="status:late"
+        filterTags={[
+          ...(selectedEmployee !== 'ALL' && activeEmployeeObj
+            ? [{ key: 'employee', label: `staff: ${activeEmployeeObj.fullName || activeEmployeeObj.firstName}` }]
+            : []),
+          ...(selectedDepartment !== 'ALL'
+            ? [{ key: 'department', label: `dept: ${selectedDepartment}` }]
+            : []),
+        ]}
+        onRemoveTag={(tag) => {
+          if (tag.key === 'employee') setSelectedEmployee('ALL');
+          if (tag.key === 'department') setSelectedDepartment('ALL');
+        }}
+        dateRangeLabel={selectedMonthLabel}
+        dateRangeOptions={pastMonthsList.map((m) => ({
+          key: `${m.year}-${m.month}`,
+          label: m.label,
+        }))}
+        activeDateRange={`${selectedYear}-${selectedMonth}`}
+        onDateRangeChange={(val) => {
+          const [y, m] = val.split('-').map(Number);
+          setSelectedYear(y);
+          setSelectedMonth(m);
+        }}
+        sortOptions={sortOptions}
+        activeSort={activeSort}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setActiveSort(key);
+          setSortOrder(order);
+        }}
+        filterCount={
+          (selectedEmployee !== 'ALL' ? 1 : 0) +
+          (selectedDepartment !== 'ALL' ? 1 : 0)
+        }
+        filterContent={
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Attendance Filters
+              </span>
+              {(selectedEmployee !== 'ALL' || selectedDepartment !== 'ALL') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedEmployee('ALL');
+                    setSelectedDepartment('ALL');
+                  }}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset All
+                </button>
+              )}
+            </div>
+
+            {/* Employee Filter */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Staff Member
+              </label>
+              <div className="space-y-1 max-h-40 overflow-y-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEmployee('ALL')}
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                    selectedEmployee === 'ALL'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span>All Employees</span>
+                  {selectedEmployee === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
+                </button>
+                {employees.map((emp) => {
+                  const isSelected = selectedEmployee === emp.id || selectedEmployee === emp.employeeCode;
+                  return (
+                    <button
+                      key={emp.id}
+                      type="button"
+                      onClick={() => setSelectedEmployee(emp.id)}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                        isSelected
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="truncate">{emp.firstName} {emp.lastName}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Department Filter */}
+            <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Department
+              </label>
+              <div className="space-y-1 max-h-36 overflow-y-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDepartment('ALL')}
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                    selectedDepartment === 'ALL'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span>All Departments</span>
+                  {selectedDepartment === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
+                </button>
+                {departmentList.map((dept) => (
+                  <button
+                    key={dept}
+                    type="button"
+                    onClick={() => setSelectedDepartment(dept)}
+                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                      selectedDepartment === dept
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="truncate">{dept}</span>
+                    {selectedDepartment === dept && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        }
+        actionButton={
+          <button
+            type="button"
+            onClick={exportToCSV}
+            title="Export filtered records to CSV"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
+        }
+      />
+
+      {/* ========================================================================= */}
+      {/* 4. ATTENDANCE HISTORY & TIMESHEETS CONTAINER */}
       {/* ========================================================================= */}
       {loading ? (
         <TableSkeleton rows={6} cols={selectedEmployee === 'ALL' ? 5 : 4} />
       ) : (
-        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all">
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all overflow-hidden">
           {/* Header with Title & Month Navigation Controls */}
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -827,165 +986,6 @@ const Attendance = () => {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Modern Dynamic Search & Filtering Section */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40">
-            <ModernSearchBarSection
-              statusTabs={[
-                { key: 'ALL', label: 'All Records', count: counts.all },
-                { key: 'PRESENT', label: 'Present', count: counts.present },
-                { key: 'LATE', label: 'Late', count: counts.late },
-                { key: 'ON_LEAVE', label: 'On Leave', count: counts.leave },
-              ]}
-              activeStatus={statusFilter}
-              onStatusChange={setStatusFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Search records, employee name, employee code, notes..."
-              searchHint="status:late"
-              filterTags={[
-                ...(selectedEmployee !== 'ALL' && activeEmployeeObj
-                  ? [{ key: 'employee', label: `staff: ${activeEmployeeObj.fullName || activeEmployeeObj.firstName}` }]
-                  : []),
-                ...(selectedDepartment !== 'ALL'
-                  ? [{ key: 'department', label: `dept: ${selectedDepartment}` }]
-                  : []),
-              ]}
-              onRemoveTag={(tag) => {
-                if (tag.key === 'employee') setSelectedEmployee('ALL');
-                if (tag.key === 'department') setSelectedDepartment('ALL');
-              }}
-              dateRangeLabel={selectedMonthLabel}
-              dateRangeOptions={pastMonthsList.map((m) => ({
-                key: `${m.year}-${m.month}`,
-                label: m.label,
-              }))}
-              activeDateRange={`${selectedYear}-${selectedMonth}`}
-              onDateRangeChange={(val) => {
-                const [y, m] = val.split('-').map(Number);
-                setSelectedYear(y);
-                setSelectedMonth(m);
-              }}
-              sortOptions={sortOptions}
-              activeSort={activeSort}
-              sortOrder={sortOrder}
-              onSortChange={(key, order) => {
-                setActiveSort(key);
-                setSortOrder(order);
-              }}
-              filterCount={
-                (selectedEmployee !== 'ALL' ? 1 : 0) +
-                (selectedDepartment !== 'ALL' ? 1 : 0)
-              }
-              filterContent={
-                <div className="space-y-3.5">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                      Attendance Filters
-                    </span>
-                    {(selectedEmployee !== 'ALL' || selectedDepartment !== 'ALL') && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedEmployee('ALL');
-                          setSelectedDepartment('ALL');
-                        }}
-                        className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
-                      >
-                        Reset All
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Employee Filter */}
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Staff Member
-                    </label>
-                    <div className="space-y-1 max-h-40 overflow-y-auto">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedEmployee('ALL')}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                          selectedEmployee === 'ALL'
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                        }`}
-                      >
-                        <span>All Employees</span>
-                        {selectedEmployee === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
-                      </button>
-                      {employees.map((emp) => {
-                        const isSelected = selectedEmployee === emp.id || selectedEmployee === emp.employeeCode;
-                        return (
-                          <button
-                            key={emp.id}
-                            type="button"
-                            onClick={() => setSelectedEmployee(emp.id)}
-                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                              isSelected
-                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                            }`}
-                          >
-                            <span className="truncate">{emp.firstName} {emp.lastName}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Department Filter */}
-                  <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Department
-                    </label>
-                    <div className="space-y-1 max-h-36 overflow-y-auto">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedDepartment('ALL')}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                          selectedDepartment === 'ALL'
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                        }`}
-                      >
-                        <span>All Departments</span>
-                        {selectedDepartment === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
-                      </button>
-                      {departmentList.map((dept) => (
-                        <button
-                          key={dept}
-                          type="button"
-                          onClick={() => setSelectedDepartment(dept)}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                            selectedDepartment === dept
-                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <span className="truncate">{dept}</span>
-                          {selectedDepartment === dept && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              }
-              actionButton={
-                <button
-                  type="button"
-                  onClick={exportToCSV}
-                  title="Export filtered records to CSV"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export CSV</span>
-                </button>
-              }
-            />
           </div>
 
           {/* Individual Employee Profile Header (When an employee is selected) */}
