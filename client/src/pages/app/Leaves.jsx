@@ -576,13 +576,167 @@ const Leaves = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. LEAVE APPLICATIONS & APPROVAL WORKFLOWS TABLE CONTAINER */}
+      {/* 3. MODERN DYNAMIC SEARCH & FILTER COMMAND BAR */}
+      {/* ========================================================================= */}
+      <ModernSearchBarSection
+        statusTabs={statusTabs}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search leave requests by employee name, code, reason, or leave type..."
+        searchHint="status:pending"
+        filterTags={filterTags}
+        onRemoveTag={(tag) => {
+          const key = typeof tag === 'string' ? tag : tag.key;
+          if (key === 'employee') setSelectedEmployee('ALL');
+          if (key === 'leaveType') setLeaveTypeFilter('ALL');
+          if (key === 'dateRange') setDateRange('ALL');
+        }}
+        dateRangeLabel={dateRangeLabel}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={dateRange}
+        onDateRangeChange={setDateRange}
+        sortOptions={sortOptions}
+        activeSort={sortKey}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setSortKey(key);
+          setSortOrder(order);
+        }}
+        filterCount={filterCount}
+        filterContent={
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Leave Filters
+              </span>
+              {filterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedEmployee('ALL');
+                    setLeaveTypeFilter('ALL');
+                    setDateRange('ALL');
+                  }}
+                  className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                >
+                  Reset All
+                </button>
+              )}
+            </div>
+
+            {/* Staff Member Filter */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Staff Member
+              </label>
+              <div className="space-y-1 max-h-40 overflow-y-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEmployee('ALL')}
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                    selectedEmployee === 'ALL'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span>All Employees</span>
+                  {selectedEmployee === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
+                </button>
+                {employees.map((emp) => {
+                  const isSelected = selectedEmployee === emp.id || selectedEmployee === emp.employeeCode;
+                  return (
+                    <button
+                      key={emp.id}
+                      type="button"
+                      onClick={() => setSelectedEmployee(emp.id)}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                        isSelected
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="truncate">{emp.firstName} {emp.lastName}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Leave Type Filter */}
+            <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Leave Policy
+              </label>
+              <div className="space-y-1 max-h-36 overflow-y-auto">
+                {['ALL', ...new Set(leaveTypes.map((t) => t.name))].map((typeName) => {
+                  const isSelected = leaveTypeFilter === typeName;
+                  return (
+                    <button
+                      key={typeName}
+                      type="button"
+                      onClick={() => setLeaveTypeFilter(typeName)}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                        isSelected
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="truncate">{typeName === 'ALL' ? 'All Policies' : typeName}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Date Range
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {dateRangeOptions.map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setDateRange(opt.key)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                      dateRange === opt.key
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        }
+        actionButton={
+          <button
+            type="button"
+            onClick={exportToCSV}
+            title="Export filtered records to CSV"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
+        }
+      />
+
+      {/* ========================================================================= */}
+      {/* 4. LEAVE APPLICATIONS & APPROVAL WORKFLOWS TABLE CONTAINER */}
       {/* ========================================================================= */}
       {loading ? (
         <TableSkeleton rows={6} cols={selectedEmployee === 'ALL' ? 6 : 5} />
       ) : (
-        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all">
-          {/* Header with Title & Action Controls */}
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all overflow-hidden">
+          {/* Header with Title */}
           <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
@@ -598,7 +752,7 @@ const Leaves = () => {
                       </span>
                     )}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                     {selectedEmployee === 'ALL'
                       ? `Viewing organization-wide leave records (${filtered.length} applications)`
                       : `Viewing leave records for ${activeEmployeeObj?.fullName || `${activeEmployeeObj?.firstName} ${activeEmployeeObj?.lastName}`} (${filtered.length} applications)`}
@@ -607,179 +761,9 @@ const Leaves = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={exportToCSV}
-                title="Export filtered records to CSV"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export CSV</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleOpenApplyModal}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm shadow-sky-500/20 transition-all cursor-pointer hover:scale-105 active:scale-95"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Apply on Behalf</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Modern Dynamic Search & Filtering Section */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40">
-            <ModernSearchBarSection
-              statusTabs={statusTabs}
-              activeStatus={statusFilter}
-              onStatusChange={setStatusFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Search leave requests by employee name, code, reason, or leave type..."
-              searchHint="status:pending"
-              filterTags={filterTags}
-              onRemoveTag={(tag) => {
-                const key = typeof tag === 'string' ? tag : tag.key;
-                if (key === 'employee') setSelectedEmployee('ALL');
-                if (key === 'leaveType') setLeaveTypeFilter('ALL');
-                if (key === 'dateRange') setDateRange('ALL');
-              }}
-              dateRangeLabel={dateRangeLabel}
-              dateRangeOptions={dateRangeOptions}
-              activeDateRange={dateRange}
-              onDateRangeChange={setDateRange}
-              sortOptions={sortOptions}
-              activeSort={sortKey}
-              sortOrder={sortOrder}
-              onSortChange={(key, order) => {
-                setSortKey(key);
-                setSortOrder(order);
-              }}
-              filterCount={filterCount}
-              filterContent={
-                <div className="space-y-3.5">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                      Leave Filters
-                    </span>
-                    {filterCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedEmployee('ALL');
-                          setLeaveTypeFilter('ALL');
-                          setDateRange('ALL');
-                        }}
-                        className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
-                      >
-                        Reset All
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Staff Member Filter */}
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Staff Member
-                    </label>
-                    <div className="space-y-1 max-h-40 overflow-y-auto">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedEmployee('ALL')}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                          selectedEmployee === 'ALL'
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                        }`}
-                      >
-                        <span>All Employees</span>
-                        {selectedEmployee === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500" />}
-                      </button>
-                      {employees.map((emp) => {
-                        const isSelected = selectedEmployee === emp.id || selectedEmployee === emp.employeeCode;
-                        return (
-                          <button
-                            key={emp.id}
-                            type="button"
-                            onClick={() => setSelectedEmployee(emp.id)}
-                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                              isSelected
-                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                            }`}
-                          >
-                            <span className="truncate">{emp.firstName} {emp.lastName}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Leave Type Filter */}
-                  <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Leave Policy
-                    </label>
-                    <div className="space-y-1 max-h-36 overflow-y-auto">
-                      {['ALL', ...new Set(leaveTypes.map((t) => t.name))].map((typeName) => {
-                        const isSelected = leaveTypeFilter === typeName;
-                        return (
-                          <button
-                            key={typeName}
-                            type="button"
-                            onClick={() => setLeaveTypeFilter(typeName)}
-                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                              isSelected
-                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                            }`}
-                          >
-                            <span className="truncate">{typeName === 'ALL' ? 'All Policies' : typeName}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Date Range Filter */}
-                  <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Date Range
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {dateRangeOptions.map((opt) => (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          onClick={() => setDateRange(opt.key)}
-                          className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
-                            dateRange === opt.key
-                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
-                              : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              }
-              actionButton={
-                <button
-                  type="button"
-                  onClick={exportToCSV}
-                  title="Export filtered records to CSV"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export CSV</span>
-                </button>
-              }
-            />
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full self-start md:self-auto shrink-0">
+              {filtered.length} Applications
+            </span>
           </div>
 
           {/* Individual Employee Profile Header (When an employee is selected) */}
