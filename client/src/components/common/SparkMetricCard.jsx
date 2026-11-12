@@ -16,7 +16,8 @@ import React, { useState, useId, useMemo, useRef } from 'react';
  *
  * @param {Object} props
  * @param {'dark' | 'light'} [props.variant='light']
- * @param {string} [props.title]
+ * @param {string | React.ReactNode} [props.title]
+ * @param {React.ReactNode} [props.titleAction]
  * @param {string | number} [props.value]
  * @param {number} [props.previousValue]
  * @param {string} [props.unit]
@@ -35,6 +36,7 @@ import React, { useState, useId, useMemo, useRef } from 'react';
 const SparkMetricCard = ({
   variant = 'light',
   title,
+  titleAction,
   value,
   previousValue,
   unit,
@@ -388,13 +390,23 @@ const SparkMetricCard = ({
       <div className="flex items-start justify-between gap-1.5">
         {/* Left Column: Title & Main Number */}
         <div className="space-y-1 min-w-0 flex-1">
-          <div
-            className={`text-xs font-semibold tracking-tight truncate ${
-              isDark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'
-            }`}
-            title={title}
-          >
-            {title}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              className={`text-xs font-semibold tracking-tight truncate ${
+                isDark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'
+              }`}
+              title={typeof title === 'string' ? title : undefined}
+            >
+              {title}
+            </span>
+            {titleAction && (
+              <span
+                onClick={(e) => e.stopPropagation()}
+                className="shrink-0 flex items-center"
+              >
+                {titleAction}
+              </span>
+            )}
           </div>
 
           <div className="flex items-baseline gap-1 flex-wrap sm:flex-nowrap">

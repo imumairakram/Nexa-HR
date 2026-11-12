@@ -24,6 +24,8 @@ import {
   Tag,
   User,
   Building2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -47,6 +49,24 @@ const EmployeeDashboard = () => {
   const [attendanceLogs, setAttendanceLogs] = useState(() => api.getCached('/attendance/my-logs?limit=14')?.data?.attendances || []);
   const [payslipHistory, setPayslipHistory] = useState(() => api.getCached('/payroll/my-payslips')?.data?.payslips || []);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [isSalaryHidden, setIsSalaryHidden] = useState(() => {
+    try {
+      return localStorage.getItem('nexahr_hide_salary') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSalaryVisibility = (e) => {
+    e?.stopPropagation();
+    setIsSalaryHidden((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('nexahr_hide_salary', String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Live digital clock timer update
   useEffect(() => {
@@ -218,6 +238,21 @@ const EmployeeDashboard = () => {
     ? formatCurrency(currentUser.salaryStructure.basicSalary)
     : formatCurrency(0);
 
+  const displaySalary = useMemo(() => {
+    if (!isSalaryHidden) return netSalaryAmount;
+    if (typeof netSalaryAmount === 'string') {
+      const parts = netSalaryAmount.trim().split(/\s+/);
+      if (parts.length > 1) {
+        return `${parts[0]} ••••••`;
+      }
+      const match = netSalaryAmount.match(/^([^0-9]+)/);
+      if (match) {
+        return `${match[1].trim()} ••••••`;
+      }
+    }
+    return '••••••••';
+  }, [netSalaryAmount, isSalaryHidden]);
+
   const payslipPeriod = latestPayslip?.month
     ? `Paid for Month ${latestPayslip.month}/${latestPayslip.year}`
     : currentUser?.salaryStructure
@@ -328,7 +363,9 @@ const EmployeeDashboard = () => {
         return {
           value: amount,
           label: `M${p.month}`,
-          tooltip: `Month ${p.month}/${p.year}: ${formatCurrency(amount)} • ${p.status || 'PAID'}`,
+          tooltip: isSalaryHidden
+            ? `Month ${p.month}/${p.year}: ••••••`
+            : `Month ${p.month}/${p.year}: ${formatCurrency(amount)} • ${p.status || 'PAID'}`,
         };
       });
     }
@@ -338,12 +375,12 @@ const EmployeeDashboard = () => {
     const gross = base + allowances;
     const net = gross - deductions;
     return [
-      { value: base, label: 'Basic', tooltip: `Basic Salary: ${formatCurrency(base)}` },
-      { value: gross, label: 'Gross', tooltip: `Gross Pay: ${formatCurrency(gross)} (+${formatCurrency(allowances)} Allowances)` },
-      { value: Math.max(0, deductions), label: 'Deduct', tooltip: `Deductions & Tax: ${formatCurrency(deductions)}` },
-      { value: net, label: 'Net', tooltip: `Net Take-Home: ${formatCurrency(net)}` },
+      { value: base, label: 'Basic', tooltip: isSalaryHidden ? 'Basic: ••••••' : `Basic Salary: ${formatCurrency(base)}` },
+      { value: gross, label: 'Gross', tooltip: isSalaryHidden ? 'Gross: ••••••' : `Gross Pay: ${formatCurrency(gross)} (+${formatCurrency(allowances)} Allowances)` },
+      { value: Math.max(0, deductions), label: 'Deduct', tooltip: isSalaryHidden ? 'Deductions: ••••••' : `Deductions & Tax: ${formatCurrency(deductions)}` },
+      { value: net, label: 'Net', tooltip: isSalaryHidden ? 'Net: ••••••' : `Net Take-Home: ${formatCurrency(net)}` },
     ];
-  }, [payslipHistory, currentUser, formatCurrency]);
+  }, [payslipHistory, currentUser, formatCurrency, isSalaryHidden]);
 
   // Card 1 Dynamic Tag Logic
   const card1Badge = useMemo(() => {
@@ -593,7 +630,22 @@ const EmployeeDashboard = () => {
         <SparkMetricCard
           variant="light"
           title="Latest Net Salary"
-          value={netSalaryAmount}
+          titleAction={
+            <button
+              type="button"
+              onClick={toggleSalaryVisibility}
+              title={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
+              aria-label={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
+              className="p-1 -my-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center justify-center active:scale-90"
+            >
+              {isSalaryHidden ? (
+                <EyeOff className="w-3.5 h-3.5" />
+              ) : (
+                <Eye className="w-3.5 h-3.5" />
+              )}
+            </button>
+          }
+          value={displaySalary}
           badgeText={card4Badge.text}
           badgeType={card4Badge.type}
           badgeIcon={card4Badge.icon}
