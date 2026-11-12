@@ -171,7 +171,17 @@ const AppPageHeader = ({
         activeUser = res.data.user;
         setCurrentUser(activeUser);
         const currentStored = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('user', JSON.stringify({ ...currentStored, ...activeUser }));
+        const bankPayload = activeUser.bankDetails || activeUser.profile || {};
+        localStorage.setItem('user', JSON.stringify({
+          ...currentStored,
+          ...activeUser,
+          bankName: bankPayload.bankName || currentStored.bankName || '',
+          accountTitle: bankPayload.accountTitle || currentStored.accountTitle || '',
+          accountNumber: bankPayload.accountNumber || currentStored.accountNumber || '',
+          branchCode: bankPayload.branchCode || currentStored.branchCode || '',
+          payoutMethod: bankPayload.payoutMethod || currentStored.payoutMethod || 'Direct Bank Transfer',
+          ntnNumber: bankPayload.ntnNumber || currentStored.ntnNumber || '',
+        }));
       }
     } catch (e) {
       // Offline fallback
@@ -361,6 +371,8 @@ const AppPageHeader = ({
     ? `${currentUser.firstName} ${currentUser.lastName}`
     : 'System Administrator';
 
+  const userRole = currentUser?.designation || (currentUser?.role === 'ADMIN' ? 'System Administrator' : 'Administrator');
+
   const userHandle = currentUser ? `@${currentUser.firstName?.toLowerCase()}` : '@system';
 
   const displayUserEmail = useMemo(() => {
@@ -451,7 +463,7 @@ const AppPageHeader = ({
       )}
 
       {/* Top Header Row: Responsive Grid on Mobile, Flex on Desktop */}
-      <div className="grid grid-cols-[1fr_auto] gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 w-full">
+      <div className="grid grid-cols-[1fr_auto] gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-start sm:justify-between sm:gap-4 w-full">
         {/* Left Side Title & Subtitle Date: Row 1 Col 1 on Mobile, Left flex on Desktop */}
         <div className={`col-start-1 row-start-1 min-w-0 sm:flex-1 sm:order-1 flex ${hideMobileSubtitle ? 'items-center' : 'items-start sm:items-center'} gap-2 sm:gap-2.5`}>
           <button
@@ -459,9 +471,9 @@ const AppPageHeader = ({
             onClick={() => window.dispatchEvent(new CustomEvent('nexahr_open_mobile_sidebar'))}
             title="Open Navigation Menu"
             aria-label="Open Navigation Menu"
-            className={`lg:hidden ${hideMobileSubtitle ? '' : 'mt-0.5 sm:mt-0'} w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 shrink-0 cursor-pointer active:scale-95 transition-all`}
+            className={`lg:hidden ${hideMobileSubtitle ? '' : 'mt-0.5 sm:mt-0'} w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 shrink-0 cursor-pointer active:scale-95 transition-all`}
           >
-            <Menu className="w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[2.2]" />
+            <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300 stroke-[2.2]" />
           </button>
           <div className="min-w-0 flex-1">
             {resolvedMobileTitle ? (
@@ -482,7 +494,7 @@ const AppPageHeader = ({
               <p
                 className={`${
                   hideMobileSubtitle ? 'hidden sm:block' : 'line-clamp-2 sm:line-clamp-none'
-                } text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5`}
+                } text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium max-w-xl leading-relaxed mt-0.5`}
               >
                 {displaySubtitle}
               </p>
@@ -506,19 +518,19 @@ const AppPageHeader = ({
                 value={searchQuery}
                 onFocus={() => setIsSearchOpen(true)}
                 onChange={handleSearchChange}
-                className="w-full bg-slate-100/70 dark:bg-[#1E293B] border border-slate-200/60 dark:border-slate-800 rounded-[8px] pl-4 pr-14 py-2 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 dark:focus:ring-teal-400/20 dark:focus:border-teal-400 border border-[#E2E1DC] dark:border-[#273834] bg-[#ECEAE4]/60 dark:bg-[#111A18] transition-all"
+                className="w-full bg-slate-100/70 dark:bg-[#1E293B] border border-slate-200/60 dark:border-slate-800 rounded-[8px] pl-4 pr-14 py-2 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-600 shadow-inner transition-all"
               />
 
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                 {searchQuery ? (
                   <button
                     onClick={clearSearch}
-                    className="p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    className="p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 ) : (
-                  <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-slate-400 bg-slate-200/60 dark:bg-slate-700/60 px-1.5 py-0.5 rounded-md pointer-events-none">
+                  <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-slate-400 bg-slate-200/60 dark:bg-slate-700/60 px-1.5 py-0.5 rounded-lg pointer-events-none">
                     ⌘K
                   </span>
                 )}
@@ -550,7 +562,7 @@ const AppPageHeader = ({
                           className="w-full flex items-center justify-between p-2 rounded-2xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors text-left group cursor-pointer"
                         >
                           <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/50 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">
+                            <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-sky-50 dark:group-hover:bg-sky-950/50 group-hover:text-sky-600 dark:group-hover:text-sky-300 transition-colors">
                               <IconComp className="w-3.5 h-3.5" />
                             </div>
                             <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">
@@ -579,11 +591,12 @@ const AppPageHeader = ({
             type="button"
             onClick={handleRefreshClick}
             title="Refresh Data"
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-sm border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95"
+            aria-label="Refresh portal data"
+            className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           >
             <RefreshCw
-              className={`w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[2] transition-transform duration-300 ${
-                isRefreshing || loading ? 'animate-spin text-teal-700 dark:text-teal-400' : 'group-hover:rotate-45'
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300 stroke-[2] transition-transform duration-300 ${
+                isRefreshing || loading ? 'animate-spin text-sky-600 dark:text-sky-400' : 'group-hover:rotate-45'
               }`}
             />
           </button>
@@ -593,12 +606,13 @@ const AppPageHeader = ({
             type="button"
             onClick={toggleTheme}
             title={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-sm border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95"
+            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer group active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           >
             {resolvedTheme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400 stroke-[2] transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
+              <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 stroke-[2] transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
             ) : (
-              <Moon className="w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[2] transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
+              <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300 stroke-[2] transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
             )}
           </button>
 
@@ -608,11 +622,13 @@ const AppPageHeader = ({
               type="button"
               onClick={() => setIsNotifyOpen(!isNotifyOpen)}
               title="Notifications"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-sm border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer active:scale-95"
+              aria-label="View notifications"
+              aria-expanded={isNotifyOpen}
+              className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-800 relative transition-all shrink-0 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             >
-              <Bell className="w-4 h-4 text-slate-700 dark:text-slate-300 stroke-[1.75]" />
+              <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300 stroke-[1.75]" />
               {unreadCount > 0 && (
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 absolute top-2 right-2 ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 absolute top-1.5 right-1.5 ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
               )}
             </button>
 
@@ -633,7 +649,7 @@ const AppPageHeader = ({
                       <button
                         onClick={markAllAsRead}
                         title="Mark all as read"
-                        className="p-1 text-slate-400 hover:text-teal-700 dark:hover:text-sky-400 rounded-md transition-colors text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                        className="p-1 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 rounded-md transition-colors text-[10px] font-bold flex items-center gap-1 cursor-pointer"
                       >
                         <Check className="w-3 h-3" />
                         <span>Read All</span>
@@ -684,7 +700,7 @@ const AppPageHeader = ({
                                 {notif.title}
                               </p>
                               {!isRead && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
                               )}
                             </div>
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
@@ -713,72 +729,75 @@ const AppPageHeader = ({
             )}
           </div>
 
-          {/* User Profile Circular Avatar Button */}
+          {/* User Profile Pill & Dropdown */}
           <div className="relative" ref={profileRef}>
             <button
               type="button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              title={userFullName}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 p-0.5 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all cursor-pointer shrink-0 flex items-center justify-center overflow-hidden active:scale-95"
+              aria-label="User profile menu"
+              aria-expanded={isProfileOpen}
+              className="w-8.5 h-8.5 sm:w-auto sm:h-auto flex items-center gap-2 p-1 sm:pl-2 sm:pr-3 sm:py-1 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl shadow-xs border border-slate-200/80 dark:border-slate-800 cursor-pointer transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 shrink-0"
             >
-              <img
-                src={userAvatar || DEFAULT_AVATAR}
-                alt="User Avatar"
-                className="w-full h-full rounded-full object-cover"
-                onError={(e) => {
-                  e.target.src = DEFAULT_AVATAR;
-                }}
-              />
+              <div className="w-6.5 h-6.5 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-white text-xs font-bold ring-2 ring-sky-500/20 shrink-0">
+                <img
+                  src={userAvatar || DEFAULT_AVATAR}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = DEFAULT_AVATAR;
+                  }}
+                />
+              </div>
+              <div className="hidden sm:block text-left">
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                  {userFullName}
+                </div>
+                <div className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold leading-none">
+                  {currentUser?.role === 'ADMIN' ? 'Administrator' : (currentUser?.designation || 'Administrator')}
+                </div>
+              </div>
             </button>
 
             {isProfileOpen && (
-              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto sm:right-0 top-16 sm:top-auto sm:mt-2 sm:w-56 bg-white dark:bg-[#1E293B] rounded-[14px] shadow-drawer border border-[#E2E1DC] dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                  <img
-                    src={userAvatar || DEFAULT_AVATAR}
-                    alt="Avatar"
-                    className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
-                    onError={(e) => {
-                      e.target.src = DEFAULT_AVATAR;
-                    }}
-                  />
-                  <div className="overflow-hidden">
-                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{userFullName}</p>
-                    <p className="text-[10px] font-semibold text-slate-400 truncate">
-                      {userHandle}{displayUserEmail ? ` • ${displayUserEmail}` : ''}
-                    </p>
-                  </div>
+              <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto sm:right-0 top-16 sm:top-auto sm:mt-2 sm:w-64 bg-white dark:bg-[#1E293B] rounded-[14px] shadow-drawer border border-[#E2E1DC] dark:border-slate-800 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                  <div className="text-xs font-bold text-slate-900 dark:text-white">{userFullName}</div>
+                  <div className="text-[11px] text-slate-400 truncate">{displayUserEmail || ''}</div>
+                  <div className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold mt-0.5">{userRole}</div>
                 </div>
-                <div className="py-1">
+
+                <div className="space-y-1">
                   <button
                     onClick={() => {
-                      setIsProfileOpen(false);
                       navigate('/app/profile');
+                      setIsProfileOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                   >
-                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    <User className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span>My Profile</span>
                   </button>
+
                   <button
                     onClick={() => {
-                      setIsProfileOpen(false);
                       navigate('/app/settings');
+                      setIsProfileOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                   >
-                    <Settings className="w-3.5 h-3.5 text-slate-400" />
+                    <Settings className="w-4 h-4 text-slate-500" />
                     <span>System Settings</span>
                   </button>
-                </div>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2.5 cursor-pointer transition-colors"
-                  >
-                    <LogOut className="w-3.5 h-3.5 text-rose-600" />
-                    <span>Sign Out</span>
-                  </button>
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

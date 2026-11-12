@@ -539,6 +539,16 @@ export const api = {
             }
           });
 
+          if (!types || types.length === 0) {
+            types = [
+              { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
+              { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
+              { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
+              { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
+              { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
+            ];
+          }
+
           return {
             ...res,
             data: {
@@ -550,7 +560,24 @@ export const api = {
           // If merging throws, proceed with original response
         }
       }
-      return res;
+
+      const resTypes = Array.isArray(res?.data?.leaveTypes) && res.data.leaveTypes.length > 0
+        ? res.data.leaveTypes
+        : [
+            { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
+            { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
+            { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
+            { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
+            { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
+          ];
+
+      return {
+        ...res,
+        data: {
+          ...res?.data,
+          leaveTypes: resTypes,
+        },
+      };
     } catch (err) {
       if (typeof window !== 'undefined' && window.localStorage) {
         try {
@@ -558,10 +585,11 @@ export const api = {
           const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
           const custom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
           let fallback = [
-            { id: 'def-1', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 14, isPaid: true, description: 'Statutory annual vacation leave entitlement.' },
-            { id: 'def-2', name: 'Medical & Sick Leave', code: 'SICK', daysAllowed: 10, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-            { id: 'def-3', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-            { id: 'def-4', name: 'Study Leave', code: 'STUDY', daysAllowed: 5, isPaid: true, description: 'Leave for educational examinations and certifications.' },
+            { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
+            { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
+            { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
+            { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
+            { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
             ...custom,
           ];
           fallback = fallback.filter((t) => !deleted.includes(t.id) && !deleted.includes(t.code));
@@ -572,7 +600,18 @@ export const api = {
           return { success: true, data: { leaveTypes: fallback } };
         } catch (e) {}
       }
-      throw err;
+      return {
+        success: true,
+        data: {
+          leaveTypes: [
+            { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
+            { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
+            { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
+            { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
+            { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
+          ],
+        },
+      };
     }
   },
 

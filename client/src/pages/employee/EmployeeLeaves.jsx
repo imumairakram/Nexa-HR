@@ -56,8 +56,19 @@ export const formatLeaveDays = (days) => {
   return `${count} ${count === 1 ? 'day' : 'days'}`;
 };
 
+export const DEFAULT_LEAVE_TYPES = [
+  { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
+  { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
+  { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
+  { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
+  { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
+];
+
 const EmployeeLeaves = () => {
-  const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
+  const [leaveTypes, setLeaveTypes] = useState(() => {
+    const cached = api.getCached('/leaves/types')?.data?.leaveTypes;
+    return Array.isArray(cached) && cached.length > 0 ? cached : DEFAULT_LEAVE_TYPES;
+  });
   const [requests, setRequests] = useState(() => api.getCached('/leaves/my-requests')?.data?.leaveRequests || api.getCached('/leaves/requests')?.data?.leaveRequests || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/leaves/my-requests') && !api.hasCached('/leaves/requests'));
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -111,11 +122,13 @@ const EmployeeLeaves = () => {
         api.getMyLeaveRequests({}, opts),
       ]);
 
-      if (typesRes.status === 'fulfilled' && typesRes.value?.data?.leaveTypes) {
+      if (typesRes.status === 'fulfilled' && Array.isArray(typesRes.value?.data?.leaveTypes) && typesRes.value.data.leaveTypes.length > 0) {
         setLeaveTypes(typesRes.value.data.leaveTypes);
-        if (typesRes.value.data.leaveTypes.length > 0) {
+        if (!leaveForm.leaveTypeId) {
           setLeaveForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
         }
+      } else {
+        setLeaveTypes((prev) => (Array.isArray(prev) && prev.length > 0 ? prev : DEFAULT_LEAVE_TYPES));
       }
       if (reqRes.status === 'fulfilled' && reqRes.value?.data?.leaveRequests) {
         setRequests(reqRes.value.data.leaveRequests);
@@ -182,7 +195,7 @@ const EmployeeLeaves = () => {
       await fetchMyLeaves(true);
       setIsApplyOpen(false);
       setLeaveForm({
-        leaveTypeId: leaveTypes[0]?.id || '',
+        leaveTypeId: activeLeaveTypes[0]?.id || '',
         startDate: new Date().toISOString().split('T')[0],
         endDate: new Date().toISOString().split('T')[0],
         dayType: 'FULL',
@@ -197,9 +210,13 @@ const EmployeeLeaves = () => {
     }
   };
 
+  const activeLeaveTypes = useMemo(() => {
+    return Array.isArray(leaveTypes) && leaveTypes.length > 0 ? leaveTypes : DEFAULT_LEAVE_TYPES;
+  }, [leaveTypes]);
+
   // Compute live quota balances
   const quotaCards = useMemo(() => {
-    return leaveTypes.map((lt, idx) => {
+    return activeLeaveTypes.map((lt, idx) => {
       const usedDays = requests
         .filter((r) => (r.leaveTypeId === lt.id || r.leaveType?.id === lt.id || r.leaveType?.name === lt.name || r.leaveType?.code === lt.code) && r.status === 'APPROVED')
         .reduce((acc, r) => acc + calculateLeaveDays(r), 0);
@@ -246,7 +263,7 @@ const EmployeeLeaves = () => {
         theme: themes[idx % themes.length],
       };
     });
-  }, [leaveTypes, requests]);
+  }, [activeLeaveTypes, requests]);
 
   const stats = useMemo(() => ({
     total: requests.length,
@@ -570,7 +587,7 @@ const EmployeeLeaves = () => {
                 Leave Policy
               </label>
               <div className="grid grid-cols-2 gap-1.5">
-                {['ALL', ...new Set(leaveTypes.map((t) => t.name))].map((typeName) => (
+                {['ALL', ...new Set(activeLeaveTypes.map((t) => t.name))].map((typeName) => (
                   <button
                     key={typeName}
                     type="button"
@@ -963,7 +980,7 @@ const EmployeeLeaves = () => {
             </div>
 
             <form onSubmit={handleApplySubmit} className="space-y-6">
-              {/* Row 1: Leave Policy Classification Cards */}
+              {/* Row 1: Leave Policy Classification Dropdown */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
@@ -974,74 +991,28 @@ const EmployeeLeaves = () => {
                   </span>
                 </div>
 
-                {leaveTypes && leaveTypes.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                    {leaveTypes.map((lt) => {
-                      const isSelected = String(leaveForm.leaveTypeId) === String(lt.id);
-                      const nameLower = (lt.name || '').toLowerCase();
-                      const IconComp = nameLower.includes('sick') || nameLower.includes('med')
-                        ? AlertCircle
-                        : nameLower.includes('casual') || nameLower.includes('personal')
-                        ? Clock
-                        : nameLower.includes('matern') || nameLower.includes('patern')
-                        ? Sparkles
-                        : nameLower.includes('unpaid')
-                        ? FileText
-                        : CalendarDays;
-
-                      return (
-                        <button
-                          key={lt.id}
-                          type="button"
-                          onClick={() => setLeaveForm((p) => ({ ...p, leaveTypeId: lt.id }))}
-                          className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[96px] ${
-                            isSelected
-                              ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
-                              : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <div
-                              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                                isSelected
-                                  ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                              }`}
-                            >
-                              <IconComp className="w-4 h-4" />
-                            </div>
-                            {isSelected && (
-                              <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
-                            )}
-                          </div>
-                          <div>
-                            <p
-                              className={`text-xs font-bold leading-tight truncate ${
-                                isSelected
-                                  ? 'text-sky-700 dark:text-sky-300'
-                                  : 'text-slate-800 dark:text-slate-200'
-                              }`}
-                            >
-                              {lt.name}
-                            </p>
-                            <p className="text-[10px] text-slate-400 mt-0.5 truncate">
-                              {lt.daysAllowed ? `${lt.daysAllowed} days quota` : 'Custom quota'}
-                            </p>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
+                <div className="relative">
                   <select
                     required
                     value={leaveForm.leaveTypeId}
                     onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                    className="w-full appearance-none px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner pr-10"
                   >
                     <option value="">Select Leave Policy</option>
+                    {activeLeaveTypes.map((lt) => (
+                      <option
+                        key={lt.id}
+                        value={lt.id}
+                        className="text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 py-1.5"
+                      >
+                        {lt.name} ({lt.daysAllowed || lt.days || 12} days quota • {lt.isPaid ? 'Paid' : 'Unpaid'})
+                      </option>
+                    ))}
                   </select>
-                )}
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               {/* Row 2: Duration Type & Date Range Grid */}
@@ -1151,12 +1122,12 @@ const EmployeeLeaves = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
-                        {leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
+                        {activeLeaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
                       </h4>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          {leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.daysAllowed
-                            ? `${leaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.daysAllowed} Days Annual Quota`
+                          {activeLeaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.daysAllowed
+                            ? `${activeLeaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.daysAllowed} Days Annual Quota`
                             : 'Standard Policy'}
                         </span>
                         <span className="text-slate-300 dark:text-slate-600">•</span>

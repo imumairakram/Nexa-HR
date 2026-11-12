@@ -142,7 +142,17 @@ const EmployeePageHeader = ({
         activeUser = res.data.user;
         setCurrentUser(activeUser);
         const currentStored = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('user', JSON.stringify({ ...currentStored, ...activeUser }));
+        const bankPayload = activeUser.bankDetails || activeUser.profile || {};
+        localStorage.setItem('user', JSON.stringify({
+          ...currentStored,
+          ...activeUser,
+          bankName: bankPayload.bankName || currentStored.bankName || '',
+          accountTitle: bankPayload.accountTitle || currentStored.accountTitle || '',
+          accountNumber: bankPayload.accountNumber || currentStored.accountNumber || '',
+          branchCode: bankPayload.branchCode || currentStored.branchCode || '',
+          payoutMethod: bankPayload.payoutMethod || currentStored.payoutMethod || 'Direct Bank Transfer',
+          ntnNumber: bankPayload.ntnNumber || currentStored.ntnNumber || '',
+        }));
       }
     } catch (e) {
       // Offline fallback

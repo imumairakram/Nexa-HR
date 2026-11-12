@@ -311,9 +311,16 @@ const Profile = () => {
 
         // Update localStorage cache with freshest DB state
         const currentLocal = JSON.parse(localStorage.getItem('user') || '{}');
+        const bankPayload = liveUser.bankDetails || liveUser.profile || {};
         localStorage.setItem('user', JSON.stringify({
           ...currentLocal,
           ...liveUser,
+          bankName: bankPayload.bankName || currentLocal.bankName || '',
+          accountTitle: bankPayload.accountTitle || currentLocal.accountTitle || '',
+          accountNumber: bankPayload.accountNumber || currentLocal.accountNumber || '',
+          branchCode: bankPayload.branchCode || currentLocal.branchCode || '',
+          payoutMethod: bankPayload.payoutMethod || currentLocal.payoutMethod || 'Direct Bank Transfer',
+          ntnNumber: bankPayload.ntnNumber || currentLocal.ntnNumber || '',
           address: liveUser.profile?.address || liveUser.address,
           emergencyContact: liveUser.profile?.emergencyContact || liveUser.emergencyContact,
         }));
@@ -524,35 +531,57 @@ const Profile = () => {
     setIsSavingBank(true);
     try {
       const payload = {
-        bankName: formData.bankName,
-        accountTitle: formData.accountTitle || `${formData.firstName} ${formData.lastName}`.trim(),
-        accountNumber: formData.accountNumber,
-        branchCode: formData.branchCode,
-        payoutMethod: formData.payoutMethod,
-        ntnNumber: formData.ntnNumber,
+        bankName: (formData.bankName || '').trim(),
+        accountTitle: (formData.accountTitle || `${formData.firstName} ${formData.lastName}`).trim(),
+        accountNumber: (formData.accountNumber || '').trim(),
+        branchCode: (formData.branchCode || '').trim(),
+        payoutMethod: formData.payoutMethod || 'Direct Bank Transfer',
+        ntnNumber: (formData.ntnNumber || '').trim(),
       };
 
-      const res = await api.updateMyProfile(payload);
-      if (res?.success && res.data?.user) {
-        populateUserData(res.data.user);
-      } else {
-        setFormData((prev) => ({ ...prev, ...payload }));
-      }
+      // 1. Instantly update form state so UI responds immediately
+      setFormData((prev) => ({
+        ...prev,
+        ...payload,
+      }));
 
-      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      // 2. Persist to API
+      const res = await api.updateMyProfile(payload);
+
+      // 3. Construct unified user object
+      const baseUser = (res?.success && res.data?.user) ? res.data.user : (currentUser || {});
       const updatedUser = {
-        ...storedUser,
-        profile: {
-          ...(storedUser.profile || {}),
+        ...baseUser,
+        ...payload,
+        bankDetails: {
+          ...(baseUser.bankDetails || {}),
           ...payload,
         },
+        profile: {
+          ...(baseUser.profile || {}),
+          ...payload,
+        },
+      };
+
+      setCurrentUser(updatedUser);
+      populateUserData(updatedUser);
+
+      // 4. Update localStorage consistently across root and nested bank keys
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const finalStored = {
+        ...storedUser,
+        ...updatedUser,
+        ...payload,
         bankDetails: {
           ...(storedUser.bankDetails || {}),
           ...payload,
         },
-        ...payload,
+        profile: {
+          ...(storedUser.profile || {}),
+          ...payload,
+        },
       };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem('user', JSON.stringify(finalStored));
       window.dispatchEvent(new Event('user_profile_updated'));
       window.dispatchEvent(new Event('storage'));
 
@@ -1178,13 +1207,13 @@ const Profile = () => {
                 <div>
                   <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Designated Bank *</label>
                   <select
-                    value={BANK_OPTIONS.includes(formData.bankName) ? formData.bankName : (formData.bankName ? 'CUSTOM' : '')}
+                    value={BANK_OPTIONS.filter((b) => b !== 'CUSTOM').includes(formData.bankName) ? formData.bankName : (formData.bankName ? 'CUSTOM' : '')}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === 'CUSTOM') {
-                        setFormData({ ...formData, bankName: '' });
+                        setFormData((prev) => ({ ...prev, bankName: '' }));
                       } else {
-                        setFormData({ ...formData, bankName: val });
+                        setFormData((prev) => ({ ...prev, bankName: val }));
                       }
                     }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
@@ -1196,13 +1225,16 @@ const Profile = () => {
                       </option>
                     ))}
                   </select>
-                  {(!BANK_OPTIONS.includes(formData.bankName) || formData.bankName === '') && (
+                  {(!BANK_OPTIONS.filter((b) => b !== 'CUSTOM').includes(formData.bankName)) && (
                     <input
                       type="text"
                       required
                       placeholder="Enter complete bank name"
                       value={formData.bankName}
-                      onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData((prev) => ({ ...prev, bankName: val }));
+                      }}
                       className="mt-2 w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
                     />
                   )}
@@ -1217,7 +1249,10 @@ const Profile = () => {
                     required
                     placeholder={`${formData.firstName || ''} ${formData.lastName || ''}`.trim() || 'e.g. John Doe'}
                     value={formData.accountTitle}
-                    onChange={(e) => setFormData({ ...formData, accountTitle: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormData((prev) => ({ ...prev, accountTitle: val }));
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
                   />
                 </div>
@@ -1231,7 +1266,10 @@ const Profile = () => {
                     required
                     placeholder="e.g. PK72 SCBL 0000 0012 3456 7801"
                     value={formData.accountNumber}
-                    onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormData((prev) => ({ ...prev, accountNumber: val }));
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
                   />
                 </div>
@@ -1243,7 +1281,10 @@ const Profile = () => {
                       type="text"
                       placeholder="e.g. 0142 (Corporate Wing)"
                       value={formData.branchCode}
-                      onChange={(e) => setFormData({ ...formData, branchCode: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData((prev) => ({ ...prev, branchCode: val }));
+                      }}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
                     />
                   </div>
@@ -1252,7 +1293,10 @@ const Profile = () => {
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Disbursement Method</label>
                     <select
                       value={formData.payoutMethod || 'Direct Bank Transfer'}
-                      onChange={(e) => setFormData({ ...formData, payoutMethod: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData((prev) => ({ ...prev, payoutMethod: val }));
+                      }}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none cursor-pointer"
                     >
                       <option value="Direct Bank Transfer">Direct Bank Transfer (Raast / IBFT)</option>
@@ -1268,7 +1312,10 @@ const Profile = () => {
                     type="text"
                     placeholder="e.g. NTN-9842101-7"
                     value={formData.ntnNumber}
-                    onChange={(e) => setFormData({ ...formData, ntnNumber: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormData((prev) => ({ ...prev, ntnNumber: val }));
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
                   />
                 </div>
@@ -1276,7 +1323,10 @@ const Profile = () => {
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <button
                     type="button"
-                    onClick={() => setIsEditingBank(false)}
+                    onClick={() => {
+                      setIsEditingBank(false);
+                      if (currentUser) populateUserData(currentUser);
+                    }}
                     className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-all"
                   >
                     Cancel

@@ -485,24 +485,6 @@ const EmployeeDashboard = () => {
               Attendance is recorded automatically via biometric hardware machines (Face-ID / Fingerprint) synchronized in real-time with enterprise cloud turnstiles. Daily punch records, shift rosters, and working hours are streamed live into your personal employee dossier.
             </p>
 
-            {/* Dynamic Telemetry Badges */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{employeeShift}</span>
-              </span>
-              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{officeLocation}</span>
-              </span>
-              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{monthlyAttendance.presentDays || 0} Days Present</span>
-              </span>
-              {(monthlyAttendance.lateDays || 0) > 0 && (
-                <span className="flex items-center bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-xl border border-amber-200/80 dark:border-amber-800/50 font-bold">
-                  <span>{monthlyAttendance.lateDays} Late Arrivals</span>
-                </span>
-              )}
-            </div>
-
             {/* Live Clock Display */}
             <div className="flex items-center gap-4 pt-1">
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-200/70 dark:border-slate-700/80 shadow-xs flex items-center gap-2">
