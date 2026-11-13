@@ -466,6 +466,7 @@ const applyLeave = async (req, res) => {
 
       await sendLeaveRequestSubmittedEmail({
         adminEmails,
+        employeeEmail: targetUser.email,
         employeeName: applicantName,
         employeeCode: targetUser.email || targetUser.employeeCode,
         leaveType: leaveType.name,
@@ -493,6 +494,20 @@ const applyLeave = async (req, res) => {
         category: 'LEAVE',
         link: '/employee/leaves',
       });
+
+      if (targetUser.email) {
+        await sendLeaveRequestSubmittedEmail({
+          adminEmails: [],
+          employeeEmail: targetUser.email,
+          employeeName: applicantName,
+          employeeCode: targetUser.employeeCode || targetUser.email,
+          leaveType: leaveType.name,
+          startDate: start,
+          endDate: end,
+          totalDays,
+          reason: `Entered on your behalf by ${creatorName}${reason ? `: ${reason.trim()}` : ''}`,
+        });
+      }
     }
 
     return res.status(201).json({

@@ -1,6 +1,6 @@
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
-const { createInAppNotification } = require('../services/notification.service');
+const { createInAppNotification, sendTicketCreatedEmail } = require('../services/notification.service');
 
 const CATEGORY_LABELS = {
   IT_HARDWARE: 'IT & Equipment',
@@ -410,6 +410,24 @@ const createTicket = async (req, res) => {
       });
     } catch (notifErr) {
       console.warn('Could not dispatch ticket notification:', notifErr.message);
+    }
+
+    // Send confirmation email to the employee
+    if (newTicket.user?.email) {
+      try {
+        await sendTicketCreatedEmail({
+          email: newTicket.user.email,
+          name: `${newTicket.user.firstName} ${newTicket.user.lastName}`,
+          ticketNumber,
+          subject: subject.trim(),
+          category: CATEGORY_LABELS[category] || category,
+          priority: priority || 'MEDIUM',
+          description: description.trim(),
+          assignedTo: targetAssignee,
+        });
+      } catch (mailErr) {
+        console.warn('Could not dispatch ticket email:', mailErr.message);
+      }
     }
 
     cacheService.invalidateTags(['tickets']);

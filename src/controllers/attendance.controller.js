@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const cacheService = require('../services/cache.service');
 const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
+const { createInAppNotification, sendAttendancePunchInEmail } = require('../services/notification.service');
 
 /**
  * Constant-time string comparison preventing timing side-channel attacks
@@ -112,6 +113,39 @@ async function processAttendancePunch({ employeeCode, timestamp, type, sourceNot
         notes: `${sourceNote} (Check-In)`,
       },
     });
+
+    // 1. Dispatch In-App Notification to employee
+    try {
+      const timeStr = eventTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      await createInAppNotification({
+        userId: user.id,
+        title: `Attendance Punch-In Recorded`,
+        message: `Checked in at ${timeStr}. Status: ${status === 'LATE' ? 'Late Arrival' : 'On-Time (Present)'}.`,
+        type: status === 'LATE' ? 'warning' : 'success',
+        category: 'ATTENDANCE',
+        link: '/employee/attendance',
+      });
+    } catch (notifErr) {
+      console.warn('Could not dispatch in-app attendance notification:', notifErr.message);
+    }
+
+    // 2. Dispatch Email Notification to employee
+    if (user.email) {
+      try {
+        await sendAttendancePunchInEmail({
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+          employeeCode: user.employeeCode,
+          checkInTime: eventTime,
+          date: todayDate,
+          status,
+          shift: user.shift || 'General Morning (09:00 - 17:30)',
+          sourceNote,
+        });
+      } catch (mailErr) {
+        console.warn('Could not dispatch attendance email:', mailErr.message);
+      }
+    }
   } else if (eventType === 'OUT') {
     const existing = await prisma.attendance.findUnique({
       where: {
