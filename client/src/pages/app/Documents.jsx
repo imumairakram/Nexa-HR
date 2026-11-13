@@ -1227,8 +1227,115 @@ ${doc.description || 'This document serves as an official verified corporate rec
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODERN DYNAMIC REPOSITORY SEARCH & FILTER COMMAND BAR */}
+      {/* 3. REPOSITORY CONTROLS & MODERN SEARCH BAR */}
       {/* ========================================================================= */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Repository Tab Switcher: Issued Documents vs Company Policies */}
+        <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 w-fit">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('issued');
+              setTypeFilter('ALL');
+              setDeptFilter('ALL');
+            }}
+            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'issued'
+                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Issued Documents</span>
+            <span
+              className={`text-[10px] px-2 py-0.2 rounded-full font-extrabold transition-all ${
+                activeTab === 'issued'
+                  ? 'bg-sky-500 text-white'
+                  : 'bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              {issuedDocs.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('policies');
+              setPolicyCategoryFilter('ALL');
+            }}
+            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'policies'
+                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Company Policies</span>
+            <span
+              className={`text-[10px] px-2 py-0.2 rounded-full font-extrabold transition-all ${
+                activeTab === 'policies'
+                  ? 'bg-sky-500 text-white'
+                  : 'bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              {companyPolicies.length}
+            </span>
+          </button>
+        </div>
+
+        {/* View Mode & Primary Action Button */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {activeTab === 'issued' && (
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                title="Table View"
+                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <Grid className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'issued' ? (
+            <button
+              type="button"
+              onClick={() => setIsIssueModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Issue Document</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsPolicyModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Publish Policy</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       <ModernSearchBarSection
         statusTabs={
           activeTab === 'issued'
@@ -1401,110 +1508,33 @@ ${doc.description || 'This document serves as an official verified corporate rec
             )}
           </div>
         }
-        actionButton={
-          <div className="flex items-center gap-2">
-            {/* Vault Switch Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('issued');
-                  setTypeFilter('ALL');
-                  setDeptFilter('ALL');
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'issued'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
-              >
-                Issued ({issuedDocs.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('policies');
-                  setPolicyCategoryFilter('ALL');
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'policies'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
-              >
-                Policies ({companyPolicies.length})
-              </button>
-            </div>
-
-            {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80">
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                title="Table View"
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <List className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                title="Grid View"
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <Grid className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Action Button */}
-            {activeTab === 'issued' ? (
-              <button
-                type="button"
-                onClick={() => setIsIssueModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Issue Document</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsPolicyModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Publish Policy</span>
-              </button>
-            )}
-          </div>
-        }
+        actionButton={null}
       />
 
       {/* ========================================================================= */}
       {/* 4. DOCUMENTS CONTENT VIEW */}
       {/* ========================================================================= */}
       {activeTab === 'issued' && (
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Issued Employee Documents & Agreements
-              </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Complete directory of corporate offer letters, employment contracts, and increment letters issued to workforce members
-              </p>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-sky-100 dark:border-slate-800 overflow-hidden">
+          <div className="p-5 sm:p-6 border-b border-sky-100/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-sky-50/50 via-white to-white dark:from-sky-950/20 dark:via-slate-900 dark:to-slate-900">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200/70 dark:border-sky-800/60 flex items-center justify-center shrink-0 shadow-2xs">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  Issued Employee Documents & Agreements
+                </h3>
+                <p className="text-xs text-slate-400 dark:text-slate-400 font-medium mt-0.5">
+                  Complete directory of corporate offer letters, employment contracts, and increment letters issued to workforce members
+                </p>
+              </div>
             </div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-              {filteredIssuedDocs.length} Records
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/70 border border-sky-200/80 dark:border-sky-800/80 px-3 py-1 rounded-full">
+                {filteredIssuedDocs.length} {filteredIssuedDocs.length === 1 ? 'Record' : 'Records'}
+              </span>
+            </div>
           </div>
 
           {loading ? (
@@ -1513,7 +1543,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
             </div>
           ) : filteredIssuedDocs.length === 0 ? (
             <div className="p-12 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center border border-sky-200/60 dark:border-sky-800/60 shadow-2xs">
                 <FolderOpen className="w-6 h-6" />
               </div>
               <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">No documents matched your criteria</h4>
@@ -1524,7 +1554,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               </p>
               <button
                 onClick={() => setIsIssueModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-sky-500 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5 transition-all"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Issue New Document</span>
@@ -1536,7 +1566,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
               {viewMode === 'list' && (
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                    <thead className="bg-sky-50/40 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-black text-[10px] tracking-wider border-b border-sky-100/80 dark:border-slate-800">
                       <tr>
                         <th className="py-3.5 px-6">Document Title & Ref</th>
                         <th className="py-3.5 px-4">Recipient Employee</th>
@@ -1547,22 +1577,22 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         <th className="py-3.5 px-6 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 font-medium">
                       {filteredIssuedDocs.map((doc) => (
                         <tr
                           key={doc.id}
-                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group"
+                          className="hover:bg-sky-50/30 dark:hover:bg-slate-800/40 transition-colors group"
                         >
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200/60 dark:border-sky-800/50">
+                              <div className="w-9 h-9 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200/70 dark:border-sky-800/60 shadow-2xs">
                                 <FileText className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
                                 <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate max-w-xs">
                                   {doc.title}
                                 </span>
-                                <span className="text-[10px] text-slate-400 font-mono font-bold">
+                                <span className="text-[10px] text-slate-400 font-mono font-bold tracking-tight">
                                   {doc.referenceNumber || `#${doc.id}`}
                                 </span>
                               </div>
@@ -1570,12 +1600,12 @@ ${doc.description || 'This document serves as an official verified corporate rec
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold text-xs flex items-center justify-center shrink-0">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-full bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 font-bold text-xs flex items-center justify-center shrink-0 border border-sky-200/80 dark:border-sky-800/80">
                                 {doc.employeeName ? doc.employeeName.charAt(0).toUpperCase() : 'E'}
                               </div>
                               <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-100 text-xs">
+                                <div className="font-bold text-slate-900 dark:text-white text-xs">
                                   {doc.employeeName || 'Company Team Member'}
                                 </div>
                                 <div className="text-[10px] text-slate-400 font-mono">
@@ -1587,27 +1617,28 @@ ${doc.description || 'This document serves as an official verified corporate rec
 
                           <td className="py-4 px-4 whitespace-nowrap">
                             <div className="flex flex-col gap-1 items-start">
-                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60">
                                 {doc.typeLabel || doc.type}
                               </span>
                               {doc.uploadedBy === 'EMPLOYEE' && (
-                                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                   Employee Upload
                                 </span>
                               )}
                             </div>
                           </td>
 
-                          <td className="py-4 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                          <td className="py-4 px-4 text-slate-700 dark:text-slate-300 whitespace-nowrap text-xs font-medium">
                             {doc.department || 'Operations'}
                           </td>
 
-                          <td className="py-4 px-4 text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">
+                          <td className="py-4 px-4 text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap text-xs">
                             {doc.issueDate}
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 flex items-center w-fit">
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/70 flex items-center gap-1.5 w-fit">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
                               <span>{doc.status || 'VERIFIED'}</span>
                             </span>
                           </td>
@@ -1616,21 +1647,21 @@ ${doc.description || 'This document serves as an official verified corporate rec
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => setSelectedDoc(doc)}
-                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 transition-colors cursor-pointer"
+                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-300 hover:border-sky-200/80 dark:hover:border-sky-800/80 border border-transparent transition-all cursor-pointer"
                                 title="Preview Document Dossier"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDownload(doc)}
-                                className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                                className="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                               >
                                 <Download className="w-3 h-3" />
                                 <span>Download</span>
                               </button>
                               <button
                                 onClick={() => handleDeleteDoc(doc.id)}
-                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer"
                                 title="Revoke & Delete"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1653,19 +1684,20 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 {filteredIssuedDocs.map((doc) => (
                   <div
                     key={doc.id}
-                    className="rounded-3xl p-5 border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all space-y-3.5 group flex flex-col justify-between"
+                    className="rounded-3xl p-5 border border-sky-100 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-sky-200 dark:hover:border-slate-700 hover:shadow-md transition-all space-y-3.5 group flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/60">
+                        <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-800/60 shadow-2xs">
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 flex items-center">
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/70 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
                             <span>{doc.typeLabel || doc.type}</span>
                           </span>
                           {doc.uploadedBy === 'EMPLOYEE' && (
-                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200">
+                            <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                               Employee Upload
                             </span>
                           )}
@@ -1673,7 +1705,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 group-hover:text-sky-600 transition-colors">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                           {doc.title}
                         </h4>
                         <p className="text-[10px] text-slate-400 font-mono mt-0.5 font-bold">
@@ -1682,8 +1714,8 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       </div>
 
                       {/* Recipient Details */}
-                      <div className="p-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold text-xs flex items-center justify-center shrink-0">
+                      <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-sky-100/70 dark:border-slate-700/60 flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold text-xs flex items-center justify-center shrink-0 border border-sky-200/80 dark:border-sky-800/80">
                           {doc.employeeName ? doc.employeeName.charAt(0).toUpperCase() : 'E'}
                         </div>
                         <div className="min-w-0">
@@ -1697,28 +1729,28 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
                       <span className="text-[11px] text-slate-400 font-mono">{doc.issueDate}</span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedDoc(doc)}
-                          className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 cursor-pointer"
+                          className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors"
                           title="Preview"
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDeleteDoc(doc.id)}
-                          className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-rose-600 cursor-pointer"
+                          className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors"
                           title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDownload(doc)}
-                          className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all"
                         >
-                          <Download className="w-3.5 h-3.5" />
+                          <Download className="w-3 h-3" />
                           <span>PDF</span>
                         </button>
                       </div>
