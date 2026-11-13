@@ -48,56 +48,56 @@ const getDocTypeMeta = (type = '') => {
   const norm = String(type || '').toUpperCase();
   if (norm.includes('CONTRACT') || norm.includes('OFFER') || norm.includes('APPOINTMENT')) {
     return {
-      icon: <FileCheck className="w-4 h-4" />,
+      icon: <FileCheck className="w-4 h-4 stroke-[2.2]" />,
       bg: 'bg-sky-50 dark:bg-sky-950/60',
       color: 'text-sky-600 dark:text-sky-400',
-      border: 'border-sky-200/70 dark:border-sky-800/60',
-      badgeBg: 'bg-sky-50 dark:bg-sky-950/60',
+      border: 'border-sky-100 dark:border-sky-800/60',
+      badgeBg: 'bg-sky-50 dark:bg-sky-950/80',
       badgeColor: 'text-sky-700 dark:text-sky-300',
-      badgeBorder: 'border-sky-200/60 dark:border-sky-800/60',
+      badgeBorder: 'border-sky-200/80 dark:border-sky-800/80',
     };
   }
   if (norm.includes('CERTIFICATE') || norm.includes('ACADEMIC') || norm.includes('DEGREE')) {
     return {
-      icon: <Award className="w-4 h-4" />,
-      bg: 'bg-purple-50 dark:bg-purple-950/60',
-      color: 'text-purple-600 dark:text-purple-400',
-      border: 'border-purple-200/70 dark:border-purple-800/60',
-      badgeBg: 'bg-purple-50 dark:bg-purple-950/60',
-      badgeColor: 'text-purple-700 dark:text-purple-300',
-      badgeBorder: 'border-purple-200/60 dark:border-purple-800/60',
+      icon: <Award className="w-4 h-4 stroke-[2.2]" />,
+      bg: 'bg-sky-50 dark:bg-sky-950/60',
+      color: 'text-sky-600 dark:text-sky-400',
+      border: 'border-sky-100 dark:border-sky-800/60',
+      badgeBg: 'bg-sky-50 dark:bg-sky-950/80',
+      badgeColor: 'text-sky-700 dark:text-sky-300',
+      badgeBorder: 'border-sky-200/80 dark:border-sky-800/80',
     };
   }
   if (norm.includes('IDENT') || norm.includes('PASSPORT') || norm.includes('CNIC') || norm.includes('NDA')) {
     return {
-      icon: <Shield className="w-4 h-4" />,
-      bg: 'bg-cyan-50 dark:bg-cyan-950/60',
-      color: 'text-cyan-600 dark:text-cyan-400',
-      border: 'border-cyan-200/70 dark:border-cyan-800/60',
-      badgeBg: 'bg-cyan-50 dark:bg-cyan-950/60',
-      badgeColor: 'text-cyan-700 dark:text-cyan-300',
-      badgeBorder: 'border-cyan-200/60 dark:border-cyan-800/60',
+      icon: <Shield className="w-4 h-4 stroke-[2.2]" />,
+      bg: 'bg-sky-50 dark:bg-sky-950/60',
+      color: 'text-sky-600 dark:text-sky-400',
+      border: 'border-sky-100 dark:border-sky-800/60',
+      badgeBg: 'bg-sky-50 dark:bg-sky-950/80',
+      badgeColor: 'text-sky-700 dark:text-sky-300',
+      badgeBorder: 'border-sky-200/80 dark:border-sky-800/80',
     };
   }
   if (norm.includes('TAX') || norm.includes('FINANCE') || norm.includes('SALARY')) {
     return {
-      icon: <FileSpreadsheet className="w-4 h-4" />,
-      bg: 'bg-amber-50 dark:bg-amber-950/60',
-      color: 'text-amber-600 dark:text-amber-400',
-      border: 'border-amber-200/70 dark:border-amber-800/60',
-      badgeBg: 'bg-amber-50 dark:bg-amber-950/60',
-      badgeColor: 'text-amber-700 dark:text-amber-300',
-      badgeBorder: 'border-amber-200/60 dark:border-amber-800/60',
+      icon: <FileSpreadsheet className="w-4 h-4 stroke-[2.2]" />,
+      bg: 'bg-slate-100 dark:bg-slate-800',
+      color: 'text-slate-700 dark:text-slate-300',
+      border: 'border-slate-200 dark:border-slate-700',
+      badgeBg: 'bg-slate-100 dark:bg-slate-800',
+      badgeColor: 'text-slate-800 dark:text-slate-200',
+      badgeBorder: 'border-slate-200 dark:border-slate-700',
     };
   }
   return {
-    icon: <FileText className="w-4 h-4" />,
+    icon: <FileText className="w-4 h-4 stroke-[2.2]" />,
     bg: 'bg-sky-50 dark:bg-sky-950/60',
     color: 'text-sky-600 dark:text-sky-400',
-    border: 'border-sky-200/70 dark:border-sky-800/60',
-    badgeBg: 'bg-slate-100 dark:bg-slate-800',
-    badgeColor: 'text-slate-700 dark:text-slate-300',
-    badgeBorder: 'border-slate-200/60 dark:border-slate-700/60',
+    border: 'border-sky-100 dark:border-sky-800/60',
+    badgeBg: 'bg-sky-50 dark:bg-sky-950/80',
+    badgeColor: 'text-sky-700 dark:text-sky-300',
+    badgeBorder: 'border-sky-200/80 dark:border-sky-800/80',
   };
 };
 
@@ -1123,27 +1123,36 @@ const EmployeeDocuments = () => {
       {/* 4. DOCUMENTS CONTENT VIEW (PERSONAL VAULT OR COMPANY POLICIES) */}
       {/* ========================================================================= */}
       {activeTab === 'personal' && (
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Personal Employment Vault & Certificates</span>
-              </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
-                AES-256 encrypted repository of verified employment contracts, credentials, and tax filings
-              </p>
+        <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl shadow-xs border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-sky-50/40 via-white to-transparent dark:from-sky-950/20 dark:via-[#1E293B] dark:to-[#1E293B]">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center shrink-0 shadow-xs">
+                <FolderLock className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  Personal Employment Vault & Certificates
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  AES-256 encrypted repository of verified employment contracts, credentials, and tax filings
+                </p>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {/* Vault Switch Toggle */}
-              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setActiveTab('personal');
                     setTypeFilter('ALL');
                   }}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs"
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    activeTab === 'personal'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
                 >
                   Vault ({personalDocs.length})
                 </button>
@@ -1153,43 +1162,15 @@ const EmployeeDocuments = () => {
                     setActiveTab('policies');
                     setTypeFilter('ALL');
                   }}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    activeTab === 'policies'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
                 >
                   Policies ({policies.length})
                 </button>
               </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('list')}
-                  title="Table List View"
-                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                    viewMode === 'list'
-                      ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                      : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                  }`}
-                >
-                  <List className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  title="Card Grid View"
-                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                    viewMode === 'grid'
-                      ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs'
-                      : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                  }`}
-                >
-                  <Grid className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full shrink-0">
-                {filteredPersonalDocs.length} Documents
-              </span>
             </div>
           </div>
 
@@ -1257,15 +1238,15 @@ const EmployeeDocuments = () => {
               {viewMode === 'list' && (
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
-                    <thead className="bg-slate-50/80 dark:bg-slate-800/70 text-slate-400 dark:text-slate-400 uppercase font-black text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                    <thead className="bg-slate-50/90 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200/80 dark:border-slate-800">
                       <tr>
-                        <th className="py-4 px-6">Document Name & Ref</th>
-                        <th className="py-4 px-4">Category</th>
-                        <th className="py-4 px-4">Issuing Authority</th>
-                        <th className="py-4 px-4">Date Issued</th>
-                        <th className="py-4 px-4">File Size</th>
-                        <th className="py-4 px-4">Status</th>
-                        <th className="py-4 px-6 text-right">Actions</th>
+                        <th className="py-3.5 px-6">Document Name & Ref</th>
+                        <th className="py-3.5 px-4">Category</th>
+                        <th className="py-3.5 px-4">Issuing Authority</th>
+                        <th className="py-3.5 px-4">Date Issued</th>
+                        <th className="py-3.5 px-4">File Size</th>
+                        <th className="py-3.5 px-4">Status</th>
+                        <th className="py-3.5 px-6 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 font-medium">
@@ -1291,7 +1272,7 @@ const EmployeeDocuments = () => {
                                     <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-bold">
                                       {doc.referenceNumber || `#${doc.id}`}
                                     </span>
-                                    <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-mono font-extrabold uppercase">
+                                    <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[9px] font-mono font-bold uppercase border border-slate-200/60 dark:border-slate-700/60">
                                       PDF
                                     </span>
                                   </div>
@@ -1301,7 +1282,7 @@ const EmployeeDocuments = () => {
 
                             <td className="py-4 px-4 whitespace-nowrap">
                               <span
-                                className={`px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap-1.5 ${typeInfo.badgeBg} ${typeInfo.badgeColor} border ${typeInfo.badgeBorder}`}
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap-1.5 ${typeInfo.badgeBg} ${typeInfo.badgeColor} border ${typeInfo.badgeBorder}`}
                               >
                                 {doc.typeLabel || doc.type?.replace(/_/g, ' ') || 'Document'}
                               </span>
@@ -1330,7 +1311,7 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
                                 <span>{doc.status || 'Verified'}</span>
                               </span>
                             </td>
@@ -1339,21 +1320,21 @@ const EmployeeDocuments = () => {
                               <div className="flex items-center justify-end gap-2">
                                 <button
                                   onClick={() => setSelectedDoc(doc)}
-                                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer shadow-xs"
+                                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-600 dark:hover:text-sky-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
                                   title="Preview Details"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDownload(doc)}
-                                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm shadow-sky-600/20 hover:shadow-md transition-all active:scale-95"
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold border border-slate-900 dark:border-white shadow-xs transition-all active:scale-95 cursor-pointer"
                                 >
-                                  <Download className="w-3 h-3" />
+                                  <Download className="w-3 h-3 stroke-[2.2]" />
                                   <span>Download</span>
                                 </button>
                                 <button
                                   onClick={() => handleDeleteDoc(doc.id)}
-                                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer shadow-xs"
+                                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
                                   title="Delete Document"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1443,27 +1424,36 @@ const EmployeeDocuments = () => {
 
       {/* Policies Tab Content */}
       {activeTab === 'policies' && (
-        <div className="bg-white dark:bg-[#1E293B] rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Company Policies & Operating Handbooks
-              </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Official enterprise charters, compliance frameworks, and employee benefit guides
-              </p>
+        <div className="bg-white dark:bg-[#1E293B] rounded-2xl sm:rounded-3xl shadow-xs border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-sky-50/40 via-white to-transparent dark:from-sky-950/20 dark:via-[#1E293B] dark:to-[#1E293B]">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center shrink-0 shadow-xs">
+                <BookOpen className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  Company Policies & Operating Handbooks
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  Official enterprise charters, compliance frameworks, and employee benefit guides
+                </p>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {/* Vault Switch Toggle */}
-              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+              <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setActiveTab('personal');
                     setTypeFilter('ALL');
                   }}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    activeTab === 'personal'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
                 >
                   Vault ({personalDocs.length})
                 </button>
@@ -1473,15 +1463,15 @@ const EmployeeDocuments = () => {
                     setActiveTab('policies');
                     setTypeFilter('ALL');
                   }}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-2xs"
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    activeTab === 'policies'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
                 >
                   Policies ({policies.length})
                 </button>
               </div>
-
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full shrink-0">
-                {filteredPolicies.length} Handbooks
-              </span>
             </div>
           </div>
 
