@@ -867,6 +867,12 @@ export const api = {
     });
   },
 
+  acknowledgeAnnouncement: async (id) => {
+    return await fetchAPI(`/announcements/${id}/acknowledge`, {
+      method: 'POST',
+    });
+  },
+
   // --- Helpdesk & Support Tickets ---
   getMyTickets: async (params = {}) => {
     const query = new URLSearchParams(params).toString();

@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 const {
   broadcastInAppNotification,
   sendAnnouncementEmail,
@@ -30,16 +31,56 @@ const getAnnouncements = async (req, res) => {
       ];
     }
 
-    const announcements = await prisma.announcement.findMany({
-      where,
-      orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
+    const [totalStaff, announcements] = await Promise.all([
+      prisma.user.count({
+        where: { isActive: true, ...nonDemoUsersWhere },
+      }),
+      prisma.announcement.findMany({
+        where,
+        include: {
+          acknowledgments: {
+            select: {
+              userId: true,
+              acknowledgedAt: true,
+            },
+          },
+        },
+        orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
+      }),
+    ]);
+
+    const currentUserId = req.user?.id || req.user?.userId;
+
+    const formattedAnnouncements = announcements.map((item) => {
+      const acks = item.acknowledgments || [];
+      const acknowledgedCount = acks.length;
+      const hasAcknowledged = currentUserId ? acks.some((ack) => ack.userId === currentUserId) : false;
+
+      return {
+        id: item.id,
+        title: item.title,
+        category: item.category,
+        priority: item.priority,
+        department: item.department,
+        summary: item.summary,
+        content: item.content,
+        author: item.author,
+        pinned: item.pinned,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        acknowledgedCount,
+        hasAcknowledged,
+        acknowledged: hasAcknowledged,
+        totalTargetCount: totalStaff,
+      };
     });
 
     return res.status(200).json({
       success: true,
       data: {
-        announcements,
-        total: announcements.length,
+        announcements: formattedAnnouncements,
+        total: formattedAnnouncements.length,
+        totalStaff,
       },
     });
   } catch (error) {
@@ -110,6 +151,8 @@ const createAnnouncement = async (req, res) => {
       announcement,
     });
 
+    cacheService.invalidateTags(['announcements']);
+
     return res.status(201).json({
       success: true,
       message: 'Announcement published! Notifications and emails broadcasted to all employees.',
@@ -164,6 +207,8 @@ const updateAnnouncement = async (req, res) => {
       data,
     });
 
+    cacheService.invalidateTags(['announcements']);
+
     return res.status(200).json({
       success: true,
       message: 'Announcement updated successfully.',
@@ -201,6 +246,8 @@ const deleteAnnouncement = async (req, res) => {
       where: { id },
     });
 
+    cacheService.invalidateTags(['announcements']);
+
     return res.status(200).json({
       success: true,
       message: 'Announcement deleted successfully.',
@@ -215,9 +262,95 @@ const deleteAnnouncement = async (req, res) => {
   }
 };
 
+/**
+ * Toggle acknowledgment of an announcement by the authenticated employee
+ */
+const acknowledgeAnnouncement = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id || req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required to acknowledge notice.',
+      });
+    }
+
+    const announcement = await prisma.announcement.findUnique({
+      where: { id },
+    });
+
+    if (!announcement) {
+      return res.status(404).json({
+        success: false,
+        message: 'Announcement not found.',
+      });
+    }
+
+    const existingAck = await prisma.announcementAcknowledgment.findUnique({
+      where: {
+        announcementId_userId: {
+          announcementId: id,
+          userId,
+        },
+      },
+    });
+
+    let acknowledged = false;
+    if (existingAck) {
+      await prisma.announcementAcknowledgment.delete({
+        where: { id: existingAck.id },
+      });
+      acknowledged = false;
+    } else {
+      await prisma.announcementAcknowledgment.create({
+        data: {
+          announcementId: id,
+          userId,
+        },
+      });
+      acknowledged = true;
+    }
+
+    const [acknowledgedCount, totalStaff] = await Promise.all([
+      prisma.announcementAcknowledgment.count({
+        where: { announcementId: id },
+      }),
+      prisma.user.count({
+        where: { isActive: true, ...nonDemoUsersWhere },
+      }),
+    ]);
+
+    // Invalidate cached announcements so fresh acknowledgement counts are returned
+    cacheService.invalidateTags(['announcements']);
+
+    return res.status(200).json({
+      success: true,
+      message: acknowledged
+        ? 'Circular officially acknowledged and verified in HR records.'
+        : 'Acknowledgment status revoked.',
+      data: {
+        announcementId: id,
+        acknowledged,
+        acknowledgedCount,
+        totalTargetCount: totalStaff,
+      },
+    });
+  } catch (error) {
+    console.error('Error acknowledging announcement:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update acknowledgment status.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAnnouncements,
   createAnnouncement,
   updateAnnouncement,
   deleteAnnouncement,
+  acknowledgeAnnouncement,
 };

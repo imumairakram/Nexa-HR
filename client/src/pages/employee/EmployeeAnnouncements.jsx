@@ -89,11 +89,15 @@ const EmployeeAnnouncements = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  const [totalStaff, setTotalStaff] = useState(() => api.getCached('/announcements')?.data?.totalStaff || 0);
   const [announcements, setAnnouncements] = useState(() => {
     const cached = api.getCached('/announcements')?.data?.announcements;
     if (Array.isArray(cached)) {
       return cached.map((item) => ({
         ...item,
+        acknowledged: Boolean(item.acknowledged || item.hasAcknowledged),
+        acknowledgedCount: Number(item.acknowledgedCount || 0),
+        totalTargetCount: item.totalTargetCount || api.getCached('/announcements')?.data?.totalStaff || 0,
         categoryLabel: getCategoryLabel(item.category),
         readTime: `${Math.max(1, Math.ceil((item.content?.length || 100) / 400))} min read`,
         date: item.createdAt
@@ -128,8 +132,15 @@ const EmployeeAnnouncements = () => {
       localStorage.removeItem('nexahr_notices_data');
       const res = await api.getAnnouncements();
       if (res?.success && Array.isArray(res.data?.announcements)) {
+        const staffCount = typeof res.data?.totalStaff === 'number' ? res.data.totalStaff : totalStaff;
+        if (typeof res.data?.totalStaff === 'number') {
+          setTotalStaff(res.data.totalStaff);
+        }
         const formatted = res.data.announcements.map((item) => ({
           ...item,
+          acknowledged: Boolean(item.acknowledged || item.hasAcknowledged),
+          acknowledgedCount: Number(item.acknowledgedCount || 0),
+          totalTargetCount: item.totalTargetCount || staffCount || 0,
           categoryLabel: getCategoryLabel(item.category),
           readTime: `${Math.max(1, Math.ceil((item.content?.length || 100) / 400))} min read`,
           date: item.createdAt
@@ -175,24 +186,86 @@ const EmployeeAnnouncements = () => {
     showToast(target?.pinned ? 'Notice pinned to top of board' : 'Notice unpinned');
   };
 
-  const toggleAcknowledge = (id) => {
-    const updated = announcements.map((a) => {
-      if (a.id === id) {
-        const nextState = !a.acknowledged;
-        return {
-          ...a,
-          acknowledged: nextState,
-          acknowledgedCount: nextState ? (a.acknowledgedCount || 0) + 1 : Math.max(0, (a.acknowledgedCount || 1) - 1),
-        };
-      }
-      return a;
-    });
-    saveNoticesLocally(updated);
-    const target = updated.find((a) => a.id === id);
-    if (target?.acknowledged) {
+  const toggleAcknowledge = async (id) => {
+    const previous = announcements.find((a) => a.id === id);
+    const nextState = !previous?.acknowledged;
+    const nextCount = nextState
+      ? (previous?.acknowledgedCount || 0) + 1
+      : Math.max(0, (previous?.acknowledgedCount || 1) - 1);
+
+    // Optimistic UI update
+    setAnnouncements((prev) =>
+      prev.map((a) =>
+        a.id === id
+          ? {
+              ...a,
+              acknowledged: nextState,
+              hasAcknowledged: nextState,
+              acknowledgedCount: nextCount,
+            }
+          : a
+      )
+    );
+
+    if (selectedItem?.id === id) {
+      setSelectedItem((prev) =>
+        prev
+          ? {
+              ...prev,
+              acknowledged: nextState,
+              hasAcknowledged: nextState,
+              acknowledgedCount: nextCount,
+            }
+          : null
+      );
+    }
+
+    if (nextState) {
       showToast('Circular officially acknowledged and verified in HR records.');
     } else {
       showToast('Acknowledgment status revoked.');
+    }
+
+    try {
+      const res = await api.acknowledgeAnnouncement(id);
+      if (res?.success && res.data) {
+        setAnnouncements((prev) =>
+          prev.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  acknowledged: res.data.acknowledged,
+                  hasAcknowledged: res.data.acknowledged,
+                  acknowledgedCount: res.data.acknowledgedCount,
+                  totalTargetCount: res.data.totalTargetCount || a.totalTargetCount,
+                }
+              : a
+          )
+        );
+        if (selectedItem?.id === id) {
+          setSelectedItem((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  acknowledged: res.data.acknowledged,
+                  hasAcknowledged: res.data.acknowledged,
+                  acknowledgedCount: res.data.acknowledgedCount,
+                  totalTargetCount: res.data.totalTargetCount || prev.totalTargetCount,
+                }
+              : null
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Failed to acknowledge announcement:', err);
+      // Revert optimistic update
+      setAnnouncements((prev) =>
+        prev.map((a) => (a.id === id ? previous : a))
+      );
+      if (selectedItem?.id === id) {
+        setSelectedItem(previous);
+      }
+      showToast('Failed to update acknowledgment status. Please try again.');
     }
   };
 
@@ -527,10 +600,10 @@ const EmployeeAnnouncements = () => {
           filteredNotices.map((item) => (
             <div
               key={item.id}
-              className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/10 ${
+              className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 transition-all duration-300 border border-slate-200/90 dark:border-slate-800 hover:shadow-lg hover:shadow-sky-500/5 ${
                 item.pinned
-                  ? 'border-2 border-sky-400/80 dark:border-sky-500/80 bg-gradient-to-br from-sky-50/70 via-white to-sky-50/30 dark:from-sky-950/40 dark:via-[#1E293B] dark:to-sky-950/20 shadow-md shadow-sky-500/5'
-                  : 'bg-white dark:bg-[#1E293B] border border-slate-200/90 dark:border-slate-800 hover:border-sky-300/80 dark:hover:border-sky-700/80 shadow-xs'
+                  ? 'bg-gradient-to-br from-sky-50/40 via-white to-slate-50/30 dark:from-sky-950/20 dark:via-[#1E293B] dark:to-[#1E293B] shadow-xs'
+                  : 'bg-white dark:bg-[#1E293B] shadow-xs'
               }`}
             >
               <div className="flex items-start gap-4">
@@ -622,7 +695,7 @@ const EmployeeAnnouncements = () => {
                     <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-sky-500" />
                       <span>
-                        <strong className="text-slate-900 dark:text-white font-bold">{item.acknowledgedCount || 0}</strong> of {item.totalTargetCount || 160} staff acknowledged
+                        <strong className="text-slate-900 dark:text-white font-bold">{item.acknowledgedCount || 0}</strong> of {item.totalTargetCount || totalStaff || 0} staff acknowledged
                       </span>
                     </span>
                   </div>
@@ -773,7 +846,7 @@ const EmployeeAnnouncements = () => {
                           Team Engagement
                         </h4>
                         <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium truncate mt-0.5">
-                          {selectedItem.acknowledgedCount || 0} of {selectedItem.totalTargetCount || 160} Staff Acknowledged
+                          {selectedItem.acknowledgedCount || 0} of {selectedItem.totalTargetCount || totalStaff || 0} Staff Acknowledged
                         </p>
                       </div>
                     </div>
@@ -831,27 +904,15 @@ const EmployeeAnnouncements = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    toggleAcknowledge(selectedItem.id);
-                    setSelectedItem((prev) => ({ ...prev, acknowledged: !prev.acknowledged }));
-                  }}
-                  className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold shadow-lg active:scale-[0.99] transition-all cursor-pointer ${
+                  onClick={() => toggleAcknowledge(selectedItem.id)}
+                  className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.99] ${
                     selectedItem.acknowledged
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25'
-                      : 'bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white shadow-sky-600/25'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white'
+                      : 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100'
                   }`}
                 >
-                  {selectedItem.acknowledged ? (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                      <span>Acknowledged</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 stroke-[2.5]" />
-                      <span>Mark as Acknowledged</span>
-                    </>
-                  )}
+                  <Check className={`w-4 h-4 ${selectedItem.acknowledged ? 'text-white dark:text-slate-900 stroke-[2.5]' : 'stroke-[2]'}`} />
+                  <span>{selectedItem.acknowledged ? 'Acknowledged' : 'Mark as Acknowledged'}</span>
                 </button>
               </div>
             </footer>

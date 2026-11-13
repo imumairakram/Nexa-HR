@@ -8,12 +8,16 @@ const {
   createAnnouncement,
   updateAnnouncement,
   deleteAnnouncement,
+  acknowledgeAnnouncement,
 } = require('../controllers/announcement.controller');
 
 router.use(verifyToken);
 
 // All authenticated users can view announcements
 router.get('/', cacheService.middleware({ ttlSeconds: 120, tags: ['announcements'] }), getAnnouncements);
+
+// All authenticated employees can acknowledge an announcement
+router.post('/:id/acknowledge', acknowledgeAnnouncement);
 
 // HR and Admins can create, update, and delete announcements
 router.post('/', checkRole('ADMIN', 'HR_MANAGER'), createAnnouncement);

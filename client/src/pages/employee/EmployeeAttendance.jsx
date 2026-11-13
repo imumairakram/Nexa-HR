@@ -508,9 +508,6 @@ const EmployeeAttendance = () => {
                 <span>{lateArrivals} Late Arrivals Flagged</span>
               </span>
               <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                <span>{employeeShift}</span>
-              </span>
-              <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                 <span>{officeLocation}</span>
               </span>
             </div>

@@ -90,6 +90,7 @@ model User {
   accountTransactions AccountTransaction[]
   vaultUploads        VaultDocument[]       @relation("VaultUploader")
   vaultIssuedDocs     VaultDocument[]       @relation("VaultIssuedTo")
+  announcementAcks    AnnouncementAcknowledgment[]
 
   @@map("users")
 }
@@ -363,8 +364,25 @@ model Announcement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  acknowledgments AnnouncementAcknowledgment[]
+
   @@index([createdAt])
   @@map("announcements")
+}
+
+model AnnouncementAcknowledgment {
+  id              String       @id @default(uuid())
+  announcementId  String
+  userId          String
+  acknowledgedAt  DateTime     @default(now())
+
+  announcement    Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([announcementId])
+  @@index([userId])
+  @@map("announcement_acknowledgments")
 }
 
 // ====================================================
