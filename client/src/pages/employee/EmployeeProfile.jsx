@@ -32,6 +32,7 @@ import {
   Edit3,
   Copy,
   X,
+  UserCheck,
 } from 'lucide-react';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import { ProfileSkeleton } from '../../components/common/Skeleton';
@@ -754,9 +755,9 @@ const EmployeeProfile = () => {
           {/* ========================================================================= */}
           {/* 2. GRID LAYOUT: PERSONAL (EDITABLE), SECURITY, EMPLOYMENT & BANK DETAILS */}
           {/* ========================================================================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* LEFT COLUMN: PERSONAL DETAILS & EMERGENCY CONTACT (EDITABLE - 2 COLS WIDE) */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* LEFT COLUMN: PERSONAL DETAILS & EMERGENCY CONTACT (EDITABLE - 7 COLS WIDE) */}
+            <div className="lg:col-span-7 xl:col-span-7 space-y-6">
               {/* CARD 2: PERSONAL DETAILS & EMERGENCY CONTACT (EDITABLE FORM) */}
               <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -1026,58 +1027,85 @@ const EmployeeProfile = () => {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: READ-ONLY EMPLOYMENT & BANK DETAILS (1 COL WIDE) */}
-            <div className="space-y-6">
+            {/* RIGHT COLUMN: READ-ONLY EMPLOYMENT & BANK DETAILS (5 COLS WIDE) */}
+            <div className="lg:col-span-5 xl:col-span-5 space-y-6">
               {/* CARD 1: EMPLOYMENT INFORMATION (READ-ONLY) */}
               <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-soft border border-slate-100 dark:border-slate-800 space-y-5">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
                       <Briefcase className="w-5 h-5" />
                     </div>
-                    <div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Employment Details</h3>
-                      <p className="text-xs text-slate-400 font-medium">Verified corporate employment details</p>
+                    <div className="min-w-0">
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">Employment Details</h3>
+                      <p className="text-xs text-slate-400 font-medium truncate">Verified corporate employment details</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                  <span className="text-[10px] font-extrabold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0 whitespace-nowrap">
                     Read-Only
                   </span>
                 </div>
 
                 {/* Clean Key-Value List */}
-                <div className="space-y-3.5 text-xs">
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Department</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{formData.department || 'Not Assigned'}</span>
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 font-medium flex items-center gap-2 shrink-0">
+                      <Building className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span>Department</span>
+                    </span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right truncate">
+                      {formData.department || 'Not Assigned'}
+                    </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Designation</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{formData.designation || 'Not Assigned'}</span>
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 font-medium flex items-center gap-2 shrink-0">
+                      <Briefcase className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span>Designation</span>
+                    </span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right truncate">
+                      {formData.designation || 'Not Assigned'}
+                    </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Joining Date</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{formData.joinDate || 'Not Available'}</span>
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 font-medium flex items-center gap-2 shrink-0">
+                      <Calendar className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span>Joining Date</span>
+                    </span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right truncate">
+                      {formData.joinDate || 'Not Available'}
+                    </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Reporting Manager</span>
-                    <span className="font-bold text-sky-600 dark:text-sky-400 text-right">{formData.reportingManager || 'HR Operations'}</span>
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 font-medium flex items-center gap-2 shrink-0">
+                      <UserCheck className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span>Reporting Manager</span>
+                    </span>
+                    <span className="font-bold text-sky-600 dark:text-sky-400 text-right break-words min-w-0" title={formData.reportingManager || 'HR Operations'}>
+                      {formData.reportingManager || 'HR Operations'}
+                    </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 font-medium flex items-center gap-2 shrink-0">
+                      <Building2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                       <span>Office Work Location</span>
                     </span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{formData.workLocation || 'Corporate Office'}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right truncate">
+                      {formData.workLocation || 'Corporate Office'}
+                    </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold">Assigned Shift</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-[11px]">{formData.shift || 'General Shift'}</span>
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 font-medium flex items-center gap-2 shrink-0">
+                      <Clock className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span>Assigned Shift</span>
+                    </span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right truncate">
+                      {formData.shift || 'General Shift'}
+                    </span>
                   </div>
                 </div>
               </div>
