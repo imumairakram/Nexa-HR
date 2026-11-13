@@ -527,48 +527,54 @@ const EmployeeAnnouncements = () => {
           filteredNotices.map((item) => (
             <div
               key={item.id}
-              className={`rounded-3xl p-6 sm:p-7 shadow-soft border transition-all duration-300 hover:shadow-md ${
+              className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/10 ${
                 item.pinned
-                  ? 'bg-gradient-to-r from-amber-500/5 via-sky-500/5 to-white dark:to-[#1E293B] border-amber-200/80 dark:border-amber-900/50'
-                  : 'bg-white dark:bg-[#1E293B] border-slate-100 dark:border-slate-800'
+                  ? 'border-2 border-sky-400/80 dark:border-sky-500/80 bg-gradient-to-br from-sky-50/70 via-white to-sky-50/30 dark:from-sky-950/40 dark:via-[#1E293B] dark:to-sky-950/20 shadow-md shadow-sky-500/5'
+                  : 'bg-white dark:bg-[#1E293B] border border-slate-200/90 dark:border-slate-800 hover:border-sky-300/80 dark:hover:border-sky-700/80 shadow-xs'
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                {/* Notice Icon Thumbnail */}
+                <div
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
+                    item.pinned
+                      ? 'bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-500 text-white shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/60'
+                      : 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/60'
+                  }`}
+                >
+                  <Megaphone className="w-5 h-5 stroke-[2.2]" />
+                </div>
+
                 <div className="space-y-3 flex-1 min-w-0">
                   {/* Header Row: Category Badge + Date + Author Info */}
                   <div className="flex flex-wrap items-center gap-2">
                     {item.pinned && (
-                      <span className="inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300/60">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white shadow-xs tracking-wider uppercase">
+                        <Pin className="w-2.5 h-2.5 stroke-[2.5]" />
                         <span>PINNED</span>
                       </span>
                     )}
 
-                    <span
-                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
-                        item.priority === 'HIGH'
-                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
-                          : item.priority === 'MEDIUM'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
-                          : 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60'
-                      }`}
-                    >
+                    <span className="inline-flex items-center text-[10px] font-extrabold px-3 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 uppercase tracking-wider">
                       {item.categoryLabel || item.category}
                     </span>
 
-                    <span className="text-[11px] text-slate-400 font-medium">{item.date}</span>
-                    <span className="text-[11px] text-slate-400 font-medium">• By <strong className="text-slate-700 dark:text-slate-300">{item.author}</strong> ({item.department})</span>
+                    <span className="text-xs text-slate-400 font-medium">{item.date}</span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      • By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong> ({item.department})
+                    </span>
                   </div>
 
                   {/* Notice Title */}
                   <h3
                     onClick={() => setSelectedItem(item)}
-                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors leading-snug"
+                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors leading-snug tracking-tight"
                   >
                     {item.title}
                   </h3>
 
                   {/* Summary */}
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-5xl">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-5xl font-normal">
                     {item.summary}
                   </p>
 
@@ -579,9 +585,9 @@ const EmployeeAnnouncements = () => {
                         <button
                           key={aIdx}
                           onClick={() => handleDownloadAttachment(att)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/70 dark:border-slate-700/60"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700"
                         >
-                          <Paperclip className="w-3 h-3 text-slate-400" />
+                          <Paperclip className="w-3 h-3 text-sky-500" />
                           <span>{att.name}</span>
                           <span className="text-[9px] text-slate-400">({att.size})</span>
                         </button>
@@ -591,30 +597,33 @@ const EmployeeAnnouncements = () => {
 
                   {/* Bottom Actions Row */}
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <button
                         onClick={() => setSelectedItem(item)}
-                        className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 transition-all cursor-pointer shadow-xs active:scale-95"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                         <span>Read Full Notice</span>
                       </button>
 
                       <button
                         onClick={() => toggleAcknowledge(item.id)}
-                        className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs active:scale-95 ${
                           item.acknowledged
-                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200'
-                            : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-sky-500'
+                            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white'
+                            : 'bg-white text-slate-800 dark:bg-[#1E293B] dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 hover:text-sky-600 dark:hover:text-sky-400'
                         }`}
                       >
-                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-sky-600' : 'text-slate-400'}`} />
+                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-white dark:text-slate-900 stroke-[2.5]' : 'text-slate-400'}`} />
                         <span>{item.acknowledged ? 'Acknowledged' : 'Acknowledge Notice'}</span>
                       </button>
                     </div>
 
-                    <span className="text-[11px] text-slate-400 font-medium">
-                      {item.acknowledgedCount || 0} of {item.totalTargetCount || 160} employees acknowledged
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-sky-500" />
+                      <span>
+                        <strong className="text-slate-900 dark:text-white font-bold">{item.acknowledgedCount || 0}</strong> of {item.totalTargetCount || 160} staff acknowledged
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -623,13 +632,13 @@ const EmployeeAnnouncements = () => {
                 <button
                   onClick={() => togglePin(item.id)}
                   title={item.pinned ? 'Unpin Notice' : 'Pin Notice to Top'}
-                  className={`p-2.5 rounded-2xl transition-all cursor-pointer shrink-0 ${
+                  className={`p-2.5 rounded-xl transition-all cursor-pointer shrink-0 border ${
                     item.pinned
-                      ? 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400 scale-110 shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-amber-500'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
+                      : 'bg-slate-50 dark:bg-slate-800/70 text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200/80 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
-                  <Star className={`w-4 h-4 ${item.pinned ? 'fill-amber-500 text-amber-500' : ''}`} />
+                  <Pin className={`w-4 h-4 ${item.pinned ? 'fill-current' : ''}`} />
                 </button>
               </div>
             </div>

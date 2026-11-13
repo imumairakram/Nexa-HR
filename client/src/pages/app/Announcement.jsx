@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   FileText,
   Building2,
+  Pin,
 } from 'lucide-react';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -530,69 +531,80 @@ const Announcement = () => {
           filtered.map((item) => (
             <div
               key={item.id}
-              className={`bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border transition-all ${
+              className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/10 ${
                 item.pinned
-                  ? 'border-blue-300 dark:border-blue-800/80 bg-blue-50/10 dark:bg-blue-950/10'
-                  : 'border-slate-100 dark:border-slate-800'
+                  ? 'border-2 border-sky-400/80 dark:border-sky-500/80 bg-gradient-to-br from-sky-50/70 via-white to-sky-50/30 dark:from-sky-950/40 dark:via-[#1E293B] dark:to-sky-950/20 shadow-md shadow-sky-500/5'
+                  : 'bg-white dark:bg-[#1E293B] border border-slate-200/90 dark:border-slate-800 hover:border-sky-300/80 dark:hover:border-sky-700/80 shadow-xs'
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
+              <div className="flex items-start gap-4">
+                {/* Notice Icon Thumbnail */}
+                <div
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
+                    item.pinned
+                      ? 'bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-500 text-white shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/60'
+                      : 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/60'
+                  }`}
+                >
+                  <Megaphone className="w-5 h-5 stroke-[2.2]" />
+                </div>
+
+                <div className="space-y-3 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase ${
-                        item.priority === 'HIGH'
-                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                          : item.priority === 'MEDIUM'
-                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                          : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                      }`}
-                    >
+                    {item.pinned && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white shadow-xs tracking-wider uppercase">
+                        <Pin className="w-2.5 h-2.5 stroke-[2.5]" />
+                        <span>PINNED</span>
+                      </span>
+                    )}
+
+                    <span className="inline-flex items-center text-[10px] font-extrabold px-3 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 uppercase tracking-wider">
                       {item.category} • {item.priority}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">{item.date}</span>
-                    <span className="text-[11px] text-slate-400 font-medium">• {item.author}</span>
+
+                    <span className="text-xs text-slate-400 font-medium">{item.date}</span>
+                    <span className="text-xs text-slate-400 font-medium">• By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
                   </div>
 
                   <h3
                     onClick={() => setSelectedNotice(item)}
-                    className="text-base font-black text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors leading-snug tracking-tight"
                   >
                     {item.title}
                   </h3>
 
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl font-normal">
                     {item.summary}
                   </p>
 
-                  <div className="flex items-center gap-4 pt-2">
+                  <div className="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                     <button
                       onClick={() => setSelectedNotice(item)}
-                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 transition-all cursor-pointer shadow-xs active:scale-95"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                       <span>Read Full Notice</span>
                     </button>
-                    <span className="text-[11px] text-slate-400">Broadcasted to employee portal</span>
+                    <span className="text-xs text-slate-400 font-medium">Broadcasted to employee portal</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => togglePin(item.id, item.pinned)}
-                    className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
                       item.pinned
-                        ? 'border-amber-300 bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:border-amber-800'
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-500'
+                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-800/70 text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200/80 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
-                    title={item.pinned ? 'Unpin' : 'Pin to Top'}
+                    title={item.pinned ? 'Unpin Notice' : 'Pin to Top'}
                   >
-                    <Star className={`w-4 h-4 ${item.pinned ? 'fill-current' : ''}`} />
+                    <Pin className={`w-4 h-4 ${item.pinned ? 'fill-current' : ''}`} />
                   </button>
 
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 transition-all cursor-pointer"
+                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-700 transition-all cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/40"
                     title="Delete Notice"
                   >
                     <Trash2 className="w-4 h-4" />
