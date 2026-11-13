@@ -527,142 +527,106 @@ const EmployeeAnnouncements = () => {
           filteredNotices.map((item) => (
             <div
               key={item.id}
-              className={`group rounded-[24px] sm:rounded-[28px] p-5 sm:p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
+              className={`rounded-3xl p-6 sm:p-7 shadow-soft border transition-all duration-300 hover:shadow-md ${
                 item.pinned
-                  ? 'bg-gradient-to-br from-amber-500/[0.04] via-sky-500/[0.02] to-white dark:to-[#1E293B] border-2 border-amber-300/80 dark:border-amber-700/60 shadow-md shadow-amber-500/5 relative overflow-hidden'
-                  : 'bg-white dark:bg-[#1E293B] border border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-sky-300 dark:hover:border-sky-800/70'
+                  ? 'bg-gradient-to-r from-amber-500/5 via-sky-500/5 to-white dark:to-[#1E293B] border-amber-200/80 dark:border-amber-900/50'
+                  : 'bg-white dark:bg-[#1E293B] border-slate-100 dark:border-slate-800'
               }`}
             >
-              {item.pinned && (
-                <div className="absolute top-0 right-0 w-52 h-52 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-              )}
-
-              <div className="flex items-start gap-4 sm:gap-5 relative z-10">
-                {/* Left Visual Anchor Icon */}
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm hidden sm:flex ${
-                  item.pinned
-                    ? 'bg-gradient-to-tr from-amber-500 to-amber-600 text-white shadow-amber-500/20 ring-4 ring-amber-100/70 dark:ring-amber-950/60'
-                    : 'bg-gradient-to-tr from-sky-500 to-cyan-500 text-white shadow-sky-500/20 ring-4 ring-sky-100/70 dark:ring-sky-950/60'
-                }`}>
-                  <Megaphone className="w-5 h-5 stroke-[2.2]" />
-                </div>
-
-                {/* Main Content Area */}
-                <div className="space-y-2.5 flex-1 min-w-0">
-                  {/* Top Meta Strip */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-3 flex-1 min-w-0">
+                  {/* Header Row: Category Badge + Date + Author Info */}
                   <div className="flex flex-wrap items-center gap-2">
                     {item.pinned && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-100/90 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300/80 tracking-wide">
-                        <Pin className="w-2.5 h-2.5 fill-amber-700 dark:fill-amber-400" />
+                      <span className="inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300/60">
                         <span>PINNED</span>
                       </span>
                     )}
 
                     <span
-                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${
+                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                         item.priority === 'HIGH'
-                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200/80'
+                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
                           : item.priority === 'MEDIUM'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200/80'
-                          : 'bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border-sky-200/80'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
+                          : 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200/60'
                       }`}
                     >
                       {item.categoryLabel || item.category}
                     </span>
 
-                    <span className="inline-flex items-center gap-1 text-xs text-slate-400 font-medium">
-                      <Calendar className="w-3 h-3 text-slate-400" />
-                      <span>{item.date}</span>
-                    </span>
-
-                    <span className="text-xs text-slate-400 font-medium truncate">
-                      • By <strong className="text-slate-700 dark:text-slate-200 font-semibold">{item.author}</strong>
-                      <span className="text-slate-400 ml-1">({item.department || 'Company-Wide'})</span>
-                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium">{item.date}</span>
+                    <span className="text-[11px] text-slate-400 font-medium">• By <strong className="text-slate-700 dark:text-slate-300">{item.author}</strong> ({item.department})</span>
                   </div>
 
                   {/* Notice Title */}
                   <h3
                     onClick={() => setSelectedItem(item)}
-                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors leading-snug tracking-tight"
+                    className="text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors leading-snug"
                   >
                     {item.title}
                   </h3>
 
-                  {/* Summary / Description */}
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl font-normal">
+                  {/* Summary */}
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-5xl">
                     {item.summary}
                   </p>
 
                   {/* Attachments Chips if present */}
                   {item.attachments && item.attachments.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
                       {item.attachments.map((att, aIdx) => (
                         <button
                           key={aIdx}
-                          type="button"
                           onClick={() => handleDownloadAttachment(att)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100/90 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700/80"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/70 dark:border-slate-700/60"
                         >
                           <Paperclip className="w-3 h-3 text-slate-400" />
                           <span>{att.name}</span>
-                          <span className="text-[10px] text-slate-400 font-normal">({att.size})</span>
+                          <span className="text-[9px] text-slate-400">({att.size})</span>
                         </button>
                       ))}
                     </div>
                   )}
 
                   {/* Bottom Actions Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-3.5 border-t border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center gap-2 sm:gap-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                    <div className="flex items-center gap-3">
                       <button
-                        type="button"
                         onClick={() => setSelectedItem(item)}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-sky-500/20 active:scale-95 transition-all cursor-pointer"
+                        className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Read Full Notice</span>
                       </button>
 
                       <button
-                        type="button"
                         onClick={() => toggleAcknowledge(item.id)}
-                        className={`text-xs font-bold px-3.5 py-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 ${
+                        className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
                           item.acknowledged
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60 shadow-xs'
-                            : 'bg-white text-slate-700 dark:bg-slate-800 dark:text-slate-200 border-slate-200/90 dark:border-slate-700 hover:border-sky-400 shadow-xs'
+                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200'
+                            : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-sky-500'
                         }`}
                       >
-                        {item.acknowledged ? (
-                          <>
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 stroke-[2.5]" />
-                            <span>Acknowledged</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-slate-400 stroke-[2]" />
-                            <span>Acknowledge Notice</span>
-                          </>
-                        )}
+                        <Check className={`w-3.5 h-3.5 ${item.acknowledged ? 'text-sky-600' : 'text-slate-400'}`} />
+                        <span>{item.acknowledged ? 'Acknowledged' : 'Acknowledge Notice'}</span>
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                      <Users className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                      <span><strong>{item.acknowledgedCount || 0}</strong> of {item.totalTargetCount || 160} employees acknowledged</span>
-                    </div>
+                    <span className="text-[11px] text-slate-400 font-medium">
+                      {item.acknowledgedCount || 0} of {item.totalTargetCount || 160} employees acknowledged
+                    </span>
                   </div>
                 </div>
 
                 {/* Pin / Star Action Button */}
                 <button
-                  type="button"
                   onClick={() => togglePin(item.id)}
                   title={item.pinned ? 'Unpin Notice' : 'Pin Notice to Top'}
-                  className={`p-2.5 rounded-2xl transition-all cursor-pointer shrink-0 border ${
+                  className={`p-2.5 rounded-2xl transition-all cursor-pointer shrink-0 ${
                     item.pinned
-                      ? 'bg-amber-100/90 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/80 dark:border-amber-800 shadow-xs hover:scale-105 active:scale-95'
-                      : 'bg-slate-100/80 dark:bg-slate-800 text-slate-400 hover:text-amber-500 hover:bg-amber-50/50 border-slate-200/70 dark:border-slate-700/70'
+                      ? 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400 scale-110 shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-amber-500'
                   }`}
                 >
                   <Star className={`w-4 h-4 ${item.pinned ? 'fill-amber-500 text-amber-500' : ''}`} />
@@ -699,23 +663,23 @@ const EmployeeAnnouncements = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. FULL NOTICE READ MODAL (ENTERPRISE LETTERHEAD LAYOUT) */}
+      {/* 4. FULL NOTICE READ MODAL (NEW TICKET CARD STYLING) */}
       {/* ========================================================================= */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[28px] sm:rounded-[32px] max-w-xl sm:max-w-2xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-2xl sm:max-w-3xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="px-6 sm:px-8 py-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/80 via-white to-cyan-50/40 dark:from-sky-950/30 dark:via-[#1E293B] dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-64 h-64 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/15 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="flex items-center gap-3.5 min-w-0 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/60">
-                  <Megaphone className="w-6 h-6 stroke-[2.2]" />
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                {/* Glowing Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <Megaphone className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60 uppercase tracking-wider">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 uppercase tracking-wider">
                       {selectedItem.categoryLabel || selectedItem.category}
                     </span>
                     <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
@@ -723,57 +687,111 @@ const EmployeeAnnouncements = () => {
                       {selectedItem.date}
                     </span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white truncate tracking-tight mt-1">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug truncate">
                     {selectedItem.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
-                    Issued by <strong className="text-slate-800 dark:text-slate-200 font-bold">{selectedItem.author}</strong> • {selectedItem.department || 'Company-Wide'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal truncate">
+                    Issued by <strong className="font-semibold text-slate-700 dark:text-slate-200">{selectedItem.author}</strong> • {selectedItem.department || 'Company-Wide (All Offices)'}
                   </p>
                 </div>
               </div>
 
+              {/* Close Action */}
               <button
                 type="button"
+                aria-label="Close modal"
                 onClick={() => setSelectedItem(null)}
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 relative z-10"
-                aria-label="Close notice"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-5 space-y-4 custom-scrollbar text-xs">
-              <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                <span>Official Broadcast Memorandum</span>
-                <span className="text-sky-600 dark:text-sky-400 flex items-center gap-1 font-semibold normal-case">
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span>{selectedItem.department || 'All Offices'}</span>
-                </span>
+            {/* Modal Body */}
+            <div className="space-y-6">
+              {/* Announcement Memorandum Card */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                    <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                    Official Notice Memorandum
+                  </label>
+                  <span className="text-[11px] font-mono font-medium text-slate-400">
+                    Broadcast ID #{selectedItem.id}
+                  </span>
+                </div>
+                <div className="w-full p-4 sm:p-5 text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-100 leading-relaxed whitespace-pre-line font-medium shadow-xs min-h-[90px]">
+                  {selectedItem.content || selectedItem.summary}
+                </div>
               </div>
 
-              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800/80 text-slate-800 dark:text-slate-100 text-sm leading-relaxed whitespace-pre-line font-medium shadow-xs min-h-[90px]">
-                {selectedItem.content || selectedItem.summary}
-              </div>
+              {/* Dual Summary & Routing Preview (Same as new ticket card) */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                    <Eye className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                    Broadcast Scope & Engagement Card
+                  </span>
+                  <span className="text-[11px] font-medium text-slate-400">Real-time stats</span>
+                </div>
 
-              {/* Attachments Section */}
-              {selectedItem.attachments && selectedItem.attachments.length > 0 && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/60 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 space-y-3">
-                  <div className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                    <Paperclip className="w-3.5 h-3.5 text-sky-500" />
-                    <span>Attached Documents & Forms:</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Card 1: Target Scope */}
+                  <div className="h-24 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/80 dark:to-slate-850/80 p-4 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                        <Building2 className="w-6 h-6 stroke-[2]" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                          Audience Target
+                        </h4>
+                        <p className="text-xs text-sky-600 dark:text-sky-400 font-medium truncate mt-0.5">
+                          {selectedItem.department || 'Company-Wide (All Offices)'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+
+                  {/* Card 2: Acknowledgment Status */}
+                  <div className="h-24 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/80 dark:to-slate-850/80 p-4 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <Users className="w-6 h-6 stroke-[2]" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                          Team Engagement
+                        </h4>
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium truncate mt-0.5">
+                          {selectedItem.acknowledgedCount || 0} of {selectedItem.totalTargetCount || 160} Staff Acknowledged
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Attachments Section if present */}
+              {selectedItem.attachments && selectedItem.attachments.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                      <Paperclip className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                      Attached Documents ({selectedItem.attachments.length})
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {selectedItem.attachments.map((att, aIdx) => (
                       <div
                         key={aIdx}
-                        className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 text-xs shadow-xs"
+                        className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 text-xs shadow-xs"
                       >
                         <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-2">{att.name}</span>
                         <button
                           type="button"
                           onClick={() => handleDownloadAttachment(att)}
-                          className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-xs"
+                          className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-xs"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download</span>
@@ -785,28 +803,38 @@ const EmployeeAnnouncements = () => {
               )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="px-6 sm:px-8 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                <ShieldCheck className="w-4 h-4 text-sky-500" />
-                <span className="hidden sm:inline">Official NexaHR Broadcast</span>
+            {/* Modal Actions Footer */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6" data-purpose="modal-footer">
+              {/* Trust & Compliance Note */}
+              <div className="flex items-center text-xs text-slate-400 dark:text-slate-400 order-2 sm:order-1">
+                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                <span>Enterprise compliance broadcast & acknowledgement audit trail logged</span>
               </div>
-              <div className="flex items-center justify-end gap-3 w-full sm:w-auto">
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedItem(null)}
+                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                >
+                  Close
+                </button>
                 <button
                   type="button"
                   onClick={() => {
                     toggleAcknowledge(selectedItem.id);
                     setSelectedItem((prev) => ({ ...prev, acknowledged: !prev.acknowledged }));
                   }}
-                  className={`px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95 ${
+                  className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold shadow-lg active:scale-[0.99] transition-all cursor-pointer ${
                     selectedItem.acknowledged
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs'
-                      : 'bg-gradient-to-r from-sky-500 via-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white shadow-lg shadow-sky-500/25'
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25'
+                      : 'bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white shadow-sky-600/25'
                   }`}
                 >
                   {selectedItem.acknowledged ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 stroke-[2.5]" />
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                       <span>Acknowledged</span>
                     </>
                   ) : (
@@ -816,16 +844,9 @@ const EmployeeAnnouncements = () => {
                     </>
                   )}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedItem(null)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
-                >
-                  Close
-                </button>
               </div>
-            </div>
-          </div>
+            </footer>
+          </main>
         </div>
       )}
     </div>

@@ -23,6 +23,9 @@ import {
   RefreshCw,
   ChevronDown,
   RotateCcw,
+  ShieldCheck,
+  FileText,
+  Building2,
 } from 'lucide-react';
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
@@ -793,39 +796,119 @@ const Announcement = () => {
         </div>
       )}
 
-      {/* DETAIL MODAL */}
+      {/* DETAIL MODAL (NEW TICKET CARD STYLING) */}
       {selectedNotice && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl w-full p-6 sm:p-7 shadow-2xl border border-sky-200/60 dark:border-sky-800/60 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar relative">
-            <div className="flex items-start justify-between border-b border-indigo-100/80 dark:border-indigo-800/60 pb-4">
-              <div>
-                <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200/60 dark:border-sky-800/60">
-                  {selectedNotice.category} • {selectedNotice.priority}
-                </span>
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-2">{selectedNotice.title}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{selectedNotice.date} • {selectedNotice.author || selectedNotice.department}</p>
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-2xl sm:max-w-3xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                {/* Glowing Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <Megaphone className="w-6 h-6 stroke-[2.2]" />
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 uppercase tracking-wider">
+                      {selectedNotice.category || 'GENERAL'}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {selectedNotice.date}
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug truncate">
+                    {selectedNotice.title}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal truncate">
+                    Issued by <strong className="font-semibold text-slate-700 dark:text-slate-200">{selectedNotice.author || 'System Administrator'}</strong> • {selectedNotice.department || 'Company-Wide (All Offices)'}
+                  </p>
+                </div>
               </div>
+
+              {/* Close Action */}
               <button
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setSelectedNotice(null)}
-                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
+            </header>
+
+            {/* Modal Body */}
+            <div className="space-y-6">
+              {/* Notice Content Card */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                    <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                    Official Notice Memorandum
+                  </label>
+                  <span className="text-[11px] font-mono font-medium text-slate-400">
+                    Broadcast ID #{selectedNotice.id}
+                  </span>
+                </div>
+                <div className="w-full p-4 sm:p-5 text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-100 leading-relaxed whitespace-pre-line font-medium shadow-xs min-h-[90px]">
+                  {selectedNotice.content}
+                </div>
+              </div>
+
+              {/* Scope & Routing Card */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                    <Eye className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                    Broadcast Scope & Distribution Card
+                  </span>
+                  <span className="text-[11px] font-medium text-slate-400">Audience Scope</span>
+                </div>
+
+                <div className="h-24 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/80 dark:to-slate-850/80 p-4 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                      <Building2 className="w-6 h-6 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                        Target Audience
+                      </h4>
+                      <p className="text-xs text-sky-600 dark:text-sky-400 font-medium truncate mt-0.5">
+                        {selectedNotice.department || 'Company-Wide (All Offices)'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                      <span>{selectedNotice.priority || 'NORMAL'} Priority</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="p-5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-line border border-slate-200/70 dark:border-slate-700/60">
-              {selectedNotice.content}
-            </div>
+            {/* Modal Actions Footer */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6" data-purpose="modal-footer">
+              <div className="flex items-center text-xs text-slate-400 dark:text-slate-400 order-2 sm:order-1">
+                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                <span>Enterprise compliance broadcast & acknowledgement audit trail logged</span>
+              </div>
 
-            <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
-              <button
-                onClick={() => setSelectedNotice(null)}
-                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+              <div className="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedNotice(null)}
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-sm font-semibold shadow-md active:scale-[0.99] transition-all cursor-pointer"
+                >
+                  Close Notice
+                </button>
+              </div>
+            </footer>
+          </main>
         </div>
       )}
     </div>
