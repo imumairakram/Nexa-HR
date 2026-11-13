@@ -1064,111 +1064,117 @@ const EmploymentStatus = () => {
       {/* 6. MODAL: EMPLOYEE PROFILE VIEW (DOSSIER VIEW) */}
       {/* ========================================================================= */}
       {selectedEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full p-6 sm:p-7 shadow-2xl border border-sky-200/60 dark:border-sky-800/60 space-y-4 animate-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-3xl sm:max-w-4xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
             {/* Profile Header */}
-            <div className="flex items-start justify-between border-b border-sky-100/80 dark:border-sky-800/60 pb-5">
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-4">
-                <img
-                  src={getAvatarUrl(selectedEmployee)}
-                  alt=""
-                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-sky-500/20 shadow-lg shrink-0 bg-slate-100 dark:bg-slate-800"
-                  onError={(e) => {
-                    e.target.src = DEFAULT_BLANK_AVATAR;
-                  }}
-                />
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden ring-4 ring-sky-100 dark:ring-sky-950/50 shadow-lg shadow-sky-500/20 shrink-0 bg-slate-100 dark:bg-slate-800">
+                  <img
+                    src={getAvatarUrl(selectedEmployee)}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = DEFAULT_BLANK_AVATAR;
+                    }}
+                  />
+                </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-lg border border-sky-200/80 dark:border-sky-800/60 inline-block">
                       {selectedEmployee.employeeCode}
                     </span>
                   </div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     {selectedEmployee.firstName} {selectedEmployee.lastName}
                   </h3>
-                  <p className="text-xs font-bold text-sky-600 dark:text-sky-400 whitespace-nowrap">
+                  <p className="text-xs sm:text-sm font-semibold text-sky-600 dark:text-sky-400 mt-0.5">
                     {selectedEmployee.profile?.designation?.title || 'Staff Member'} • {selectedEmployee.profile?.department?.name || 'Engineering'}
                   </p>
                 </div>
               </div>
+
               <button
+                type="button"
                 onClick={() => setSelectedEmployee(null)}
-                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Dossier Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Department</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 mb-6">
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Department</span>
                 <span className="font-extrabold text-slate-900 dark:text-white text-sm">
                   {selectedEmployee.profile?.department?.name || 'Engineering'}
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Role Authorization</span>
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Role Authorization</span>
                 <span className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">{selectedEmployee.role || 'EMPLOYEE'}</span>
               </div>
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Base Compensation</span>
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Base Compensation</span>
                 <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
                   {formatSalary(selectedEmployee.salaryStructure, selectedEmployee.profile?.salary)}
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Contact Email</span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{selectedEmployee.email}</span>
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Contact Email</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate block">{selectedEmployee.email}</span>
               </div>
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-sky-600 dark:text-sky-400 tracking-wider flex items-center gap-1 mb-0.5">
-                  <Building2 className="w-3 h-3" />
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-sky-600 dark:text-sky-400 tracking-wider flex items-center gap-1.5 mb-1">
+                  <Building2 className="w-3.5 h-3.5" />
                   <span>Office Work Location</span>
                 </span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate block">
                   {selectedEmployee.profile?.workLocation || selectedEmployee.workLocation || 'Islamabad HQ & Innovation Lab'}
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1 mb-0.5">
-                  <Home className="w-3 h-3" />
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1.5 mb-1">
+                  <Home className="w-3.5 h-3.5" />
                   <span>Residential Home Address</span>
                 </span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate block">
                   {selectedEmployee.profile?.address || selectedEmployee.address || 'Home Address Not Specified'}
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-0.5">Onboarding Date</span>
-                <span className="font-extrabold text-slate-900 dark:text-white">
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-inner sm:col-span-2 md:col-span-1">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Onboarding Date</span>
+                <span className="font-extrabold text-slate-900 dark:text-white text-xs">
                   {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : (selectedEmployee.createdAt ? selectedEmployee.createdAt.split('T')[0] : 'Active')}
                 </span>
               </div>
             </div>
 
-            {/* Dossier Actions */}
-            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            {/* Dossier Actions Footer */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
                 <button
+                  type="button"
                   onClick={() => {
                     const toEdit = selectedEmployee;
                     setSelectedEmployee(null);
                     handleOpenEdit(toEdit);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-extrabold hover:bg-sky-600 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
+                  className="px-4 py-2.5 rounded-2xl border border-sky-200 dark:border-sky-800/80 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-extrabold hover:bg-sky-500 hover:text-white hover:border-sky-500 transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit Profile</span>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     const toDelete = selectedEmployee;
                     setSelectedEmployee(null);
                     setEmployeeToDelete(toDelete);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-extrabold hover:bg-rose-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
+                  className="px-4 py-2.5 rounded-2xl border border-rose-200 dark:border-rose-800/80 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-extrabold hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
                   title="Remove Employee from Directory"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -1177,8 +1183,9 @@ const EmploymentStatus = () => {
               </div>
 
               <button
+                type="button"
                 onClick={() => setSelectedEmployee(null)}
-                className="px-6 py-2.5 rounded-xl bg-[#0F172A] dark:bg-white text-white dark:text-slate-900 text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-md"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
               >
                 Close Dossier
               </button>
@@ -1191,62 +1198,68 @@ const EmploymentStatus = () => {
       {/* 7. MODAL: REMOVE EMPLOYEE CONFIRMATION */}
       {/* ========================================================================= */}
       {employeeToDelete && (
-        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-rose-200/60 dark:border-rose-900/40 space-y-4 animate-in zoom-in-95 duration-200 relative">
-            <div className="flex items-start justify-between border-b border-rose-100/80 dark:border-rose-900/40 pb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-500 via-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25 ring-4 ring-rose-500/15">
-                  <UserX className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-lg bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200 space-y-5">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-tr from-rose-600 via-rose-500 to-red-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/25 ring-4 ring-rose-100 dark:ring-rose-950/50 shrink-0">
+                  <UserX className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Remove Employee
                   </h3>
-                  <p className="text-xs text-rose-600 dark:text-rose-400 font-bold mt-0.5 whitespace-nowrap">
+                  <p className="text-xs sm:text-sm font-bold text-rose-600 dark:text-rose-400 mt-0.5">
                     Confirm Deletion Action
                   </p>
                 </div>
               </div>
+
               <button
+                type="button"
                 onClick={() => setEmployeeToDelete(null)}
-                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500">{employeeToDelete.employeeCode}</span>) from company directory?
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500 dark:text-slate-400">{employeeToDelete.employeeCode}</span>) from company directory?
             </p>
 
-            <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/80 space-y-2 text-xs">
+            {/* Employee Preview Summary Box */}
+            <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 space-y-2.5 text-xs shadow-inner">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-bold text-[11px]">Department:</span>
+                <span className="text-slate-400 font-bold text-[11px] uppercase tracking-wider">Department</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200">
                   {employeeToDelete.profile?.department?.name || 'General Dept'}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-                <span className="text-slate-400 font-bold text-[11px]">Role Authorization:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{employeeToDelete.role || 'EMPLOYEE'}</span>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
+                <span className="text-slate-400 font-bold text-[11px] uppercase tracking-wider">Role Authorization</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">{employeeToDelete.role || 'EMPLOYEE'}</span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-                <span className="text-slate-400 font-bold text-[11px]">Work Email:</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{employeeToDelete.email}</span>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
+                <span className="text-slate-400 font-bold text-[11px] uppercase tracking-wider">Work Email</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[220px]">{employeeToDelete.email}</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-700 dark:text-rose-300 font-medium flex items-center gap-2.5">
+            {/* Permanent Warning */}
+            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-xs text-rose-700 dark:text-rose-300 font-medium flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
               <span>This record will be permanently deleted from the database.</span>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            {/* Footer Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-5 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setEmployeeToDelete(null)}
                 disabled={deleting}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer disabled:opacity-50"
+                className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1254,7 +1267,7 @@ const EmploymentStatus = () => {
                 type="button"
                 onClick={handleDeleteEmployee}
                 disabled={deleting}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-black text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white text-xs sm:text-sm font-bold shadow-lg shadow-rose-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
               >
                 {deleting ? (
                   <>
