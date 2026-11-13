@@ -97,7 +97,7 @@ const SEARCH_SHORTCUTS = [
 ];
 
 const AppPageHeader = ({
-  title = 'Welcome Back, Admin',
+  title = 'Admin Dashboard',
   subtitle = null,
   mobileTitle = null,
   hideMobileSubtitle = true,

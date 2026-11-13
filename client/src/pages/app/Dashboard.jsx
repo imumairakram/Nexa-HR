@@ -96,12 +96,12 @@ const Dashboard = () => {
 
   const desktopTitle = useMemo(() => {
     if (mobileDashboardTitle === 'HR Dashboard') {
-      return 'HR Control Center & Performance Dashboard';
+      return 'HR Dashboard';
     }
     if (mobileDashboardTitle === 'Employee Dashboard') {
-      return 'Employee Performance Dashboard';
+      return 'Employee Dashboard';
     }
-    return 'Admin Control Center & Performance Dashboard';
+    return 'Admin Dashboard';
   }, [mobileDashboardTitle]);
 
   const isHrPortal = useMemo(() => {

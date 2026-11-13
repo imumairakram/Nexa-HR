@@ -492,7 +492,7 @@ const LeavePolicy = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Leave Policy Configuration & Quota Rules"
+        title="Leave Policy Configuration"
         subtitle="Establish company-wide paid time-off limits, parental allowances, and statutory leave quota rules."
       />
 

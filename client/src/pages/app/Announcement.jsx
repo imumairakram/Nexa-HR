@@ -290,7 +290,7 @@ const Announcement = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Company Announcements & Notice Board"
+        title="Company Announcements Board"
         subtitle="Publish official company circulars, policy changes, retreat notices, and executive broadcasts."
       />
 

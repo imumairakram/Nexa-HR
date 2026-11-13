@@ -363,7 +363,7 @@ const EmploymentStatus = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Workforce Employment Status & Shifts"
+        title="Employment Status & Shifts"
         subtitle="Manage employment classifications, remote work contracts, shift timings, and probation statuses."
       />
 

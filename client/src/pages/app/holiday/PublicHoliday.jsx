@@ -394,7 +394,7 @@ const PublicHoliday = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Official Gazetted Public Holidays & Calendar"
+        title="Official Holidays & Calendar"
         subtitle="Dynamic multi-year holiday schedule synchronized in real-time with regional timezone and organizational policies."
       />
 

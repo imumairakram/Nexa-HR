@@ -244,7 +244,7 @@ const Departments = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Department & Business Unit Architecture"
+        title="Department & Business Unit"
         subtitle="Organize company divisional hierarchy, manage department codes, and structure organizational reporting lines."
         onRefresh={fetchAllData}
         loading={loading}

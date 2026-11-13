@@ -447,7 +447,7 @@ const Leaves = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Leave Management & Approval Workflows"
+        title="Leave Management & Approval"
         subtitle="Review employee time-off applications, manage quota allowances, and automate approval pipelines."
         onRefresh={fetchLeaveData}
         loading={loading}
