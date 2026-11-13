@@ -445,11 +445,6 @@ const EmployeeLeaves = () => {
               <span className="flex items-center bg-white/80 dark:bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                 <span>{stats.approved} Leaves Approved</span>
               </span>
-              {stats.pending > 0 && (
-                <span className="flex items-center bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-xl border border-amber-200/80 dark:border-amber-800/50 animate-pulse font-bold">
-                  <span>{stats.pending} Request{stats.pending > 1 ? 's' : ''} Pending Review</span>
-                </span>
-              )}
             </div>
           </div>
 
@@ -1139,7 +1134,7 @@ const EmployeeLeaves = () => {
                         <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">
                           {calculateDays()} {calculateDays() === 1 ? 'Day' : 'Days'} ({leaveForm.dayType === 'HALF' ? 'Half Day' : 'Full Day'})
                         </span>
-                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase bg-white text-black border border-slate-300 shadow-2xs dark:bg-slate-800 dark:text-white dark:border-slate-700">
                           Pending Review
                         </span>
                       </div>

@@ -1030,95 +1030,127 @@ const Helpdesk = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. TICKET LIVE CONVERSATION & RESOLUTION MODAL */}
+      {/* 5. TICKET LIVE CONVERSATION & RESOLUTION MODAL (ENTERPRISE HIGH-FIDELITY) */}
       {/* ========================================================================= */}
       {selectedTicket && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-sky-300/20 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="flex items-center gap-3.5 min-w-0 relative z-10">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
-                  <LifeBuoy className="w-5 h-5 stroke-[2.2]" />
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-5 shrink-0" data-purpose="modal-header">
+              <div className="flex items-center gap-4 min-w-0">
+                {/* Glowing Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <LifeBuoy className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
+
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200/60 dark:border-slate-700/60">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700">
                       #{selectedTicket.id}
                     </span>
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-white/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700">
                       {selectedTicket.categoryLabel || selectedTicket.category}
                     </span>
                     <span
-                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 border ${
+                      className={`text-xs font-bold px-3 py-0.5 rounded-full inline-flex items-center gap-1.5 border ${
                         selectedTicket.status === 'RESOLVED'
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket.status === 'RESOLVED' ? 'bg-emerald-500' : 'bg-amber-500 animate-ping'}`} />
-                      {selectedTicket.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          selectedTicket.status === 'RESOLVED' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
+                        }`}
+                      />
+                      <span>{selectedTicket.status === 'RESOLVED' ? 'Resolved' : 'In Progress'}</span>
                     </span>
+                    {selectedTicket.priority && (
+                      <span
+                        className={`text-xs font-bold px-3 py-0.5 rounded-full inline-flex items-center gap-1.5 border ${
+                          selectedTicket.priority === 'HIGH'
+                            ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                            : selectedTicket.priority === 'MEDIUM'
+                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200 dark:border-sky-800'
+                            : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            selectedTicket.priority === 'HIGH'
+                              ? 'bg-rose-500 animate-pulse'
+                              : selectedTicket.priority === 'MEDIUM'
+                              ? 'bg-sky-500'
+                              : 'bg-slate-400'
+                          }`}
+                        />
+                        <span>{selectedTicket.priority} Priority</span>
+                      </span>
+                    )}
                   </div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate mt-0.5">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug truncate">
                     {selectedTicket.subject}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                  </h2>
+                  <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
                     <span>
-                      Requester: <strong className="text-slate-800 dark:text-slate-100 font-bold">{selectedTicket.userName || 'Employee'}</strong> {selectedTicket.userEmail && `(${selectedTicket.userEmail})`}
+                      Requester: <strong className="text-slate-700 dark:text-slate-200 font-semibold">{selectedTicket.userName || 'Employee'}</strong> {selectedTicket.userEmail && `(${selectedTicket.userEmail})`}
                     </span>
                     <span>•</span>
                     <span>
-                      Assigned: <strong className="text-slate-800 dark:text-slate-100 font-bold">{selectedTicket.assignedTo || 'NexaHR Support Team'}</strong>
+                      Assigned: <strong className="text-slate-700 dark:text-slate-200 font-semibold">{selectedTicket.assignedTo || 'NexaHR Support Team'}</strong>
                     </span>
                   </div>
                 </div>
               </div>
 
+              {/* Close Action */}
               <button
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setSelectedTicket(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shrink-0 ml-3"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
             {/* Conversation Messages Thread */}
-            <div className="flex-1 overflow-y-auto px-6 sm:px-7 py-5 space-y-4 custom-scrollbar text-xs">
+            <div className="flex-1 overflow-y-auto px-1 sm:px-2 py-2 space-y-4 custom-scrollbar text-xs">
               {/* Requester Dossier & Original Message */}
-              <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-sky-50/30 dark:from-slate-800/50 dark:to-sky-950/20 border border-sky-100/80 dark:border-slate-800 space-y-2">
-                <div className="flex items-center justify-between border-b border-sky-100/60 dark:border-slate-700/60 pb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-sky-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-800/40 p-4 sm:p-5 space-y-2">
+                <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-cyan-500 text-white text-[11px] font-bold flex items-center justify-center shadow-xs">
                       {(selectedTicket.userName || 'E').slice(0, 2).toUpperCase()}
                     </div>
-                    <span className="font-extrabold text-slate-800 dark:text-slate-200 text-xs">
-                      {selectedTicket.userName}
-                    </span>
-                    {selectedTicket.userEmail && (
-                      <span className="text-[10px] text-slate-400">({selectedTicket.userEmail})</span>
-                    )}
+                    <div>
+                      <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">
+                        {selectedTicket.userName}
+                      </span>
+                      {selectedTicket.userEmail && (
+                        <span className="text-[11px] text-slate-400 ml-1.5">({selectedTicket.userEmail})</span>
+                      )}
+                    </div>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono">
+                  <span className="text-[11px] text-slate-400 font-mono">
                     {formatTimeDisplay(selectedTicket.createdDate)}
                   </span>
                 </div>
-                <div className="pt-0.5">
-                  <span className="font-extrabold text-slate-800 dark:text-slate-200 text-[11px] uppercase tracking-wider flex items-center gap-1.5 mb-1 text-sky-600 dark:text-sky-400">
+                <div className="pt-1">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs uppercase tracking-wide flex items-center gap-1.5 mb-1.5 text-sky-600 dark:text-sky-400">
                     <FileText className="w-3.5 h-3.5" />
                     Original Inquiry Description
                   </span>
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-wrap">
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-wrap">
                     {selectedTicket.description}
                   </p>
                 </div>
               </div>
 
               {/* Thread of Responses */}
-              <div className="space-y-3 pt-1">
+              <div className="space-y-3.5 pt-1">
                 {selectedTicket.replies?.map((rep, idx) => {
                   const isSupportLead = rep.sender?.includes('(You)') || rep.user?.role === 'ADMIN' || rep.user?.role === 'HR_MANAGER';
                   return (
@@ -1126,18 +1158,18 @@ const Helpdesk = () => {
                       key={rep.id || idx}
                       className={`flex flex-col ${isSupportLead ? 'items-end' : 'items-start'} space-y-1.5`}
                     >
-                      <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold px-1">
-                        <span className={isSupportLead ? 'text-sky-600 dark:text-sky-400 font-bold' : 'text-slate-700 dark:text-slate-300'}>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium px-1">
+                        <span className={isSupportLead ? 'text-sky-600 dark:text-sky-400 font-semibold' : 'text-slate-700 dark:text-slate-300 font-semibold'}>
                           {rep.sender}
                         </span>
                         <span>•</span>
                         <span>{formatTimeDisplay(rep.time)}</span>
                       </div>
                       <div
-                        className={`px-4 py-2.5 rounded-2xl max-w-lg text-xs leading-relaxed font-normal shadow-xs ${
+                        className={`px-4 py-2.5 rounded-2xl max-w-lg text-xs sm:text-sm leading-relaxed font-normal shadow-xs ${
                           isSupportLead
-                            ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-br-xs shadow-sky-500/20'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-xs border border-slate-200/60 dark:border-slate-700/50'
+                            ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white rounded-br-xs shadow-md shadow-sky-500/20'
+                            : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs'
                         }`}
                       >
                         {rep.message}
@@ -1149,8 +1181,8 @@ const Helpdesk = () => {
             </div>
 
             {/* Official Response Composer Bar & Action Footer */}
-            <div className="px-6 sm:px-7 py-3.5 border-t border-sky-100/60 dark:border-sky-900/40 space-y-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
-              <div className="flex items-center gap-2.5">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4 shrink-0">
+              <div className="flex items-center gap-3">
                 <input
                   type="text"
                   placeholder={`Write official support response to ${selectedTicket.userName || 'the employee'}...`}
@@ -1160,23 +1192,24 @@ const Helpdesk = () => {
                     if (e.key === 'Enter') handleSendReply(selectedTicket.id);
                   }}
                   disabled={isReplying}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 disabled:opacity-60 transition-all shadow-xs"
+                  className="flex-1 h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
                 />
                 <button
+                  type="button"
                   onClick={() => handleSendReply(selectedTicket.id)}
                   disabled={!replyText.trim() || isReplying}
-                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 active:scale-95 text-white text-xs font-bold flex items-center gap-2 cursor-pointer disabled:opacity-40 transition-all shadow-md shadow-sky-500/20"
+                  className="h-11 px-6 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 active:scale-[0.99] text-white text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 transition-all shadow-lg shadow-sky-600/25 shrink-0"
                 >
-                  {isReplying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                  {isReplying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   <span>{isReplying ? 'Sending...' : 'Send Response'}</span>
                 </button>
               </div>
 
               {/* Status Switcher, Assignee, and Priority Controls */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-sky-100/40 dark:border-slate-800/60">
-                <div className="flex flex-wrap items-center gap-2.5 text-[11px]">
+              <footer className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4" data-purpose="modal-footer">
+                <div className="flex flex-wrap items-center gap-2.5 text-[11px] w-full sm:w-auto">
                   {/* Dynamic Assignee Selector */}
-                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
+                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700">
                     <span className="text-slate-500 font-medium">Assignee:</span>
                     <select
                       value={editAssignee}
@@ -1197,7 +1230,7 @@ const Helpdesk = () => {
                   </div>
 
                   {/* Priority Selector */}
-                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
+                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700">
                     <span className="text-slate-500 font-medium">Priority:</span>
                     <select
                       value={editPriority}
@@ -1212,44 +1245,53 @@ const Helpdesk = () => {
 
                   {(editAssignee !== selectedTicket.assignedTo || editPriority !== selectedTicket.priority) && (
                     <button
+                      type="button"
                       onClick={() => handleSaveMetaChanges(selectedTicket.id)}
                       disabled={isUpdatingMeta}
-                      className="px-3 py-1 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] cursor-pointer transition-all shadow-xs"
+                      className="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-[11px] cursor-pointer transition-all shadow-xs"
                     >
                       {isUpdatingMeta ? 'Saving...' : 'Save Changes'}
                     </button>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-auto">
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                   <button
+                    type="button"
+                    onClick={() => setSelectedTicket(null)}
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => handleToggleResolved(selectedTicket.id)}
                     disabled={isUpdatingStatus}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 border shadow-xs ${
+                    className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 border ${
                       selectedTicket.status === 'RESOLVED'
-                        ? 'bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60 shadow-xs'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shadow-xs'
                     }`}
                   >
                     {isUpdatingStatus ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : selectedTicket.status === 'RESOLVED' ? (
-                      <RotateCcw className="w-3.5 h-3.5" />
+                      <RotateCcw className="w-4 h-4" />
                     ) : (
-                      <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <Check className="w-4 h-4 stroke-[2.5]" />
                     )}
                     <span>
                       {isUpdatingStatus
                         ? 'Updating...'
                         : selectedTicket.status === 'RESOLVED'
                         ? 'Reopen Ticket'
-                        : 'Mark as Solved & Resolved'}
+                        : 'Mark as Resolved'}
                     </span>
                   </button>
                 </div>
-              </div>
+              </footer>
             </div>
-          </div>
+          </main>
         </div>
       )}
 
