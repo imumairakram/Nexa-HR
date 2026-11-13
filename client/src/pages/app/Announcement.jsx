@@ -31,6 +31,26 @@ import {
 import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 
+const getCategoryLabel = (cat) => {
+  switch (cat) {
+    case 'EVENTS':
+      return 'Social & Events';
+    case 'POLICIES':
+      return 'HR Policies';
+    case 'BENEFITS':
+      return 'Benefits & Perks';
+    case 'MEETINGS':
+      return 'Meetings & Townhalls';
+    case 'MAINTENANCE':
+    case 'OPERATIONS':
+      return 'Operations & IT';
+    case 'CORPORATE':
+      return 'Corporate Circular';
+    default:
+      return cat || 'General Notice';
+  }
+};
+
 const Announcement = () => {
   const { formatDate } = useRegionalSettings();
   const [announcements, setAnnouncements] = useState(() => api.getCached('/announcements')?.data?.announcements || []);
@@ -296,7 +316,7 @@ const Announcement = () => {
 
       {toastMsg && (
         <div className="fixed top-5 right-5 z-[9999] flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12),0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.6)] animate-in slide-in-from-top-3 fade-in duration-200 max-w-md pointer-events-auto">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/25 flex items-center justify-center shrink-0 shadow-xs">
             <CheckCircle2 className="w-4.5 h-4.5 stroke-[2.2]" />
           </div>
           <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug flex-1 pr-1">
@@ -306,11 +326,11 @@ const Announcement = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC ANNOUNCEMENT HERO BANNER (INDIGO-PURPLE LIGHT THEME AESTHETIC) */}
+      {/* 1. DYNAMIC ANNOUNCEMENT HERO BANNER */}
       {/* ========================================================================= */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
         <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Broadcast Telemetry */}
@@ -531,10 +551,10 @@ const Announcement = () => {
           filtered.map((item) => (
             <div
               key={item.id}
-              className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/10 ${
+              className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 transition-all duration-300 border border-slate-200/90 dark:border-slate-800 hover:shadow-lg hover:shadow-sky-500/5 ${
                 item.pinned
-                  ? 'border-2 border-sky-400/80 dark:border-sky-500/80 bg-gradient-to-br from-sky-50/70 via-white to-sky-50/30 dark:from-sky-950/40 dark:via-[#1E293B] dark:to-sky-950/20 shadow-md shadow-sky-500/5'
-                  : 'bg-white dark:bg-[#1E293B] border border-slate-200/90 dark:border-slate-800 hover:border-sky-300/80 dark:hover:border-sky-700/80 shadow-xs'
+                  ? 'bg-gradient-to-br from-sky-50/40 via-white to-slate-50/30 dark:from-sky-950/20 dark:via-[#1E293B] dark:to-[#1E293B] shadow-xs'
+                  : 'bg-white dark:bg-[#1E293B] shadow-xs'
               }`}
             >
               <div className="flex items-start gap-4">
@@ -559,7 +579,7 @@ const Announcement = () => {
                     )}
 
                     <span className="inline-flex items-center text-[10px] font-extrabold px-3 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 uppercase tracking-wider">
-                      {item.category} • {item.priority}
+                      {getCategoryLabel(item.category)}
                     </span>
 
                     <span className="text-xs text-slate-400 font-medium">{item.date}</span>
@@ -624,99 +644,71 @@ const Announcement = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL: POST CIRCULAR (STITCH LUXURY DESIGN) */}
+      {/* MODAL: BROADCAST ANNOUNCEMENT (NEW TICKET CARD UI DESIGN) */}
       {/* ========================================================================= */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl border border-sky-200/60 dark:border-sky-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-100/80 dark:border-sky-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/80 to-blue-50/60 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
-                  <Megaphone className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <Megaphone className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Broadcast Announcement
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     Publish company circulars, executive updates, and operational memos to all employees.
                   </p>
                 </div>
               </div>
+
               <button
+                type="button"
                 onClick={() => setIsPostModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
-            <form onSubmit={handlePostSubmit} className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-4 custom-scrollbar text-xs relative z-10">
-              {/* Title */}
-              <div className="space-y-1.5">
-                <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                  Announcement Title <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Megaphone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <form onSubmit={handlePostSubmit} className="space-y-6">
+              {/* Row 1: Title & Target Audience */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Megaphone className="w-3.5 h-3.5 text-sky-500" />
+                      Announcement Title <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[11px] font-medium text-slate-400">
+                      {form.title.length}/100 chars
+                    </span>
+                  </div>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Annual Company Retreat 2026 Announcement & Itinerary"
+                    maxLength={100}
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                    placeholder="e.g. Annual Company Retreat 2026 Announcement & Itinerary"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
-              </div>
 
-              {/* Category, Priority & Department */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                    Category Scope <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="EVENTS">Events & Retreats</option>
-                    <option value="BENEFITS">Benefits & Health</option>
-                    <option value="MEETINGS">Meetings & Town Halls</option>
-                    <option value="OPERATIONS">Operations & IT</option>
-                    <option value="CORPORATE">Corporate Circular</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                    Priority Urgency <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={form.priority}
-                    onChange={(e) => setForm({ ...form, priority: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="HIGH">High Priority (Urgent Red Alert)</option>
-                    <option value="MEDIUM">Medium Priority (Standard Amber)</option>
-                    <option value="INFO">Informational Bulletin (Blue)</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                    Target Audience
-                  </label>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                      Target Audience Scope
+                    </label>
+                  </div>
                   <select
                     value={form.department}
                     onChange={(e) => setForm({ ...form, department: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="Company-Wide (All Offices)">Company-Wide (All Offices)</option>
                     {departments.length > 0 ? (
@@ -736,35 +728,188 @@ const Announcement = () => {
                 </div>
               </div>
 
-              {/* Detailed Notice Body */}
-              <div className="space-y-1.5">
-                <label className="block text-slate-800 dark:text-slate-200 font-bold">
-                  Detailed Circular Body <span className="text-rose-500">*</span>
+              {/* Row 2: Urgency Priority Pills */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                  Urgency Priority
                 </label>
-                <div className="relative">
+                <div className="grid grid-cols-3 gap-2.5">
+                  {[
+                    { id: 'INFO', label: 'Info', hint: 'Bulletin' },
+                    { id: 'MEDIUM', label: 'Medium', hint: 'Standard' },
+                    { id: 'HIGH', label: 'High', hint: 'Urgent Alert' },
+                  ].map((p) => {
+                    const isSelected = form.priority === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, priority: p.id }))}
+                        className={`py-2.5 px-3 rounded-2xl border text-center transition-all cursor-pointer font-bold text-xs ${
+                          isSelected
+                            ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
+                            : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
+                        }`}
+                      >
+                        <div className="font-extrabold">{p.label}</div>
+                        <div className={`text-[10px] font-normal opacity-85 ${isSelected ? 'text-white' : 'text-slate-400'}`}>
+                          {p.hint}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Row 3: Category Classification Interactive Grid */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Category Classification <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-xs font-medium text-slate-400">
+                    Select circular scope
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {[
+                    { id: 'EVENTS', label: 'Events & Social', icon: Calendar, hint: 'Townhalls, outings' },
+                    { id: 'POLICIES', label: 'HR Policies', icon: ShieldCheck, hint: 'Rules, compliance' },
+                    { id: 'BENEFITS', label: 'Benefits & Perks', icon: Tag, hint: 'Health, wellness' },
+                    { id: 'OPERATIONS', label: 'Operations & IT', icon: Building2, hint: 'Systems, office' },
+                    { id: 'CORPORATE', label: 'Corporate Circular', icon: FileText, hint: 'Executive memo' },
+                  ].map((cat) => {
+                    const isSelected = form.category === cat.id;
+                    const IconComp = cat.icon;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setForm((p) => ({ ...p, category: cat.id }))}
+                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
+                          isSelected
+                            ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
+                            : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                            }`}
+                          >
+                            <IconComp className="w-4 h-4" />
+                          </div>
+                          {isSelected && (
+                            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
+                          )}
+                        </div>
+                        <div>
+                          <p
+                            className={`text-xs font-bold leading-tight ${
+                              isSelected
+                                ? 'text-sky-700 dark:text-sky-300'
+                                : 'text-slate-800 dark:text-slate-200'
+                            }`}
+                          >
+                            {cat.label}
+                          </p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 truncate">
+                            {cat.hint}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Row 4: Two-column Description & Live Preview Card */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-sky-500" />
+                      Detailed Circular Body <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <textarea
                     rows={4}
                     required
                     placeholder="Full announcement text, schedule of events, guidelines, links..."
                     value={form.content}
                     onChange={(e) => setForm({ ...form, content: e.target.value })}
-                    className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none placeholder:text-slate-400"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all resize-none shadow-inner"
                   />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5 text-sky-500" />
+                      Live Preview & Distribution Card
+                    </label>
+                    <span className="text-xs font-medium text-slate-400">
+                      Real-time summary
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex items-start gap-3.5 min-h-[110px]">
+                    <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
+                      <Megaphone className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
+                        {form.title || 'Untitled Announcement'}
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          {getCategoryLabel(form.category)}
+                        </span>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                        <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 truncate">
+                          {form.department}
+                        </span>
+                      </div>
+                      <div className="mt-2.5 flex items-center gap-2">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase ${
+                            form.priority === 'HIGH'
+                              ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                              : form.priority === 'MEDIUM'
+                              ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
+                              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          }`}
+                        >
+                          {form.priority} PRIORITY
+                        </span>
+                        {form.pinned && (
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-900 text-white dark:bg-white dark:text-slate-900 tracking-wide uppercase flex items-center gap-1">
+                            <Pin className="w-2.5 h-2.5" />
+                            PINNED
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Pin Switch Toggle Card */}
-              <div className="p-4 rounded-xl bg-gradient-to-br from-sky-50/70 via-blue-50/30 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-sky-100 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-slate-900 dark:text-white text-xs">Pin to Top of Notice Board</div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  <div className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Pin to Top of Notice Board</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                     Ensures all employees see this notice immediately upon portal login.
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, pinned: !form.pinned })}
-                  className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                  className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
                     form.pinned ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
                   }`}
                 >
@@ -777,31 +922,38 @@ const Announcement = () => {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={() => setIsPostModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                >
-                  {submitting ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Publishing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
-                      <span>Publish & Broadcast</span>
-                    </>
-                  )}
-                </button>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Guaranteed real-time broadcast & notification dispatch</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsPostModalOpen(false)}
+                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Publishing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                        <span>Publish & Broadcast</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -906,7 +1058,7 @@ const Announcement = () => {
             {/* Modal Actions Footer */}
             <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6" data-purpose="modal-footer">
               <div className="flex items-center text-xs text-slate-400 dark:text-slate-400 order-2 sm:order-1">
-                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                 <span>Enterprise compliance broadcast & acknowledgement audit trail logged</span>
               </div>
 
@@ -914,7 +1066,7 @@ const Announcement = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedNotice(null)}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-sm font-semibold shadow-md active:scale-[0.99] transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold shadow-md active:scale-[0.99] transition-all cursor-pointer"
                 >
                   Close Notice
                 </button>

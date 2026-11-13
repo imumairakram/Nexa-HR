@@ -603,11 +603,6 @@ const Helpdesk = () => {
               <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 <span>SLA: {stats.avgSla}</span>
               </span>
-              {stats.highPriority > 0 && (
-                <span className="flex items-center bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-xl border border-amber-200/80 dark:border-amber-800/50 animate-pulse font-bold">
-                  <span>{stats.highPriority} Urgent Priority</span>
-                </span>
-              )}
             </div>
           </div>
 

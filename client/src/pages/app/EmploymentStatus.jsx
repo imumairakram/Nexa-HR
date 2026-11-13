@@ -27,6 +27,7 @@ import {
   ChevronDown,
   RotateCcw,
   Check,
+  ShieldCheck,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -811,48 +812,100 @@ const EmploymentStatus = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. MODAL: UPDATE STATUS & SHIFTS */}
+      {/* 5. MODAL: UPDATE STATUS & SHIFTS (NEW TICKET CARD UI DESIGN) */}
       {/* ========================================================================= */}
       {selectedEmp && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-sky-200/60 dark:border-sky-800/60 overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-5 border-b border-sky-100/80 dark:border-sky-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/60 dark:via-sky-900/40 dark:to-[#1E293B] relative z-10">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15 shrink-0">
-                  <Briefcase className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <Briefcase className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white truncate">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Update {selectedEmp.name}
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     {selectedEmp.employeeCode} • Configure classification, shift timing, and work station.
                   </p>
                 </div>
               </div>
+
               <button
+                type="button"
                 onClick={() => setSelectedEmp(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Form Fields */}
-            <form onSubmit={handleUpdateStatus} className="p-6 sm:p-7 space-y-5 text-xs relative z-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleUpdateStatus} className="space-y-6">
+              {/* Quick Status Selection Grid */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                  Quick Classification Selector
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { id: 'FULL_TIME', label: 'Full-Time Permanent', hint: 'Standard payroll', code: 'FT' },
+                    { id: 'REMOTE', label: 'Full-Time Remote', hint: 'Distributed hub', code: 'RM' },
+                    { id: 'CONTRACT', label: 'Fixed Contract', hint: 'Term-based', code: 'CT' },
+                    { id: 'PROBATION', label: 'Probationary Period', hint: '90-day evaluation', code: 'PR' },
+                  ].map((t) => {
+                    const isSelected = selectedEmp.employmentType === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setSelectedEmp((prev) => ({ ...prev, employmentType: t.id }))}
+                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[82px] ${
+                          isSelected
+                            ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
+                            : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-xs font-black font-mono px-2 py-0.5 rounded-md ${
+                            isSelected
+                              ? 'bg-sky-500 text-white shadow-xs'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          }`}>
+                            {t.code}
+                          </span>
+                          {isSelected && (
+                            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
+                          )}
+                        </div>
+                        <div>
+                          <p className={`text-xs font-bold leading-tight ${
+                            isSelected ? 'text-sky-700 dark:text-sky-300' : 'text-slate-800 dark:text-slate-200'
+                          }`}>
+                            {t.label}
+                          </p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 truncate">{t.hint}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Row: Classification & Shift Schedule */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Employment Classification *
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-sky-500" />
+                      Employment Classification <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <select
                     value={selectedEmp.employmentType}
                     onChange={(e) => setSelectedEmp({ ...selectedEmp, employmentType: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer transition-all"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="FULL_TIME">Full-Time Permanent</option>
                     <option value="REMOTE">Full-Time Remote</option>
@@ -862,13 +915,16 @@ const EmploymentStatus = () => {
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">
-                    Assigned Shift Schedule *
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-sky-500" />
+                      Assigned Shift Schedule <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <select
                     value={selectedEmp.shift}
                     onChange={(e) => setSelectedEmp({ ...selectedEmp, shift: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer transition-all"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="General Morning (09:00 - 17:30)">General Shift (09:00 AM - 05:30 PM)</option>
                     <option value="Flexible Remote">Flexible Remote (Asynchronous)</option>
@@ -878,105 +934,126 @@ const EmploymentStatus = () => {
                 </div>
               </div>
 
+              {/* Office Location */}
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
-                  <span>Assigned Office Work Location *</span>
-                  <span className="text-[11px] text-slate-400 font-normal">Physical Campus / Hub</span>
-                </label>
-                <div className="space-y-2">
-                  <select
-                    value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(selectedEmp.location) ? selectedEmp.location : 'CUSTOM'}
-                    onChange={(e) => {
-                      if (e.target.value === 'CUSTOM') {
-                        setSelectedEmp({ ...selectedEmp, location: '' });
-                      } else {
-                        setSelectedEmp({ ...selectedEmp, location: e.target.value });
-                      }
-                    }}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none cursor-pointer transition-all text-xs"
-                  >
-                    <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
-                    <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
-                    <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
-                    <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
-                    <option value="CUSTOM">Custom Office Campus / Branch...</option>
-                  </select>
-                  {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(selectedEmp.location)) && (
-                    <input
-                      type="text"
-                      required
-                      placeholder="Enter custom office campus or branch address"
-                      value={selectedEmp.location}
-                      onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all text-xs"
-                    />
-                  )}
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                    Assigned Office Work Location <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-xs font-medium text-slate-400">Physical Campus / Hub</span>
                 </div>
+                <select
+                  value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(selectedEmp.location) ? selectedEmp.location : 'CUSTOM'}
+                  onChange={(e) => {
+                    if (e.target.value === 'CUSTOM') {
+                      setSelectedEmp({ ...selectedEmp, location: '' });
+                    } else {
+                      setSelectedEmp({ ...selectedEmp, location: e.target.value });
+                    }
+                  }}
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                >
+                  <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
+                  <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
+                  <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
+                  <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
+                  <option value="CUSTOM">Custom Office Campus / Branch...</option>
+                </select>
+                {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(selectedEmp.location)) && (
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter custom office campus or branch address"
+                    value={selectedEmp.location}
+                    onChange={(e) => setSelectedEmp({ ...selectedEmp, location: e.target.value })}
+                    className="w-full mt-2.5 px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
+                )}
               </div>
 
-              {/* Live Preview Card */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-sky-50/70 via-cyan-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-sky-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-500 via-sky-600 to-blue-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm shrink-0">
-                    {selectedEmp.employmentType === 'FULL_TIME'
-                      ? 'FT'
-                      : selectedEmp.employmentType === 'REMOTE'
-                        ? 'RM'
-                        : selectedEmp.employmentType === 'CONTRACT'
-                          ? 'CT'
-                          : 'PR'}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-extrabold text-slate-900 dark:text-white text-sm truncate">
-                      {selectedEmp.name}
-                    </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 truncate">
-                      {selectedEmp.shift} • {selectedEmp.location}
-                    </div>
-                  </div>
+              {/* Live Preview & Dossier Card */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-sky-500" />
+                    Live Preview & Dossier Card
+                  </label>
+                  <span className="text-xs font-medium text-slate-400">Real-time profile summary</span>
                 </div>
-                <span
-                  className={`text-xs font-extrabold px-3.5 py-1.5 rounded-full border shrink-0 inline-flex items-center gap-1.5 self-start sm:self-auto ${selectedEmp.employmentType === 'FULL_TIME'
-                    ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                    : selectedEmp.employmentType === 'REMOTE'
-                      ? 'bg-indigo-100/80 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
-                      : selectedEmp.employmentType === 'CONTRACT'
-                        ? 'bg-blue-100/80 text-blue-800 dark:bg-blue-300 border-blue-200 dark:border-blue-800'
-                        : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                      {selectedEmp.employmentType === 'FULL_TIME'
+                        ? 'FT'
+                        : selectedEmp.employmentType === 'REMOTE'
+                          ? 'RM'
+                          : selectedEmp.employmentType === 'CONTRACT'
+                            ? 'CT'
+                            : 'PR'}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base truncate">
+                        {selectedEmp.name}
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 truncate">
+                        {selectedEmp.shift} • {selectedEmp.location}
+                      </div>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`text-xs font-extrabold px-3.5 py-1.5 rounded-full border shrink-0 inline-flex items-center gap-1.5 self-start sm:self-auto ${
+                      selectedEmp.employmentType === 'FULL_TIME'
+                        ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/80'
+                        : selectedEmp.employmentType === 'REMOTE'
+                        ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/80'
+                        : selectedEmp.employmentType === 'CONTRACT'
+                        ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/80'
+                        : 'bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/80'
                     }`}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                  <span>{selectedEmp.employmentType.replace('_', ' ')}</span>
-                </span>
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                    <span>{selectedEmp.employmentType.replace('_', ' ')}</span>
+                  </span>
+                </div>
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={() => setSelectedEmp(null)}
-                  disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
-                >
-                  {saving ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
-                      <span>Save Changes</span>
-                    </>
-                  )}
-                </button>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Real-time directory sync & audit trail logged</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedEmp(null)}
+                    disabled={saving}
+                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {saving ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                        <span>Save Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
