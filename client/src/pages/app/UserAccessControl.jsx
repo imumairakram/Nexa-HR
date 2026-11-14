@@ -994,13 +994,13 @@ const UserAccessControl = () => {
                     onChange={(e) => handleApplyPreset(e.target.value)}
                     className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none cursor-pointer shadow-2xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   >
-                    <option value="SUPER_ADMIN">👑 Super Administrator</option>
-                    <option value="HR_MANAGER">👔 HR Manager</option>
-                    <option value="PAYROLL_SPECIALIST">💰 Payroll Specialist</option>
-                    <option value="RECRUITER">🎯 Talent Recruiter</option>
-                    <option value="TEAM_LEAD">👥 Team Supervisor</option>
-                    <option value="STANDARD_EMPLOYEE">👤 Standard Employee</option>
-                    <option value="CUSTOM">⚙️ Custom User Access</option>
+                    <option value="SUPER_ADMIN">Super Administrator</option>
+                    <option value="HR_MANAGER">HR Manager</option>
+                    <option value="PAYROLL_SPECIALIST">Payroll Specialist</option>
+                    <option value="RECRUITER">Talent Recruiter</option>
+                    <option value="TEAM_LEAD">Team Supervisor</option>
+                    <option value="STANDARD_EMPLOYEE">Standard Employee</option>
+                    <option value="CUSTOM">Custom User Access</option>
                   </select>
                 </div>
               </div>

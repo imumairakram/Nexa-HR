@@ -767,7 +767,7 @@ const Documents = () => {
     </div>
     <div>
       <div class="grid-label">LEGAL VERIFICATION STATUS</div>
-      <div class="grid-val" style="color: #0d9488;">✔ NexaHR Digital Signature Verified</div>
+      <div class="grid-val" style="color: #0d9488;">NexaHR Digital Signature Verified</div>
     </div>
   </div>
 

@@ -990,7 +990,7 @@ const NewEmployee = () => {
                   </div>
                   <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 px-1 font-medium">
                     <span className={form.defaultPassword.length >= 6 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-amber-500 font-semibold'}>
-                      {form.defaultPassword.length >= 6 ? '✓ Meets minimum 6-character length' : '⚠ Minimum 6 characters required'}
+                      {form.defaultPassword.length >= 6 ? 'Meets minimum 6-character length' : 'Minimum 6 characters required'}
                     </span>
                     <span>Dispatched via Email</span>
                   </div>

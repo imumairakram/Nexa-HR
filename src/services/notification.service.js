@@ -1045,7 +1045,7 @@ function buildWelcomeEmailHtml({
                 <tr>
                   <td style="padding: 22px 24px;">
                     <div style="font-size: 12px; text-transform: uppercase; color: #0284c7; font-weight: 800; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">
-                      <span>🔑</span> YOUR PORTAL LOGIN CREDENTIALS
+                      YOUR PORTAL LOGIN CREDENTIALS
                     </div>
                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
@@ -1120,7 +1120,7 @@ function buildWelcomeEmailHtml({
 
               <!-- Security Advisory -->
               <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin: 18px 0 0; text-align: center;">
-                🔒 <strong>Security Notice:</strong> Please keep your login credentials strictly confidential. Never share your password with anyone.
+                <strong>Security Notice:</strong> Please keep your login credentials strictly confidential. Never share your password with anyone.
               </p>
             </td>
           </tr>
@@ -1499,7 +1499,7 @@ function buildOtpEmailHtml({ name, otp, expiryMinutes = 10 }) {
                       ${otp}
                     </div>
                     <div style="font-size: 13px; color: #059669; font-weight: 600; margin-top: 8px;">
-                      ⏱️ Valid for ${expiryMinutes} minutes
+                      Valid for ${expiryMinutes} minutes
                     </div>
                   </td>
                 </tr>

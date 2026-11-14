@@ -1276,7 +1276,7 @@ const handleViewResume = async (candidateId) => {
                           <div className="flex flex-wrap gap-1.5">
                             {selectedCandidate.aiStrengths.map((s, idx) => (
                               <span key={idx} className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold border border-emerald-200/60 dark:border-emerald-800/60">
-                                ✓ {s}
+                                {s}
                               </span>
                             ))}
                           </div>

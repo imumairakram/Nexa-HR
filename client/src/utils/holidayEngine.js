@@ -132,36 +132,36 @@ export function getMoonPhaseInfo(date = new Date()) {
   const frac = daysIntoCycle / 29.53058867;
 
   let phase = 'New Moon';
-  let icon = '🌑';
+  let icon = '';
   let illumination = Math.round((1 - Math.cos(frac * 2 * Math.PI)) / 2 * 100);
 
   if (daysIntoCycle < 1.84566) {
     phase = 'New Moon (Hilal Birth)';
-    icon = '🌑';
+    icon = '';
   } else if (daysIntoCycle < 5.53699) {
     phase = 'Waxing Crescent (Hilal)';
-    icon = '🌒';
+    icon = '';
   } else if (daysIntoCycle < 9.22831) {
     phase = 'First Quarter';
-    icon = '🌓';
+    icon = '';
   } else if (daysIntoCycle < 12.91963) {
     phase = 'Waxing Gibbous';
-    icon = '🌔';
+    icon = '';
   } else if (daysIntoCycle < 16.61096) {
     phase = 'Full Moon (Badr)';
-    icon = '🌕';
+    icon = '';
   } else if (daysIntoCycle < 20.30228) {
     phase = 'Waning Gibbous';
-    icon = '🌖';
+    icon = '';
   } else if (daysIntoCycle < 23.99361) {
     phase = 'Last Quarter';
-    icon = '🌗';
+    icon = '';
   } else if (daysIntoCycle < 27.68493) {
     phase = 'Waning Crescent';
-    icon = '🌘';
+    icon = '';
   } else {
     phase = 'New Moon (Hilal Birth)';
-    icon = '🌑';
+    icon = '';
   }
 
   return {
