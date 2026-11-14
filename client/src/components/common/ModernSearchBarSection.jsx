@@ -8,6 +8,8 @@ import {
   ChevronDown,
   Check,
   SlidersHorizontal,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 
 /**
@@ -26,6 +28,9 @@ const ModernSearchBarSection = ({
   statusTabs = [],
   activeStatus = 'ALL',
   onStatusChange,
+  customTabs = null,
+  viewMode = '',
+  onViewModeChange = null,
   searchQuery = '',
   onSearchChange,
   searchPlaceholder = 'Search...',
@@ -95,41 +100,44 @@ const ModernSearchBarSection = ({
       {/* ========================================================================= */}
       {/* ROW 1: STATUS SEGMENTS + DATE RANGE & SORT PICKERS (+ ACTION BUTTON)      */}
       {/* ========================================================================= */}
-      {(statusTabs.length > 0 || dateRangeOptions.length > 0 || sortOptions.length > 0 || actionButton) && (
+      {(customTabs || statusTabs.length > 0 || dateRangeOptions.length > 0 || sortOptions.length > 0 || onViewModeChange || actionButton) && (
         <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 w-full min-w-0">
-          {/* Left: Segmented Status Pills */}
-          {statusTabs.length > 0 && (
-            <div className="flex items-center gap-1 p-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] shadow-2xs overflow-x-auto max-w-full min-w-0 scrollbar-none no-scrollbar">
-              {statusTabs.map((tab) => {
-                const isSelected = activeStatus === tab.key;
-                return (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => onStatusChange && onStatusChange(tab.key)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-[9px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
-                      isSelected
-                        ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
-                        : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
-                    }`}
-                  >
-                    <span>{tab.label}</span>
-                    {tab.count !== undefined && (
-                      <span
-                        className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-full transition-all ${
-                          isSelected
-                            ? 'bg-white/20 text-white'
-                            : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
-                        }`}
-                      >
-                        {tab.count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          {/* Left: Custom Tabs (e.g. Issued Documents vs Policies) + Segmented Status Pills */}
+          <div className="flex items-center gap-2 flex-wrap max-w-full min-w-0">
+            {customTabs}
+            {statusTabs.length > 0 && (
+              <div className="flex items-center gap-1 p-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] shadow-2xs overflow-x-auto max-w-full min-w-0 scrollbar-none no-scrollbar">
+                {statusTabs.map((tab) => {
+                  const isSelected = activeStatus === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => onStatusChange && onStatusChange(tab.key)}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-[9px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
+                        isSelected
+                          ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                          : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+                      }`}
+                    >
+                      <span>{tab.label}</span>
+                      {tab.count !== undefined && (
+                        <span
+                          className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-full transition-all ${
+                            isSelected
+                              ? 'bg-white/20 text-white'
+                              : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                          }`}
+                        >
+                          {tab.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Right: Date Range + Sort Controls + Action Button */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto max-w-full">
@@ -229,6 +237,36 @@ const ModernSearchBarSection = ({
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* View Mode Toggle Capsule (Grid / List) */}
+            {onViewModeChange && (
+              <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onViewModeChange('list')}
+                  className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                    viewMode === 'list'
+                      ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                      : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
+                  }`}
+                  title="Table view"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onViewModeChange('grid')}
+                  className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                    viewMode === 'grid'
+                      ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                      : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
+                  }`}
+                  title="Grid view"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
               </div>
             )}
 

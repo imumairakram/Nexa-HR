@@ -1229,114 +1229,62 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       {/* 3. REPOSITORY CONTROLS & MODERN SEARCH BAR */}
       {/* ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Repository Tab Switcher: Issued Documents vs Company Policies */}
-        <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 w-fit">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('issued');
-              setTypeFilter('ALL');
-              setDeptFilter('ALL');
-            }}
-            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'issued'
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Issued Documents</span>
-            <span
-              className={`text-[10px] px-2 py-0.2 rounded-full font-extrabold transition-all ${
-                activeTab === 'issued'
-                  ? 'bg-sky-500 text-white'
-                  : 'bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300'
-              }`}
-            >
-              {issuedDocs.length}
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('policies');
-              setPolicyCategoryFilter('ALL');
-            }}
-            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'policies'
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Company Policies</span>
-            <span
-              className={`text-[10px] px-2 py-0.2 rounded-full font-extrabold transition-all ${
-                activeTab === 'policies'
-                  ? 'bg-sky-500 text-white'
-                  : 'bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300'
-              }`}
-            >
-              {companyPolicies.length}
-            </span>
-          </button>
-        </div>
-
-        {/* View Mode & Primary Action Button */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {activeTab === 'issued' && (
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                title="Table View"
-                className={`p-2 rounded-xl transition-all cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <List className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                title="Grid View"
-                className={`p-2 rounded-xl transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <Grid className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'issued' ? (
-            <button
-              type="button"
-              onClick={() => setIsIssueModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Issue Document</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsPolicyModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Publish Policy</span>
-            </button>
-          )}
-        </div>
-      </div>
-
       <ModernSearchBarSection
+        customTabs={
+          <div className="flex items-center gap-1 p-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] shadow-2xs shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('issued');
+                setTypeFilter('ALL');
+                setDeptFilter('ALL');
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-[9px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
+                activeTab === 'issued'
+                  ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                  : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Issued Documents</span>
+              <span
+                className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-full transition-all ${
+                  activeTab === 'issued'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                }`}
+              >
+                {issuedDocs.length}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('policies');
+                setPolicyCategoryFilter('ALL');
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-[9px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
+                activeTab === 'policies'
+                  ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                  : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Company Policies</span>
+              <span
+                className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-full transition-all ${
+                  activeTab === 'policies'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                }`}
+              >
+                {companyPolicies.length}
+              </span>
+            </button>
+          </div>
+        }
+        viewMode={activeTab === 'issued' ? viewMode : ''}
+        onViewModeChange={activeTab === 'issued' ? setViewMode : null}
         statusTabs={
           activeTab === 'issued'
             ? [
