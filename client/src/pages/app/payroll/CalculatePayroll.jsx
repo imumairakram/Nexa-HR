@@ -128,7 +128,7 @@ const CalculatePayroll = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Automated Payroll Calculator & Pre-Run Audit"
+        title="Automated Payroll Calculator"
         subtitle="Review real-time biometric attendance deductions, overtime additions, and federal/state tax calculations."
       />
 

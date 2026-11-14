@@ -151,7 +151,7 @@ const Payroll = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Global Payroll Processing & Auto-Tax Engine"
+        title="Global Payroll Processing"
         subtitle="Automate salary disbursements, compute tax withholdings, manage allowances, and export payslips."
         onRefresh={fetchPayroll}
         loading={loading}

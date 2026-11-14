@@ -186,7 +186,7 @@ const PayslipList = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Employee Payslip Repository & PDF Invoicing"
+        title="Employee Payslip Repository"
         subtitle="Search and print official company payslips, verify tax withholding schedules, and export batch archives."
       />
 

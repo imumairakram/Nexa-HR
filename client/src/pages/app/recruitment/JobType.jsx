@@ -77,7 +77,7 @@ const JobType = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Employment & Contract Types Master Table"
+        title="Employment & Contract Types"
         subtitle="Configure standard employment arrangements, working commitments, and benefit eligibility tracks."
       />
 

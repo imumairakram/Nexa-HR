@@ -44,7 +44,7 @@ const JobDesk = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Recruiter Command Desk & Talent Intelligence"
+        title="Recruiter Command Desk"
         subtitle="Real-time hiring velocity, candidate conversion funnels, open requisition metrics, and interview loads."
       />
 

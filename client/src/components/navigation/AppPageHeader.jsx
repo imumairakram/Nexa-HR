@@ -120,6 +120,24 @@ const AppPageHeader = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('nexahr_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handleSidebarChange = (e) => {
+      if (e.detail?.isCollapsed !== undefined) {
+        setIsSidebarCollapsed(e.detail.isCollapsed);
+      }
+    };
+    window.addEventListener('nexahr_sidebar_state_changed', handleSidebarChange);
+    return () => window.removeEventListener('nexahr_sidebar_state_changed', handleSidebarChange);
+  }, []);
+
   const searchRef = useRef(null);
   const notifyRef = useRef(null);
   const profileRef = useRef(null);
@@ -490,23 +508,38 @@ const AppPageHeader = ({
           <div className="min-w-0 flex-1">
             {resolvedMobileTitle ? (
               <>
-                <h1 className="sm:hidden text-lg sm:text-xl font-bold font-heading text-slate-900 dark:text-white tracking-tight leading-tight truncate">
+                <h1 className="sm:hidden text-lg font-bold font-heading text-slate-900 dark:text-white tracking-tight leading-tight truncate whitespace-nowrap" title={typeof resolvedMobileTitle === 'string' ? resolvedMobileTitle : undefined}>
                   {resolvedMobileTitle}
                 </h1>
-                <h1 className="hidden sm:block text-xl sm:text-2xl font-bold font-heading text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+                <h1
+                  title={typeof title === 'string' ? title : undefined}
+                  className={`hidden sm:block font-bold font-heading text-slate-900 dark:text-white tracking-tight leading-tight truncate whitespace-nowrap transition-all ${
+                    !isSidebarCollapsed
+                      ? 'text-lg sm:text-xl lg:text-[21px] xl:text-2xl'
+                      : 'text-xl sm:text-2xl'
+                  }`}
+                >
                   {title}
                 </h1>
               </>
             ) : (
-              <h1 className="text-lg sm:text-2xl font-bold font-heading text-slate-900 dark:text-white tracking-tight leading-snug sm:leading-tight">
+              <h1
+                title={typeof title === 'string' ? title : undefined}
+                className={`font-bold font-heading text-slate-900 dark:text-white tracking-tight leading-tight truncate whitespace-nowrap transition-all ${
+                  !isSidebarCollapsed
+                    ? 'text-lg sm:text-xl lg:text-[21px] xl:text-2xl'
+                    : 'text-lg sm:text-2xl'
+                }`}
+              >
                 {title}
               </h1>
             )}
             {displaySubtitle && (
               <p
                 className={`${
-                  hideMobileSubtitle ? 'hidden sm:block' : 'line-clamp-2 sm:line-clamp-none'
-                } text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium max-w-xl leading-relaxed mt-0.5`}
+                  hideMobileSubtitle ? 'hidden sm:block' : 'line-clamp-1 sm:line-clamp-none'
+                } text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium max-w-xl leading-relaxed mt-0.5 truncate`}
+                title={typeof displaySubtitle === 'string' ? displaySubtitle : undefined}
               >
                 {displaySubtitle}
               </p>
@@ -521,7 +554,14 @@ const AppPageHeader = ({
           } col-span-2 sm:col-auto w-full sm:w-auto items-center gap-2 sm:gap-3 sm:order-2 shrink-0 sm:self-center`}
         >
           {action || children}
-          <div className="relative w-full sm:w-56 md:w-64 lg:w-72" ref={searchRef}>
+          <div
+            className={`relative w-full transition-all duration-300 ${
+              !isSidebarCollapsed
+                ? 'sm:w-44 md:w-52 lg:w-60 xl:w-68'
+                : 'sm:w-52 md:w-60 lg:w-68 xl:w-72'
+            }`}
+            ref={searchRef}
+          >
             <div className="relative flex items-center">
               <input
                 ref={inputRef}

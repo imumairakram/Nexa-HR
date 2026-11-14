@@ -35,6 +35,7 @@ const MainLayout = () => {
       const next = !prev;
       try {
         localStorage.setItem('nexahr_sidebar_collapsed', String(next));
+        window.dispatchEvent(new CustomEvent('nexahr_sidebar_state_changed', { detail: { isCollapsed: next } }));
       } catch (e) {
         console.warn('LocalStorage error:', e);
       }

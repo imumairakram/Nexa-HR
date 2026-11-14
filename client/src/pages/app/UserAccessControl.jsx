@@ -423,7 +423,7 @@ const UserAccessControl = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="System Admin User Access Control & Feature Clearance"
+        title="User Access Control & Security"
         subtitle="Configure granular feature permissions per employee, delegate administrative privileges, and assign departmental presets."
       />
 

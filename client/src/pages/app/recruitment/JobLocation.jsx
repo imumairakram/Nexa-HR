@@ -79,7 +79,7 @@ const JobLocation = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Office Locations & Regional Hiring Hubs"
+        title="Office Locations & Regional Hubs"
         subtitle="Manage geographic workplace campuses, remote hiring zones, timezone mappings, and facility requisitions."
       />
 

@@ -557,7 +557,7 @@ const Helpdesk = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Helpdesk & Employee Support Desk"
+        title="Helpdesk & Support"
         subtitle="Review employee support queries, reply to active technical threads, assign specialists, and resolve HR tickets."
       />
 

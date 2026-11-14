@@ -76,7 +76,7 @@ const JobCategory = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Job Categories Master Table & Requisition Taxonomy"
+        title="Job Categories & Taxonomy"
         subtitle="Organize job requisitions, career portal departments, and hiring pipelines into structured functional categories."
       />
 

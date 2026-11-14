@@ -379,7 +379,7 @@ const RecruitmentSettings = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Recruitment Master Data & Taxonomy Settings"
+        title="Recruitment Master Settings"
         subtitle="Configure requisition categories, contract formats, regional hiring hubs, candidate skill taxonomy, and career seniority tracks."
       />
 

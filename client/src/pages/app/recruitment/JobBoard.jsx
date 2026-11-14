@@ -153,7 +153,7 @@ const JobBoard = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Candidate Hiring Pipeline Kanban Board"
+        title="Candidate Hiring Pipeline"
         subtitle="Track candidates across hiring stages from initial resume application to final employment offer."
       />
 

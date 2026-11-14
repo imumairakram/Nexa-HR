@@ -1076,7 +1076,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Documents & Corporate Policies Hub"
+        title="Documents & Corporate Policies"
         subtitle="Issue official employment offers, contracts, and NDA letters to employees, and govern statutory company handbooks."
       />
 

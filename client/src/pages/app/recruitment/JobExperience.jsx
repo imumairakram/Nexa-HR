@@ -79,7 +79,7 @@ const JobExperience = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Experience Bands & Seniority Tiers Master Table"
+        title="Experience Bands & Seniority Tiers"
         subtitle="Configure candidate years-of-experience criteria, career progression levels, and benchmark compensation."
       />
 

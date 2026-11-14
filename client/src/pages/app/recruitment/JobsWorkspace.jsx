@@ -414,7 +414,7 @@ const JobsWorkspace = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="Recruitment Jobs Workspace & Requisition Command"
+        title="Recruitment Jobs Workspace"
         subtitle="Consolidated active job openings, applicant pipelines, talent conversion telemetry, and requisition lifecycle management."
       />
 

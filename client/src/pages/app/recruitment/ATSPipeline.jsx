@@ -610,7 +610,7 @@ const handleViewResume = async (candidateId) => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
-        title="ATS Candidate Pipeline & Interview Orchestration"
+        title="ATS Candidate Pipeline"
         subtitle="Visual drag-and-drop talent board, stages advancement, automated interview schedules, and candidate dossiers."
       />
 

@@ -182,7 +182,7 @@ const JobInterview = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Candidate Interview Schedules & Panels"
+        title="Candidate Interview Schedules"
         subtitle="Coordinate technical assessments, panel interviews, calendar invitations, and scorecards."
       />
 

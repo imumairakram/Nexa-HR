@@ -108,7 +108,7 @@ const JobSkills = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Candidate Skill Taxonomy & Assessments"
+        title="Candidate Skill Taxonomy"
         subtitle="Manage required technical competencies, automated grading rubrics, and talent stack tags."
       />
 

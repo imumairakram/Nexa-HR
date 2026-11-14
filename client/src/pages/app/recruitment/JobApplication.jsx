@@ -214,7 +214,7 @@ const JobApplication = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
-        title="Candidate Application Roster & Resumes"
+        title="Candidate Applications & Resumes"
         subtitle="Review inbound candidate resumes, stage progression, ATS match scores, and interview evaluations."
       />
 
