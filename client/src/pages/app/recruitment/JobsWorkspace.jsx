@@ -990,210 +990,240 @@ const JobsWorkspace = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. SLIDE-OUT SIDE-DRAWER (FRAMER MOTION ANIMATED) FOR CREATE / EDIT */}
+      {/* 5. JOB REQUISITION MODAL (NEW TICKET CARD UI ARCHITECTURE) */}
       {/* ========================================================================= */}
-      <AnimatePresence>
-        {isDrawerOpen && (
-          <div className="fixed inset-0 z-50 overflow-hidden">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsDrawerOpen(false)}
-              className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
-            />
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-2xl lg:max-w-3xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <Briefcase className="w-6 h-6 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {editingJob ? 'Edit Job Requisition' : 'Create Job Opening'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    {editingJob ? 'Update requisition details, classification, and compensation.' : 'Publish opening to corporate careers portal and applicant tracking.'}
+                  </p>
+                </div>
+              </div>
 
-            {/* Slide-out Drawer Panel */}
-            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-                className="w-screen max-w-xl bg-white dark:bg-[#1E293B] shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between"
+              <button
+                type="button"
+                onClick={() => setIsDrawerOpen(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                {/* Header */}
-                <div className="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
-                      <Briefcase className="w-6 h-6 stroke-[2.2]" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                        {editingJob ? 'Edit Job Requisition' : 'Create Job Opening'}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {editingJob ? 'Update requisition details and compensation' : 'Publish opening to corporate careers portal'}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsDrawerOpen(false)}
-                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Inline Error Alert */}
-                {formError && (
-                  <div className="mx-6 sm:mx-8 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-2xl flex items-center gap-2.5 text-xs text-rose-600 dark:text-rose-300 font-semibold animate-in fade-in">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-                    <span>{formError}</span>
-                  </div>
-                )}
-
-                {/* Form Body with Smooth Scroll */}
-                <form id="job-drawer-form" onSubmit={handleSaveJob} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5 custom-scrollbar">
-                  {/* Title */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Job Title *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Senior React & Node Engineer"
-                      value={form.title}
-                      onChange={(e) => setForm({ ...form, title: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                    />
-                  </div>
-
-                  {/* Department & Status */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Department</label>
-                      <select
-                        value={form.dept}
-                        onChange={(e) => setForm({ ...form, dept: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                      >
-                        {departments.length > 0 ? (
-                          departments.map((d) => (
-                            <option key={d.id} value={d.name}>
-                              {d.name}
-                            </option>
-                          ))
-                        ) : (
-                          <>
-                            <option value="Engineering & DevOps">Engineering & DevOps</option>
-                            <option value="Product & Design">Product & Design</option>
-                            <option value="People Operations & HR">People Operations & HR</option>
-                            <option value="Finance & Accounts">Finance & Accounts</option>
-                            <option value="Growth & Marketing">Growth & Marketing</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Requisition Status</label>
-                      <select
-                        value={form.status}
-                        onChange={(e) => setForm({ ...form, status: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                      >
-                        <option value="ACTIVE">Active (Published)</option>
-                        <option value="PAUSED">Paused (Internal Hold)</option>
-                        <option value="CLOSED">Closed (Archived)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Location & Contract Type */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Location Hub *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Islamabad HQ / Remote"
-                        value={form.location}
-                        onChange={(e) => setForm({ ...form, location: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Contract Format</label>
-                      <select
-                        value={form.type}
-                        onChange={(e) => setForm({ ...form, type: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                      >
-                        <option value="Full-Time">Full-Time Permanent</option>
-                        <option value="Full-Time Remote">Full-Time Remote</option>
-                        <option value="Contract">Fixed-Term Contract</option>
-                        <option value="Internship">Internship / Fellow</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Experience & Salary */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Experience Seniority</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 5 - 8 Years"
-                        value={form.experience}
-                        onChange={(e) => setForm({ ...form, experience: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Compensation Range</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. PKR 140k - PKR 170k"
-                        value={form.salary}
-                        onChange={(e) => setForm({ ...form, salary: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Description / Requirements */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                      Role Overview & Key Qualifications
-                    </label>
-                    <textarea
-                      rows={5}
-                      placeholder="Outline mission, key technical expectations, deliverables, and requirements..."
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all leading-relaxed"
-                    />
-                  </div>
-                </form>
-
-                {/* Footer Actions */}
-                <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3 bg-slate-50/50 dark:bg-slate-800/40">
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={() => setIsDrawerOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    form="job-drawer-form"
-                    disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 disabled:opacity-60 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
-                  >
-                    {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>{editingJob ? (isSubmitting ? 'Saving...' : 'Save Requisition') : (isSubmitting ? 'Publishing...' : 'Publish Job Opening')}</span>
-                  </button>
-                </div>
-              </motion.div>
+                <X className="w-5 h-5" />
+              </button>
             </div>
+
+            {/* Inline Error Alert */}
+            {formError && (
+              <div className="mb-5 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-2xl flex items-center gap-2.5 text-xs text-rose-600 dark:text-rose-300 font-semibold animate-in fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveJob} className="space-y-5">
+              {/* Row 1: Job Title */}
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                  <Briefcase className="w-3.5 h-3.5 text-sky-500" />
+                  Job Title <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Lead Product Designer / Senior Full-Stack Engineer"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                />
+              </div>
+
+              {/* Row 2: Department & Requisition Status */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                    Department
+                  </label>
+                  <select
+                    value={form.dept}
+                    onChange={(e) => setForm({ ...form, dept: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                  >
+                    {departments.length > 0 ? (
+                      departments.map((d) => (
+                        <option key={d.id} value={d.name}>
+                          {d.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Engineering & DevOps">Engineering & DevOps</option>
+                        <option value="Product & Design">Product & Design</option>
+                        <option value="People Operations & HR">People Operations & HR</option>
+                        <option value="Finance & Accounts">Finance & Accounts</option>
+                        <option value="Growth & Marketing">Growth & Marketing</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-sky-500" />
+                    Requisition Status
+                  </label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                  >
+                    <option value="ACTIVE">Active (Published)</option>
+                    <option value="PAUSED">Paused (Internal Hold)</option>
+                    <option value="CLOSED">Closed (Archived)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 3: Location Hub & Contract Format */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <MapPin className="w-3.5 h-3.5 text-sky-500" />
+                    Location Hub <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Islamabad HQ (On-Site) / Remote"
+                    value={form.location}
+                    onChange={(e) => setForm({ ...form, location: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Clock className="w-3.5 h-3.5 text-sky-500" />
+                    Contract Format
+                  </label>
+                  <select
+                    value={form.type}
+                    onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                  >
+                    <option value="Full-Time Permanent">Full-Time Permanent</option>
+                    <option value="Full-Time Remote">Full-Time Remote</option>
+                    <option value="Fixed-Term Contract">Fixed-Term Contract</option>
+                    <option value="Internship">Internship / Fellow</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 4: Experience Seniority & Compensation */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <TrendingUp className="w-3.5 h-3.5 text-sky-500" />
+                    Experience Seniority
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 3+ Years / Senior Lead"
+                    value={form.experience}
+                    onChange={(e) => setForm({ ...form, experience: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Banknote className="w-3.5 h-3.5 text-sky-500" />
+                    Compensation Range
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. PKR 100k - PKR 140k"
+                    value={form.salary}
+                    onChange={(e) => setForm({ ...form, salary: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
+                </div>
+              </div>
+
+              {/* Row 5: Role Overview & Qualifications */}
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-sky-500" />
+                  Role Overview & Key Qualifications
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder="Outline mission, key technical expectations, deliverables, and requirements..."
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all leading-relaxed shadow-inner"
+                />
+              </div>
+
+              {/* Live Requisition Preview Strip */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50/70 via-sky-50/30 to-transparent dark:from-sky-950/40 dark:via-slate-800/50 border border-sky-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center font-extrabold text-xs shadow-md shadow-sky-500/20 ring-2 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                    <Briefcase className="w-5 h-5 stroke-[2.2]" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate">
+                      {form.title || 'Untitled Opening'}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                      {form.dept} • {form.location || 'Location Hub'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
+                    {form.type}
+                  </span>
+                  {form.salary && (
+                    <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80">
+                      {form.salary}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="px-6 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 active:scale-95 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                >
+                  {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{editingJob ? (isSubmitting ? 'Saving...' : 'Save Requisition') : (isSubmitting ? 'Publishing...' : 'Publish Job Opening')}</span>
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 };
