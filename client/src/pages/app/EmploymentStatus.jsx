@@ -850,10 +850,10 @@ const EmploymentStatus = () => {
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { id: 'FULL_TIME', label: 'Full-Time Permanent', hint: 'Standard payroll', code: 'FT' },
-                    { id: 'REMOTE', label: 'Full-Time Remote', hint: 'Distributed hub', code: 'RM' },
-                    { id: 'CONTRACT', label: 'Fixed Contract', hint: 'Term-based', code: 'CT' },
-                    { id: 'PROBATION', label: 'Probationary Period', hint: '90-day evaluation', code: 'PR' },
+                    { id: 'FULL_TIME', label: 'Full-Time Permanent', hint: 'Standard payroll' },
+                    { id: 'REMOTE', label: 'Full-Time Remote', hint: 'Distributed hub' },
+                    { id: 'CONTRACT', label: 'Fixed Contract', hint: 'Term-based' },
+                    { id: 'PROBATION', label: 'Probationary Period', hint: '90-day evaluation' },
                   ].map((t) => {
                     const isSelected = selectedEmp.employmentType === t.id;
                     return (
@@ -861,22 +861,19 @@ const EmploymentStatus = () => {
                         key={t.id}
                         type="button"
                         onClick={() => setSelectedEmp((prev) => ({ ...prev, employmentType: t.id }))}
-                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[82px] ${
+                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[76px] ${
                           isSelected
                             ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
                             : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className={`text-xs font-black font-mono px-2 py-0.5 rounded-md ${
-                            isSelected
-                              ? 'bg-sky-500 text-white shadow-xs'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                          }`}>
-                            {t.code}
-                          </span>
-                          {isSelected && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
+                        <div className="flex items-center justify-end mb-1">
+                          {isSelected ? (
+                            <span className="w-3.5 h-3.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900 flex items-center justify-center">
+                              <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+                            </span>
+                          ) : (
+                            <span className="w-3 h-3 rounded-full border-2 border-slate-300 dark:border-slate-600" />
                           )}
                         </div>
                         <div>
@@ -984,14 +981,25 @@ const EmploymentStatus = () => {
 
                 <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
-                      {selectedEmp.employmentType === 'FULL_TIME'
-                        ? 'FT'
-                        : selectedEmp.employmentType === 'REMOTE'
-                          ? 'RM'
-                          : selectedEmp.employmentType === 'CONTRACT'
-                            ? 'CT'
-                            : 'PR'}
+                    <div className="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-sm shadow-sm ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0 overflow-hidden border border-sky-200/80 dark:border-sky-800/80">
+                      {getAvatarUrl(selectedEmp) && getAvatarUrl(selectedEmp) !== DEFAULT_BLANK_AVATAR ? (
+                        <img
+                          src={getAvatarUrl(selectedEmp)}
+                          alt={selectedEmp.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>
+                          {selectedEmp.name
+                            ? selectedEmp.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')
+                                .slice(0, 2)
+                                .toUpperCase()
+                            : 'EM'}
+                        </span>
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base truncate">
