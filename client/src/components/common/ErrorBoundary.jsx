@@ -1,7 +1,8 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
-class ErrorBoundary extends React.Component {
+class ErrorBoundaryInner extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
@@ -14,6 +15,13 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({ errorInfo });
+  }
+
+  componentDidUpdate(prevProps) {
+    // Automatically reset error boundary state when the route location changes
+    if (this.state.hasError && prevProps.location?.pathname !== this.props.location?.pathname) {
+      this.setState({ hasError: false, error: null, errorInfo: null });
+    }
   }
 
   handleReset = () => {
@@ -44,18 +52,20 @@ class ErrorBoundary extends React.Component {
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
+                type="button"
                 onClick={this.handleReset}
-                className="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                className="flex-1 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Reload Page</span>
               </button>
               <button
+                type="button"
                 onClick={() => {
                   this.setState({ hasError: false, error: null, errorInfo: null });
                   window.location.href = '/app/dashboard';
                 }}
-                className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <Home className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -69,5 +79,14 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+const ErrorBoundary = ({ children }) => {
+  const location = useLocation();
+  return (
+    <ErrorBoundaryInner key={location.pathname} location={location}>
+      {children}
+    </ErrorBoundaryInner>
+  );
+};
 
 export default ErrorBoundary;
