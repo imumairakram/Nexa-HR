@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
-import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
 import { JobCardSkeleton, TableSkeleton } from '../../../components/common/Skeleton';
 import { api } from '../../../services/api';
 import {
@@ -28,9 +27,11 @@ import {
   List,
   ShieldCheck,
   ChevronRight,
+  ChevronDown,
   SlidersHorizontal,
   Building2,
   Share2,
+  Link2,
   Loader2,
   AlertCircle,
 } from 'lucide-react';
@@ -39,6 +40,7 @@ const INITIAL_JOBS = [];
 
 const JobsWorkspace = () => {
   const navigate = useNavigate();
+  const searchInputRef = useRef(null);
   const [jobs, setJobs] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -153,9 +155,34 @@ const JobsWorkspace = () => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 2500);
+  };
+
+  const handleShareJob = (job) => {
+    try {
+      const shareUrl = `${window.location.origin}/careers/${job.id}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl);
+        showToast(`Job link copied to clipboard`);
+      } else {
+        showToast(`Job link: ${shareUrl}`);
+      }
+    } catch (e) {
+      showToast('Job link copied to clipboard');
+    }
   };
 
   const persistJobs = (updated) => {
@@ -328,13 +355,31 @@ const JobsWorkspace = () => {
 
   // Filtering
   const filteredJobs = jobs.filter((job) => {
-    const q = searchQuery.toLowerCase();
+    let q = searchQuery.toLowerCase().trim();
+    let typeFilter = null;
+    if (q.includes('type:')) {
+      const match = q.match(/type:([a-zA-Z0-9_-]+)/);
+      if (match) {
+        typeFilter = match[1].replace(/_/g, '-');
+        q = q.replace(/type:[a-zA-Z0-9_-]+/, '').trim();
+      }
+    }
+
+    if (typeFilter) {
+      const jobType = (job.type || '').toLowerCase().replace(/[\s_]+/g, '-');
+      if (!jobType.includes(typeFilter)) {
+        return false;
+      }
+    }
+
+    const jobDept = (job.dept || job.department || '').toLowerCase();
     const matchesSearch =
+      !q ||
       job.title.toLowerCase().includes(q) ||
-      job.dept.toLowerCase().includes(q) ||
-      job.location.toLowerCase().includes(q) ||
+      jobDept.includes(q) ||
+      (job.location || '').toLowerCase().includes(q) ||
       (job.description && job.description.toLowerCase().includes(q));
-    const matchesDept = deptFilter === 'ALL' || job.dept === deptFilter;
+    const matchesDept = deptFilter === 'ALL' || (job.dept || job.department) === deptFilter;
     const matchesStatus = statusFilter === 'ALL' || job.status === statusFilter;
     return matchesSearch && matchesDept && matchesStatus;
   });
@@ -587,150 +632,186 @@ const JobsWorkspace = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODERN SEARCHBAR & TOOLBAR CONTROLS */}
+      {/* 3. REDESIGNED SEARCHBAR & TOOLBAR CONTROLS (MATCHING EXACT PROTOTYPE) */}
       {/* ========================================================================= */}
-      <ModernSearchBarSection
-        statusTabs={[
-          { key: 'ALL', label: 'All Postings', count: jobs.length },
-          { key: 'ACTIVE', label: 'Active Requisitions', count: jobs.filter((j) => j.status === 'ACTIVE').length },
-          { key: 'PAUSED', label: 'Paused / On Hold', count: jobs.filter((j) => j.status === 'PAUSED').length },
-        ]}
-        activeStatus={statusFilter}
-        onStatusChange={setStatusFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Search job requisitions, skills, locations..."
-        searchHint="type:full_time"
-        filterTags={[
-          ...(deptFilter !== 'ALL' ? [{ key: 'dept', label: `Dept: ${deptFilter}` }] : []),
-          ...(searchQuery ? [{ key: 'query', label: `"${searchQuery}"` }] : []),
-        ]}
-        onRemoveTag={(key) => {
-          if (key === 'dept') setDeptFilter('ALL');
-          if (key === 'query') setSearchQuery('');
-        }}
-        sortOptions={[
-          { key: 'recent', label: 'Date' },
-          { key: 'title', label: 'Title' },
-          { key: 'applicants', label: 'Applicants' },
-        ]}
-        activeSort={sortField}
-        sortOrder={sortOrder}
-        onSortChange={(key, order) => {
-          setSortField(key);
-          setSortOrder(order);
-        }}
-        filterCount={deptFilter !== 'ALL' ? 1 : 0}
-        filterContent={
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Department</span>
-              {deptFilter !== 'ALL' && (
-                <button
-                  type="button"
-                  onClick={() => setDeptFilter('ALL')}
-                  className="text-[10px] font-bold text-sky-600 hover:underline cursor-pointer"
-                >
-                  Reset
-                </button>
-              )}
-            </div>
-            <div className="space-y-1 max-h-52 overflow-y-auto custom-scrollbar">
-              <button
-                type="button"
-                onClick={() => setDeptFilter('ALL')}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  deptFilter === 'ALL'
-                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                }`}
-              >
-                <span>All Departments</span>
-                <span className="text-[10px] font-bold text-slate-400">{jobs.length}</span>
-              </button>
-              {allDepartmentNames.map((d) => {
-                const count = jobs.filter((j) => (j.dept || j.department) === d).length;
-                return (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setDeptFilter(d)}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      deptFilter === d
-                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                    }`}
-                  >
-                    <span className="truncate pr-2">{d}</span>
-                    <span className="text-[10px] font-bold text-slate-400">{count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        }
-        actionButton={
-          <div className="flex items-center gap-2">
-            {/* Department Quick Dropdown */}
-            <div className="relative">
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className={`border rounded-full px-3.5 py-1.5 sm:py-2 text-xs font-bold transition-all shadow-2xs cursor-pointer outline-none ${
-                  deptFilter !== 'ALL'
-                    ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
-                    : 'bg-white dark:bg-slate-800 border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                }`}
-              >
-                <option value="ALL">All Departments</option>
-                {allDepartmentNames.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Grid / Table View Toggles */}
-            <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-full p-1 shadow-2xs">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-sky-500 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                }`}
-                title="Grid Cards View"
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('table')}
-                className={`hidden md:block p-1.5 rounded-full transition-all cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-sky-500 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                }`}
-                title="Table View"
-              >
-                <List className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* New Opening CTA */}
+      <div className="space-y-2.5">
+        {/* Row 1: Status Tabs (Left) & Sort Dropdown (Right) */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs">
             <button
               type="button"
-              onClick={handleOpenCreate}
-              className="px-4 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 shrink-0"
+              onClick={() => setStatusFilter('ALL')}
+              className={`px-3 py-1.5 rounded-[9px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer ${
+                statusFilter === 'ALL'
+                  ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                  : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+              }`}
             >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>New Opening</span>
+              <span>All postings</span>
+              <span
+                className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === 'ALL'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                }`}
+              >
+                {jobs.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter('ACTIVE')}
+              className={`px-3 py-1.5 rounded-[9px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer ${
+                statusFilter === 'ACTIVE'
+                  ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                  : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+              }`}
+            >
+              <span>Active requisitions</span>
+              <span
+                className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === 'ACTIVE'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                }`}
+              >
+                {jobs.filter((j) => j.status === 'ACTIVE').length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter('PAUSED')}
+              className={`px-3 py-1.5 rounded-[9px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer ${
+                statusFilter === 'PAUSED'
+                  ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                  : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+              }`}
+            >
+              <span>Paused / on hold</span>
+              <span
+                className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === 'PAUSED'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                }`}
+              >
+                {jobs.filter((j) => j.status === 'PAUSED').length}
+              </span>
             </button>
           </div>
-        }
-      />
+
+          {/* Sort Dropdown */}
+          <div className="relative">
+            <select
+              value={sortField}
+              onChange={(e) => setSortField(e.target.value)}
+              className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-[13.5px] font-medium rounded-[12px] pl-3.5 pr-8 py-2 shadow-2xs focus:outline-none cursor-pointer"
+            >
+              <option value="recent">Sort: Date</option>
+              <option value="title">Sort: Title</option>
+              <option value="applicants">Sort: Applicants</option>
+            </select>
+            <ChevronDown className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Row 2: Department Filter + View Segments + New Opening CTA */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Department Dropdown */}
+          <div className="relative">
+            <select
+              value={deptFilter}
+              onChange={(e) => setDeptFilter(e.target.value)}
+              className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-[13.5px] font-medium rounded-[12px] pl-3.5 pr-8 py-2 shadow-2xs focus:outline-none cursor-pointer"
+            >
+              <option value="ALL">All departments</option>
+              {allDepartmentNames.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* View Toggles Capsule */}
+          <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                  : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
+              }`}
+              title="Card view"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                viewMode === 'table'
+                  ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                  : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
+              }`}
+              title="List view"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* New Opening CTA */}
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="bg-[#0A8FB5] hover:bg-[#07617D] text-white font-semibold text-[13.5px] px-4 py-2 rounded-[12px] flex items-center gap-1.5 shadow-xs transition-all cursor-pointer shrink-0"
+          >
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>New opening</span>
+          </button>
+        </div>
+
+        {/* Row 3: Full-width Search Input Container */}
+        <div className="w-full bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] px-3.5 py-2.5 flex items-center gap-2.5 shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
+          <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search job requisitions, skills, locations"
+            className="w-full bg-transparent border-0 outline-none text-[13.5px] text-[#0E2A33] dark:text-[#E6F2F5] placeholder-[#5B727B]/70"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-white p-0.5 rounded-full cursor-pointer shrink-0"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              if (!searchQuery.toLowerCase().includes('type:full_time')) {
+                setSearchQuery((prev) => (prev ? `${prev.trim()} type:full_time` : 'type:full_time'));
+              }
+            }}
+            className="text-xs text-[#5B727B] hover:text-[#0A8FB5] dark:text-[#8FA8B1] dark:hover:text-[#3CC1E6] shrink-0 cursor-pointer font-medium transition-colors whitespace-nowrap"
+          >
+            Try type:full_time
+          </button>
+          <kbd className="text-[11px] font-medium bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] px-1.5 py-0.5 rounded-[6px] shrink-0 select-none">
+            ⌘K
+          </kbd>
+        </div>
+      </div>
 
       {/* ========================================================================= */}
       {/* 4. ACTIVE JOBS DISPLAY (ZERO-LAYOUT-SHIFT SKELETONS) */}
@@ -750,135 +831,146 @@ const JobsWorkspace = () => {
         </>
       ) : (
         <>
-          {/* VIEW 1: RICH "NEW TICKET CARD" GLASSMORHIC GRID CARDS */}
+          {/* VIEW 1: REDESIGNED POSTED JOB CARDS (MATCHING SAMPLE IMAGE) */}
           {(viewMode === 'grid' || viewMode === 'table') && (
-            <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
+            <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-4 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
               {sortedJobs.length > 0 ? (
                 sortedJobs.map((job) => (
-                  <div
+                  <article
                     key={job.id}
-                    className="group relative bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl p-6 sm:p-7 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-sky-100/80 dark:border-slate-800 flex flex-col justify-between space-y-5"
+                    className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[20px] p-5 shadow-[0_1px_2px_rgba(14,42,51,0.06),0_8px_24px_-12px_rgba(14,42,51,0.14)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)] flex flex-col gap-3.5 relative transition-all hover:border-[#0A8FB5]/50 group"
                   >
-                    <div className="space-y-4">
-                      {/* Top Header: Icon + Dept + Status Toggle */}
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
-                            <Briefcase className="w-6 h-6 stroke-[2.2]" />
-                          </div>
-                          <div className="min-w-0">
-                            <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full border border-sky-200/80 dark:border-sky-800/80 shadow-2xs truncate max-w-[190px]">
-                              {job.dept}
-                            </span>
-                            {job.posted && (
-                              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1 truncate">
-                                Posted {job.posted}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Status Pill Toggle */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStatus(job)}
-                          className={`px-3 py-1 rounded-full text-[11px] font-bold cursor-pointer transition-all border shadow-2xs flex items-center gap-1.5 shrink-0 active:scale-95 ${
+                    {/* Header: Briefcase Icon + Dept Badge + Active/Paused Status Pill */}
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-[42px] h-[42px] rounded-[12px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] flex items-center justify-center shrink-0">
+                        <Briefcase className="w-[18px] h-[18px] stroke-[1.8]" />
+                      </div>
+                      <span className="text-[13px] font-semibold text-[#07617D] dark:text-[#3CC1E6] bg-[#E1F4FA] dark:bg-[#12333D] rounded-[8px] px-2.5 py-1 truncate max-w-[200px]">
+                        {job.dept || job.department || 'General'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStatus(job)}
+                        className={`ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold rounded-full px-2.5 py-0.5 cursor-pointer transition-all active:scale-95 ${
+                          job.status === 'ACTIVE'
+                            ? 'text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F] hover:bg-[#cceed9]'
+                            : 'text-[#9A6100] dark:text-[#F0BE5A] bg-[#FBEFD3] dark:bg-[#33270B] hover:bg-[#f6e6bd]'
+                        }`}
+                        title="Click to toggle status"
+                      >
+                        <span
+                          className={`w-[7px] h-[7px] rounded-full ${
                             job.status === 'ACTIVE'
-                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/80 hover:bg-emerald-100'
-                              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/80 hover:bg-amber-100'
+                              ? 'bg-[#157A45] dark:bg-[#5FD08C]'
+                              : 'bg-[#9A6100] dark:bg-[#F0BE5A]'
                           }`}
-                          title="Click to toggle status"
-                        >
-                          <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                          <span>{job.status}</span>
-                        </button>
-                      </div>
+                        />
+                        <span>{job.status === 'ACTIVE' ? 'Active' : 'Paused'}</span>
+                      </button>
+                    </div>
 
-                      {/* Job Title */}
-                      <div>
-                        <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
-                          {job.title}
-                        </h3>
-                      </div>
+                    {/* Job Title */}
+                    <h3 className="text-[20px] font-bold text-[#0E2A33] dark:text-[#E6F2F5] leading-tight tracking-tight">
+                      {job.title}
+                    </h3>
 
-                      {/* Requisition Meta Strip (Signature "New Ticket" preview strip) */}
-                      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-sky-50/70 via-sky-50/30 to-transparent dark:from-sky-950/40 dark:via-slate-800/50 border border-sky-100/80 dark:border-slate-800/80 flex flex-wrap items-center gap-y-2 gap-x-3 text-xs">
-                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-semibold">
-                          <MapPin className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                          <span>{job.location}</span>
+                    {/* Meta Chips */}
+                    <div className="flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-1.5 text-[13px] border border-[#DCE6EA] dark:border-[#223840] bg-[#F5F8F9] dark:bg-[#0D1B21] rounded-[10px] px-2.5 py-1 text-[#0E2A33] dark:text-[#E6F2F5]">
+                        <MapPin className="w-[15px] h-[15px] text-[#5B727B] dark:text-[#8FA8B1]" />
+                        <span>{job.location}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-[13px] border border-[#DCE6EA] dark:border-[#223840] bg-[#F5F8F9] dark:bg-[#0D1B21] rounded-[10px] px-2.5 py-1 text-[#0E2A33] dark:text-[#E6F2F5]">
+                        <Briefcase className="w-[15px] h-[15px] text-[#5B727B] dark:text-[#8FA8B1]" />
+                        <span>{job.type}</span>
+                      </span>
+                      {job.experience && (
+                        <span className="inline-flex items-center gap-1.5 text-[13px] border border-[#DCE6EA] dark:border-[#223840] bg-[#F5F8F9] dark:bg-[#0D1B21] rounded-[10px] px-2.5 py-1 text-[#0E2A33] dark:text-[#E6F2F5]">
+                          <Clock className="w-[15px] h-[15px] text-[#5B727B] dark:text-[#8FA8B1]" />
+                          <span>{job.experience}</span>
                         </span>
-                        <span className="text-slate-300 dark:text-slate-700">•</span>
-                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-semibold">
-                          <Briefcase className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                          <span>{job.type}</span>
+                      )}
+                      {job.salary && (
+                        <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F] rounded-[10px] px-2.5 py-1">
+                          <Banknote className="w-[15px] h-[15px] text-current" />
+                          <span>{job.salary}</span>
                         </span>
-                        {job.experience && (
-                          <>
-                            <span className="text-slate-300 dark:text-slate-700">•</span>
-                            <span className="text-slate-600 dark:text-slate-300 font-semibold">
-                              {job.experience}
-                            </span>
-                          </>
-                        )}
-                        {job.salary && (
-                          <>
-                            <span className="text-slate-300 dark:text-slate-700">•</span>
-                            <span className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400">
-                              <Banknote className="w-3.5 h-3.5 shrink-0" />
-                              <span>{job.salary}</span>
-                            </span>
-                          </>
-                        )}
-                      </div>
+                      )}
+                    </div>
 
-                      {/* Description */}
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
-                        {job.description}
+                    {/* Description */}
+                    <p className="text-[14px] text-[#5B727B] dark:text-[#8FA8B1] line-clamp-2 leading-relaxed">
+                      {job.description}
+                    </p>
+
+                    {/* Pipeline Segment Bar */}
+                    <div className="border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[14px] px-3 py-2.5 flex items-center gap-3 bg-[#F5F8F9] dark:bg-[#0D1B21]">
+                      <div className="flex gap-1 flex-1">
+                        {[0, 1, 2, 3].map((step) => (
+                          <span
+                            key={step}
+                            className={`h-1.5 flex-1 rounded-full ${
+                              (job.applicants || 0) > step
+                                ? 'bg-[#0A8FB5] dark:bg-[#3CC1E6]'
+                                : 'bg-[#DCE6EA] dark:bg-[#223840]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-[13px] text-[#5B727B] dark:text-[#8FA8B1] whitespace-nowrap">
+                        {(job.applicants || 0) === 0
+                          ? 'No applicants yet. Share the link to start the pipeline.'
+                          : `${job.applicants} applicant${job.applicants > 1 ? 's' : ''} in pipeline`}
                       </p>
                     </div>
 
-                    {/* Card Footer: Applicants count + Actions */}
-                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                    {/* Footer: Applicants CTA + Share CTA + Edit & Delete Buttons */}
+                    <div className="flex items-center gap-2 pt-1">
                       <button
                         type="button"
                         onClick={() => navigate('/app/recruitment/pipeline')}
-                        className="px-3.5 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold transition-all flex items-center gap-2 shadow-2xs group/btn cursor-pointer"
+                        className="inline-flex items-center gap-2.5 h-[42px] px-3.5 pl-3 rounded-[12px] bg-[#0A8FB5] hover:bg-[#07617D] dark:bg-[#3CC1E6] dark:hover:bg-[#7FD8F1] text-white dark:text-[#06222B] font-semibold text-[14px] transition-all cursor-pointer"
                       >
-                        <div className="w-6 h-6 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-xs">
-                          <Users className="w-3.5 h-3.5" />
-                        </div>
-                        <span>{job.applicants || 0} {job.applicants === 1 ? 'Applicant' : 'Applicants'}</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-sky-500 transition-transform group-hover/btn:translate-x-0.5" />
+                        <Users className="w-[18px] h-[18px]" />
+                        <span>Applicants</span>
+                        <b className="bg-white/25 dark:bg-black/20 rounded-[8px] px-2 py-0.5 font-bold text-xs">
+                          {job.applicants || 0}
+                        </b>
                       </button>
 
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEdit(job)}
-                          className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-sky-950/60 text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-sky-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
-                          title="Edit Job Requisition"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteJob(job.id)}
-                          className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-rose-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
-                          title="Delete Job"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleShareJob(job)}
+                        className="inline-flex items-center gap-2 h-[42px] px-3.5 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] hover:border-[#0A8FB5] dark:hover:border-[#3CC1E6] text-[#0E2A33] dark:text-[#E6F2F5] text-[14px] font-medium transition-all cursor-pointer"
+                      >
+                        <Link2 className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1]" />
+                        <span>Share</span>
+                      </button>
+
+                      <span className="flex-1" />
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(job)}
+                        className="w-[38px] h-[38px] rounded-[10px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5] hover:border-[#0E2A33] dark:hover:border-[#E6F2F5] transition-all cursor-pointer"
+                        title="Edit job requisition"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteJob(job.id)}
+                        className="w-[38px] h-[38px] rounded-[10px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] dark:hover:text-[#F07185] hover:border-[#C0354A] dark:hover:border-[#F07185] transition-all cursor-pointer"
+                        title="Delete job requisition"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  </div>
+                  </article>
                 ))
               ) : (
-                <div className="col-span-full py-16 text-center bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl border border-sky-100/80 dark:border-slate-800 shadow-xl space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center mx-auto shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50">
-                    <Briefcase className="w-7 h-7 stroke-[2.2]" />
-                  </div>
-                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white">No job openings found</h4>
-                  <p className="text-xs text-slate-400 max-w-sm mx-auto font-medium">Try clearing your search query, status tabs, or department filters.</p>
+                <div className="col-span-full py-12 text-center text-[#5B727B] dark:text-[#8FA8B1] text-sm border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[20px] bg-white dark:bg-[#112229]">
+                  No postings match these filters. Clear the search or pick another department.
                 </div>
               )}
             </div>
@@ -886,78 +978,86 @@ const JobsWorkspace = () => {
 
           {/* VIEW 2: DATA TABLE VIEW (Desktop Only) */}
           {viewMode === 'table' && (
-            <div className="hidden md:block bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl border border-sky-100/80 dark:border-slate-800 shadow-xl overflow-hidden">
+            <div className="hidden md:block mt-4 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[20px] shadow-[0_1px_2px_rgba(14,42,51,0.06),0_8px_24px_-12px_rgba(14,42,51,0.14)] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-sky-100/80 dark:border-slate-800 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-gradient-to-r from-sky-50/50 via-white to-transparent dark:from-sky-950/30 dark:via-slate-800/40">
-                      <th className="py-4 px-6">Job Title & Requisition</th>
-                      <th className="py-4 px-6">Department</th>
-                      <th className="py-4 px-6">Location</th>
-                      <th className="py-4 px-6">Contract</th>
-                      <th className="py-4 px-6">Compensation</th>
-                      <th className="py-4 px-6">Candidates</th>
-                      <th className="py-4 px-6">Status</th>
-                      <th className="py-4 px-6 text-right">Actions</th>
+                    <tr className="border-b border-[#DCE6EA] dark:border-[#223840] text-[11px] font-bold text-[#5B727B] dark:text-[#8FA8B1] uppercase tracking-wider bg-[#F5F8F9] dark:bg-[#0D1B21]">
+                      <th className="py-3.5 px-5">Job Title & Requisition</th>
+                      <th className="py-3.5 px-5">Department</th>
+                      <th className="py-3.5 px-5">Location</th>
+                      <th className="py-3.5 px-5">Contract</th>
+                      <th className="py-3.5 px-5">Compensation</th>
+                      <th className="py-3.5 px-5">Candidates</th>
+                      <th className="py-3.5 px-5">Status</th>
+                      <th className="py-3.5 px-5 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                  <tbody className="divide-y divide-[#DCE6EA] dark:divide-[#223840] text-xs">
                     {sortedJobs.length > 0 ? (
                       sortedJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-sky-50/50 dark:hover:bg-sky-950/20 transition-colors">
-                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
+                        <tr key={job.id} className="hover:bg-[#F5F8F9]/50 dark:hover:bg-[#0D1B21]/50 transition-colors">
+                          <td className="py-3.5 px-5 font-bold text-[#0E2A33] dark:text-[#E6F2F5]">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-md shadow-sky-500/20 ring-2 ring-sky-100 dark:ring-sky-950/50 shrink-0">
-                                <Briefcase className="w-5 h-5 stroke-[2.2]" />
+                              <div className="w-9 h-9 rounded-[10px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] flex items-center justify-center shrink-0">
+                                <Briefcase className="w-4 h-4 stroke-[1.8]" />
                               </div>
                               <div>
                                 <p className="leading-snug">{job.title}</p>
-                                <p className="text-[10px] text-slate-400 font-normal mt-0.5">Posted {job.posted || 'recently'}</p>
+                                {job.posted && <p className="text-[10px] text-[#5B727B] dark:text-[#8FA8B1] font-normal mt-0.5">Posted {job.posted}</p>}
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium">
-                            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
-                              {job.dept}
+                          <td className="py-3.5 px-5 text-[#5B727B] dark:text-[#8FA8B1]">
+                            <span className="text-[11px] font-semibold text-[#07617D] dark:text-[#3CC1E6] bg-[#E1F4FA] dark:bg-[#12333D] rounded-[6px] px-2 py-0.5">
+                              {job.dept || job.department || 'General'}
                             </span>
                           </td>
-                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{job.location}</td>
-                          <td className="py-4 px-6">
-                            <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
+                          <td className="py-3.5 px-5 text-[#5B727B] dark:text-[#8FA8B1]">{job.location}</td>
+                          <td className="py-3.5 px-5">
+                            <span className="font-medium text-[#0E2A33] dark:text-[#E6F2F5] bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] px-2 py-0.5 rounded-[8px]">
                               {job.type}
                             </span>
                           </td>
-                          <td className="py-4 px-6 font-bold text-emerald-600 dark:text-emerald-400">{job.salary}</td>
-                          <td className="py-4 px-6">
+                          <td className="py-3.5 px-5 font-semibold text-[#157A45] dark:text-[#5FD08C]">{job.salary}</td>
+                          <td className="py-3.5 px-5">
                             <button
                               type="button"
                               onClick={() => navigate('/app/recruitment/pipeline')}
-                              className="font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1.5 cursor-pointer"
+                              className="font-bold text-[#0A8FB5] hover:text-[#07617D] dark:text-[#3CC1E6] flex items-center gap-1.5 cursor-pointer"
                             >
                               <Users className="w-3.5 h-3.5" />
-                              <span>{job.applicants || 0} {job.applicants === 1 ? 'candidate' : 'candidates'}</span>
+                              <span>{job.applicants || 0}</span>
                             </button>
                           </td>
-                          <td className="py-4 px-6">
+                          <td className="py-3.5 px-5">
                             <button
                               type="button"
                               onClick={() => handleToggleStatus(job)}
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-all border shadow-2xs flex items-center gap-1.5 ${
+                              className={`inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-2 py-0.5 cursor-pointer transition-all ${
                                 job.status === 'ACTIVE'
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                  : 'bg-amber-50 text-amber-700 border-amber-200/80 dark:bg-amber-950/60 dark:text-amber-300'
+                                  ? 'text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F]'
+                                  : 'text-[#9A6100] dark:text-[#F0BE5A] bg-[#FBEFD3] dark:bg-[#33270B]'
                               }`}
                             >
-                              <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                              <span>{job.status}</span>
+                              <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'ACTIVE' ? 'bg-[#157A45] dark:bg-[#5FD08C]' : 'bg-[#9A6100] dark:bg-[#F0BE5A]'}`} />
+                              <span>{job.status === 'ACTIVE' ? 'Active' : 'Paused'}</span>
                             </button>
                           </td>
-                          <td className="py-4 px-6 text-right">
+                          <td className="py-3.5 px-5 text-right">
                             <div className="inline-flex items-center gap-1.5">
                               <button
                                 type="button"
+                                onClick={() => handleShareJob(job)}
+                                className="w-7 h-7 rounded-[8px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0A8FB5] transition-all cursor-pointer"
+                                title="Share Job"
+                              >
+                                <Link2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => handleOpenEdit(job)}
-                                className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-sky-950/60 text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-sky-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
+                                className="w-7 h-7 rounded-[8px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] transition-all cursor-pointer"
                                 title="Edit Job Requisition"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
@@ -965,7 +1065,7 @@ const JobsWorkspace = () => {
                               <button
                                 type="button"
                                 onClick={() => handleDeleteJob(job.id)}
-                                className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-rose-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
+                                className="w-7 h-7 rounded-[8px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] transition-all cursor-pointer"
                                 title="Delete Job"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -976,8 +1076,8 @@ const JobsWorkspace = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-400 text-xs">
-                          No jobs matching filter criteria
+                        <td colSpan={8} className="py-10 text-center text-[#5B727B] dark:text-[#8FA8B1] text-xs">
+                          No postings match these filters.
                         </td>
                       </tr>
                     )}
@@ -994,7 +1094,7 @@ const JobsWorkspace = () => {
       {/* ========================================================================= */}
       {isDrawerOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
-          <div className="relative z-10 w-full max-w-2xl lg:max-w-3xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+          <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
             {/* Header: Icon, Titles, Close */}
             <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-4">
