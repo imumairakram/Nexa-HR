@@ -717,8 +717,8 @@ const JobsWorkspace = () => {
           </div>
         </div>
 
-        {/* Row 2: Department Filter + View Segments + New Opening CTA */}
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* Row 2: Department Filter + View Segments + New Opening CTA (Right-aligned) */}
+        <div className="flex items-center justify-end gap-3 flex-wrap">
           {/* Department Dropdown */}
           <div className="relative">
             <select
