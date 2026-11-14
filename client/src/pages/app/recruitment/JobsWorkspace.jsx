@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
+import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
 import { JobCardSkeleton, TableSkeleton } from '../../../components/common/Skeleton';
 import { api } from '../../../services/api';
 import {
@@ -44,6 +45,8 @@ const JobsWorkspace = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [sortField, setSortField] = useState('recent'); // 'recent' | 'title' | 'applicants'
+  const [sortOrder, setSortOrder] = useState('desc'); // 'asc' | 'desc'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
   const [toastMsg, setToastMsg] = useState('');
 
@@ -309,6 +312,20 @@ const JobsWorkspace = () => {
     }
   };
 
+  // Departments List
+  const allDepartmentNames = useMemo(() => {
+    return Array.from(
+      new Set([
+        'Engineering & DevOps',
+        'Product & Design',
+        'People Operations & HR',
+        'Finance & Accounts',
+        ...departments.map((d) => d.name),
+        ...jobs.map((j) => j.dept || j.department),
+      ].filter(Boolean))
+    );
+  }, [departments, jobs]);
+
   // Filtering
   const filteredJobs = jobs.filter((job) => {
     const q = searchQuery.toLowerCase();
@@ -321,6 +338,21 @@ const JobsWorkspace = () => {
     const matchesStatus = statusFilter === 'ALL' || job.status === statusFilter;
     return matchesSearch && matchesDept && matchesStatus;
   });
+
+  // Sorting
+  const sortedJobs = useMemo(() => {
+    return [...filteredJobs].sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'title') {
+        comparison = (a.title || '').localeCompare(b.title || '');
+      } else if (sortField === 'applicants') {
+        comparison = (a.applicants || 0) - (b.applicants || 0);
+      } else {
+        comparison = (b.id || 0) - (a.id || 0);
+      }
+      return sortOrder === 'desc' ? -comparison : comparison;
+    });
+  }, [filteredJobs, sortField, sortOrder]);
 
   // Telemetry computations with dynamic fallback
   const totalOpenings = telemetry?.activeOpenings ?? jobs.filter((j) => j.status === 'ACTIVE').length;
@@ -555,97 +587,150 @@ const JobsWorkspace = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. TOOLBAR & VIEW CONTROLS */}
+      {/* 3. MODERN SEARCHBAR & TOOLBAR CONTROLS */}
       {/* ========================================================================= */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <input
-            type="text"
-            placeholder="Search job requisitions, skills, locations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all shadow-xs"
-          />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
+      <ModernSearchBarSection
+        statusTabs={[
+          { key: 'ALL', label: 'All Postings', count: jobs.length },
+          { key: 'ACTIVE', label: 'Active Requisitions', count: jobs.filter((j) => j.status === 'ACTIVE').length },
+          { key: 'PAUSED', label: 'Paused / On Hold', count: jobs.filter((j) => j.status === 'PAUSED').length },
+        ]}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search job requisitions, skills, locations..."
+        searchHint="type:full_time"
+        filterTags={[
+          ...(deptFilter !== 'ALL' ? [{ key: 'dept', label: `Dept: ${deptFilter}` }] : []),
+          ...(searchQuery ? [{ key: 'query', label: `"${searchQuery}"` }] : []),
+        ]}
+        onRemoveTag={(key) => {
+          if (key === 'dept') setDeptFilter('ALL');
+          if (key === 'query') setSearchQuery('');
+        }}
+        sortOptions={[
+          { key: 'recent', label: 'Date' },
+          { key: 'title', label: 'Title' },
+          { key: 'applicants', label: 'Applicants' },
+        ]}
+        activeSort={sortField}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setSortField(key);
+          setSortOrder(order);
+        }}
+        filterCount={deptFilter !== 'ALL' ? 1 : 0}
+        filterContent={
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Department</span>
+              {deptFilter !== 'ALL' && (
+                <button
+                  type="button"
+                  onClick={() => setDeptFilter('ALL')}
+                  className="text-[10px] font-bold text-sky-600 hover:underline cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className="space-y-1 max-h-52 overflow-y-auto custom-scrollbar">
+              <button
+                type="button"
+                onClick={() => setDeptFilter('ALL')}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  deptFilter === 'ALL'
+                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                }`}
+              >
+                <span>All Departments</span>
+                <span className="text-[10px] font-bold text-slate-400">{jobs.length}</span>
+              </button>
+              {allDepartmentNames.map((d) => {
+                const count = jobs.filter((j) => (j.dept || j.department) === d).length;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setDeptFilter(d)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      deptFilter === d
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                    }`}
+                  >
+                    <span className="truncate pr-2">{d}</span>
+                    <span className="text-[10px] font-bold text-slate-400">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        }
+        actionButton={
+          <div className="flex items-center gap-2">
+            {/* Department Quick Dropdown */}
+            <div className="relative">
+              <select
+                value={deptFilter}
+                onChange={(e) => setDeptFilter(e.target.value)}
+                className={`border rounded-full px-3.5 py-1.5 sm:py-2 text-xs font-bold transition-all shadow-2xs cursor-pointer outline-none ${
+                  deptFilter !== 'ALL'
+                    ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
+                    : 'bg-white dark:bg-slate-800 border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                }`}
+              >
+                <option value="ALL">All Departments</option>
+                {allDepartmentNames.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Filters and View Toggles */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Dept Filter */}
-          <select
-            value={deptFilter}
-            onChange={(e) => setDeptFilter(e.target.value)}
-            className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none shadow-xs"
-          >
-            <option value="ALL">All Departments</option>
-            {Array.from(
-              new Set([
-                'Engineering & DevOps',
-                'Product & Design',
-                'People Operations & HR',
-                'Finance & Accounts',
-                ...departments.map((d) => d.name),
-                ...jobs.map((j) => j.dept || j.department),
-              ].filter(Boolean))
-            ).map((deptName) => (
-              <option key={deptName} value={deptName}>
-                {deptName}
-              </option>
-            ))}
-          </select>
+            {/* Grid / Table View Toggles */}
+            <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-full p-1 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-sky-500 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                }`}
+                title="Grid Cards View"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`hidden md:block p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-sky-500 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                }`}
+                title="Table View"
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none shadow-xs"
-          >
-            <option value="ALL">All Statuses</option>
-            <option value="ACTIVE">Active Only</option>
-            <option value="PAUSED">Paused Only</option>
-          </select>
-
-          {/* View Toggles */}
-          <div className="flex items-center bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs">
+            {/* New Opening CTA */}
             <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'grid' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
-              }`}
-              title="Grid Cards View"
+              type="button"
+              onClick={handleOpenCreate}
+              className="px-4 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 shrink-0"
             >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`hidden md:block p-1.5 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'table' ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
-              }`}
-              title="Table View"
-            >
-              <List className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>New Opening</span>
             </button>
           </div>
-
-          {/* Add Job Button */}
-          <button
-            onClick={handleOpenCreate}
-            className="px-4 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>New Opening</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 4. ACTIVE JOBS DISPLAY (ZERO-LAYOUT-SHIFT SKELETONS) */}
@@ -665,88 +750,120 @@ const JobsWorkspace = () => {
         </>
       ) : (
         <>
-          {/* VIEW 1: RICH GLASSMORHIC GRID CARDS (Always on mobile, and desktop when grid) */}
+          {/* VIEW 1: RICH "NEW TICKET CARD" GLASSMORHIC GRID CARDS */}
           {(viewMode === 'grid' || viewMode === 'table') && (
-            <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map((job) => (
+            <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
+              {sortedJobs.length > 0 ? (
+                sortedJobs.map((job) => (
                   <div
                     key={job.id}
-                    className="group bg-white dark:bg-[#1E293B] rounded-[32px] p-6 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-800 flex flex-col justify-between space-y-4"
+                    className="group relative bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl p-6 sm:p-7 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-sky-100/80 dark:border-slate-800 flex flex-col justify-between space-y-5"
                   >
-                    <div className="space-y-3">
-                      {/* Top Header: Dept & Status */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full">
-                          {job.dept}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => handleToggleStatus(job)}
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
-                              job.status === 'ACTIVE'
-                                ? 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                : 'bg-amber-100/80 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                            }`}
-                          >
-                            {job.status}
-                          </button>
+                    <div className="space-y-4">
+                      {/* Top Header: Icon + Dept + Status Toggle */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                            <Briefcase className="w-6 h-6 stroke-[2.2]" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full border border-sky-200/80 dark:border-sky-800/80 shadow-2xs truncate max-w-[190px]">
+                              {job.dept}
+                            </span>
+                            {job.posted && (
+                              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1 truncate">
+                                Posted {job.posted}
+                              </p>
+                            )}
+                          </div>
                         </div>
+
+                        {/* Status Pill Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(job)}
+                          className={`px-3 py-1 rounded-full text-[11px] font-bold cursor-pointer transition-all border shadow-2xs flex items-center gap-1.5 shrink-0 active:scale-95 ${
+                            job.status === 'ACTIVE'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/80 hover:bg-emerald-100'
+                              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/80 hover:bg-amber-100'
+                          }`}
+                          title="Click to toggle status"
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                          <span>{job.status}</span>
+                        </button>
                       </div>
 
-                      {/* Title */}
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
-                        {job.title}
-                      </h3>
+                      {/* Job Title */}
+                      <div>
+                        <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
+                          {job.title}
+                        </h3>
+                      </div>
 
-                      {/* Meta Pills: Location, Type, Salary */}
-                      <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500 dark:text-slate-400">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                      {/* Requisition Meta Strip (Signature "New Ticket" preview strip) */}
+                      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-sky-50/70 via-sky-50/30 to-transparent dark:from-sky-950/40 dark:via-slate-800/50 border border-sky-100/80 dark:border-slate-800/80 flex flex-wrap items-center gap-y-2 gap-x-3 text-xs">
+                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-semibold">
+                          <MapPin className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                           <span>{job.location}</span>
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-slate-300 dark:text-slate-700">•</span>
+                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-semibold">
+                          <Briefcase className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                           <span>{job.type}</span>
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
-                          <Banknote className="w-3.5 h-3.5" />
-                          <span>{job.salary}</span>
-                        </span>
+                        {job.experience && (
+                          <>
+                            <span className="text-slate-300 dark:text-slate-700">•</span>
+                            <span className="text-slate-600 dark:text-slate-300 font-semibold">
+                              {job.experience}
+                            </span>
+                          </>
+                        )}
+                        {job.salary && (
+                          <>
+                            <span className="text-slate-300 dark:text-slate-700">•</span>
+                            <span className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400">
+                              <Banknote className="w-3.5 h-3.5 shrink-0" />
+                              <span>{job.salary}</span>
+                            </span>
+                          </>
+                        )}
                       </div>
 
                       {/* Description */}
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
                         {job.description}
                       </p>
                     </div>
 
                     {/* Card Footer: Applicants count + Actions */}
-                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
                       <button
+                        type="button"
                         onClick={() => navigate('/app/recruitment/pipeline')}
-                        className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                        className="px-3.5 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold transition-all flex items-center gap-2 shadow-2xs group/btn cursor-pointer"
                       >
-                        <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sky-500">
+                        <div className="w-6 h-6 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-xs">
                           <Users className="w-3.5 h-3.5" />
                         </div>
-                        <span>{job.applicants} {job.applicants === 1 ? 'Applicant' : 'Applicants'}</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{job.applicants || 0} {job.applicants === 1 ? 'Applicant' : 'Applicants'}</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-sky-500 transition-transform group-hover/btn:translate-x-0.5" />
                       </button>
 
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button
+                          type="button"
                           onClick={() => handleOpenEdit(job)}
-                          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-xl transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-sky-950/60 text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-sky-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
                           title="Edit Job Requisition"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDeleteJob(job.id)}
-                          className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-xl transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-rose-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
                           title="Delete Job"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -756,10 +873,12 @@ const JobsWorkspace = () => {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full py-16 text-center bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800">
-                  <Briefcase className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">No job openings found</h4>
-                  <p className="text-xs text-slate-400 mt-1">Try clearing your search query or department filters</p>
+                <div className="col-span-full py-16 text-center bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl border border-sky-100/80 dark:border-slate-800 shadow-xl space-y-3">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center mx-auto shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50">
+                    <Briefcase className="w-7 h-7 stroke-[2.2]" />
+                  </div>
+                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white">No job openings found</h4>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto font-medium">Try clearing your search query, status tabs, or department filters.</p>
                 </div>
               )}
             </div>
@@ -767,11 +886,11 @@ const JobsWorkspace = () => {
 
           {/* VIEW 2: DATA TABLE VIEW (Desktop Only) */}
           {viewMode === 'table' && (
-            <div className="hidden md:block bg-white dark:bg-[#1E293B] rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
+            <div className="hidden md:block bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl border border-sky-100/80 dark:border-slate-800 shadow-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/40">
+                    <tr className="border-b border-sky-100/80 dark:border-slate-800 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-gradient-to-r from-sky-50/50 via-white to-transparent dark:from-sky-950/30 dark:via-slate-800/40">
                       <th className="py-4 px-6">Job Title & Requisition</th>
                       <th className="py-4 px-6">Department</th>
                       <th className="py-4 px-6">Location</th>
@@ -783,59 +902,71 @@ const JobsWorkspace = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                    {filteredJobs.length > 0 ? (
-                      filteredJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                    {sortedJobs.length > 0 ? (
+                      sortedJobs.map((job) => (
+                        <tr key={job.id} className="hover:bg-sky-50/50 dark:hover:bg-sky-950/20 transition-colors">
                           <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-                                <Briefcase className="w-4 h-4" />
+                              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-md shadow-sky-500/20 ring-2 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                                <Briefcase className="w-5 h-5 stroke-[2.2]" />
                               </div>
                               <div>
                                 <p className="leading-snug">{job.title}</p>
-                                <p className="text-[10px] text-slate-400 font-normal">Posted {job.posted}</p>
+                                <p className="text-[10px] text-slate-400 font-normal mt-0.5">Posted {job.posted || 'recently'}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium">{job.dept}</td>
+                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium">
+                            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
+                              {job.dept}
+                            </span>
+                          </td>
                           <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{job.location}</td>
                           <td className="py-4 px-6">
                             <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
                               {job.type}
                             </span>
                           </td>
-                          <td className="py-4 px-6 font-semibold text-emerald-600 dark:text-emerald-400">{job.salary}</td>
+                          <td className="py-4 px-6 font-bold text-emerald-600 dark:text-emerald-400">{job.salary}</td>
                           <td className="py-4 px-6">
                             <button
+                              type="button"
                               onClick={() => navigate('/app/recruitment/pipeline')}
-                              className="font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
+                              className="font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1.5 cursor-pointer"
                             >
                               <Users className="w-3.5 h-3.5" />
-                              <span>{job.applicants} {job.applicants === 1 ? 'candidate' : 'candidates'}</span>
+                              <span>{job.applicants || 0} {job.applicants === 1 ? 'candidate' : 'candidates'}</span>
                             </button>
                           </td>
                           <td className="py-4 px-6">
-                            <span
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStatus(job)}
+                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-all border shadow-2xs flex items-center gap-1.5 ${
                                 job.status === 'ACTIVE'
-                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                  : 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  : 'bg-amber-50 text-amber-700 border-amber-200/80 dark:bg-amber-950/60 dark:text-amber-300'
                               }`}
                             >
-                              {job.status}
-                            </span>
+                              <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                              <span>{job.status}</span>
+                            </button>
                           </td>
                           <td className="py-4 px-6 text-right">
-                            <div className="inline-flex items-center gap-1">
+                            <div className="inline-flex items-center gap-1.5">
                               <button
+                                type="button"
                                 onClick={() => handleOpenEdit(job)}
-                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                                className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-sky-950/60 text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-sky-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
+                                title="Edit Job Requisition"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
                               </button>
                               <button
+                                type="button"
                                 onClick={() => handleDeleteJob(job.id)}
-                                className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                                className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 border border-slate-200/70 dark:border-slate-700/70 hover:border-rose-200 transition-all shadow-2xs flex items-center justify-center cursor-pointer"
+                                title="Delete Job"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -884,15 +1015,15 @@ const JobsWorkspace = () => {
               >
                 {/* Header */}
                 <div className="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 stroke-[2]" />
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                      <Briefcase className="w-6 h-6 stroke-[2.2]" />
                     </div>
                     <div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                      <h3 className="text-lg font-black text-slate-900 dark:text-white">
                         {editingJob ? 'Edit Job Requisition' : 'Create Job Opening'}
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {editingJob ? 'Update requisition details and compensation' : 'Publish opening to corporate careers portal'}
                       </p>
                     </div>
@@ -924,7 +1055,7 @@ const JobsWorkspace = () => {
                       placeholder="e.g. Senior React & Node Engineer"
                       value={form.title}
                       onChange={(e) => setForm({ ...form, title: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
 
@@ -935,7 +1066,7 @@ const JobsWorkspace = () => {
                       <select
                         value={form.dept}
                         onChange={(e) => setForm({ ...form, dept: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                       >
                         {departments.length > 0 ? (
                           departments.map((d) => (
@@ -960,7 +1091,7 @@ const JobsWorkspace = () => {
                       <select
                         value={form.status}
                         onChange={(e) => setForm({ ...form, status: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                       >
                         <option value="ACTIVE">Active (Published)</option>
                         <option value="PAUSED">Paused (Internal Hold)</option>
@@ -979,7 +1110,7 @@ const JobsWorkspace = () => {
                         placeholder="Islamabad HQ / Remote"
                         value={form.location}
                         onChange={(e) => setForm({ ...form, location: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                       />
                     </div>
 
@@ -988,7 +1119,7 @@ const JobsWorkspace = () => {
                       <select
                         value={form.type}
                         onChange={(e) => setForm({ ...form, type: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                       >
                         <option value="Full-Time">Full-Time Permanent</option>
                         <option value="Full-Time Remote">Full-Time Remote</option>
@@ -1007,7 +1138,7 @@ const JobsWorkspace = () => {
                         placeholder="e.g. 5 - 8 Years"
                         value={form.experience}
                         onChange={(e) => setForm({ ...form, experience: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                       />
                     </div>
 
@@ -1018,7 +1149,7 @@ const JobsWorkspace = () => {
                         placeholder="e.g. PKR 140k - PKR 170k"
                         value={form.salary}
                         onChange={(e) => setForm({ ...form, salary: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                       />
                     </div>
                   </div>
@@ -1033,7 +1164,7 @@ const JobsWorkspace = () => {
                       placeholder="Outline mission, key technical expectations, deliverables, and requirements..."
                       value={form.description}
                       onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 leading-relaxed"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all leading-relaxed"
                     />
                   </div>
                 </form>
@@ -1052,7 +1183,7 @@ const JobsWorkspace = () => {
                     type="submit"
                     form="job-drawer-form"
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 disabled:opacity-60 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 disabled:opacity-60 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
                   >
                     {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     <span>{editingJob ? (isSubmitting ? 'Saving...' : 'Save Requisition') : (isSubmitting ? 'Publishing...' : 'Publish Job Opening')}</span>
