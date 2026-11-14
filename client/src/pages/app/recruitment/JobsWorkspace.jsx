@@ -647,8 +647,8 @@ const JobsWorkspace = () => {
       {/* 3. REDESIGNED SEARCHBAR & TOOLBAR CONTROLS (RESPONSIVE & MOBILE-ADAPTIVE) */}
       {/* ========================================================================= */}
       <div className="space-y-2.5">
-        {/* Row 1: Status Tabs (Left) & Sort Dropdown (Right) */}
-        <div className="flex items-center justify-between gap-2.5 sm:gap-3 flex-wrap">
+        {/* Row 1: Status Tabs (Left) & Sort Dropdown (Right) - Visible on tablet/desktop */}
+        <div className="hidden md:flex items-center justify-between gap-2.5 sm:gap-3 flex-wrap">
           <div className="flex items-center gap-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs max-w-full overflow-x-auto no-scrollbar scrollbar-none">
             <button
               type="button"
@@ -830,94 +830,215 @@ const JobsWorkspace = () => {
             type="button"
             onClick={() => setShowMobileFilter((prev) => !prev)}
             className={`md:hidden flex items-center justify-center gap-1.5 h-[38px] px-3 rounded-[12px] border text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 ${
-              deptFilter !== 'ALL' || showMobileFilter
+              deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent' || showMobileFilter
                 ? 'bg-[#E1F4FA] dark:bg-[#12333D] border-[#0A8FB5] dark:border-[#3CC1E6] text-[#07617D] dark:text-[#3CC1E6]'
                 : 'bg-white dark:bg-[#112229] border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5]'
             }`}
-            title="Filter by department"
+            title="Filter & sort options"
           >
             <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
             <span>Filter</span>
-            {deptFilter !== 'ALL' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0A8FB5] dark:bg-[#3CC1E6]" />
+            {(deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent') && (
+              <span className="w-2 h-2 rounded-full bg-[#0A8FB5] dark:bg-[#3CC1E6]" />
             )}
           </button>
 
-          {/* Mobile Filter Popover */}
+          {/* Mobile Filter Popover Drawer (Status + Sort + Department) */}
           {showMobileFilter && (
-            <div className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] shadow-2xl p-4 z-40 animate-in fade-in zoom-in-95">
-              <div className="flex items-center justify-between pb-2 border-b border-[#DCE6EA] dark:border-[#223840] mb-3">
+            <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] shadow-2xl p-4 z-40 animate-in fade-in zoom-in-95 space-y-3.5">
+              {/* Header with Title & Reset All */}
+              <div className="flex items-center justify-between pb-2 border-b border-[#DCE6EA] dark:border-[#223840]">
                 <span className="text-xs font-bold text-[#0E2A33] dark:text-[#E6F2F5] uppercase tracking-wider flex items-center gap-1.5">
                   <SlidersHorizontal className="w-3.5 h-3.5 text-[#0A8FB5]" />
-                  Department Filter
+                  Filters & Sort
                 </span>
-                {deptFilter !== 'ALL' && (
+                {(statusFilter !== 'ALL' || deptFilter !== 'ALL' || sortField !== 'recent') && (
                   <button
                     type="button"
-                    onClick={() => setDeptFilter('ALL')}
+                    onClick={() => {
+                      setStatusFilter('ALL');
+                      setDeptFilter('ALL');
+                      setSortField('recent');
+                    }}
                     className="text-[11px] font-bold text-[#0A8FB5] hover:underline cursor-pointer"
                   >
-                    Reset
+                    Reset All
                   </button>
                 )}
               </div>
 
-              <div className="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDeptFilter('ALL');
-                    setShowMobileFilter(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                    deptFilter === 'ALL'
-                      ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
-                      : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
-                  }`}
-                >
-                  <span>All Departments</span>
-                  <span className="text-[10px] text-[#5B727B] dark:text-[#8FA8B1]">{jobs.length}</span>
-                </button>
-                {allDepartmentNames.map((d) => {
-                  const count = jobs.filter((j) => (j.dept || j.department) === d).length;
-                  return (
+              {/* 1. Status Filter Section */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold text-[#5B727B] dark:text-[#8FA8B1] uppercase tracking-wider block">
+                  Requisition Status
+                </span>
+                <div className="grid grid-cols-1 gap-1">
+                  {[
+                    { key: 'ALL', label: 'All postings', count: jobs.length },
+                    { key: 'ACTIVE', label: 'Active requisitions', count: jobs.filter((j) => j.status === 'ACTIVE').length },
+                    { key: 'PAUSED', label: 'Paused / on hold', count: jobs.filter((j) => j.status === 'PAUSED').length },
+                  ].map((st) => (
                     <button
-                      key={d}
+                      key={st.key}
                       type="button"
-                      onClick={() => {
-                        setDeptFilter(d);
-                        setShowMobileFilter(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                        deptFilter === d
-                          ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
+                      onClick={() => setStatusFilter(st.key)}
+                      className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                        statusFilter === st.key
+                          ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA] font-bold'
                           : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
                       }`}
                     >
-                      <span className="truncate pr-2">{d}</span>
-                      <span className="text-[10px] text-[#5B727B] dark:text-[#8FA8B1]">{count}</span>
+                      <span>{st.label}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                          statusFilter === st.key
+                            ? 'bg-white/20 text-white'
+                            : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
+                        }`}
+                      >
+                        {st.count}
+                      </span>
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
+
+              {/* 2. Sort By Section */}
+              <div className="space-y-1.5 pt-2 border-t border-[#DCE6EA] dark:border-[#223840]">
+                <span className="text-[10px] font-bold text-[#5B727B] dark:text-[#8FA8B1] uppercase tracking-wider block">
+                  Sort Order
+                </span>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { key: 'recent', label: 'Date' },
+                    { key: 'title', label: 'Title' },
+                    { key: 'applicants', label: 'Applicants' },
+                  ].map((s) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => setSortField(s.key)}
+                      className={`px-2 py-1.5 rounded-xl text-xs font-medium text-center transition-all cursor-pointer truncate ${
+                        sortField === s.key
+                          ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold border border-[#0A8FB5]/40'
+                          : 'border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3. Department Section */}
+              <div className="space-y-1.5 pt-2 border-t border-[#DCE6EA] dark:border-[#223840]">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-[#5B727B] dark:text-[#8FA8B1] uppercase tracking-wider">
+                    Department
+                  </span>
+                  {deptFilter !== 'ALL' && (
+                    <button
+                      type="button"
+                      onClick={() => setDeptFilter('ALL')}
+                      className="text-[10px] font-semibold text-[#0A8FB5] hover:underline"
+                    >
+                      Reset Dept
+                    </button>
+                  )}
+                </div>
+
+                <div className="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDeptFilter('ALL');
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                      deptFilter === 'ALL'
+                        ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
+                        : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+                    }`}
+                  >
+                    <span>All Departments</span>
+                    <span className="text-[10px] text-[#5B727B] dark:text-[#8FA8B1]">{jobs.length}</span>
+                  </button>
+                  {allDepartmentNames.map((d) => {
+                    const count = jobs.filter((j) => (j.dept || j.department) === d).length;
+                    return (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => {
+                          setDeptFilter(d);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                          deptFilter === d
+                            ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
+                            : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
+                        }`}
+                      >
+                        <span className="truncate pr-2">{d}</span>
+                        <span className="text-[10px] text-[#5B727B] dark:text-[#8FA8B1]">{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Close / Apply button */}
+              <button
+                type="button"
+                onClick={() => setShowMobileFilter(false)}
+                className="w-full py-2 rounded-xl bg-[#0A8FB5] text-white text-xs font-bold hover:bg-[#07617D] transition-colors cursor-pointer"
+              >
+                Done
+              </button>
             </div>
           )}
         </div>
 
-        {/* Active Department Filter Tag (Mobile Only indicator) */}
-        {deptFilter !== 'ALL' && (
-          <div className="md:hidden flex items-center gap-1.5 pt-0.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] text-xs font-semibold">
-              <span>Department: {deptFilter}</span>
-              <button
-                type="button"
-                onClick={() => setDeptFilter('ALL')}
-                className="hover:text-rose-500 cursor-pointer p-0.5"
-                title="Clear department filter"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
+        {/* Active Filter Tags (Mobile Only) */}
+        {(deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent') && (
+          <div className="md:hidden flex items-center gap-1.5 flex-wrap pt-0.5">
+            {statusFilter !== 'ALL' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] text-xs font-semibold">
+                <span>Status: {statusFilter === 'ACTIVE' ? 'Active' : 'Paused'}</span>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('ALL')}
+                  className="hover:text-rose-500 cursor-pointer p-0.5"
+                  title="Clear status filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {deptFilter !== 'ALL' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] text-xs font-semibold">
+                <span>Dept: {deptFilter}</span>
+                <button
+                  type="button"
+                  onClick={() => setDeptFilter('ALL')}
+                  className="hover:text-rose-500 cursor-pointer p-0.5"
+                  title="Clear department filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {sortField !== 'recent' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] text-xs font-semibold">
+                <span>Sort: {sortField === 'title' ? 'Title' : 'Applicants'}</span>
+                <button
+                  type="button"
+                  onClick={() => setSortField('recent')}
+                  className="hover:text-rose-500 cursor-pointer p-0.5"
+                  title="Reset sort"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
           </div>
         )}
       </div>
