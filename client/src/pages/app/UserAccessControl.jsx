@@ -45,6 +45,27 @@ import {
   saveUserFeatureAccess,
 } from '../../utils/accessControl';
 
+const DEFAULT_BLANK_AVATAR = '/blank-profile-picture.png';
+
+const getAvatarUrl = (emp) => {
+  if (!emp) return null;
+  if (emp.avatar && typeof emp.avatar === 'string' && emp.avatar.trim() !== '' && !emp.avatar.includes('unsplash')) {
+    return emp.avatar;
+  }
+  if (emp.profile?.avatarUrl && typeof emp.profile.avatarUrl === 'string' && emp.profile.avatarUrl.trim() !== '' && !emp.profile.avatarUrl.includes('unsplash')) {
+    return emp.profile.avatarUrl;
+  }
+  if (emp.id) {
+    try {
+      const scoped = localStorage.getItem(`user_avatar_${emp.id}`);
+      if (scoped && typeof scoped === 'string' && scoped.trim() !== '' && !scoped.includes('unsplash')) {
+        return scoped;
+      }
+    } catch {}
+  }
+  return null;
+};
+
 const UserAccessControl = () => {
   const navigate = useNavigate();
 
@@ -483,7 +504,7 @@ const UserAccessControl = () => {
             <button
               onClick={handleSave}
               disabled={submitting || !selectedEmployee}
-              className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Save className="w-3.5 h-3.5" />
               <span>{submitting ? 'Saving Policy...' : 'Save Permissions'}</span>
@@ -565,34 +586,43 @@ const UserAccessControl = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: User Roster & Filter List (5 cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center">
-                <Users className="w-4 h-4" />
+        <div className="lg:col-span-5 bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl p-5 sm:p-6 shadow-xl border border-sky-100/80 dark:border-slate-800 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                <Users className="w-5 h-5 stroke-[2.2]" />
               </div>
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Employee Roster</h3>
+              <div>
+                <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                  Employee Roster
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Directory & access clearance
+                </p>
+              </div>
             </div>
-            <span className="text-xs font-bold text-slate-400">{filteredEmployees.length} Matches</span>
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
+              {filteredEmployees.length} Matches
+            </span>
           </div>
 
           {/* Search & Filter Toolbar */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-2">
               <div className="relative flex-1 min-w-0">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Search by name, email, EMP code..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 transition-all"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all shadow-2xs"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-all cursor-pointer"
                     title="Clear Search"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -605,10 +635,10 @@ const UserAccessControl = () => {
                 <button
                   type="button"
                   onClick={() => setShowFilterMenu((prev) => !prev)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer shadow-2xs shrink-0 ${
                     selectedDept !== 'ALL' || filterType !== 'ALL'
                       ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 shadow-sky-500/10'
-                      : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
+                      : 'bg-white dark:bg-slate-900/80 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700/60'
                   }`}
                   title="Filter by Department or Clearance"
                 >
@@ -638,7 +668,7 @@ const UserAccessControl = () => {
 
                 {/* Dropdown Menu */}
                 {showFilterMenu && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
+                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-sky-100/90 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
                     {/* Clearance Section */}
                     <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
                       <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
@@ -788,7 +818,7 @@ const UserAccessControl = () => {
             {(selectedDept !== 'ALL' || filterType !== 'ALL' || searchQuery) && (
               <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
                 {selectedDept !== 'ALL' && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold">
                     Dept: {selectedDept}
                     <button
                       type="button"
@@ -802,12 +832,12 @@ const UserAccessControl = () => {
                 )}
 
                 {filterType !== 'ALL' && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold">
                     Clearance: {filterType === 'CUSTOM' ? 'Custom' : filterType === 'ADMIN' ? 'Admin' : 'Standard'}
                     <button
                       type="button"
                       onClick={() => setFilterType('ALL')}
-                      className="hover:text-indigo-900 dark:hover:text-indigo-100 cursor-pointer p-0.5"
+                      className="hover:text-sky-900 dark:hover:text-sky-100 cursor-pointer p-0.5"
                       title="Clear Clearance Filter"
                     >
                       <X className="w-2.5 h-2.5" />
@@ -816,7 +846,7 @@ const UserAccessControl = () => {
                 )}
 
                 {searchQuery && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-semibold">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-semibold">
                     "{searchQuery}"
                     <button
                       type="button"
@@ -850,6 +880,7 @@ const UserAccessControl = () => {
               const isSelected = emp.id === selectedUserId;
               const access = getUserFeatureAccess(emp.id, emp.role);
               const initials = `${emp.firstName?.[0] || ''}${emp.lastName?.[0] || ''}`.toUpperCase();
+              const avatarUrl = getAvatarUrl(emp);
 
               return (
                 <div
@@ -857,26 +888,34 @@ const UserAccessControl = () => {
                   onClick={() => selectUser(emp)}
                   className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-sky-50/70 dark:bg-sky-950/50 border-sky-300 dark:border-indigo-600/60 shadow-xs'
-                      : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
+                      ? 'bg-gradient-to-r from-sky-50/90 via-sky-50/40 to-white dark:from-sky-950/60 dark:via-sky-900/20 dark:to-slate-800/60 border-sky-400 dark:border-sky-600 ring-2 ring-sky-500/20 shadow-xs'
+                      : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-100/80 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800/80 hover:border-sky-200 dark:hover:border-slate-700'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                      {initials}
-                    </div>
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={emp.firstName}
+                        className="w-10 h-10 rounded-2xl object-cover ring-2 ring-sky-200/70 dark:ring-sky-900 shrink-0 shadow-xs"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20 ring-2 ring-sky-200/70 dark:ring-sky-900">
+                        {initials}
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-extrabold text-xs text-slate-900 dark:text-white truncate">
                           {emp.firstName} {emp.lastName}
                         </span>
                         {emp.role === 'ADMIN' && (
-                          <span className="px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[9px] font-black uppercase">
+                          <span className="px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-[9px] font-black uppercase border border-rose-200/80 dark:border-rose-900/60">
                             Admin
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400 truncate">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
                         {emp.profile?.designation?.title || emp.role} • {emp.profile?.department?.name || 'General'}
                       </div>
                     </div>
@@ -884,15 +923,19 @@ const UserAccessControl = () => {
 
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     {access.isCustom ? (
-                      <span className="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-[10px] font-black border border-purple-200 dark:border-purple-800">
+                      <span className="px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold border border-sky-200/80 dark:border-sky-800/80">
                         Custom
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-semibold">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-semibold border border-slate-200/60 dark:border-slate-700/60">
                         {emp.role}
                       </span>
                     )}
-                    <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'text-sky-600 translate-x-1' : 'text-slate-300'}`} />
+                    <ChevronRight
+                      className={`w-3.5 h-3.5 transition-transform ${
+                        isSelected ? 'text-sky-600 dark:text-sky-400 translate-x-1' : 'text-slate-300 dark:text-slate-600'
+                      }`}
+                    />
                   </div>
                 </div>
               );
@@ -911,37 +954,45 @@ const UserAccessControl = () => {
         {/* Right Column: Granular Feature Permission Inspector (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
           {selectedEmployee ? (
-            <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-6">
+            <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl p-6 sm:p-7 shadow-xl border border-sky-100/80 dark:border-slate-800 space-y-6">
               {/* Selected User Header Card */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-sky-50/80 via-blue-50/50 to-sky-100/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-sky-900/30 border border-sky-100 dark:border-sky-900/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-sky-500 text-white font-black text-sm flex items-center justify-center shadow-md shadow-sky-500/20">
-                    {selectedEmployee.firstName?.[0]}{selectedEmployee.lastName?.[0]}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-black text-slate-900 dark:text-white">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-sky-50/80 via-white to-sky-50/40 dark:from-sky-950/40 dark:via-slate-800/80 dark:to-sky-900/20 border border-sky-200/70 dark:border-sky-900/50 shadow-xs">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  {getAvatarUrl(selectedEmployee) ? (
+                    <img
+                      src={getAvatarUrl(selectedEmployee)}
+                      alt={selectedEmployee.firstName}
+                      className="w-13 h-13 rounded-2xl object-cover ring-4 ring-sky-100 dark:ring-sky-950/60 shadow-md shadow-sky-500/20 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white font-extrabold text-sm flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                      {selectedEmployee.firstName?.[0]}{selectedEmployee.lastName?.[0]}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">
                         {selectedEmployee.firstName} {selectedEmployee.lastName}
                       </h3>
-                      <span className="font-mono text-[10px] text-slate-400 font-bold bg-white/80 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                      <span className="font-mono text-[11px] text-sky-700 dark:text-sky-300 font-bold bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-lg border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
                         {selectedEmployee.employeeCode || 'EMP-CODE'}
                       </span>
                     </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                       {selectedEmployee.email} • {selectedEmployee.profile?.designation?.title || 'Staff Specialist'}
                     </div>
                   </div>
                 </div>
 
                 {/* Role Preset Quick Dropdown */}
-                <div className="space-y-1 sm:text-right">
-                  <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                <div className="space-y-1 sm:text-right shrink-0">
+                  <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
                     Permission Preset
                   </label>
                   <select
                     value={activePreset}
                     onChange={(e) => handleApplyPreset(e.target.value)}
-                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800 text-xs font-bold text-sky-700 dark:text-sky-300 outline-none cursor-pointer shadow-xs"
+                    className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none cursor-pointer shadow-2xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   >
                     <option value="SUPER_ADMIN">👑 Super Administrator</option>
                     <option value="HR_MANAGER">👔 HR Manager</option>
@@ -955,46 +1006,47 @@ const UserAccessControl = () => {
               </div>
 
               {/* Quick Action Buttons Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-b border-slate-100 dark:border-slate-800 pb-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={handleGrantAll}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-bold transition-all cursor-pointer"
+                    className="px-3.5 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold transition-all cursor-pointer shadow-2xs"
                   >
                     Grant All Features
                   </button>
                   <button
                     onClick={handleRevokeAll}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-xs font-bold transition-all cursor-pointer"
+                    className="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs"
                   >
                     Revoke Elevated Rights
                   </button>
                   <button
                     onClick={handleResetDefault}
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                    className="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span>Reset to Role Default</span>
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Tabs Switcher Pill */}
+                <div className="flex items-center p-1 bg-slate-100/80 dark:bg-slate-800/90 rounded-2xl border border-slate-200/70 dark:border-slate-700/70">
                   <button
                     onClick={() => setActiveTab('permissions')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'permissions'
                         ? 'bg-sky-500 text-white shadow-xs'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Features Matrix
                   </button>
                   <button
                     onClick={() => setActiveTab('audit')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'audit'
                         ? 'bg-sky-500 text-white shadow-xs'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Audit Trail
@@ -1012,34 +1064,34 @@ const UserAccessControl = () => {
                     return (
                       <div
                         key={module.id}
-                        className="rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-700/60 overflow-hidden"
+                        className="rounded-3xl bg-white dark:bg-slate-900/60 border border-sky-100/90 dark:border-slate-800 shadow-xs overflow-hidden"
                       >
                         {/* Module Header */}
-                        <div className="p-4 bg-slate-100/70 dark:bg-slate-800/70 border-b border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-3">
+                        <div className="p-4 sm:p-5 bg-gradient-to-r from-sky-50/50 via-white to-transparent dark:from-sky-950/30 dark:via-slate-800/40 dark:to-transparent border-b border-sky-100/70 dark:border-slate-800 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-xs border border-slate-200/50 dark:border-slate-600">
+                            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-xs border border-sky-200/70 dark:border-sky-800/60 ring-2 ring-sky-100/60 dark:ring-sky-950/40">
                               {renderModuleIcon(module.icon)}
                             </div>
                             <div>
-                              <h4 className="text-xs font-black text-slate-900 dark:text-white">
+                              <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
                                 {module.name}
                               </h4>
-                              <p className="text-[11px] text-slate-400">{module.description}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{module.description}</p>
                             </div>
                           </div>
 
                           {/* Module Quick Toggle */}
                           <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-bold text-slate-400">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
                               {enabledCount} / {module.features.length}
                             </span>
                             <button
                               type="button"
                               onClick={() => handleToggleModule(module.id, !allEnabled)}
-                              className={`text-[10px] font-extrabold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                              className={`text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                                 allEnabled
-                                  ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
-                                  : 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300'
+                                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700'
+                                  : 'bg-sky-500 hover:bg-sky-600 text-white shadow-xs'
                               }`}
                             >
                               {allEnabled ? 'Disable All' : 'Enable All'}
@@ -1048,20 +1100,20 @@ const UserAccessControl = () => {
                         </div>
 
                         {/* Individual Features Grid */}
-                        <div className="p-4 divide-y divide-slate-100 dark:divide-slate-800">
+                        <div className="p-4 sm:p-5 divide-y divide-slate-100/80 dark:divide-slate-800/80">
                           {module.features.map((feat) => {
                             const isAllowed = !!userPermissions[feat.key];
 
                             return (
                               <div
                                 key={feat.key}
-                                className="py-3 flex items-center justify-between gap-4 first:pt-0 last:pb-0"
+                                className="py-3.5 flex items-center justify-between gap-4 first:pt-0 last:pb-0"
                               >
                                 <div className="space-y-0.5 min-w-0 flex-1">
                                   <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                     {feat.label}
                                   </div>
-                                  <div className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                                  <div className="text-[11px] text-slate-400 dark:text-slate-400 font-medium leading-relaxed">
                                     {feat.description}
                                   </div>
                                 </div>
@@ -1071,11 +1123,11 @@ const UserAccessControl = () => {
                                   type="button"
                                   onClick={() => handleToggleFeature(feat.key)}
                                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                    isAllowed ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'
+                                    isAllowed ? 'bg-sky-500 shadow-sm shadow-sky-500/25' : 'bg-slate-200 dark:bg-slate-700'
                                   }`}
                                 >
                                   <span
-                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
                                       isAllowed ? 'translate-x-5' : 'translate-x-0'
                                     }`}
                                   />
@@ -1093,36 +1145,40 @@ const UserAccessControl = () => {
               {/* TAB 2: SECURITY AUDIT TRAIL LOG */}
               {activeTab === 'audit' && (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <h4 className="text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
                       Recent Authorization Modifications
                     </h4>
-                    <span className="text-[11px] text-slate-400 font-semibold">{auditLogs.length} Events Logged</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
+                      {auditLogs.length} Events Logged
+                    </span>
                   </div>
 
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
                     {auditLogs.map((log) => (
                       <div
                         key={log.id}
-                        className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs"
+                        className="p-4 rounded-2xl bg-slate-50/60 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs hover:border-sky-200 transition-all"
                       >
                         <div className="space-y-1">
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                            </div>
                             <span>{log.action}</span>
                           </div>
-                          <div className="text-[11px] text-slate-400">
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
                             Authorized by: <span className="font-semibold text-slate-700 dark:text-slate-300">{log.performedBy}</span>
                           </div>
                         </div>
-                        <div className="text-[10px] text-slate-400 font-mono">
+                        <div className="text-[10px] text-slate-400 font-mono bg-white dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-200/70 dark:border-slate-800">
                           {new Date(log.timestamp).toLocaleString()}
                         </div>
                       </div>
                     ))}
 
                     {auditLogs.length === 0 && (
-                      <div className="text-center py-10 text-xs text-slate-400">
+                      <div className="text-center py-10 text-xs text-slate-400 font-medium">
                         No authorization changes recorded yet.
                       </div>
                     )}
@@ -1132,9 +1188,9 @@ const UserAccessControl = () => {
 
               {/* Bottom Sticky Save CTA */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-                <div className="text-xs text-slate-400 font-medium">
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {isCustom ? (
-                    <span className="text-purple-600 dark:text-purple-400 font-bold flex items-center gap-1">
+                    <span className="text-sky-600 dark:text-sky-400 font-bold flex items-center gap-1.5">
                       <Sliders className="w-3.5 h-3.5" />
                       <span>Custom user policy override active</span>
                     </span>
@@ -1146,7 +1202,7 @@ const UserAccessControl = () => {
                 <button
                   onClick={handleSave}
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-4 h-4" />
                   <span>{submitting ? 'Saving Policy...' : 'Save & Enforce Policy'}</span>
@@ -1154,12 +1210,14 @@ const UserAccessControl = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 text-center shadow-soft border border-slate-100 dark:border-slate-800 space-y-3">
-              <Users className="w-12 h-12 text-slate-300 mx-auto" />
-              <h3 className="text-base font-black text-slate-900 dark:text-white">
+            <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl p-12 text-center shadow-xl border border-sky-100/80 dark:border-slate-800 space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center mx-auto shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50">
+                <Users className="w-7 h-7 stroke-[2.2]" />
+              </div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                 Select an Employee to Inspect Feature Access
               </h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto font-medium">
                 Choose any employee from the roster on the left to configure their custom feature access, module permissions, and role presets.
               </p>
             </div>
