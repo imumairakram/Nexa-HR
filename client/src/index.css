@@ -16,6 +16,19 @@
   --color-teal-900: #134E4A;
   --color-teal-950: #042F2E;
 
+  /* Brand Cyan/Teal Palette (#0A8FB5) replacing default light sky blue across the entire project */
+  --color-sky-50: #F0F9FC;
+  --color-sky-100: #E1F4FA;
+  --color-sky-200: #BAE6F5;
+  --color-sky-300: #7CD1EB;
+  --color-sky-400: #3CC1E6;
+  --color-sky-500: #0A8FB5;
+  --color-sky-600: #087A9B;
+  --color-sky-700: #07617D;
+  --color-sky-800: #094F66;
+  --color-sky-900: #0C4356;
+  --color-sky-950: #052B38;
+
   --color-primary-50: #F0FDFA;
   --color-primary-100: #CCFBF1;
   --color-primary-200: #99F6E4;
@@ -73,9 +86,9 @@
   --color-danger-light: #FEE2E2;
   --color-danger-dark: #B91C1C;
 
-  --color-info: #0369A1;
-  --color-info-light: #E0F2FE;
-  --color-info-dark: #075985;
+  --color-info: #0A8FB5;
+  --color-info-light: #E1F4FA;
+  --color-info-dark: #07617D;
 
   /* Strict 3-Tier Radius Scale */
   --radius-control: 8px;

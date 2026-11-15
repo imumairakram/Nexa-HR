@@ -462,10 +462,10 @@ const EmployeeDocuments = () => {
   <title>${doc.title} - NexaHR Certified Employee Copy</title>
   <style>
     body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: #0f172a; margin: 40px; background: #fff; line-height: 1.6; }
-    .header { border-bottom: 3px solid #0284c7; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .brand { font-size: 28px; font-weight: 900; color: #0284c7; }
+    .header { border-bottom: 3px solid #0A8FB5; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .brand { font-size: 28px; font-weight: 900; color: #0A8FB5; }
     .subbrand { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; }
-    .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; margin-top: 20px; }
+    .badge { display: inline-block; background: #E1F4FA; color: #07617D; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; margin-top: 20px; }
     .title { font-size: 22px; font-weight: 800; color: #0f172a; margin: 15px 0 5px 0; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 25px 0; font-size: 13px; }
     .grid-label { color: #64748b; font-weight: 600; font-size: 11px; }

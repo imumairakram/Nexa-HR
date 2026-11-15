@@ -523,8 +523,8 @@ const Dashboard = () => {
               <AreaChart data={lineChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="skyGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0EA5E9" stopOpacity={0.45} />
-                    <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#0A8FB5" stopOpacity={0.45} />
+                    <stop offset="95%" stopColor="#0A8FB5" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
@@ -563,7 +563,7 @@ const Dashboard = () => {
                 <Area
                   type="monotone"
                   dataKey="attendance"
-                  stroke="#0EA5E9"
+                  stroke="#0A8FB5"
                   strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#skyGradient)"
@@ -739,7 +739,7 @@ const Dashboard = () => {
                     }}
                   />
                   <Radar name="Target" dataKey="scoreB" stroke="#94A3B8" strokeDasharray="3 3" fill="#94A3B8" fillOpacity={0.05} />
-                  <Radar name="Current" dataKey="scoreA" stroke="#0EA5E9" strokeWidth={2} fill="#0EA5E9" fillOpacity={0.35} />
+                  <Radar name="Current" dataKey="scoreA" stroke="#0A8FB5" strokeWidth={2} fill="#0A8FB5" fillOpacity={0.35} />
                 </RadarChart>
               </ResponsiveContainer>
             ) : (

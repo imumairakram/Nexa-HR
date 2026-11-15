@@ -537,7 +537,7 @@ const Login = () => {
             className="absolute inset-0 opacity-15 pointer-events-none"
             style={{
               backgroundImage:
-                'linear-gradient(to right, #00A8FF 1px, transparent 1px), linear-gradient(to bottom, #00A8FF 1px, transparent 1px)',
+                'linear-gradient(to right, #0A8FB5 1px, transparent 1px), linear-gradient(to bottom, #0A8FB5 1px, transparent 1px)',
               backgroundSize: '36px 36px',
             }}
           />
@@ -719,7 +719,7 @@ const Login = () => {
 
           {/* Central Glowing NexaHR Brand Emblem */}
           <div className="relative z-20 flex flex-col items-center mt-20 sm:mt-16 mb-2">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#38BDF8] via-[#0EA5E9] to-[#0284C7] shadow-[0_10px_35px_rgba(0,102,255,0.45)] border border-blue-200/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#3CC1E6] via-[#0A8FB5] to-[#07617D] shadow-[0_10px_35px_rgba(10,143,181,0.45)] border border-cyan-200/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer">
               <svg
                 className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-sm"
                 viewBox="0 0 100 100"
