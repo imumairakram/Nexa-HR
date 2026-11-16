@@ -802,7 +802,7 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => navigate('/app/hr/new-employee')}
-              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -814,7 +814,7 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => navigate('/app/hr/new-employee')}
-              className="w-full py-3 px-4 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
               <span>Onboard Employee</span>

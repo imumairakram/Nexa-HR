@@ -539,7 +539,7 @@ const EmployeeAttendance = () => {
                     ? 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
                     : todayLog?.status === 'PRESENT'
                       ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-300/40'
-                      : 'bg-white text-[#07617D] border border-white shadow-xs font-black'
+                      : 'bg-white text-[#07617D] dark:text-white border border-white dark:border-slate-700 shadow-xs font-black'
                 }`}
               >
                 {todayLog?.status || 'Awaiting Punch'}

@@ -512,7 +512,7 @@ const EmployeeDashboard = () => {
                     ? todayStatus?.status === 'LATE'
                       ? 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
                       : 'bg-emerald-400/20 text-emerald-200 border border-emerald-300/40'
-                    : 'bg-white text-[#07617D] border border-white shadow-xs font-black'
+                    : 'bg-white text-[#07617D] dark:text-white border border-white dark:border-slate-700 shadow-xs font-black'
                 }`}
               >
                 {isPresent ? (todayStatus?.status === 'LATE' ? 'Late Recorded' : 'Biometric Synced') : 'Awaiting Entry'}
@@ -548,10 +548,10 @@ const EmployeeDashboard = () => {
             <div className="w-full pt-2">
               <button
                 onClick={() => navigate('/employee/attendance')}
-                className="w-full py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-950/20 hover:scale-105 active:scale-95 border border-white"
+                className="w-full py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-950/20 hover:scale-105 active:scale-95 border border-white dark:border-slate-700"
               >
-                <span className="text-[#07617D] font-bold">View Full Attendance History</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#07617D]" />
+                <span className="text-[#07617D] dark:text-white font-bold">View Full Attendance History</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#07617D] dark:text-white" />
               </button>
             </div>
           </div>

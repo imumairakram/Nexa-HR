@@ -272,7 +272,7 @@ const JobApplication = () => {
             <div className="flex items-center gap-2 w-full">
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="flex-1 px-3 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-105"
+                className="flex-1 px-3 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-105"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Applicant</span>

@@ -554,7 +554,7 @@ const JobsWorkspace = () => {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
             <button
               onClick={handleOpenCreate}
-              className="px-5 py-3 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-5 py-3 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Create Job Opening</span>

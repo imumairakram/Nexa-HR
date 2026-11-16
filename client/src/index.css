@@ -309,6 +309,16 @@ html.dark .text-slate-400 {
   color: #8B9A96 !important;
 }
 
+/* Banner quick action buttons & status tags: white text ONLY in dark mode */
+html.dark button.text-\[\#07617D\],
+html.dark button.text-\[\#07617D\] span,
+html.dark button.text-\[\#07617D\] svg,
+html.dark .bg-white.text-\[\#07617D\],
+html.dark .bg-white .text-\[\#07617D\] {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
 html.dark .border-slate-100,
 html.dark .border-slate-200,
 html.dark .border-slate-300,

@@ -463,10 +463,10 @@ const EmployeeLeaves = () => {
             </div>
             <button
               onClick={() => setIsApplyOpen(true)}
-              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
-              <span>Apply for Leave</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span className="text-[#07617D] dark:text-white">Apply for Leave</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#07617D] dark:text-white" />
             </button>
           </div>
         </div>
