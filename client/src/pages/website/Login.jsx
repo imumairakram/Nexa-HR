@@ -643,7 +643,7 @@ const Login = () => {
                 <span className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
                   124 Employees
                 </span>
-                <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded flex items-center">
+                <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1 py-0.5 rounded flex items-center border border-emerald-200/40 dark:border-emerald-800/40">
                   ▲ 12% Growth
                 </span>
               </div>
@@ -693,7 +693,7 @@ const Login = () => {
             </div>
 
             {/* CARD 3: Recruitment & Leave Operations (Top Right) */}
-            <div className="absolute top-4 right-0 sm:right-3 z-10 w-[215px] sm:w-[240px] bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/60 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
+            <div className="absolute top-4 right-0 sm:right-3 z-10 w-[215px] sm:w-[240px] bg-white text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
               <div className="text-[11px] font-bold text-slate-800 tracking-tight mb-2 flex items-center gap-1">
                 <Briefcase className="w-3 h-3 text-[#0A8FB5]" />
                 HR Operations Pipeline

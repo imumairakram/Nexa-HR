@@ -273,12 +273,15 @@ html.dark .soft-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
-html.dark .bg-white {
+html.dark .bg-white,
+html.dark .bg-white\/95,
+html.dark .bg-white\/90 {
   background-color: #16211E !important;
   border-color: #273834;
 }
 
-html.dark .bg-slate-50 {
+html.dark .bg-slate-50,
+html.dark .bg-slate-100 {
   background-color: #111A18 !important;
   border-color: #273834;
 }
