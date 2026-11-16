@@ -592,72 +592,93 @@ const EmployeePayslips = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 3. PAYSLIP MODAL DETAIL VIEWER */}
+      {/* 3. PAYSLIP MODAL DETAIL VIEWER (MATCHED TO "NEW TICKET" MODAL UI) */}
       {/* ========================================================================= */}
       {selectedPayslip && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-200/70 dark:border-sky-800/50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-3xl lg:max-w-4xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200 my-auto">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-50/60 to-cyan-50/40 dark:from-sky-950/40 dark:via-sky-950/30 dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-sky-300/20 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-700 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-sky-950/60">
-                  <CreditCard className="w-5 h-5 stroke-[2.2]" />
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                {/* Glowing Icon Badge with double-nested gradient */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <CreditCard className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white truncate">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
                     Salary Statement • {MONTH_NAMES[(selectedPayslip.month || 1) - 1]} {selectedPayslip.year}
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap mt-0.5">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
                     NexaHR Corporate Payroll Voucher • ID: #{selectedPayslip.id}
                   </p>
                 </div>
               </div>
 
+              {/* Close Action */}
               <button
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setSelectedPayslip(null)}
-                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
             {/* Breakdown Body */}
-            <div className="overflow-y-hidden flex-1 px-6 sm:px-7 py-5 space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Earnings */}
-                <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2.5">
-                  <div className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Earnings</div>
-                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                    <span>Basic Base Salary</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+            <div className="space-y-6 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                {/* Earnings Card */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                      Earnings
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-[12px] border border-emerald-200/60 dark:border-emerald-800/40">
+                      Disbursed
+                    </span>
                   </div>
-                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                    <span>Allowances & Housing</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(0)}</span>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                      <span>Basic Base Salary</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                      <span>Allowances & Housing</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(0)}</span>
+                    </div>
                   </div>
-                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-bold text-slate-900 dark:text-white">
+                  <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700/80 flex justify-between text-xs font-extrabold text-slate-900 dark:text-white">
                     <span>Gross Total</span>
-                    <span className="font-mono">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+                    <span className="font-mono text-sm">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
                   </div>
                 </div>
 
-                {/* Deductions */}
-                <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2.5">
-                  <div className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Deductions</div>
-                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                    <span>Income Tax Withholding</span>
-                    <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.taxDeductions || 0)}</span>
+                {/* Deductions Card */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                      Deductions
+                    </span>
+                    <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-[12px] border border-rose-200/60 dark:border-rose-800/40">
+                      Withholding
+                    </span>
                   </div>
-                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300">
-                    <span>Unpaid Leaves</span>
-                    <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.unpaidLeaveDeduction || 0)}</span>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                      <span>Income Tax Withholding</span>
+                      <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.taxDeductions || 0)}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                      <span>Unpaid Leaves</span>
+                      <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.unpaidLeaveDeduction || 0)}</span>
+                    </div>
                   </div>
-                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-bold text-slate-900 dark:text-white">
+                  <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700/80 flex justify-between text-xs font-extrabold text-slate-900 dark:text-white">
                     <span>Total Deductions</span>
-                    <span className="font-mono text-rose-500">
+                    <span className="font-mono text-sm text-rose-500">
                       -{formatCurrency(
                         (Number(selectedPayslip.taxDeductions) || 0) +
                         (Number(selectedPayslip.otherDeductions) || 0) +
@@ -669,35 +690,47 @@ const EmployeePayslips = () => {
               </div>
 
               {/* Net Salary Highlight */}
-              <div className="p-4 sm:p-4.5 rounded-xl bg-gradient-to-r from-sky-500/10 via-sky-500/5 to-transparent border border-sky-200/60 dark:border-sky-800/40 flex items-center justify-between">
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-sky-500/5 to-transparent border border-sky-200/70 dark:border-sky-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                 <div>
-                  <div className="text-xs font-extrabold text-sky-700 dark:text-sky-300 uppercase tracking-wider">Net Amount Deposited</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Wire Transferred to Registered Bank Account</div>
+                  <div className="text-xs font-extrabold text-sky-700 dark:text-sky-300 uppercase tracking-wider">
+                    Net Amount Deposited
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                    Wire Transferred to Registered Bank Account
+                  </div>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono">
+                <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono tracking-tight">
                   {formatCurrency(selectedPayslip.netSalary || 0)}
                 </div>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="px-6 sm:px-7 py-3.5 border-t border-sky-100/60 dark:border-sky-900/40 flex items-center justify-end gap-3 bg-white/40 dark:bg-slate-900/40 shrink-0">
-              <button
-                onClick={handlePrint}
-                className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 transition-colors flex items-center gap-2 cursor-pointer text-xs"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print Slip</span>
-              </button>
-              <button
-                onClick={() => handleDownload(selectedPayslip)}
-                className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-700 to-sky-600 hover:from-sky-600 hover:to-sky-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 text-xs"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download PDF</span>
-              </button>
-            </div>
-          </div>
+            {/* Modal Actions Footer */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
+              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Verified Cryptographic Payroll Voucher</span>
+              </div>
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 text-xs font-bold transition-all cursor-pointer shadow-2xs inline-flex items-center justify-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Print Slip</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDownload(selectedPayslip)}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-bold shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </footer>
+          </main>
         </div>
       )}
     </div>
