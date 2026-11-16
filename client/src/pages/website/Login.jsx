@@ -530,7 +530,7 @@ const Login = () => {
         {/* ========================================================================= */}
         {/* RIGHT COLUMN: HRM & WORKFORCE INTELLIGENCE SHOWCASE (DESKTOP ONLY) */}
         {/* ========================================================================= */}
-        <div className="hidden lg:flex flex-1 lg:w-[52%] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] rounded-[30px] sm:rounded-[38px] p-6 sm:p-8 lg:p-10 relative overflow-hidden flex-col justify-between text-white shadow-2xl border border-white/20 min-h-[580px] lg:min-h-[620px]">
+        <div className="hidden lg:flex flex-1 lg:w-[52%] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] rounded-[30px] sm:rounded-[38px] p-6 sm:p-7 lg:px-8 lg:pt-6 lg:pb-5 relative overflow-hidden flex-col justify-between text-white shadow-2xl border border-white/20 min-h-[600px] lg:min-h-[630px]">
           {/* Subtle Grid Lines Overlay */}
           <div
             className="absolute inset-0 opacity-15 pointer-events-none"
@@ -546,10 +546,10 @@ const Login = () => {
           <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-[#3CC1E6]/30 rounded-full blur-3xl pointer-events-none" />
 
           {/* 1. TOP: Central Glowing NexaHR Brand Emblem, Title & Description */}
-          <div className="relative z-20 text-center max-w-lg mx-auto flex flex-col items-center pt-1">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.2)] border border-white/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer mb-3">
+          <div className="relative z-20 text-center max-w-lg mx-auto flex flex-col items-center">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.2)] border border-white/40 flex items-center justify-center text-white transform hover:scale-105 transition-transform duration-300 cursor-pointer mb-2 sm:mb-2.5">
               <svg
-                className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-sm"
+                className="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-sm"
                 viewBox="0 0 100 100"
                 fill="none"
               >
@@ -562,18 +562,18 @@ const Login = () => {
               </svg>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white whitespace-pre-line leading-snug">
+            <h2 className="text-lg sm:text-xl lg:text-[22px] font-bold tracking-tight text-white whitespace-pre-line leading-tight">
               {slides[activeSlide].title}
             </h2>
-            <p className="text-xs sm:text-sm text-white/90 mt-2.5 leading-relaxed max-w-md mx-auto">
+            <p className="text-xs sm:text-[13px] text-white/90 mt-1.5 sm:mt-2 leading-relaxed max-w-md mx-auto">
               {slides[activeSlide].description}
             </p>
           </div>
 
           {/* 2. MIDDLE: Floating HRM Showcase Cards Section */}
-          <div className="relative z-10 w-full h-[320px] sm:h-[340px] my-auto">
+          <div className="relative z-10 w-full h-[310px] sm:h-[325px] my-auto">
             {/* CARD 1: Workforce Presence & Live Attendance (Top Center-Left) */}
-            <div className="absolute top-0 left-0 sm:left-4 z-20 w-[240px] sm:w-[260px] bg-white text-slate-800 rounded-2xl p-4 shadow-[0_20px_45px_rgba(0,0,0,0.25)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
+            <div className="absolute top-0 left-0 sm:left-4 z-20 w-[235px] sm:w-[255px] bg-white text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-[0_20px_45px_rgba(0,0,0,0.25)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-slate-800 tracking-tight flex items-center gap-1">
                   <UserCheck className="w-3 h-3 text-[#0A8FB5]" />
@@ -626,8 +626,8 @@ const Login = () => {
               </div>
             </div>
 
-            {/* CARD 2: Department Headcount & Payroll Allocation (Bottom Left) */}
-            <div className="absolute top-36 sm:top-40 left-4 sm:left-10 z-30 w-[245px] sm:w-[270px] bg-white text-slate-800 rounded-2xl p-4 shadow-[0_25px_50px_rgba(0,0,0,0.3)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[1deg] transition-all duration-300">
+            {/* CARD 2: Department Headcount & Payroll Allocation (Cascading Lower) */}
+            <div className="absolute top-24 sm:top-28 left-4 sm:left-8 z-30 w-[240px] sm:w-[265px] bg-white text-slate-800 rounded-2xl p-3 sm:p-3.5 shadow-[0_25px_50px_rgba(0,0,0,0.3)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[1deg] transition-all duration-300">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[11px] font-bold text-slate-800 tracking-tight flex items-center gap-1">
                   <Users className="w-3 h-3 text-[#0A8FB5]" />
@@ -639,7 +639,7 @@ const Login = () => {
               </div>
 
               <div className="text-[8px] text-slate-400 font-medium">Total Active Team</div>
-              <div className="flex items-center gap-1.5 mb-2">
+              <div className="flex items-center gap-1.5 mb-1.5">
                 <span className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
                   124 Employees
                 </span>
@@ -686,21 +686,21 @@ const Login = () => {
 
               <button
                 type="button"
-                className="w-full mt-2.5 bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white py-1.5 rounded-[12px] font-bold text-[8px] transition-all shadow-xs text-center cursor-pointer"
+                className="w-full mt-2 bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white py-1.5 rounded-[12px] font-bold text-[8px] transition-all shadow-xs text-center cursor-pointer"
               >
                 Review Department Roster
               </button>
             </div>
 
             {/* CARD 3: Recruitment & Leave Operations (Top Right) */}
-            <div className="absolute top-6 right-0 sm:right-4 z-10 w-[220px] sm:w-[245px] bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-4 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/60 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
+            <div className="absolute top-4 right-0 sm:right-3 z-10 w-[215px] sm:w-[240px] bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/60 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
               <div className="text-[11px] font-bold text-slate-800 tracking-tight mb-2 flex items-center gap-1">
                 <Briefcase className="w-3 h-3 text-[#0A8FB5]" />
                 HR Operations Pipeline
               </div>
 
               {/* Senior Engineer Hiring */}
-              <div className="text-[8px] mb-2.5">
+              <div className="text-[8px] mb-2">
                 <div className="font-bold text-slate-800">Senior Full-Stack Dev</div>
                 <div className="text-slate-400 text-[7.5px]">Final Stage • 14 Applicants</div>
                 <div className="flex items-center justify-between mt-1 mb-0.5 font-bold">
@@ -742,17 +742,18 @@ const Login = () => {
           </div>
 
           {/* 3. BOTTOM: Segmented Carousel Bar */}
-          <div className="relative z-20 flex items-center justify-center gap-2 pt-4">
+          <div className="relative z-40 flex items-center justify-center gap-2 pt-3 pb-1 mt-auto">
             {slides.map((_, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => setActiveSlide(index)}
                 aria-label={`Go to slide ${index + 1}`}
-                className={`h-1.5 rounded-[12px] transition-all duration-500 cursor-pointer ${activeSlide === index
-                  ? 'w-10 sm:w-14 bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
-                  : 'w-6 sm:w-8 bg-white/30 hover:bg-white/50'
-                  }`}
+                className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                  activeSlide === index
+                    ? 'w-10 sm:w-14 bg-white shadow-[0_0_14px_rgba(255,255,255,0.95)]'
+                    : 'w-5 sm:w-7 bg-white/40 hover:bg-white/60'
+                }`}
               />
             ))}
           </div>
