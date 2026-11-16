@@ -36,13 +36,13 @@ const WorkforceDonutChart = () => {
     <svg className="w-16 h-16 -rotate-90 shrink-0" viewBox="0 0 100 100">
       {/* Background track */}
       <circle cx="50" cy="50" r="38" fill="none" stroke="#F1F5F9" strokeWidth="12" />
-      {/* Segment 1: Present & On-Time (Royal Blue - 72%) */}
+      {/* Segment 1: Present & On-Time (Deep Cyan - 72%) */}
       <circle
         cx="50"
         cy="50"
         r="38"
         fill="none"
-        stroke="#2563EB"
+        stroke="#0A8FB5"
         strokeWidth="12"
         strokeDasharray="172 239"
         strokeDashoffset="0"
@@ -237,8 +237,8 @@ const Login = () => {
   return (
     <div className="flex-1 min-h-[calc(100vh/0.9)] min-h-screen bg-[#F4F4F7] dark:bg-[#0B0F19] flex items-center justify-center p-3 sm:p-6 lg:p-8 font-sans antialiased transition-colors duration-300 relative overflow-hidden select-none">
       {/* Ambient background glows for rich aesthetic depth */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-sky-500/10 dark:bg-sky-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#0A8FB5]/20 dark:bg-[#0A8FB5]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#07617D]/15 dark:bg-[#07617D]/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Floating Theme Toggle (top-right fixed) */}
       <button
@@ -265,13 +265,12 @@ const Login = () => {
             <Logo variant="sky" />
 
             {/* Enterprise Security Badge */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
-              <Shield className="w-3 h-3 text-sky-500 dark:text-sky-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E1F4FA]/80 dark:bg-[#12333D] text-[10px] font-semibold text-[#07617D] dark:text-[#3CC1E6] border border-[#0A8FB5]/30 shadow-xs">
+              <Shield className="w-3.5 h-3.5 text-[#0A8FB5] dark:text-[#3CC1E6]" />
               <span>SSL Protected</span>
             </div>
           </div>
 
-          {/* Center Form Section */}
           {/* Center Form Section */}
           <div className="my-auto py-4 sm:py-6 max-w-md w-full mx-auto">
             {/* Header Text */}
@@ -293,11 +292,11 @@ const Login = () => {
                 type="button"
                 onClick={() => handleRoleTabChange('hr')}
                 className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-[12px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'hr'
-                  ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  ? 'bg-white dark:bg-[#16211E] text-[#07617D] dark:text-[#3CC1E6] shadow-sm border border-[#0A8FB5]/30 dark:border-slate-700 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
-                <UserCheck className={`w-4 h-4 shrink-0 ${loginRole === 'hr' ? 'text-sky-500 dark:text-sky-400' : 'text-slate-400'}`} />
+                <UserCheck className={`w-4 h-4 shrink-0 ${loginRole === 'hr' ? 'text-[#0A8FB5] dark:text-[#3CC1E6]' : 'text-slate-400'}`} />
                 <span className="truncate">HR Admin</span>
               </button>
 
@@ -306,11 +305,11 @@ const Login = () => {
                 type="button"
                 onClick={() => handleRoleTabChange('employee')}
                 className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-[12px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
-                  ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
+                  ? 'bg-white dark:bg-[#16211E] text-[#07617D] dark:text-[#3CC1E6] shadow-sm border border-[#0A8FB5]/30 dark:border-slate-700 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
-                <User className={`w-4 h-4 shrink-0 ${loginRole === 'employee' ? 'text-sky-500 dark:text-sky-400' : 'text-slate-400'}`} />
+                <User className={`w-4 h-4 shrink-0 ${loginRole === 'employee' ? 'text-[#0A8FB5] dark:text-[#3CC1E6]' : 'text-slate-400'}`} />
                 <span className="truncate">Employee</span>
               </button>
             </div>
@@ -336,8 +335,8 @@ const Login = () => {
               )}
 
               {resetSuccessNotification && (
-                <div className="p-3 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold text-center border border-sky-200 dark:border-sky-800/50 flex items-center justify-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                <div className="p-3 rounded-2xl bg-[#E1F4FA] dark:bg-[#12333D]/60 text-[#07617D] dark:text-[#3CC1E6] text-xs font-bold text-center border border-[#0A8FB5]/30 dark:border-[#0A8FB5]/40 flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#0A8FB5] dark:text-[#3CC1E6] shrink-0" />
                   <span>{resetSuccessNotification}</span>
                 </div>
               )}
@@ -349,7 +348,7 @@ const Login = () => {
                     <button
                       type="button"
                       onClick={() => handleRoleTabChange('employee')}
-                      className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+                      className="text-[11px] font-bold text-[#0A8FB5] dark:text-[#3CC1E6] hover:underline cursor-pointer inline-flex items-center gap-1"
                     >
                       Click here to switch to Employee tab &rarr;
                     </button>
@@ -358,7 +357,7 @@ const Login = () => {
                     <button
                       type="button"
                       onClick={() => handleRoleTabChange('hr')}
-                      className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+                      className="text-[11px] font-bold text-[#0A8FB5] dark:text-[#3CC1E6] hover:underline cursor-pointer inline-flex items-center gap-1"
                     >
                       Click here to switch to HR Admin tab &rarr;
                     </button>
@@ -370,7 +369,7 @@ const Login = () => {
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {loginRole === 'hr' ? 'HR Admin Work Email' : 'Employee Work Email'}{' '}
-                  <span className="text-sky-500 dark:text-sky-400">*</span>
+                  <span className="text-[#0A8FB5] dark:text-[#3CC1E6]">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
@@ -379,7 +378,7 @@ const Login = () => {
                     placeholder="name@company.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0A8FB5]/20 focus:border-[#0A8FB5] focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
                     required
                   />
                 </div>
@@ -388,7 +387,7 @@ const Login = () => {
               {/* Password */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Password <span className="text-sky-500 dark:text-sky-400">*</span>
+                  Password <span className="text-[#0A8FB5] dark:text-[#3CC1E6]">*</span>
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 stroke-[1.8]" />
@@ -397,7 +396,7 @@ const Login = () => {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-11 pr-11 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
+                    className="w-full pl-11 pr-11 py-3 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0A8FB5]/20 focus:border-[#0A8FB5] focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
                     required
                   />
                   <button
@@ -421,7 +420,7 @@ const Login = () => {
                       id="remember-me"
                       type="checkbox"
                       defaultChecked
-                      className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer text-sky-500 focus:ring-sky-400 accent-sky-500"
+                      className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer text-[#0A8FB5] focus:ring-[#0A8FB5] accent-[#0A8FB5]"
                     />
                     <label htmlFor="remember-me" className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 cursor-pointer select-none">
                       Remember me
@@ -434,7 +433,7 @@ const Login = () => {
                       setResetSuccessNotification(null);
                       setIsForgotPasswordOpen(true);
                     }}
-                    className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline cursor-pointer transition-colors"
+                    className="text-[11px] font-bold text-[#0A8FB5] dark:text-[#3CC1E6] hover:text-[#07617D] dark:hover:text-[#7CD1EB] hover:underline cursor-pointer transition-colors"
                   >
                     Forgot Password?
                   </button>
@@ -445,7 +444,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 mt-2 rounded-[12px] text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 hover:from-sky-500 hover:to-blue-600 shadow-sky-500/25"
+                className="w-full py-3.5 mt-2 rounded-[12px] text-white text-xs sm:text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] bg-gradient-to-r from-[#0A8FB5] via-[#087A9B] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] shadow-[#0A8FB5]/25 hover:shadow-xl hover:shadow-[#0A8FB5]/35"
               >
                 {loading ? (
                   <>
@@ -474,10 +473,10 @@ const Login = () => {
                     type="button"
                     disabled={loading}
                     onClick={() => handleGuestLogin(loginRole)}
-                    className="w-full py-3 px-4 rounded-[12px] border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm bg-sky-50/70 hover:bg-sky-100/90 dark:bg-sky-950/30 dark:hover:bg-sky-900/40 border-sky-200/80 dark:border-sky-800/60 text-sky-950 dark:text-sky-200"
+                    className="w-full py-3 px-4 rounded-[12px] border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm bg-[#E1F4FA]/70 hover:bg-[#E1F4FA] dark:bg-[#12333D]/40 dark:hover:bg-[#12333D]/70 border-[#0A8FB5]/30 dark:border-[#0A8FB5]/40 text-slate-900 dark:text-slate-100"
                   >
                     <div className="flex items-center gap-2.5 text-left">
-                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-sky-500 text-white shadow-sky-500/30 shadow-md">
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#0A8FB5] to-[#07617D] text-white shadow-[#0A8FB5]/30 shadow-md">
                         <Zap className="w-4 h-4 fill-current" />
                       </div>
                       <div>
@@ -498,7 +497,7 @@ const Login = () => {
                         </div>
                       </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#0A8FB5] group-hover:translate-x-1 transition-all shrink-0" />
                   </button>
                 </>
               )}
@@ -512,7 +511,7 @@ const Login = () => {
               <a
                 href="#terms"
                 onClick={(e) => e.preventDefault()}
-                className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                className="hover:text-[#0A8FB5] dark:hover:text-[#3CC1E6] transition-colors"
               >
                 Term & Condition
               </a>
@@ -520,7 +519,7 @@ const Login = () => {
               <a
                 href="#privacy"
                 onClick={(e) => e.preventDefault()}
-                className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                className="hover:text-[#0A8FB5] dark:hover:text-[#3CC1E6] transition-colors"
               >
                 Privacy & Policy
               </a>
@@ -531,20 +530,20 @@ const Login = () => {
         {/* ========================================================================= */}
         {/* RIGHT COLUMN: HRM & WORKFORCE INTELLIGENCE SHOWCASE (DESKTOP ONLY) */}
         {/* ========================================================================= */}
-        <div className="hidden lg:flex flex-1 lg:w-[52%] bg-gradient-to-br from-[#0A192F] via-[#0D2646] to-[#081220] rounded-[30px] sm:rounded-[38px] p-6 sm:p-8 lg:p-10 relative overflow-hidden flex-col justify-between text-white shadow-2xl border border-blue-900/40 min-h-[580px] lg:min-h-[620px]">
+        <div className="hidden lg:flex flex-1 lg:w-[52%] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] rounded-[30px] sm:rounded-[38px] p-6 sm:p-8 lg:p-10 relative overflow-hidden flex-col justify-between text-white shadow-2xl border border-white/20 min-h-[580px] lg:min-h-[620px]">
           {/* Subtle Grid Lines Overlay */}
           <div
             className="absolute inset-0 opacity-15 pointer-events-none"
             style={{
               backgroundImage:
-                'linear-gradient(to right, #0A8FB5 1px, transparent 1px), linear-gradient(to bottom, #0A8FB5 1px, transparent 1px)',
+                'linear-gradient(to right, rgba(255,255,255,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.22) 1px, transparent 1px)',
               backgroundSize: '36px 36px',
             }}
           />
 
           {/* Ambient Glow Orbs */}
-          <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-white/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-[#3CC1E6]/30 rounded-full blur-3xl pointer-events-none" />
 
           {/* Floating HRM Showcase Cards Section */}
           <div className="relative z-10 w-full h-[320px] sm:h-[340px]">
@@ -552,7 +551,7 @@ const Login = () => {
             <div className="absolute top-0 left-0 sm:left-4 z-20 w-[240px] sm:w-[260px] bg-white text-slate-800 rounded-2xl p-4 shadow-[0_20px_45px_rgba(0,0,0,0.25)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-slate-800 tracking-tight flex items-center gap-1">
-                  <UserCheck className="w-3 h-3 text-blue-600" />
+                  <UserCheck className="w-3 h-3 text-[#0A8FB5]" />
                   Workforce Presence
                 </span>
                 <span className="text-[9px] font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-0.5">
@@ -572,7 +571,7 @@ const Login = () => {
                   <div className="text-[9px] text-emerald-600 font-bold -mt-0.5">94.2% Attendance</div>
                   <div className="mt-1.5 space-y-0.5 text-[8px] font-semibold text-slate-500">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0A8FB5] shrink-0"></span>
                       <span>On-Time (98)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -595,7 +594,7 @@ const Login = () => {
                 </div>
                 <button
                   type="button"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-[12px] font-semibold text-[8px] transition-colors cursor-pointer"
+                  className="bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white px-2.5 py-1 rounded-[12px] font-bold text-[8px] transition-all shadow-xs cursor-pointer"
                 >
                   Live Roster
                 </button>
@@ -606,11 +605,11 @@ const Login = () => {
             <div className="absolute top-36 sm:top-40 left-4 sm:left-10 z-30 w-[245px] sm:w-[270px] bg-white text-slate-800 rounded-2xl p-4 shadow-[0_25px_50px_rgba(0,0,0,0.3)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[1deg] transition-all duration-300">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[11px] font-bold text-slate-800 tracking-tight flex items-center gap-1">
-                  <Users className="w-3 h-3 text-blue-600" />
+                  <Users className="w-3 h-3 text-[#0A8FB5]" />
                   Department Headcount
                 </span>
                 <span className="text-[8px] text-slate-400 font-medium flex items-center gap-1">
-                  <RefreshCw className="w-2.5 h-2.5 text-blue-600" /> Live Sync
+                  <RefreshCw className="w-2.5 h-2.5 text-[#0A8FB5]" /> Live Sync
                 </span>
               </div>
 
@@ -662,7 +661,7 @@ const Login = () => {
 
               <button
                 type="button"
-                className="w-full mt-2.5 bg-slate-900 hover:bg-slate-800 text-white py-1 rounded-[12px] font-semibold text-[8px] transition-colors text-center cursor-pointer"
+                className="w-full mt-2.5 bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white py-1.5 rounded-[12px] font-bold text-[8px] transition-all shadow-xs text-center cursor-pointer"
               >
                 Review Department Roster
               </button>
@@ -671,7 +670,7 @@ const Login = () => {
             {/* CARD 3: Recruitment & Leave Operations (Top Right) */}
             <div className="absolute top-6 right-0 sm:right-4 z-10 w-[220px] sm:w-[245px] bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-4 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/60 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
               <div className="text-[11px] font-bold text-slate-800 tracking-tight mb-2 flex items-center gap-1">
-                <Briefcase className="w-3 h-3 text-blue-600" />
+                <Briefcase className="w-3 h-3 text-[#0A8FB5]" />
                 HR Operations Pipeline
               </div>
 
@@ -686,11 +685,11 @@ const Login = () => {
                 {/* Progress Bar */}
                 <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-blue-600 h-full rounded-full"
+                    className="bg-gradient-to-r from-[#0A8FB5] to-[#07617D] h-full rounded-full"
                     style={{ width: '75%' }}
                   ></div>
                 </div>
-                <div className="text-right text-[7px] text-blue-600 font-bold mt-0.5">
+                <div className="text-right text-[7px] text-[#0A8FB5] font-bold mt-0.5">
                   75% Filled
                 </div>
               </div>
@@ -719,7 +718,7 @@ const Login = () => {
 
           {/* Central Glowing NexaHR Brand Emblem */}
           <div className="relative z-20 flex flex-col items-center mt-20 sm:mt-16 mb-2">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#3CC1E6] via-[#0A8FB5] to-[#07617D] shadow-[0_10px_35px_rgba(10,143,181,0.45)] border border-cyan-200/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.2)] border border-white/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer">
               <svg
                 className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-sm"
                 viewBox="0 0 100 100"
@@ -740,7 +739,7 @@ const Login = () => {
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white whitespace-pre-line leading-snug">
               {slides[activeSlide].title}
             </h2>
-            <p className="text-xs sm:text-sm text-blue-100/70 mt-3 leading-relaxed max-w-md mx-auto">
+            <p className="text-xs sm:text-sm text-white/90 mt-3 leading-relaxed max-w-md mx-auto">
               {slides[activeSlide].description}
             </p>
           </div>
@@ -755,7 +754,7 @@ const Login = () => {
                 aria-label={`Go to slide ${index + 1}`}
                 className={`h-1.5 rounded-[12px] transition-all duration-500 cursor-pointer ${activeSlide === index
                   ? 'w-10 sm:w-14 bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
-                  : 'w-6 sm:w-8 bg-white/25 hover:bg-white/45'
+                  : 'w-6 sm:w-8 bg-white/30 hover:bg-white/50'
                   }`}
               />
             ))}

@@ -5,12 +5,12 @@ const Logo = ({ collapsed = false, className = '', variant = 'sky' }) => {
 
   return (
     <div className={`flex items-center gap-2.5 sm:gap-3 select-none ${className}`}>
-      {/* NexaHR Brand Icon Emblem Badge - Solid Light Sky Blue (matching brand theme) */}
+      {/* NexaHR Brand Icon Emblem Badge - Deep Cyan Theme */}
       <div
         className={`w-9 h-9 sm:w-9.5 sm:h-9.5 rounded-[10px] flex items-center justify-center shrink-0 shadow-xs transition-colors duration-150 ${
           isTeal
             ? 'bg-teal-700 dark:bg-teal-600 border border-teal-800/30 dark:border-teal-400/30'
-            : 'bg-sky-500 dark:bg-sky-500 border border-sky-600/30 dark:border-sky-400/30 shadow-sky-500/20 shadow-xs'
+            : 'bg-gradient-to-br from-[#0A8FB5] to-[#07617D] border border-[#0A8FB5]/40 shadow-[#0A8FB5]/25 shadow-xs'
         }`}
       >
         <svg
@@ -40,7 +40,7 @@ const Logo = ({ collapsed = false, className = '', variant = 'sky' }) => {
             className={`text-xl sm:text-2xl font-bold ${
               isTeal
                 ? 'text-teal-700 dark:text-teal-400'
-                : 'text-sky-500 dark:text-sky-400'
+                : 'text-[#0A8FB5] dark:text-[#3CC1E6]'
             }`}
           >
             HR

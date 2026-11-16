@@ -1,7 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <rect width="100" height="100" rx="24" fill="#0EA5E9"/>
+  <defs>
+    <linearGradient id="nexaCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A8FB5"/>
+      <stop offset="50%" stop-color="#087A9B"/>
+      <stop offset="100%" stop-color="#07617D"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="url(#nexaCyanGrad)"/>
   <!-- NexaHR Brand White N Emblem -->
-  <rect x="14" y="26" width="22" height="48" rx="6" fill="#FFFFFF"/>
+  <rect x="14" y="26" width="22" height="48" rx="7" fill="#FFFFFF"/>
   <path d="M23 44 L68 18 C74 14 82 18 82 25 L82 30 C82 35 79 39 75 41 L30 67 C24 70 16 66 16 59 L16 54 C16 49 19 46 23 44 Z" fill="#FFFFFF"/>
-  <rect x="64" y="26" width="22" height="48" rx="6" fill="#FFFFFF"/>
+  <rect x="64" y="26" width="22" height="48" rx="7" fill="#FFFFFF"/>
 </svg>
