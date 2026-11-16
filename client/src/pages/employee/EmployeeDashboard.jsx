@@ -501,13 +501,13 @@ const EmployeeDashboard = () => {
 
           {/* Right Column: Automated Database Punch Card */}
           <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
-            <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-white">
-              <span className="flex items-center gap-1.5 text-white font-bold">
-                <Fingerprint className="w-4 h-4 text-[#7CD1EB]" />
-                <span>Biometric Status</span>
+            <div className="flex items-center justify-between gap-2 w-full mb-3 text-xs font-semibold text-white">
+              <span className="flex items-center gap-1.5 text-white font-bold truncate">
+                <Fingerprint className="w-4 h-4 text-[#7CD1EB] shrink-0" />
+                <span className="truncate">Biometric Status</span>
               </span>
               <span
-                className={`px-3 py-1 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider ${
+                className={`px-3 py-1 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider shrink-0 whitespace-nowrap ${
                   isPresent
                     ? todayStatus?.status === 'LATE'
                       ? 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
@@ -515,7 +515,7 @@ const EmployeeDashboard = () => {
                     : 'bg-white text-[#07617D] border border-white shadow-xs font-black'
                 }`}
               >
-                {isPresent ? (todayStatus?.status === 'LATE' ? 'Late Recorded' : 'Biometric Synced') : 'Awaiting Device Entry'}
+                {isPresent ? (todayStatus?.status === 'LATE' ? 'Late Recorded' : 'Biometric Synced') : 'Awaiting Entry'}
               </span>
             </div>
 
