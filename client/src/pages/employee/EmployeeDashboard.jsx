@@ -471,36 +471,36 @@ const EmployeeDashboard = () => {
       />
 
       {/* HERO BIOMETRIC HARDWARE STATUS BANNER */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           {/* Left Column: Greeting & Digital Clock */}
           <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
-            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
               {isPresent ? 'Biometric Entry Verified & Active' : 'Automated Biometric Station Active'}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl font-medium">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-2xl font-medium">
               Attendance is recorded automatically via biometric hardware machines (Face-ID / Fingerprint) synchronized in real-time with enterprise cloud turnstiles. Daily punch records, shift rosters, and working hours are streamed live into your personal employee dossier.
             </p>
 
             {/* Live Clock Display */}
             <div className="flex items-center gap-4 pt-1">
-              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-200/70 dark:border-slate-700/80 shadow-xs flex items-center gap-2">
-                <Clock className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                <span className="font-mono text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-wider">
+              <div className="bg-white/15 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 shadow-xs flex items-center gap-2">
+                <Clock className="w-4 h-4 text-white" />
+                <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wider">
                   {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </span>
               </div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <span className="text-xs text-white/80 font-medium">
                 {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
               </span>
             </div>
           </div>
 
           {/* Right Column: Automated Database Punch Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
+          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
             <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
               <span>Biometric Status</span>
               <span
@@ -858,7 +858,7 @@ const EmployeeDashboard = () => {
                   Assigned Shift Schedule
                 </span>
               </div>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-500/20 text-sky-300 border border-sky-500/30">
                 Active Policy
               </span>
             </div>
@@ -894,7 +894,7 @@ const EmployeeDashboard = () => {
               <div className="absolute top-0 right-0 w-48 h-48 bg-sky-400/10 rounded-full blur-2xl pointer-events-none" />
               <div className="absolute -bottom-6 left-10 w-36 h-36 bg-sky-400/10 rounded-full blur-2xl pointer-events-none" />
 
-              <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 relative z-10">
+              <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 relative z-10">
                 {selectedAnnouncement.category || 'NOTICE'}
               </span>
 

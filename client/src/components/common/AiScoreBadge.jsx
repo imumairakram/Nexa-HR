@@ -31,7 +31,7 @@ export const AiScoreBadge = ({ score = 0, showLabel = true, className = '' }) =>
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[8px] text-[10px] sm:text-[11px] font-bold tracking-tight select-none shrink-0 ${styling} ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[10px] sm:text-[11px] font-bold tracking-tight select-none shrink-0 ${styling} ${className}`}
       title={`AI Screening Score: ${numericScore}/100 (${ratingLabel})`}
     >
       <Sparkles className="w-3 h-3 stroke-[1.75] shrink-0" />

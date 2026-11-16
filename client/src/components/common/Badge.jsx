@@ -23,7 +23,7 @@ export const Badge = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[8px] text-[11px] font-semibold tracking-tight transition-colors shrink-0 ${variantStyles} ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[11px] font-semibold tracking-tight transition-colors shrink-0 ${variantStyles} ${className}`}
       {...props}
     >
       {Icon && <Icon className="w-3 h-3 shrink-0 stroke-[1.75]" />}

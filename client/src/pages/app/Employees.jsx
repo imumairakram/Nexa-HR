@@ -762,47 +762,47 @@ NexaHR Workforce Systems`;
       {/* ========================================================================= */}
       {/* 1. DYNAMIC EMPLOYEES HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           {/* Left Side: Directory Telemetry */}
           <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
-            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
               Company Directory & Workforce Talent (PIM)
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
               Manage complete employee dossiers, department allocations, salary compensation tiers, role access privileges, and multi-step onboarding pipelines.
             </p>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-white/90 font-semibold pt-1">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{stats.total} Total Headcount</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{stats.active} Active & Verified</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{departments.length} Operating Departments</span>
               </span>
             </div>
           </div>
 
           {/* Right Side: Action Glassmorphic Card (Desktop / Tablet) */}
-          <div className="hidden sm:flex bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+          <div className="hidden sm:flex bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center">
               <UserPlus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
-              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Talent Onboarding</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Add employee dossier</div>
+              <div className="text-xs font-extrabold text-white">Talent Onboarding</div>
+              <div className="text-[11px] text-white/80 mt-0.5">Add employee dossier</div>
             </div>
             <button
               type="button"
               onClick={() => navigate('/app/hr/new-employee')}
-              className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -814,7 +814,7 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => navigate('/app/hr/new-employee')}
-              className="w-full py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -953,7 +953,7 @@ NexaHR Workforce Systems`;
                   <Building2 className="w-3.5 h-3.5 text-slate-400" />
                   <span>All Departments</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500">
                   {employees.length}
                 </span>
               </button>
@@ -976,7 +976,7 @@ NexaHR Workforce Systems`;
                     )}
                     <span className="truncate">{dept.name}</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0">
                     {dept.count}
                   </span>
                 </button>
@@ -1186,367 +1186,444 @@ NexaHR Workforce Systems`;
       {/* 4. MODAL: EDIT EMPLOYEE PROFILE */}
       {/* ========================================================================= */}
       {isEditOpen && editingEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-4xl w-full shadow-2xl border border-indigo-200/60 dark:border-indigo-800/60 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 my-auto relative">
-            {/* Ambient background blur orbs */}
-            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-400/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-10 left-10 w-48 h-48 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
-
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200 my-auto">
             {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-200/50 dark:border-sky-800/50 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/80 to-blue-50/60 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-[#1E293B] relative z-10">
-              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
-                  <Edit3 className="w-5 h-5 stroke-[2.2]" />
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                {/* Glowing Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <Edit3 className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
                     Edit Profile: {editForm.firstName} {editForm.lastName}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
                     Update role authorizations, workplace position, compensation matrix, and directory info.
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsEditOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            {/* Scrollable Form Body */}
-            <div className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-5 custom-scrollbar text-xs relative z-10 bg-gradient-to-b from-white/40 via-indigo-50/15 to-purple-50/20 dark:from-transparent dark:via-indigo-950/10 dark:to-purple-950/10">
-              {/* Modal Segmented Stepper Tabs */}
-              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl text-xs font-bold no-scrollbar overflow-x-auto border border-slate-200/70 dark:border-slate-800/70 shrink-0">
-                {[
-                  { id: 'basic', step: '01', label: 'Identity & Role' },
-                  { id: 'position', step: '02', label: 'Job Position' },
-                  { id: 'salary', step: '03', label: 'Compensation & Salary' },
-                  { id: 'personal', step: '04', label: 'Contact & Address' },
-                ].map((tab) => (
+              {/* Close Action */}
+              <button
+                type="button"
+                aria-label="Close modal"
+                onClick={() => setIsEditOpen(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </header>
+
+            {/* Stepper Tabs */}
+            <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 dark:bg-slate-800/90 rounded-[12px] mb-6 border border-slate-200/80 dark:border-slate-700/80 overflow-x-auto no-scrollbar">
+              {[
+                { id: 'basic', step: '01', label: 'Identity & Role', icon: UserCheck },
+                { id: 'position', step: '02', label: 'Job Position', icon: Briefcase },
+                { id: 'salary', step: '03', label: 'Compensation & Salary', icon: Banknote },
+                { id: 'personal', step: '04', label: 'Contact & Address', icon: MapPin },
+              ].map((tab) => {
+                const TabIcon = tab.icon;
+                const isSelected = editTab === tab.id;
+                return (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setEditTab(tab.id)}
-                    className={`flex-1 py-2 px-3 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 ${
-                      editTab === tab.id
-                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 font-bold'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium hover:bg-white/50 dark:hover:bg-slate-800/50'
+                    className={`flex-1 py-2.5 px-3 rounded-[10px] transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25 font-bold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
                     }`}
                   >
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${editTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-800 text-slate-500'}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-[8px] font-mono ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
                       {tab.step}
                     </span>
+                    <TabIcon className="w-3.5 h-3.5" />
                     <span>{tab.label}</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
+            </div>
 
-              <form onSubmit={handleEditSubmit} className="space-y-4 text-xs">
-                {/* EDIT TAB 1: IDENTITY & ROLE */}
-                {editTab === 'basic' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">First Name *</label>
-                        <input
-                          type="text"
-                          required
-                          value={editForm.firstName || ''}
-                          onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Last Name *</label>
-                        <input
-                          type="text"
-                          required
-                          value={editForm.lastName || ''}
-                          onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
+            {/* Form Section */}
+            <form onSubmit={handleSaveEdit} className="space-y-6">
+              {/* EDIT TAB 1: BASIC INFORMATION */}
+              {editTab === 'basic' && (
+                <div className="space-y-4 animate-in fade-in duration-150">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        First Name <span className="text-rose-500 ml-0.5">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={editForm.firstName || ''}
+                        onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Work Email *</label>
-                        <input
-                          type="email"
-                          required
-                          value={editForm.email || ''}
-                          onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Employee Code</label>
-                        <input
-                          type="text"
-                          value={editForm.employeeCode || ''}
-                          onChange={(e) => setEditForm({ ...editForm, employeeCode: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Role Authorization ACL</label>
-                        <select
-                          value={editForm.role || 'EMPLOYEE'}
-                          onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
-                          <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
-                          <option value="ADMIN">ADMIN (Full System Privilege)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Employment Status</label>
-                        <select
-                          value={editForm.isActive ? 'true' : 'false'}
-                          onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'true' })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          <option value="true">Active & Verified Employee</option>
-                          <option value="false">Inactive / Suspended</option>
-                        </select>
-                      </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Last Name <span className="text-rose-500 ml-0.5">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={editForm.lastName || ''}
+                        onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
                     </div>
                   </div>
-                )}
 
-                {/* EDIT TAB 2: JOB POSITION */}
-                {editTab === 'position' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Department</label>
-                        <select
-                          value={editForm.departmentName || 'Engineering'}
-                          onChange={(e) => setEditForm({ ...editForm, departmentName: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          {deptOptions.map((d) => (
-                            <option key={d} value={d}>
-                              {d}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Designation Title / Position</label>
-                        <input
-                          type="text"
-                          required
-                          value={editForm.designationTitle || ''}
-                          onChange={(e) => setEditForm({ ...editForm, designationTitle: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Work Email <span className="text-rose-500 ml-0.5">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={editForm.email || ''}
+                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
-                          <span>Assigned Office Work Location</span>
-                          <span className="text-[11px] text-slate-400 font-normal">Physical Campus / Hub</span>
-                        </label>
-                        <select
-                          value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(editForm.workLocation || editForm.location) ? (editForm.workLocation || editForm.location) : 'CUSTOM'}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val === 'CUSTOM') {
-                              setEditForm({ ...editForm, workLocation: '', location: '' });
-                            } else {
-                              setEditForm({ ...editForm, workLocation: val, location: val });
-                            }
-                          }}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs text-xs"
-                        >
-                          <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
-                          <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
-                          <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
-                          <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
-                          <option value="CUSTOM">Custom Office Campus / Branch...</option>
-                        </select>
-                        {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(editForm.workLocation || editForm.location)) && (
-                          <input
-                            type="text"
-                            placeholder="Enter custom office campus or branch name"
-                            value={editForm.workLocation || editForm.location || ''}
-                            onChange={(e) => setEditForm({ ...editForm, workLocation: e.target.value, location: e.target.value })}
-                            className="mt-2 w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs text-xs"
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Joining Date</label>
-                        <input
-                          type="date"
-                          value={editForm.joiningDate || ''}
-                          onChange={(e) => setEditForm({ ...editForm, joiningDate: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-xs cursor-pointer"
-                        />
-                      </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Employee Code
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.employeeCode || ''}
+                        onChange={(e) => setEditForm({ ...editForm, employeeCode: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
                     </div>
                   </div>
-                )}
 
-                {/* EDIT TAB 3: COMPENSATION & SALARY */}
-                {editTab === 'salary' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-purple-50/40 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-indigo-100 dark:border-slate-700 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                          <Banknote className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white text-xs">Payroll Compensation Matrix</div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Automatic payroll sync & calculation</div>
-                        </div>
-                      </div>
-                      <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        Net: PKR {(
-                          parseFloat(editForm.basicSalary || 0) +
-                          parseFloat(editForm.housingAllowance || 0) +
-                          parseFloat(editForm.transportAllowance || 0) -
-                          parseFloat(editForm.taxDeductions || 0)
-                        ).toLocaleString()} / mo
-                      </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Role Authorization ACL
+                      </label>
+                      <select
+                        value={editForm.role || 'EMPLOYEE'}
+                        onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-medium focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none cursor-pointer transition-all"
+                      >
+                        <option value="EMPLOYEE">EMPLOYEE (Standard Staff Portal)</option>
+                        <option value="HR_MANAGER">HR_MANAGER (PIM, Payroll & Leaves)</option>
+                        <option value="ADMIN">ADMIN (Full System Privilege)</option>
+                      </select>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Basic Base Salary (PKR/mo)</label>
-                        <input
-                          type="number"
-                          value={editForm.basicSalary || ''}
-                          onChange={(e) => setEditForm({ ...editForm, basicSalary: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Housing Allowance (PKR/mo)</label>
-                        <input
-                          type="number"
-                          value={editForm.housingAllowance || ''}
-                          onChange={(e) => setEditForm({ ...editForm, housingAllowance: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Employment Status
+                      </label>
+                      <select
+                        value={editForm.isActive ? 'true' : 'false'}
+                        onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'true' })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-medium focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none cursor-pointer transition-all"
+                      >
+                        <option value="true">Active & Verified Employee</option>
+                        <option value="false">Inactive / Suspended</option>
+                      </select>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Transport Allowance (PKR/mo)</label>
-                        <input
-                          type="number"
-                          value={editForm.transportAllowance || ''}
-                          onChange={(e) => setEditForm({ ...editForm, transportAllowance: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Tax Deductions (PKR/mo)</label>
-                        <input
-                          type="number"
-                          value={editForm.taxDeductions || ''}
-                          onChange={(e) => setEditForm({ ...editForm, taxDeductions: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* EDIT TAB 4: PERSONAL & CONTACT */}
-                {editTab === 'personal' && (
-                  <div className="space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Phone Number</label>
-                        <input
-                          type="text"
-                          value={editForm.phone || ''}
-                          onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Gender</label>
-                        <select
-                          value={editForm.gender || 'Not Specified'}
-                          onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all shadow-xs"
-                        >
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Non-Binary">Non-Binary</option>
-                          <option value="Not Specified">Prefer not to say</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs flex items-center justify-between">
-                          <span>Residential Street Address (Home)</span>
-                          <span className="text-[11px] text-slate-400 font-normal">Personal Residence</span>
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. House #14, Street 9, Sector F-7/2, Islamabad"
-                          value={editForm.address || ''}
-                          onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 text-xs">Emergency Contact Info</label>
-                        <input
-                          type="text"
-                          value={editForm.emergencyContact || ''}
-                          onChange={(e) => setEditForm({ ...editForm, emergencyContact: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/90 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 shadow-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Form Actions Footer */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditOpen(false)}
-                    className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-                  >
-                    Cancel
-                  </button>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 transition-all disabled:opacity-50"
-                    >
-                      {submitting ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Check className="w-4 h-4 stroke-[2.5]" />
-                      )}
-                      <span>Save Profile Updates</span>
-                    </button>
                   </div>
                 </div>
-              </form>
-            </div>
-          </div>
+              )}
+
+              {/* EDIT TAB 2: JOB POSITION */}
+              {editTab === 'position' && (
+                <div className="space-y-4 animate-in fade-in duration-150">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Department
+                      </label>
+                      <select
+                        value={editForm.departmentName || 'Engineering'}
+                        onChange={(e) => setEditForm({ ...editForm, departmentName: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-medium focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none cursor-pointer transition-all"
+                      >
+                        {deptOptions.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Designation Title / Position <span className="text-rose-500 ml-0.5">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={editForm.designationTitle || ''}
+                        onChange={(e) => setEditForm({ ...editForm, designationTitle: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                          Office Work Location
+                        </label>
+                        <span className="text-[11px] text-slate-400">Campus / Hub</span>
+                      </div>
+                      <select
+                        value={['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(editForm.workLocation || editForm.location) ? (editForm.workLocation || editForm.location) : 'CUSTOM'}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === 'CUSTOM') {
+                            setEditForm({ ...editForm, workLocation: '', location: '' });
+                          } else {
+                            setEditForm({ ...editForm, workLocation: val, location: val });
+                          }
+                        }}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-medium focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none cursor-pointer transition-all"
+                      >
+                        <option value="Islamabad HQ & Innovation Lab">Islamabad HQ & Innovation Lab (Main Campus)</option>
+                        <option value="Karachi Regional Hub">Karachi Regional Hub (Commercial Office)</option>
+                        <option value="Lahore Tech Campus">Lahore Tech Campus (Engineering)</option>
+                        <option value="Remote & Distributed Worldwide">Remote & Distributed Worldwide</option>
+                        <option value="CUSTOM">Custom Office Campus / Branch...</option>
+                      </select>
+                      {(!['Islamabad HQ & Innovation Lab', 'Karachi Regional Hub', 'Lahore Tech Campus', 'Remote & Distributed Worldwide'].includes(editForm.workLocation || editForm.location)) && (
+                        <input
+                          type="text"
+                          placeholder="Enter custom office campus or branch name"
+                          value={editForm.workLocation || editForm.location || ''}
+                          onChange={(e) => setEditForm({ ...editForm, workLocation: e.target.value, location: e.target.value })}
+                          className="mt-2 w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Joining Date
+                      </label>
+                      <input
+                        type="date"
+                        value={editForm.joiningDate || ''}
+                        onChange={(e) => setEditForm({ ...editForm, joiningDate: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* EDIT TAB 3: COMPENSATION & SALARY */}
+              {editTab === 'salary' && (
+                <div className="space-y-4 animate-in fade-in duration-150">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-sky-50/80 via-white to-sky-50/40 dark:from-slate-800/80 dark:via-slate-800/50 dark:to-slate-800/80 border border-sky-100 dark:border-slate-700 flex items-center justify-between shadow-xs mb-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-emerald-600/20">
+                        <Banknote className="w-5 h-5 stroke-[2.2]" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          Calculated Total Monthly Gross
+                        </div>
+                        <div className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                          {formatCurrency(
+                            (Number(editForm.baseSalary) || 0) +
+                            (Number(editForm.performanceAllowance) || 0) +
+                            (Number(editForm.medicalAllowance) || 0) +
+                            (Number(editForm.housingAllowance) || 0) +
+                            (Number(editForm.transportAllowance) || 0)
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-[12px] border border-emerald-200 dark:border-emerald-800/60">
+                        PostgreSQL Live Band
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Base Monthly Salary (PKR) <span className="text-rose-500 ml-0.5">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        value={editForm.baseSalary || ''}
+                        onChange={(e) => setEditForm({ ...editForm, baseSalary: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Performance Bonus Allowance (PKR/mo)
+                      </label>
+                      <input
+                        type="number"
+                        value={editForm.performanceAllowance || ''}
+                        onChange={(e) => setEditForm({ ...editForm, performanceAllowance: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Medical Health Allowance (PKR/mo)
+                      </label>
+                      <input
+                        type="number"
+                        value={editForm.medicalAllowance || ''}
+                        onChange={(e) => setEditForm({ ...editForm, medicalAllowance: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        House Rent Allowance (HRA) (PKR/mo)
+                      </label>
+                      <input
+                        type="number"
+                        value={editForm.housingAllowance || ''}
+                        onChange={(e) => setEditForm({ ...editForm, housingAllowance: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Travel / Conveyance Allowance (PKR/mo)
+                      </label>
+                      <input
+                        type="number"
+                        value={editForm.transportAllowance || ''}
+                        onChange={(e) => setEditForm({ ...editForm, transportAllowance: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Tax Deductions (PKR/mo)
+                      </label>
+                      <input
+                        type="number"
+                        value={editForm.taxDeductions || ''}
+                        onChange={(e) => setEditForm({ ...editForm, taxDeductions: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* EDIT TAB 4: PERSONAL & CONTACT */}
+              {editTab === 'personal' && (
+                <div className="space-y-4 animate-in fade-in duration-150">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.phone || ''}
+                        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Gender
+                      </label>
+                      <select
+                        value={editForm.gender || 'Not Specified'}
+                        onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-medium focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none cursor-pointer transition-all"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Non-Binary">Non-Binary</option>
+                        <option value="Not Specified">Prefer not to say</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                          Residential Street Address (Home)
+                        </label>
+                        <span className="text-[11px] text-slate-400">Personal Residence</span>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="e.g. House #14, Street 9, Sector F-7/2, Islamabad"
+                        value={editForm.address || ''}
+                        onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
+                        Emergency Contact Info
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.emergencyContact || ''}
+                        onChange={(e) => setEditForm({ ...editForm, emergencyContact: e.target.value })}
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Modal Footer / Action Controls */}
+              <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setIsEditOpen(false)}
+                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-sm font-semibold shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {submitting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Saving Updates...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 stroke-[2.5]" />
+                      <span>Save Profile Updates</span>
+                    </>
+                  )}
+                </button>
+              </footer>
+            </form>
+          </main>
         </div>
       )}
 
@@ -1554,126 +1631,171 @@ NexaHR Workforce Systems`;
       {/* 6. MODAL: EMPLOYEE PROFILE VIEW (DOSSIER VIEW) */}
       {/* ========================================================================= */}
       {selectedEmployee && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-3xl sm:max-w-4xl w-full p-6 sm:p-7 shadow-2xl shadow-indigo-950/20 dark:shadow-black/60 border border-indigo-200/70 dark:border-indigo-800/50 space-y-5 animate-in zoom-in-95 duration-200 relative overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200 my-auto">
             {/* Profile Header */}
-            <div className="flex items-start justify-between border-b border-indigo-200/50 dark:border-indigo-800/40 pb-5">
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
               <div className="flex items-center gap-4">
-                <img
-                  src={getAvatarUrl(selectedEmployee)}
-                  alt=""
-                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-indigo-500/20 shadow-md shrink-0 bg-slate-100 dark:bg-slate-800"
-                  onError={(e) => {
-                    e.target.src = DEFAULT_BLANK_AVATAR;
-                  }}
-                />
+                <div className="relative shrink-0">
+                  <img
+                    src={getAvatarUrl(selectedEmployee)}
+                    alt=""
+                    className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl object-cover ring-4 ring-sky-500/20 shadow-lg shadow-sky-500/10 shrink-0 bg-slate-100 dark:bg-slate-800"
+                    onError={(e) => {
+                      e.target.src = DEFAULT_BLANK_AVATAR;
+                    }}
+                  />
+                  <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" title="Active Verified Staff" />
+                </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2.5 py-0.5 rounded-lg border border-indigo-200/60 dark:border-indigo-800/60">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-xs font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/60">
                       #{selectedEmployee.employeeCode}
                     </span>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      {selectedEmployee.role || 'EMPLOYEE'}
+                    </span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
                     {selectedEmployee.firstName} {selectedEmployee.lastName}
-                  </h3>
-                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
                     {selectedEmployee.profile?.designation?.title || 'Staff Member'} • {selectedEmployee.profile?.department?.name || 'Engineering'}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedEmployee(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            {/* Dossier Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Department</span>
-                <span className="font-extrabold text-slate-900 dark:text-white text-sm">
+              {/* Close Action */}
+              <button
+                type="button"
+                aria-label="Close modal"
+                onClick={() => setSelectedEmployee(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </header>
+
+            {/* Dossier Information Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 mb-6">
+              {/* Department */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  Department
+                </span>
+                <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block truncate">
                   {selectedEmployee.profile?.department?.name || 'Engineering'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Role Authorization</span>
-                <span className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">{selectedEmployee.role || 'EMPLOYEE'}</span>
-              </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Base Compensation</span>
-                <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
-                  {formatSalary(selectedEmployee.salaryStructure, selectedEmployee.profile?.salary)}
+
+              {/* Role Authorization */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  Role Authorization
+                </span>
+                <span className="text-sm sm:text-base font-bold text-sky-600 dark:text-sky-400 block truncate">
+                  {selectedEmployee.role || 'EMPLOYEE'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Contact Email</span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{getSafeEmail(selectedEmployee)}</span>
+
+              {/* Base Compensation */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Banknote className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  Base Compensation
+                </span>
+                <span className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono block truncate">
+                  {formatCurrency(selectedEmployee.profile?.baseSalary || 0)} / mo
+                </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider flex items-center gap-1.5 mb-1">
+
+              {/* Contact Email */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Mail className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  Contact Email
+                </span>
+                <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block truncate" title={getSafeEmail(selectedEmployee)}>
+                  {getSafeEmail(selectedEmployee)}
+                </span>
+              </div>
+
+              {/* Office Work Location */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
                   <Building2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                   Office Work Location
                 </span>
-                <span className="font-extrabold text-slate-900 dark:text-white truncate block text-xs" title={selectedEmployee.profile?.workLocation || selectedEmployee.workLocation || selectedEmployee.profile?.location || 'Islamabad HQ & Innovation Lab'}>
-                  {selectedEmployee.profile?.workLocation || selectedEmployee.workLocation || selectedEmployee.profile?.location || 'Islamabad HQ & Innovation Lab'}
+                <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block truncate" title={selectedEmployee.profile?.workLocation || selectedEmployee.location || 'Islamabad HQ'}>
+                  {selectedEmployee.profile?.workLocation || selectedEmployee.location || 'Islamabad HQ'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider flex items-center gap-1.5 mb-1">
+
+              {/* Residential Address */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
                   <Home className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   Residential Address (Home)
                 </span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 truncate block text-xs" title={selectedEmployee.profile?.address || selectedEmployee.address || 'Not Provided'}>
+                <span className="text-sm sm:text-base font-bold text-slate-700 dark:text-slate-300 block truncate" title={selectedEmployee.profile?.address || selectedEmployee.address || 'Not Provided'}>
                   {selectedEmployee.profile?.address || selectedEmployee.address || 'Not Provided'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
-                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block mb-1">Onboarding Date</span>
-                <span className="font-extrabold text-slate-900 dark:text-white">
+
+              {/* Onboarding Date */}
+              <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:col-span-2 lg:col-span-1">
+                <span className="text-[11px] uppercase font-semibold text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  Onboarding Date
+                </span>
+                <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block">
                   {selectedEmployee.profile?.joiningDate ? selectedEmployee.profile.joiningDate.split('T')[0] : (selectedEmployee.createdAt ? selectedEmployee.createdAt.split('T')[0] : 'Active')}
                 </span>
               </div>
             </div>
 
-            {/* Dossier Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80">
-              <div className="flex items-center gap-2.5">
+            {/* Dossier Actions Footer */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={() => {
                     const toEdit = selectedEmployee;
                     setSelectedEmployee(null);
                     handleOpenEdit(toEdit);
                   }}
-                  className="px-5 py-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-extrabold hover:bg-sky-500 hover:text-white transition-all flex items-center gap-2 cursor-pointer text-xs shadow-xs"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[12px] border border-sky-200 dark:border-sky-800 bg-sky-50/80 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-500 hover:text-white hover:border-sky-500 dark:hover:bg-sky-600 dark:hover:border-sky-600 text-sm font-semibold transition-all cursor-pointer shadow-xs"
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
+                  <Edit3 className="w-4 h-4" />
                   <span>Edit Profile</span>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     const toDelete = selectedEmployee;
                     setSelectedEmployee(null);
                     setEmployeeToDelete(toDelete);
                   }}
-                  className="px-4 py-2.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-extrabold hover:bg-rose-600 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] border border-rose-200 dark:border-rose-900 bg-rose-50/80 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-600 hover:text-white hover:border-rose-600 dark:hover:bg-rose-600 dark:hover:border-rose-600 text-sm font-semibold transition-all cursor-pointer shadow-xs"
                   title="Remove Employee from Directory"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                   <span>Remove</span>
                 </button>
               </div>
 
               <button
+                type="button"
                 onClick={() => setSelectedEmployee(null)}
-                className="px-6 py-2.5 rounded-2xl bg-[#0F172A] dark:bg-white text-white dark:text-slate-900 text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-md"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold shadow-md transition-all cursor-pointer"
               >
                 Close Dossier
               </button>
-            </div>
-          </div>
+            </footer>
+          </main>
         </div>
       )}
 
@@ -1681,35 +1803,38 @@ NexaHR Workforce Systems`;
       {/* 4. MODAL: ONBOARDED EMPLOYEE CREDENTIALS CARD */}
       {/* ========================================================================= */}
       {createdCreds && (
-        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl shadow-amber-950/20 dark:shadow-black/60 border border-amber-200/70 dark:border-amber-800/50 space-y-4 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-lg bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200 my-auto">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-amber-200/50 dark:border-amber-800/40 pb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center border border-amber-200/80 dark:border-amber-800/60 shrink-0 shadow-xs">
-                  <KeyRound className="w-5 h-5 stroke-[2.2]" />
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-5" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 p-[1px] shadow-lg shadow-amber-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-white">
+                    <KeyRound className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
                     Employee Credentials Generated
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
                     Welcome email with credentials has been sent to {createdCreds.name}.
                   </p>
                 </div>
               </div>
+
               <button
                 type="button"
                 onClick={() => setCreatedCreds(null)}
-                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
                 title="Close"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
             {/* Automated Email Notice */}
-            <div className="p-3 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-2.5">
+            <div className="p-3.5 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-2.5 mb-4">
               <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 stroke-[2.5]" />
               <span>
                 Automated NexaHR welcome email with login credentials was dispatched to <strong>{createdCreds.email}</strong>.
@@ -1717,29 +1842,29 @@ NexaHR Workforce Systems`;
             </div>
 
             {/* Credentials details card */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80 space-y-3.5">
+            <div className="p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 space-y-3.5 mb-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Employee ID / Code:</span>
                 <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
                   {createdCreds.employeeCode}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/40 pt-3">
+              <div className="flex items-center justify-between border-t border-slate-200/70 dark:border-slate-700/60 pt-3">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Work Email:</span>
                 <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
                   {createdCreds.email}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/40 pt-3">
+              <div className="flex items-center justify-between border-t border-slate-200/70 dark:border-slate-700/60 pt-3">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Temporary Password:</span>
-                <span className="font-mono font-bold text-xs sm:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/80 shadow-xs">
+                <span className="font-mono font-bold text-xs sm:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-[12px] border border-amber-200 dark:border-amber-800/80 shadow-xs">
                   {createdCreds.tempPassword}
                 </span>
               </div>
             </div>
 
             {/* Warning Callout */}
-            <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 font-medium flex items-start sm:items-center gap-2.5 leading-relaxed">
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 font-medium flex items-start sm:items-center gap-2.5 leading-relaxed mb-6">
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5 sm:mt-0" />
               <span>
                 Upon logging in with these credentials, <strong>{createdCreds.name}</strong> will be prompted to set a new password.
@@ -1747,12 +1872,12 @@ NexaHR Workforce Systems`;
             </div>
 
             {/* Footer Action Buttons */}
-            <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <footer className="pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-end gap-2.5">
               <button
                 type="button"
                 disabled={isResendingEmail}
                 onClick={() => handleResendOfficialEmail(createdCreds)}
-                className="px-4 py-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/70 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold text-xs border border-sky-200 dark:border-sky-800/80 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                className="px-4 py-2.5 rounded-[12px] border border-sky-200 dark:border-sky-800 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/70 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
                 title="Resend automated NexaHR welcome email with credentials"
               >
                 {isResendingEmail ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
@@ -1762,7 +1887,7 @@ NexaHR Workforce Systems`;
               <button
                 type="button"
                 onClick={() => handleEmailCredentials(createdCreds)}
-                className="px-4 py-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                className="px-4 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 title="Open Gmail compose with pre-filled credentials"
               >
                 <span>Gmail Compose</span>
@@ -1776,7 +1901,7 @@ NexaHR Workforce Systems`;
                   setCopiedCreds(true);
                   setTimeout(() => setCopiedCreds(false), 2000);
                 }}
-                className="px-4 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/70 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-bold text-xs border border-amber-200 dark:border-amber-800/80 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                className="px-4 py-2.5 rounded-[12px] border border-amber-200 dark:border-amber-800/80 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/70 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
               >
                 {copiedCreds ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedCreds ? 'Copied Credentials!' : 'Copy Credentials'}</span>
@@ -1785,12 +1910,12 @@ NexaHR Workforce Systems`;
               <button
                 type="button"
                 onClick={() => setCreatedCreds(null)}
-                className="px-5 py-2.5 rounded-2xl bg-[#0F172A] hover:bg-[#1E293B] dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition-all shadow-md cursor-pointer"
+                className="px-5 py-2.5 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold text-xs transition-all shadow-md cursor-pointer"
               >
                 Close & Finish
               </button>
-            </div>
-          </div>
+            </footer>
+          </main>
         </div>
       )}
 
@@ -1798,62 +1923,68 @@ NexaHR Workforce Systems`;
       {/* 5. MODAL: REMOVE EMPLOYEE CONFIRMATION */}
       {/* ========================================================================= */}
       {employeeToDelete && (
-        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 shadow-2xl shadow-rose-950/20 dark:shadow-black/60 border border-rose-200/70 dark:border-rose-900/50 space-y-4 animate-in zoom-in-95 duration-200">
-            <div className="flex items-start justify-between border-b border-rose-200/50 dark:border-rose-900/40 pb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 via-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/25">
-                  <UserX className="w-6 h-6 stroke-[2.2]" />
+        <div className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200 my-auto">
+            {/* Header */}
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-rose-600 via-rose-500 to-red-400 p-[1px] shadow-lg shadow-rose-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-rose-500 to-red-500 flex items-center justify-center text-white">
+                    <UserX className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
                     Remove Employee
-                  </h3>
-                  <p className="text-xs text-rose-600 dark:text-rose-400 font-bold mt-0.5">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-rose-500 dark:text-rose-400 mt-0.5 font-semibold">
                     Confirm Deletion Action
                   </p>
                 </div>
               </div>
               <button
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setEmployeeToDelete(null)}
-                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500">{employeeToDelete.employeeCode}</span>) from company directory?
+            <p className="text-sm text-slate-600 dark:text-slate-300 font-normal leading-relaxed mb-5">
+              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-bold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500 dark:text-slate-400 font-semibold">{employeeToDelete.employeeCode}</span>) from company directory?
             </p>
 
-            <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80 space-y-2 text-xs">
+            <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 space-y-2.5 text-xs mb-5">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-bold text-[11px]">Department:</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Department:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {employeeToDelete.profile?.department?.name || 'General Dept'}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-                <span className="text-slate-400 font-bold text-[11px]">Role Authorization:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{employeeToDelete.role || 'EMPLOYEE'}</span>
+              <div className="flex items-center justify-between border-t border-slate-200/70 dark:border-slate-700/70 pt-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Role Authorization:</span>
+                <span className="font-semibold text-sky-600 dark:text-sky-400">{employeeToDelete.role || 'EMPLOYEE'}</span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-                <span className="text-slate-400 font-bold text-[11px]">Work Email:</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{getSafeEmail(employeeToDelete)}</span>
+              <div className="flex items-center justify-between border-t border-slate-200/70 dark:border-slate-700/70 pt-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Work Email:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{getSafeEmail(employeeToDelete)}</span>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-700 dark:text-rose-300 font-medium flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+            <div className="p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-medium flex items-center gap-3 mb-6">
+              <AlertCircle className="w-5 h-5 shrink-0 text-rose-600 dark:text-rose-400" />
               <span>This record will be permanently deleted from the database.</span>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            {/* Modal Footer / Action Controls */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setEmployeeToDelete(null)}
                 disabled={deleting}
-                className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer disabled:opacity-50"
+                className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1861,7 +1992,7 @@ NexaHR Workforce Systems`;
                 type="button"
                 onClick={handleDeleteEmployee}
                 disabled={deleting}
-                className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-black text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white text-sm font-semibold shadow-lg shadow-rose-600/25 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
               >
                 {deleting ? (
                   <>
@@ -1875,8 +2006,8 @@ NexaHR Workforce Systems`;
                   </>
                 )}
               </button>
-            </div>
-          </div>
+            </footer>
+          </main>
         </div>
       )}
     </div>

@@ -406,9 +406,9 @@ const EmployeeAnnouncements = () => {
       {/* 1. FULLY DYNAMIC HERO SPOTLIGHT BANNER WITH LIVE CONTROLS */}
       {/* ========================================================================= */}
       {heroNotice && (
-        <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             {/* Left Column: Spotlight details */}
@@ -435,27 +435,27 @@ const EmployeeAnnouncements = () => {
                 </div>
               )}
 
-              <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
                 {heroNotice.title}
               </h2>
 
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg font-medium">
+              <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
                 {heroNotice.summary}
               </p>
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-white/90 font-semibold pt-1">
+                <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                   <span>{heroNotice.department}</span>
                 </span>
-                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                   <span>{heroNotice.readTime}</span>
                 </span>
                 {heroNotice.totalTargetCount ? (
-                  <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                     <span>{heroNotice.acknowledgedCount || 0} / {heroNotice.totalTargetCount} Acknowledged</span>
                   </span>
                 ) : heroNotice.acknowledged ? (
-                  <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                  <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                     <span>Acknowledged</span>
                   </span>
                 ) : null}
@@ -463,19 +463,19 @@ const EmployeeAnnouncements = () => {
             </div>
 
             {/* Right Column: Hero Interactive Actions Card */}
-            <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[240px] sm:min-w-[270px] shrink-0 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/50 dark:border-sky-800/40">
+            <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[240px] sm:min-w-[270px] shrink-0 space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center border border-sky-200/50 dark:border-sky-800/40">
                 <Megaphone className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-sm font-extrabold text-slate-900 dark:text-white">Full Official Memo</div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Read complete itinerary & attachments</div>
+                <div className="text-sm font-extrabold text-white">Full Official Memo</div>
+                <div className="text-[11px] text-white/80 mt-0.5">Read complete itinerary & attachments</div>
               </div>
 
               <div className="w-full space-y-2 pt-1">
                 <button
                   onClick={() => setSelectedItem(heroNotice)}
-                  className="w-full px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                  className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
                 >
                   <span>Read Full Notice</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -622,13 +622,13 @@ const EmployeeAnnouncements = () => {
                   {/* Header Row: Category Badge + Date + Author Info */}
                   <div className="flex flex-wrap items-center gap-2">
                     {item.pinned && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white shadow-xs tracking-wider uppercase">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-[12px] bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white shadow-xs tracking-wider uppercase">
                         <Pin className="w-2.5 h-2.5 stroke-[2.5]" />
                         <span>PINNED</span>
                       </span>
                     )}
 
-                    <span className="inline-flex items-center text-[10px] font-extrabold px-3 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 uppercase tracking-wider">
+                    <span className="inline-flex items-center text-[10px] font-extrabold px-3 py-0.5 rounded-[12px] bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 uppercase tracking-wider">
                       {item.categoryLabel || item.category}
                     </span>
 
@@ -761,7 +761,7 @@ const EmployeeAnnouncements = () => {
                 </div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 uppercase tracking-wider">
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 uppercase tracking-wider">
                       {selectedItem.categoryLabel || selectedItem.category}
                     </span>
                     <span className="text-xs text-slate-400 font-medium flex items-center gap-1">

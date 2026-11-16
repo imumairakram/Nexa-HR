@@ -149,7 +149,7 @@ const RegisterTenant = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 mt-4 rounded-2xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-all shadow-md flex items-center justify-center gap-2"
+            className="w-full py-3.5 mt-4 rounded-[12px] bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-all shadow-md flex items-center justify-center gap-2"
           >
             <span>{loading ? 'Creating Tenant Instance...' : 'Complete Registration & Access Workspace'}</span>
             <ArrowRight className="w-4 h-4" />

@@ -114,7 +114,7 @@ const ModernSearchBarSection = ({
                       key={tab.key}
                       type="button"
                       onClick={() => onStatusChange && onStatusChange(tab.key)}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-[9px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-[12px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
                         isSelected
                           ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                           : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -123,7 +123,7 @@ const ModernSearchBarSection = ({
                       <span>{tab.label}</span>
                       {tab.count !== undefined && (
                         <span
-                          className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-full transition-all ${
+                          className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-[10px] transition-all ${
                             isSelected
                               ? 'bg-white/20 text-white'
                               : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
@@ -246,7 +246,7 @@ const ModernSearchBarSection = ({
                 <button
                   type="button"
                   onClick={() => onViewModeChange('list')}
-                  className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
                     viewMode === 'list'
                       ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                       : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -258,7 +258,7 @@ const ModernSearchBarSection = ({
                 <button
                   type="button"
                   onClick={() => onViewModeChange('grid')}
-                  className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
                     viewMode === 'grid'
                       ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                       : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -301,7 +301,7 @@ const ModernSearchBarSection = ({
                 return (
                   <span
                     key={tag.key}
-                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-[8px] bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] font-mono text-[10px] sm:text-[11px] border border-[#DCE6EA] dark:border-[#223840] shrink-0 whitespace-nowrap"
+                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-[12px] bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] font-mono text-[10px] sm:text-[11px] border border-[#DCE6EA] dark:border-[#223840] shrink-0 whitespace-nowrap"
                   >
                     {labelText && (
                       <span className="text-[#5B727B] dark:text-[#8FA8B1] font-normal">
@@ -394,7 +394,7 @@ const ModernSearchBarSection = ({
                     <span className="text-xs font-bold text-[#0E2A33] dark:text-[#E6F2F5]">Active Filters</span>
                   </div>
                   {filterCount > 0 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] border border-[#0A8FB5]/20">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] border border-[#0A8FB5]/20">
                       {filterCount} applied
                     </span>
                   )}

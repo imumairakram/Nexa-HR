@@ -39,7 +39,7 @@ class ErrorBoundaryInner extends React.Component {
             </div>
 
             <div className="space-y-2">
-              <span className="px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-extrabold text-[11px] border border-amber-200 dark:border-amber-900">
+              <span className="px-3 py-1 rounded-[12px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-extrabold text-[11px] border border-amber-200 dark:border-amber-900">
                 Application Runtime Notice
               </span>
               <h2 className="text-xl font-black text-slate-900 dark:text-white">
@@ -54,7 +54,7 @@ class ErrorBoundaryInner extends React.Component {
               <button
                 type="button"
                 onClick={this.handleReset}
-                className="flex-1 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                className="flex-1 py-3 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Reload Page</span>

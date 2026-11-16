@@ -115,7 +115,7 @@ const FirstLoginPasswordModal = () => {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider bg-sky-100/90 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider bg-sky-100/90 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60">
                 <ShieldCheck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 First-Time Login Security Setup
               </span>

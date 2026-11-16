@@ -30,7 +30,7 @@ const Header = () => {
     <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white rounded-[14px] p-4 md:px-6 shadow-soft border border-[#E2E1DC]">
       {/* Search Input & System Status */}
       <div className="flex items-center gap-3">
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-pastelGreen-light text-pastelGreen-dark text-xs font-semibold">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-[12px] bg-pastelGreen-light text-pastelGreen-dark text-xs font-semibold">
           <ShieldCheck className="w-4 h-4" />
           <span>Internal Portal</span>
         </div>

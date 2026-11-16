@@ -420,7 +420,7 @@ const UserAccessControl = () => {
             <Lock className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <span className="px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-extrabold text-[11px] border border-rose-200 dark:border-rose-900">
+            <span className="px-3 py-1 rounded-[12px] bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-extrabold text-[11px] border border-rose-200 dark:border-rose-900">
               Clearance Level Restricted
             </span>
             <h2 className="text-xl font-black text-slate-900 dark:text-white">
@@ -462,49 +462,49 @@ const UserAccessControl = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC SYSTEM ADMIN ACCESS CONTROL HERO BANNER (INDIGO-VIOLET LIGHT THEME) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-sky-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Telemetry Header */}
           <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
               User Feature Access & Authorization Manager
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl font-medium">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-2xl font-medium">
               Assign specific module features to individual employees without changing their core role. Enable payroll calculation for accountants, candidate pipeline for recruiters, or leave approval for supervisors.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{employees.length} Registered Accounts</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{customCount} Users with Custom Overrides</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{FEATURE_MODULES.length} Security Feature Modules</span>
               </span>
             </div>
           </div>
 
           {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center">
               <ShieldCheck className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
-              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Active Inspector</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              <div className="text-xs font-extrabold text-white">Active Inspector</div>
+              <div className="text-[11px] text-white/80 mt-0.5">
                 {selectedEmployee ? `${selectedEmployee.firstName} ${selectedEmployee.lastName}` : 'Select an employee'}
               </div>
             </div>
             <button
               onClick={handleSave}
               disabled={submitting || !selectedEmployee}
-              className="w-full px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Save className="w-3.5 h-3.5" />
               <span>{submitting ? 'Saving Policy...' : 'Save Permissions'}</span>
@@ -601,7 +601,7 @@ const UserAccessControl = () => {
                 </p>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
+            <span className="px-3 py-1 rounded-[12px] text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
               {filteredEmployees.length} Matches
             </span>
           </div>
@@ -923,11 +923,11 @@ const UserAccessControl = () => {
 
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     {access.isCustom ? (
-                      <span className="px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold border border-sky-200/80 dark:border-sky-800/80">
+                      <span className="px-2.5 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold border border-sky-200/80 dark:border-sky-800/80">
                         Custom
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-semibold border border-slate-200/60 dark:border-slate-700/60">
+                      <span className="px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-semibold border border-slate-200/60 dark:border-slate-700/60">
                         {emp.role}
                       </span>
                     )}
@@ -974,7 +974,7 @@ const UserAccessControl = () => {
                       <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">
                         {selectedEmployee.firstName} {selectedEmployee.lastName}
                       </h3>
-                      <span className="font-mono text-[11px] text-sky-700 dark:text-sky-300 font-bold bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-lg border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
+                      <span className="font-mono text-[11px] text-sky-700 dark:text-sky-300 font-bold bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
                         {selectedEmployee.employeeCode || 'EMP-CODE'}
                       </span>
                     </div>
@@ -1010,19 +1010,19 @@ const UserAccessControl = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={handleGrantAll}
-                    className="px-3.5 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                    className="px-3.5 py-2 rounded-[12px] bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 text-xs font-bold transition-all cursor-pointer shadow-2xs"
                   >
                     Grant All Features
                   </button>
                   <button
                     onClick={handleRevokeAll}
-                    className="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                    className="px-3.5 py-2 rounded-[12px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs"
                   >
                     Revoke Elevated Rights
                   </button>
                   <button
                     onClick={handleResetDefault}
-                    className="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-[12px] bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span>Reset to Role Default</span>
@@ -1082,7 +1082,7 @@ const UserAccessControl = () => {
 
                           {/* Module Quick Toggle */}
                           <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
+                            <span className="px-2.5 py-0.5 rounded-[12px] text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
                               {enabledCount} / {module.features.length}
                             </span>
                             <button
@@ -1149,7 +1149,7 @@ const UserAccessControl = () => {
                     <h4 className="text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
                       Recent Authorization Modifications
                     </h4>
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
+                    <span className="px-2.5 py-0.5 rounded-[12px] text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
                       {auditLogs.length} Events Logged
                     </span>
                   </div>
@@ -1202,7 +1202,7 @@ const UserAccessControl = () => {
                 <button
                   onClick={handleSave}
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-4 h-4" />
                   <span>{submitting ? 'Saving Policy...' : 'Save & Enforce Policy'}</span>

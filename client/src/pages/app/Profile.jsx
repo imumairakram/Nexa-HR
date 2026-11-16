@@ -687,14 +687,14 @@ const Profile = () => {
           {/* ========================================================================= */}
           {/* 1. HERO PROFILE CARD (LIGHT SKY BLUE GRADIENT AESTHETIC) */}
           {/* ========================================================================= */}
-          <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-center gap-6">
               {/* Avatar with Camera upload button */}
               <div className="relative group shrink-0">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-sky-200/80 dark:ring-sky-800/60 bg-slate-100 dark:bg-slate-800 shadow-xl flex items-center justify-center text-white font-black text-2xl sm:text-3xl relative">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-white/30 bg-white/20 shadow-xl flex items-center justify-center text-white font-black text-2xl sm:text-3xl relative">
                   <img
                     src={avatar || DEFAULT_BLANK_AVATAR}
                     alt="User Avatar"
@@ -714,7 +714,7 @@ const Profile = () => {
                 </div>
                 <label
                   title="Upload New Photo"
-                  className={`absolute bottom-0 right-0 p-2.5 rounded-full bg-sky-500 hover:bg-sky-600 text-white shadow-lg cursor-pointer transition-all group-hover:scale-110 border-2 border-white dark:border-slate-900 ${
+                  className={`absolute bottom-0 right-0 p-2.5 rounded-full bg-white hover:bg-[#E1F4FA] text-[#07617D] shadow-lg cursor-pointer transition-all group-hover:scale-110 border-2 border-white ${
                     isUploadingAvatar ? 'pointer-events-none opacity-50' : ''
                   }`}
                 >
@@ -742,7 +742,7 @@ const Profile = () => {
               {/* User Details & Identity Badges */}
               <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
                     {formData.firstName || 'Administrator'} {formData.lastName || ''}
                   </h2>
                   {formData.empCode && (
@@ -805,7 +805,7 @@ const Profile = () => {
                   <p className="text-xs text-slate-400 font-medium">Update your contact details, residential address, and emergency contact point</p>
                 </div>
               </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500">
                 Editable
               </span>
             </div>
@@ -955,7 +955,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-600 text-white font-bold transition-all hover:scale-105 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-600 text-white font-bold transition-all hover:scale-105 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                   <span>Save Profile Changes</span>
@@ -976,7 +976,7 @@ const Profile = () => {
                   <p className="text-xs text-slate-400 font-medium">Protect your administrator & HR portal account</p>
                 </div>
               </div>
-              <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-0.5 rounded-[12px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                 <span>Standard Password Auth</span>
               </span>
             </div>
@@ -1080,7 +1080,7 @@ const Profile = () => {
                   <p className="text-xs text-slate-400 font-medium truncate">Verified corporate employment details</p>
                 </div>
               </div>
-              <span className="text-[10px] font-extrabold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0 whitespace-nowrap">
+              <span className="text-[10px] font-extrabold px-3 py-1 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0 whitespace-nowrap">
                 Read-Only
               </span>
             </div>
@@ -1374,7 +1374,7 @@ const Profile = () => {
                   <button
                     type="submit"
                     disabled={isSavingBank}
-                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50 transition-all"
+                    className="px-5 py-2 rounded-[12px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50 transition-all"
                   >
                     {isSavingBank ? (
                       <>

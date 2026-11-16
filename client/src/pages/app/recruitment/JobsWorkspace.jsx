@@ -522,29 +522,29 @@ const JobsWorkspace = () => {
       {/* ========================================================================= */}
       {/* 1. HERO COMMAND BANNER (INTEGRATING JOB DESK TELEMETRY) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
               Talent Requisitions & Open Positions Desk
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl font-medium">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-xl font-medium">
               Oversee corporate headcount expansion, manage job openings across all functional branches, and advance high-caliber applicants seamlessly into the ATS pipeline.
             </p>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{jobs.length} Total Postings</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{totalOpenings} Active Requisitions</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{totalApplicants} Active Candidates Sourced</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{offerRate} Acceptance Rate</span>
               </span>
             </div>
@@ -554,16 +554,16 @@ const JobsWorkspace = () => {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
             <button
               onClick={handleOpenCreate}
-              className="px-5 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-5 py-3 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Create Job Opening</span>
             </button>
             <button
               onClick={() => navigate('/app/recruitment/pipeline')}
-              className="px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="px-4 py-2.5 rounded-2xl bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
-              <Users className="w-3.5 h-3.5 text-emerald-500" />
+              <Users className="w-3.5 h-3.5 text-[#3CC1E6]" />
               <span>Go to ATS Pipeline</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -654,7 +654,7 @@ const JobsWorkspace = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('ALL')}
-              className={`px-3 py-1.5 rounded-[9px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-[12px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 statusFilter === 'ALL'
                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                   : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -662,7 +662,7 @@ const JobsWorkspace = () => {
             >
               <span>All postings</span>
               <span
-                className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                className={`text-xs px-1.5 py-0.5 rounded-[10px] font-semibold ${
                   statusFilter === 'ALL'
                     ? 'bg-white/20 text-white'
                     : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
@@ -675,7 +675,7 @@ const JobsWorkspace = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('ACTIVE')}
-              className={`px-3 py-1.5 rounded-[9px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-[12px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 statusFilter === 'ACTIVE'
                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                   : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -683,7 +683,7 @@ const JobsWorkspace = () => {
             >
               <span>Active requisitions</span>
               <span
-                className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                className={`text-xs px-1.5 py-0.5 rounded-[10px] font-semibold ${
                   statusFilter === 'ACTIVE'
                     ? 'bg-white/20 text-white'
                     : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
@@ -696,7 +696,7 @@ const JobsWorkspace = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('PAUSED')}
-              className={`px-3 py-1.5 rounded-[9px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-[12px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 statusFilter === 'PAUSED'
                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                   : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -704,7 +704,7 @@ const JobsWorkspace = () => {
             >
               <span>Paused / on hold</span>
               <span
-                className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                className={`text-xs px-1.5 py-0.5 rounded-[10px] font-semibold ${
                   statusFilter === 'PAUSED'
                     ? 'bg-white/20 text-white'
                     : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
@@ -753,7 +753,7 @@ const JobsWorkspace = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
                   viewMode === 'grid'
                     ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                     : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -765,7 +765,7 @@ const JobsWorkspace = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
-                className={`w-9 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer ${
+                className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                     : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -1521,11 +1521,11 @@ const JobsWorkspace = () => {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
+                  <span className="px-2.5 py-1 rounded-[12px] text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
                     {form.type}
                   </span>
                   {form.salary && (
-                    <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80">
+                    <span className="hidden sm:inline-block px-2.5 py-1 rounded-[12px] text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80">
                       {form.salary}
                     </span>
                   )}
@@ -1545,7 +1545,7 @@ const JobsWorkspace = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 active:scale-95 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                  className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 active:scale-95 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-60"
                 >
                   {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>{editingJob ? (isSubmitting ? 'Saving...' : 'Save Requisition') : (isSubmitting ? 'Publishing...' : 'Publish Job Opening')}</span>

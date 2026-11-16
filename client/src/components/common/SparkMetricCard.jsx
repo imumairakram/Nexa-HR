@@ -444,7 +444,7 @@ const SparkMetricCard = ({
             <div
               id={`tooltip-${gradientId}`}
               role="tooltip"
-              className="absolute -top-7 right-0 z-30 pointer-events-none px-2.5 py-1 rounded-lg text-xs font-bold shadow-xl whitespace-nowrap border animate-in fade-in duration-100"
+              className="absolute -top-7 right-0 z-30 pointer-events-none px-2.5 py-1 rounded-[12px] text-xs font-bold shadow-xl whitespace-nowrap border animate-in fade-in duration-100"
               style={{
                 backgroundColor: isDark ? scheme.tooltipBg : '#0F172A',
                 color: isDark ? scheme.tooltipText : '#F8FAFC',

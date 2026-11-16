@@ -17,13 +17,13 @@ const LandingPage = () => {
         <div className="flex items-center gap-4">
           <Link
             to="/login"
-            className="px-5 py-2.5 rounded-full text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-white/60 transition-all"
+            className="px-5 py-2.5 rounded-[12px] text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-white/60 transition-all"
           >
             Sign In
           </Link>
           <Link
             to="/register-admin"
-            className="px-6 py-2.5 rounded-full text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-md"
+            className="px-6 py-2.5 rounded-[12px] text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-md"
           >
             Admin Setup
           </Link>
@@ -32,7 +32,7 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto w-full px-6 py-12 md:py-20 flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pastelOrange-light text-pastelOrange-dark text-xs font-bold mb-6 shadow-sm border border-orange-200">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[12px] bg-pastelOrange-light text-pastelOrange-dark text-xs font-bold mb-6 shadow-sm border border-orange-200">
           <ShieldCheck className="w-3.5 h-3.5" />
           <span>Internal Enterprise HRM Platform</span>
         </div>
@@ -48,14 +48,14 @@ const LandingPage = () => {
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
           <Link
             to="/app/dashboard"
-            className="w-full sm:w-auto px-8 py-4 rounded-full text-base font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-lg flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 rounded-[12px] text-base font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-lg flex items-center justify-center gap-2"
           >
             <span>Open HRM Dashboard</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
           <Link
             to="/login"
-            className="w-full sm:w-auto px-8 py-4 rounded-full text-base font-semibold bg-white text-slate-800 hover:bg-slate-50 transition-all shadow-soft flex items-center justify-center"
+            className="w-full sm:w-auto px-8 py-4 rounded-[12px] text-base font-semibold bg-white text-slate-800 hover:bg-slate-50 transition-all shadow-soft flex items-center justify-center"
           >
             <span>Employee Sign In</span>
           </Link>

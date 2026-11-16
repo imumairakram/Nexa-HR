@@ -442,7 +442,7 @@ const Dashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Workforce Presence</p>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
                   Live Metric
                 </span>
               </div>
@@ -711,7 +711,7 @@ const Dashboard = () => {
               <h3 className="font-black text-sm text-slate-900 dark:text-white">Organization Operations Health</h3>
               <p className="text-[11px] text-slate-400">Punctuality, presence & capacity index</p>
             </div>
-            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
               Health Index
             </span>
           </div>
@@ -905,7 +905,7 @@ const Dashboard = () => {
                 <button
                   type="submit"
                   disabled={punchLoading}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-sky-500/25 transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-[12px] shadow-md shadow-sky-500/25 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {punchLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
                   <span>Record Biometric Punch</span>

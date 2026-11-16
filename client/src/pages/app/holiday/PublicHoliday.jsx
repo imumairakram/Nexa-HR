@@ -413,23 +413,23 @@ const PublicHoliday = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC PUBLIC HOLIDAY HERO BANNER (SKY-BLUE LIGHT THEME AESTHETIC) */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-[#1E293B] p-5 sm:p-8 shadow-soft border border-sky-200/80 dark:border-sky-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Telemetry & Holiday Highlights */}
           <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
               Gazetted Holidays & Corporate Calendar
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl font-medium">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-2xl font-medium">
               Automated Islamic lunar ephemeris and gazetted statutory calendar synchronization. Real-time timezone and lunar calendar alignment ensures 100% accurate holiday schedules, automated attendance waivers, and workforce payroll compliance.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 <span>{allHolidays.length} Observances in {selectedYear}</span>
               </span>
               {stats.activeToday ? (
@@ -437,7 +437,7 @@ const PublicHoliday = () => {
                   <span>Today is {stats.activeToday.name}!</span>
                 </span>
               ) : nextHoliday ? (
-                <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+                <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                   <span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
                 </span>
               ) : null}
@@ -445,24 +445,24 @@ const PublicHoliday = () => {
           </div>
 
           {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-sky-200/60 dark:border-slate-700/60 shadow-lg flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/50 dark:border-sky-800/40 shadow-xs">
+          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center border border-sky-200/50 dark:border-sky-800/40 shadow-xs">
               <PartyPopper className="w-6 h-6 stroke-[2.2]" />
             </div>
             <div>
-              <div className="text-xs font-black text-slate-900 dark:text-white">Custom Holiday Entry</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              <div className="text-xs font-black text-white">Custom Holiday Entry</div>
+              <div className="text-[11px] text-white/80 mt-0.5">
                 Add company-specific floating day
               </div>
             </div>
             <button
               onClick={() => setIsAddOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white font-bold text-xs shadow-md shadow-sky-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Add Custom Holiday</span>
             </button>
-            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+            <div className="text-[10px] font-bold text-white/70">
               Active Year: {selectedYear}
             </div>
           </div>
@@ -676,7 +676,7 @@ const PublicHoliday = () => {
                 Synchronized with regional timezone: <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{timezone}</span>
               </p>
             </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 self-start sm:self-auto">
+            <span className="text-[11px] font-bold px-3 py-1 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 self-start sm:self-auto">
               {selectedYear} Annual Gazette
             </span>
           </div>
@@ -738,11 +738,11 @@ const PublicHoliday = () => {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[12px] text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                             {h.type}
                           </span>
                           {h.isIslamic && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 flex items-center">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 flex items-center">
                               <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                             </span>
                           )}
@@ -810,12 +810,12 @@ const PublicHoliday = () => {
                               {h.name}
                             </span>
                             {h.isCustom && (
-                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/60">
+                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/60">
                                 Company Special
                               </span>
                             )}
                             {h.isIslamic && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 flex items-center">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 flex items-center">
                                 <span>{h.hijriDateText || 'Islamic Lunar'}</span>
                               </span>
                             )}
@@ -828,14 +828,14 @@ const PublicHoliday = () => {
 
                       {/* Column 3: Category */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700">
+                        <span className="inline-flex items-center px-3 py-1 rounded-[12px] text-xs font-bold border bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700">
                           <span>{h.type}</span>
                         </span>
                       </td>
 
                       {/* Column 4: Duty / Pay Status */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-full border border-sky-200/60 dark:border-sky-800/60">
+                        <span className="inline-flex items-center text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-[12px] border border-sky-200/60 dark:border-sky-800/60">
                           <span>Paid Non-Working Day</span>
                         </span>
                       </td>
@@ -897,7 +897,7 @@ const PublicHoliday = () => {
                     {/* Month Header */}
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                       <h4 className="text-sm font-black text-slate-900 dark:text-white">{monthName}</h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300">
                         {monthHolidays.length} Holidays
                       </span>
                     </div>
@@ -1030,7 +1030,7 @@ const PublicHoliday = () => {
                       Holiday Date <span className="text-rose-500">*</span>
                     </label>
                     {formDateInfo.formattedDate && (
-                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
                         {formDateInfo.dayName} • {formDateInfo.formattedDate}
                       </span>
                     )}
@@ -1136,7 +1136,7 @@ const PublicHoliday = () => {
                     <span>Payroll & Attendance Automation</span>
                   </div>
                   {formDateInfo.isLongWeekend && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800 animate-pulse">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] text-[10px] font-extrabold bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800 animate-pulse">
                       Long Weekend Detected
                     </span>
                   )}
@@ -1295,7 +1295,7 @@ const PublicHoliday = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer"
+                    className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
                     <span>Save & Apply Holiday</span>

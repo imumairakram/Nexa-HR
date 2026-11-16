@@ -422,7 +422,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       <div className="min-w-0">
                         <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                           <span>Corporate Email Inbox</span>
-                          <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 px-2 py-0.5 rounded-[12px]">
                             HR Verified
                           </span>
                         </div>
@@ -496,7 +496,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                         <div className="min-w-0">
                           <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-1.5">
                             <span>WhatsApp OTP</span>
-                            <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded-full">
+                            <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded-[12px]">
                               Instant
                             </span>
                           </div>
@@ -537,7 +537,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-sky-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-[12px] bg-sky-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
                     Active Route
                   </span>

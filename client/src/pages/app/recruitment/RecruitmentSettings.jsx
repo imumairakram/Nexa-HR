@@ -398,36 +398,36 @@ const RecruitmentSettings = () => {
       {/* ========================================================================= */}
       {/* 1. DYNAMIC RECRUITMENT SETTINGS HERO BANNER WITH TELEMETRY */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] p-6 sm:p-8 shadow-soft border border-sky-200/70 dark:border-sky-800/50 text-slate-900 dark:text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
               Recruitment Master Data Hub
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl font-medium">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-xl font-medium">
               Seamlessly manage foundational taxonomy for candidate pipelines, job requisitions, and standardized talent acquisition data models across NexaHR.
             </p>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold pt-1">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-white/90 font-semibold pt-1">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 
 <span>{categories.length} Categories</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 
 <span>{types.length} Contract Types</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 
 <span>{locations.length} Locations</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 
 <span>{skills.length} Skills</span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
                 
 <span>{experiences.length} Seniority Tracks</span>
               </span>
@@ -438,14 +438,14 @@ const RecruitmentSettings = () => {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
             <button
               onClick={handleOpenAdd}
-              className="px-5 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-5 py-3 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Add New Entry</span>
             </button>
             <button
               onClick={loadMasterData}
-              className="px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="px-4 py-2.5 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Reload Defaults</span>
@@ -539,7 +539,7 @@ const RecruitmentSettings = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleOpenAdd}
-            className="px-4 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+            className="px-4 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Add {currentTabObj.label.replace('Master', '').trim()}</span>
@@ -574,14 +574,14 @@ const RecruitmentSettings = () => {
                               </div>
                               <span className="font-bold text-slate-900 dark:text-white text-xs">{cat.name}</span>
                             </div>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
                               {cat.code}
                             </span>
                           </div>
 
                           <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80 text-slate-600 dark:text-slate-300">
                             <span>Lead: <strong className="text-slate-800 dark:text-slate-200">{cat.lead}</strong></span>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[10px] font-bold bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                               <span>{cat.status || 'ACTIVE'}</span>
                             </span>
@@ -637,13 +637,13 @@ const RecruitmentSettings = () => {
                           <span>{cat.name}</span>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                          <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                             {cat.code}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{cat.lead}</td>
                         <td className="py-4 px-6">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[12px] text-[10px] font-bold bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>{cat.status || 'ACTIVE'}</span>
                           </span>
@@ -701,7 +701,7 @@ const RecruitmentSettings = () => {
                               </div>
                               <span className="font-bold text-slate-900 dark:text-white text-xs">{type.name}</span>
                             </div>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
                               {type.code}
                             </span>
                           </div>
@@ -767,7 +767,7 @@ const RecruitmentSettings = () => {
                             <span>{type.name}</span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                               {type.code}
                             </span>
                           </td>
@@ -987,7 +987,7 @@ const RecruitmentSettings = () => {
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-slate-400">Proficiency:</span>
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
                                 
 <span>{skill.proficiency}</span>
                               </span>
@@ -1049,7 +1049,7 @@ const RecruitmentSettings = () => {
                             </span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
                               
 <span>{skill.proficiency}</span>
                             </span>
@@ -1118,7 +1118,7 @@ const RecruitmentSettings = () => {
                               </div>
                               <span className="font-bold text-slate-900 dark:text-white text-xs">{exp.label}</span>
                             </div>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
                               {exp.code}
                             </span>
                           </div>
@@ -1184,7 +1184,7 @@ const RecruitmentSettings = () => {
                             <span>{exp.label}</span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                               {exp.code}
                             </span>
                           </td>
@@ -1610,7 +1610,7 @@ const RecruitmentSettings = () => {
                     <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span>Master Data & System Automation</span>
                   </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
                     
 <span>Live Sync</span>
                   </span>
@@ -1622,14 +1622,14 @@ const RecruitmentSettings = () => {
                       <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Job Requisition Scope</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Available in job creator & ATS pipeline.</div>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">Active</span>
+                    <span className="px-2 py-0.5 rounded-[12px] text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">Active</span>
                   </div>
                   <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Enterprise Indexing</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Indexed across corporate reports.</div>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">Synchronized</span>
+                    <span className="px-2 py-0.5 rounded-[12px] text-[10px] font-bold bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">Synchronized</span>
                   </div>
                 </div>
               </div>
@@ -1645,7 +1645,7 @@ const RecruitmentSettings = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
                   <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
                   <span>{editingItem ? 'Save Changes' : 'Create Entry'}</span>
