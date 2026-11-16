@@ -147,7 +147,7 @@ const EmployeeAttendance = () => {
       if (res?.success && res.data?.user) {
         setCurrentUser(res.data.user);
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -534,13 +534,12 @@ const EmployeeAttendance = () => {
                 <span>Today's Activity</span>
               </span>
               <span
-                className={`px-3 py-1 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider ${
-                  todayLog?.status === 'LATE'
+                className={`px-3 py-1 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider ${todayLog?.status === 'LATE'
                     ? 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
                     : todayLog?.status === 'PRESENT'
                       ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-300/40'
                       : 'bg-white text-[#07617D] dark:text-white border border-white dark:border-slate-700 shadow-xs font-black'
-                }`}
+                  }`}
               >
                 {todayLog?.status || 'Awaiting Punch'}
               </span>
@@ -709,11 +708,10 @@ const EmployeeAttendance = () => {
                   key={st.id}
                   type="button"
                   onClick={() => setStatusFilter(st.id)}
-                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
-                    statusFilter === st.id
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${statusFilter === st.id
                       ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}
+                    }`}
                 >
                   <span>{st.label}</span>
                   <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500">
@@ -803,11 +801,10 @@ const EmployeeAttendance = () => {
                             <div className="flex items-center gap-3.5">
                               {/* Date Number Badge */}
                               <div
-                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${
-                                  log.isToday
+                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${log.isToday
                                     ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-400 dark:border-sky-600 text-sky-600 dark:text-sky-400 shadow-xs'
                                     : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-sky-400/50'
-                                }`}
+                                  }`}
                               >
                                 <span className="text-[9px] font-black uppercase tracking-wider leading-none">
                                   {log.monthShort || 'DAY'}
@@ -844,18 +841,8 @@ const EmployeeAttendance = () => {
                               </span>
                             ) : (
                               <div>
-                                <span
-                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${
-                                    isLate
-                                      ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/70 dark:border-amber-800/40 text-amber-700 dark:text-amber-300'
-                                      : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/70 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300'
-                                  }`}
-                                >
-                                  <span
-                                    className={`w-2 h-2 rounded-full ${
-                                      isLate ? 'bg-amber-500' : 'bg-emerald-500'
-                                    }`}
-                                  />
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] border text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700">
+                                  <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500" />
                                   {log.checkIn}
                                 </span>
                                 <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
@@ -873,8 +860,8 @@ const EmployeeAttendance = () => {
                               </span>
                             ) : (
                               <div>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-800/40 text-blue-700 dark:text-blue-300 text-xs font-bold">
-                                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-800/60">
+                                  <span className="w-2 h-2 rounded-full bg-sky-500 dark:bg-sky-400" />
                                   {log.checkOut}
                                 </span>
                                 <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
@@ -886,27 +873,17 @@ const EmployeeAttendance = () => {
 
                           {/* 4. Status Column (Right aligned) */}
                           <td className="py-4 px-6 text-right">
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${
-                                log.status === 'PRESENT'
-                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
-                                  : isLate
-                                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
-                                  : isLeave
-                                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-800/50'
-                                  : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
-                              }`}
-                            >
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold border bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200/80 dark:border-slate-700 shadow-2xs">
                               {log.status === 'PRESENT' && (
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                <CheckCircle2 className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                               )}
                               {isLate && (
-                                <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                                <AlertTriangle className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                               )}
                               {isLeave && (
-                                <Calendar className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
+                                <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                               )}
-                              <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status}</span>
+                              <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status === 'PRESENT' ? 'Present' : log.status}</span>
                             </span>
                           </td>
                         </tr>
@@ -968,11 +945,10 @@ const EmployeeAttendance = () => {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-3">
                             <div
-                              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${
-                                log.isToday
+                              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border ${log.isToday
                                   ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-400 text-sky-600 dark:text-sky-400'
                                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
-                              }`}
+                                }`}
                             >
                               <span className="text-[8px] font-black uppercase tracking-wider leading-none">
                                 {log.monthShort}
@@ -993,13 +969,7 @@ const EmployeeAttendance = () => {
                           </div>
 
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
-                              log.status === 'PRESENT'
-                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200'
-                                : isLate
-                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200'
-                                : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200'
-                            }`}
+                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200/80 dark:border-slate-700"
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-current" />
                             <span>{isLate ? 'Late' : isLeave ? 'Leave' : 'Present'}</span>
@@ -1012,7 +982,7 @@ const EmployeeAttendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch In
                             </div>
-                            <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                            <div className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300 mt-0.5">
                               {log.checkIn}
                             </div>
                           </div>
@@ -1020,7 +990,7 @@ const EmployeeAttendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch Out
                             </div>
-                            <div className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                            <div className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400 mt-0.5">
                               {log.checkOut}
                             </div>
                           </div>
@@ -1038,15 +1008,14 @@ const EmployeeAttendance = () => {
                         <div className="space-y-1.5">
                           <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700/60 rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full ${
-                                log.ot > 0
+                              className={`h-full rounded-full ${log.ot > 0
                                   ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
                                   : durationVal >= 8.0
-                                  ? 'bg-emerald-500'
-                                  : isLate
-                                  ? 'bg-amber-500'
-                                  : 'bg-teal-500'
-                              }`}
+                                    ? 'bg-emerald-500'
+                                    : isLate
+                                      ? 'bg-amber-500'
+                                      : 'bg-teal-500'
+                                }`}
                               style={{ width: `${progressPct}%` }}
                             />
                           </div>
