@@ -123,17 +123,17 @@ const EmployeeHolidays = () => {
               <div
                 className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
-                    ? 'text-sky-300'
-                    : 'text-slate-900 dark:text-white'
+                    ? 'text-[#7CD1EB]'
+                    : 'text-white drop-shadow-xs'
                 }`}
               >
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'TODAY' : featuredHoliday.countdown}
               </div>
               <div
-                className={`text-[11px] font-semibold mt-1 px-3 py-0.5 rounded-full border ${
+                className={`text-[11px] font-semibold mt-1 px-3 py-0.5 rounded-[12px] border ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
-                    ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50'
-                    : 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50'
+                    ? 'bg-emerald-400/20 text-emerald-200 border-emerald-300/40'
+                    : 'bg-white/20 text-white border-white/30 backdrop-blur-sm'
                 }`}
               >
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Active Holiday' : 'Upcoming Observance'}

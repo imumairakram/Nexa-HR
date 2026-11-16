@@ -528,18 +528,19 @@ const EmployeeAttendance = () => {
 
           {/* Right Side: Glassmorphic Punch Summary Card */}
           <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
-            <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
-              <span className="flex items-center gap-1.5">
-                <Fingerprint className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+            <div className="flex items-center justify-between w-full mb-3 text-xs font-semibold text-white">
+              <span className="flex items-center gap-1.5 text-white font-bold">
+                <Fingerprint className="w-4 h-4 text-[#7CD1EB]" />
                 <span>Today's Activity</span>
               </span>
               <span
-                className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${todayLog?.status === 'LATE'
-                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/50'
+                className={`px-3 py-1 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider ${
+                  todayLog?.status === 'LATE'
+                    ? 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
                     : todayLog?.status === 'PRESENT'
-                      ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50'
-                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-                  }`}
+                      ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-300/40'
+                      : 'bg-white text-[#07617D] border border-white shadow-xs font-black'
+                }`}
               >
                 {todayLog?.status || 'Awaiting Punch'}
               </span>
@@ -547,31 +548,31 @@ const EmployeeAttendance = () => {
 
             {/* In / Out Timestamps */}
             <div className="w-full grid grid-cols-2 gap-2.5 my-1">
-              <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-3 border border-sky-100 dark:border-slate-700/80 text-left shadow-2xs">
-                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Punch In</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-sky-600 dark:text-sky-400 mt-0.5">
+              <div className="bg-white dark:bg-slate-800/90 rounded-[12px] p-3 border border-white/40 dark:border-slate-700/80 text-left shadow-2xs">
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Punch In</div>
+                <div className="text-lg sm:text-xl font-mono font-black text-[#0A8FB5] dark:text-[#3CC1E6] mt-0.5">
                   {todayLog?.checkIn || '--:--'}
                 </div>
                 <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-500" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-[#0A8FB5]" />
                   <span>{todayLog?.checkIn && todayLog.checkIn !== '--:--' ? 'Recorded' : 'Pending'}</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-3 border border-sky-100 dark:border-slate-700/80 text-left shadow-2xs">
-                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-sky-600 dark:text-sky-400 mt-0.5">
+              <div className="bg-white dark:bg-slate-800/90 rounded-[12px] p-3 border border-white/40 dark:border-slate-700/80 text-left shadow-2xs">
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Punch Out</div>
+                <div className="text-lg sm:text-xl font-mono font-black text-[#0A8FB5] dark:text-[#3CC1E6] mt-0.5">
                   {todayLog?.checkOut || '--:--'}
                 </div>
                 <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-sky-500" />
+                  <CheckCircle2 className="w-2.5 h-2.5 text-[#0A8FB5]" />
                   <span>{todayLog?.checkOut && todayLog.checkOut !== '--:--' ? 'Recorded' : 'Pending'}</span>
                 </div>
               </div>
             </div>
 
-            <div className="w-full pt-2 flex items-center justify-center text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-normal text-center">
-              <span>Shift: {employeeShift}</span>
+            <div className="w-full pt-2.5 flex items-center justify-center text-xs sm:text-sm text-white font-medium leading-normal text-center">
+              <span className="text-white/95 drop-shadow-xs font-semibold">Shift: <strong className="text-white font-bold">{employeeShift}</strong></span>
             </div>
           </div>
         </div>

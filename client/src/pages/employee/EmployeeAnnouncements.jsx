@@ -418,17 +418,17 @@ const EmployeeAnnouncements = () => {
                   <button
                     onClick={handlePrevHero}
                     title="Previous Notice"
-                    className="p-1 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    className="p-1 rounded-full hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
-                  <span className="text-[10px] font-mono font-bold px-1 text-slate-300">
+                  <span className="text-[10px] font-mono font-bold px-1 text-white/90">
                     {(((heroIndex % heroCandidates.length) + heroCandidates.length) % heroCandidates.length) + 1} / {heroCandidates.length}
                   </span>
                   <button
                     onClick={handleNextHero}
                     title="Next Notice"
-                    className="p-1 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    className="p-1 rounded-full hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
                   >
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
