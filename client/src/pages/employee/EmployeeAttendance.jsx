@@ -844,8 +844,18 @@ const EmployeeAttendance = () => {
                               </span>
                             ) : (
                               <div>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] border text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700">
-                                  <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500" />
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${
+                                    isLate
+                                      ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/70 dark:border-amber-800/40 text-amber-700 dark:text-amber-300'
+                                      : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/70 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300'
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-2 h-2 rounded-full ${
+                                      isLate ? 'bg-amber-500' : 'bg-emerald-500'
+                                    }`}
+                                  />
                                   {log.checkIn}
                                 </span>
                                 <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
@@ -863,8 +873,8 @@ const EmployeeAttendance = () => {
                               </span>
                             ) : (
                               <div>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-800/60">
-                                  <span className="w-2 h-2 rounded-full bg-sky-500 dark:bg-sky-400" />
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-800/40 text-blue-700 dark:text-blue-300 text-xs font-bold">
+                                  <span className="w-2 h-2 rounded-full bg-blue-500" />
                                   {log.checkOut}
                                 </span>
                                 <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
@@ -876,17 +886,27 @@ const EmployeeAttendance = () => {
 
                           {/* 4. Status Column (Right aligned) */}
                           <td className="py-4 px-6 text-right">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold border bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200/80 dark:border-slate-700 shadow-2xs">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${
+                                log.status === 'PRESENT'
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                                  : isLate
+                                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
+                                  : isLeave
+                                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-800/50'
+                                  : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                              }`}
+                            >
                               {log.status === 'PRESENT' && (
-                                <CheckCircle2 className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               )}
                               {isLate && (
-                                <AlertTriangle className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                                <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                               )}
                               {isLeave && (
-                                <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                                <Calendar className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                               )}
-                              <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status === 'PRESENT' ? 'Present' : log.status}</span>
+                              <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status}</span>
                             </span>
                           </td>
                         </tr>
@@ -973,7 +993,13 @@ const EmployeeAttendance = () => {
                           </div>
 
                           <span
-                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200/80 dark:border-slate-700"
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
+                              log.status === 'PRESENT'
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200'
+                                : isLate
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200'
+                                : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200'
+                            }`}
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-current" />
                             <span>{isLate ? 'Late' : isLeave ? 'Leave' : 'Present'}</span>
@@ -986,7 +1012,7 @@ const EmployeeAttendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch In
                             </div>
-                            <div className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300 mt-0.5">
+                            <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                               {log.checkIn}
                             </div>
                           </div>
@@ -994,7 +1020,7 @@ const EmployeeAttendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch Out
                             </div>
-                            <div className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400 mt-0.5">
+                            <div className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
                               {log.checkOut}
                             </div>
                           </div>
