@@ -545,8 +545,33 @@ const Login = () => {
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-white/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-[#3CC1E6]/30 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Floating HRM Showcase Cards Section */}
-          <div className="relative z-10 w-full h-[320px] sm:h-[340px]">
+          {/* 1. TOP: Central Glowing NexaHR Brand Emblem, Title & Description */}
+          <div className="relative z-20 text-center max-w-lg mx-auto flex flex-col items-center pt-1">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.2)] border border-white/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer mb-3">
+              <svg
+                className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-sm"
+                viewBox="0 0 100 100"
+                fill="none"
+              >
+                <rect x="14" y="26" width="22" height="48" rx="11" fill="#FFFFFF" />
+                <path
+                  d="M23 44 L68 18 C74 14 82 18 82 25 L82 30 C82 35 79 39 75 41 L30 67 C24 70 16 66 16 59 L16 54 C16 49 19 46 23 44 Z"
+                  fill="#FFFFFF"
+                />
+                <rect x="64" y="26" width="22" height="48" rx="11" fill="#FFFFFF" />
+              </svg>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white whitespace-pre-line leading-snug">
+              {slides[activeSlide].title}
+            </h2>
+            <p className="text-xs sm:text-sm text-white/90 mt-2.5 leading-relaxed max-w-md mx-auto">
+              {slides[activeSlide].description}
+            </p>
+          </div>
+
+          {/* 2. MIDDLE: Floating HRM Showcase Cards Section */}
+          <div className="relative z-10 w-full h-[320px] sm:h-[340px] my-auto">
             {/* CARD 1: Workforce Presence & Live Attendance (Top Center-Left) */}
             <div className="absolute top-0 left-0 sm:left-4 z-20 w-[240px] sm:w-[260px] bg-white text-slate-800 rounded-2xl p-4 shadow-[0_20px_45px_rgba(0,0,0,0.25)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
               <div className="flex items-center justify-between mb-2">
@@ -716,36 +741,8 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Central Glowing NexaHR Brand Emblem */}
-          <div className="relative z-20 flex flex-col items-center mt-20 sm:mt-16 mb-2">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.2)] border border-white/40 flex items-center justify-center text-white transform hover:scale-110 transition-transform duration-300 cursor-pointer">
-              <svg
-                className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-sm"
-                viewBox="0 0 100 100"
-                fill="none"
-              >
-                <rect x="14" y="26" width="22" height="48" rx="11" fill="#FFFFFF" />
-                <path
-                  d="M23 44 L68 18 C74 14 82 18 82 25 L82 30 C82 35 79 39 75 41 L30 67 C24 70 16 66 16 59 L16 54 C16 49 19 46 23 44 Z"
-                  fill="#FFFFFF"
-                />
-                <rect x="64" y="26" width="22" height="48" rx="11" fill="#FFFFFF" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Showcase Copy Headline & Description */}
-          <div className="relative z-20 text-center max-w-lg mx-auto">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white whitespace-pre-line leading-snug">
-              {slides[activeSlide].title}
-            </h2>
-            <p className="text-xs sm:text-sm text-white/90 mt-3 leading-relaxed max-w-md mx-auto">
-              {slides[activeSlide].description}
-            </p>
-          </div>
-
-          {/* Bottom Segmented Carousel Bar */}
-          <div className="relative z-20 flex items-center justify-center gap-2 pt-6">
+          {/* 3. BOTTOM: Segmented Carousel Bar */}
+          <div className="relative z-20 flex items-center justify-center gap-2 pt-4">
             {slides.map((_, index) => (
               <button
                 key={index}
