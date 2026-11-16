@@ -31,9 +31,9 @@ import { isGuestDemoConfigured, startDemoSession, isDemoSessionActive, getDemoSe
 
 
 // High-fidelity SVG Donut Chart for Workforce Presence
-const WorkforceDonutChart = () => {
+const WorkforceDonutChart = ({ className = "w-16 h-16 sm:w-[70px] sm:h-[70px] -rotate-90 shrink-0" }) => {
   return (
-    <svg className="w-16 h-16 -rotate-90 shrink-0" viewBox="0 0 100 100">
+    <svg className={className} viewBox="0 0 100 100">
       {/* Background track */}
       <circle cx="50" cy="50" r="38" fill="none" stroke="#F1F5F9" strokeWidth="12" />
       {/* Segment 1: Present & On-Time (Deep Cyan - 72%) */}
@@ -530,7 +530,7 @@ const Login = () => {
         {/* ========================================================================= */}
         {/* RIGHT COLUMN: HRM & WORKFORCE INTELLIGENCE SHOWCASE (DESKTOP ONLY) */}
         {/* ========================================================================= */}
-        <div className="hidden lg:flex flex-1 lg:w-[52%] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] rounded-[30px] sm:rounded-[38px] p-6 sm:p-7 lg:px-8 lg:pt-6 lg:pb-5 relative overflow-hidden flex-col justify-between text-white shadow-2xl border border-white/20 min-h-[600px] lg:min-h-[630px]">
+        <div className="hidden lg:flex flex-1 lg:w-[52%] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] rounded-[30px] sm:rounded-[38px] p-6 sm:p-7 lg:px-8 lg:pt-6 lg:pb-5 relative overflow-hidden flex-col justify-between text-white shadow-2xl border border-white/20 min-h-[620px] lg:min-h-[660px]">
           {/* Subtle Grid Lines Overlay */}
           <div
             className="absolute inset-0 opacity-15 pointer-events-none"
@@ -570,31 +570,31 @@ const Login = () => {
             </p>
           </div>
 
-          {/* 2. MIDDLE: Floating HRM Showcase Cards Section */}
-          <div className="relative z-10 w-full h-[310px] sm:h-[325px] my-auto">
+          {/* 2. MIDDLE: Floating HRM Showcase Cards Section (Expanded to Fill Vertical Space) */}
+          <div className="relative z-10 w-full h-[370px] sm:h-[395px] lg:h-[410px] my-auto">
             {/* CARD 1: Workforce Presence & Live Attendance (Top Center-Left) */}
-            <div className="absolute top-0 left-0 sm:left-4 z-20 w-[235px] sm:w-[255px] bg-white text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-[0_20px_45px_rgba(0,0,0,0.25)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold text-slate-800 tracking-tight flex items-center gap-1">
-                  <UserCheck className="w-3 h-3 text-[#0A8FB5]" />
+            <div className="absolute top-0 left-0 sm:left-4 z-20 w-[260px] sm:w-[285px] lg:w-[295px] bg-white text-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-[0_20px_45px_rgba(0,0,0,0.25)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
+              <div className="flex items-center justify-between mb-2 sm:mb-2.5">
+                <span className="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight flex items-center gap-1.5">
+                  <UserCheck className="w-3.5 h-3.5 text-[#0A8FB5]" />
                   Workforce Presence
                 </span>
-                <span className="text-[9px] font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-0.5">
-                  Today <ChevronDown className="w-2.5 h-2.5" />
+                <span className="text-[10px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 flex items-center gap-0.5">
+                  Today <ChevronDown className="w-3 h-3" />
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3.5">
                 {/* Donut Chart */}
-                <WorkforceDonutChart />
+                <WorkforceDonutChart className="w-16 h-16 sm:w-[70px] sm:h-[70px] -rotate-90 shrink-0" />
 
                 {/* Metric and Legend */}
                 <div>
-                  <div className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+                  <div className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
                     124 Staff
                   </div>
-                  <div className="text-[9px] text-emerald-600 font-bold -mt-0.5">94.2% Attendance</div>
-                  <div className="mt-1.5 space-y-0.5 text-[8px] font-semibold text-slate-500">
+                  <div className="text-[10px] text-emerald-600 font-bold -mt-0.5">94.2% Attendance</div>
+                  <div className="mt-1.5 space-y-0.5 text-[9px] font-semibold text-slate-500">
                     <div className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#0A8FB5] shrink-0"></span>
                       <span>On-Time (98)</span>
@@ -612,14 +612,14 @@ const Login = () => {
               </div>
 
               {/* Attendance Mini Footer */}
-              <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[8px]">
+              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
                 <div>
                   <div className="text-slate-400 font-medium">Active Roster Check-ins</div>
                   <div className="text-slate-700 font-bold">117 / 124 Signed In</div>
                 </div>
                 <button
                   type="button"
-                  className="bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white px-2.5 py-1 rounded-[12px] font-bold text-[8px] transition-all shadow-xs cursor-pointer"
+                  className="bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white px-3 py-1.5 rounded-[12px] font-bold text-[9px] transition-all shadow-xs cursor-pointer"
                 >
                   Live Roster
                 </button>
@@ -627,29 +627,29 @@ const Login = () => {
             </div>
 
             {/* CARD 2: Department Headcount & Payroll Allocation (Cascading Lower) */}
-            <div className="absolute top-24 sm:top-28 left-4 sm:left-8 z-30 w-[240px] sm:w-[265px] bg-white text-slate-800 rounded-2xl p-3 sm:p-3.5 shadow-[0_25px_50px_rgba(0,0,0,0.3)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[1deg] transition-all duration-300">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-bold text-slate-800 tracking-tight flex items-center gap-1">
-                  <Users className="w-3 h-3 text-[#0A8FB5]" />
+            <div className="absolute top-36 sm:top-40 lg:top-42 left-4 sm:left-8 lg:left-12 z-30 w-[265px] sm:w-[295px] lg:w-[310px] bg-white text-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-[0_25px_50px_rgba(0,0,0,0.3)] border border-white/80 transform hover:-translate-y-1 hover:rotate-[1deg] transition-all duration-300">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-[#0A8FB5]" />
                   Department Headcount
                 </span>
-                <span className="text-[8px] text-slate-400 font-medium flex items-center gap-1">
-                  <RefreshCw className="w-2.5 h-2.5 text-[#0A8FB5]" /> Live Sync
+                <span className="text-[9px] text-slate-400 font-medium flex items-center gap-1">
+                  <RefreshCw className="w-3 h-3 text-[#0A8FB5]" /> Live Sync
                 </span>
               </div>
 
-              <div className="text-[8px] text-slate-400 font-medium">Total Active Team</div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+              <div className="text-[9px] text-slate-400 font-medium">Total Active Team</div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
                   124 Employees
                 </span>
-                <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded flex items-center">
+                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center">
                   ▲ 12% Growth
                 </span>
               </div>
 
               {/* HRM Department Items List */}
-              <div className="space-y-1 text-[8px] border-t border-slate-100 pt-1.5">
+              <div className="space-y-1.5 text-[9px] border-t border-slate-100 pt-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-bold text-slate-800">Engineering & Cloud</div>
@@ -661,7 +661,7 @@ const Login = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-1 border-t border-slate-50">
+                <div className="flex items-center justify-between pt-1.5 border-t border-slate-50">
                   <div>
                     <div className="font-bold text-slate-800">Product & UX Design</div>
                     <div className="text-slate-400">Core Team • 28 members</div>
@@ -672,7 +672,7 @@ const Login = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-1 border-t border-slate-50">
+                <div className="flex items-center justify-between pt-1.5 border-t border-slate-50">
                   <div>
                     <div className="font-bold text-slate-800">HR & People Operations</div>
                     <div className="text-slate-400">Global HQ • 14 members</div>
@@ -686,55 +686,55 @@ const Login = () => {
 
               <button
                 type="button"
-                className="w-full mt-2 bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white py-1.5 rounded-[12px] font-bold text-[8px] transition-all shadow-xs text-center cursor-pointer"
+                className="w-full mt-3 bg-gradient-to-r from-[#0A8FB5] to-[#07617D] hover:from-[#087A9B] hover:to-[#054C62] text-white py-2 rounded-[12px] font-bold text-[9px] sm:text-[10px] transition-all shadow-xs text-center cursor-pointer"
               >
                 Review Department Roster
               </button>
             </div>
 
             {/* CARD 3: Recruitment & Leave Operations (Top Right) */}
-            <div className="absolute top-4 right-0 sm:right-3 z-10 w-[215px] sm:w-[240px] bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/60 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
-              <div className="text-[11px] font-bold text-slate-800 tracking-tight mb-2 flex items-center gap-1">
-                <Briefcase className="w-3 h-3 text-[#0A8FB5]" />
+            <div className="absolute top-4 sm:top-6 right-0 sm:right-3 z-10 w-[235px] sm:w-[265px] lg:w-[280px] bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-[0_20px_45px_rgba(0,0,0,0.22)] border border-white/60 transform hover:-translate-y-1 hover:rotate-[-1deg] transition-all duration-300">
+              <div className="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight mb-2.5 flex items-center gap-1.5">
+                <Briefcase className="w-3.5 h-3.5 text-[#0A8FB5]" />
                 HR Operations Pipeline
               </div>
 
               {/* Senior Engineer Hiring */}
-              <div className="text-[8px] mb-2">
-                <div className="font-bold text-slate-800">Senior Full-Stack Dev</div>
-                <div className="text-slate-400 text-[7.5px]">Final Stage • 14 Applicants</div>
-                <div className="flex items-center justify-between mt-1 mb-0.5 font-bold">
+              <div className="text-[9px] mb-2.5">
+                <div className="font-bold text-slate-800 text-[10px]">Senior Full-Stack Dev</div>
+                <div className="text-slate-400 text-[8.5px]">Final Stage • 14 Applicants</div>
+                <div className="flex items-center justify-between mt-1.5 mb-1 font-bold">
                   <span className="text-slate-900">3 Selected</span>
                   <span className="text-slate-400 font-normal">/ 4 Openings</span>
                 </div>
                 {/* Progress Bar */}
-                <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-[#0A8FB5] to-[#07617D] h-full rounded-full"
                     style={{ width: '75%' }}
                   ></div>
                 </div>
-                <div className="text-right text-[7px] text-[#0A8FB5] font-bold mt-0.5">
+                <div className="text-right text-[8px] text-[#0A8FB5] font-bold mt-1">
                   75% Filled
                 </div>
               </div>
 
               {/* Annual Leave Requests */}
-              <div className="text-[8px] pt-1.5 border-t border-slate-100">
-                <div className="font-bold text-slate-800">Leave Approvals</div>
-                <div className="text-slate-400 text-[7.5px]">Pending Review • 4 Requests</div>
-                <div className="flex items-center justify-between mt-1 mb-0.5 font-bold">
+              <div className="text-[8px] pt-2 border-t border-slate-100">
+                <div className="font-bold text-slate-800 text-[10px]">Leave Approvals</div>
+                <div className="text-slate-400 text-[8.5px]">Pending Review • 4 Requests</div>
+                <div className="flex items-center justify-between mt-1.5 mb-1 font-bold">
                   <span className="text-slate-900">18 Processed</span>
                   <span className="text-slate-400 font-normal">/ 22 Total</span>
                 </div>
                 {/* Progress Bar */}
-                <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-emerald-500 h-full rounded-full"
                     style={{ width: '82%' }}
                   ></div>
                 </div>
-                <div className="text-right text-[7px] text-emerald-600 font-bold mt-0.5">
+                <div className="text-right text-[8px] text-emerald-600 font-bold mt-1">
                   82% Completed
                 </div>
               </div>
