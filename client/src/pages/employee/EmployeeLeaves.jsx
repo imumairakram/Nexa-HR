@@ -56,6 +56,29 @@ export const formatLeaveDays = (days) => {
   return `${count} ${count === 1 ? 'day' : 'days'}`;
 };
 
+export const parseDateInfo = (dateStr) => {
+  if (!dateStr) return { monthShort: 'DAY', dayNum: '--', formatted: '--', weekday: '' };
+  try {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      const monthShort = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      const dayNum = String(d.getDate()).padStart(2, '0');
+      const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
+      return { monthShort, dayNum, formatted, weekday };
+    }
+  } catch {}
+  return { monthShort: 'DAY', dayNum: '--', formatted: dateStr, weekday: '' };
+};
+
+export const formatDateRange = (startDate, endDate) => {
+  if (!startDate) return '--';
+  const sInfo = parseDateInfo(startDate);
+  if (!endDate || startDate === endDate) return sInfo.formatted;
+  const eInfo = parseDateInfo(endDate);
+  return `${sInfo.formatted} – ${eInfo.formatted}`;
+};
+
 export const DEFAULT_LEAVE_TYPES = [
   { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
   { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
@@ -624,16 +647,26 @@ const EmployeeLeaves = () => {
       {loading ? (
         <TableSkeleton rows={6} cols={5} />
       ) : (
-        <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="bg-white dark:bg-[#111C24] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 transition-all overflow-hidden">
           {/* Header Bar */}
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Leave History & Review Status</h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Review log of all time-off submissions and management approval states
-              </p>
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/40 flex items-center justify-center text-sky-600 dark:text-sky-400">
+                  <CalendarDays className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>Leave History & Review Status</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                    Review log of all time-off submissions and management approval states
+                  </p>
+                </div>
+              </div>
             </div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-[12px]">
+
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-[12px] self-start md:self-auto shrink-0">
               {filteredRequests.length} Requests Found
             </span>
           </div>
@@ -643,143 +676,217 @@ const EmployeeLeaves = () => {
               {/* Mobile Responsive Grid View (Hidden on Desktop) */}
               <div className="block md:hidden p-3.5 sm:p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {filteredRequests.map((req) => (
-                    <div
-                      key={req.id}
-                      onClick={() => setSelectedReq(req)}
-                      className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-sky-400/60 transition-all flex flex-col justify-between cursor-pointer"
-                    >
-                      <div className="space-y-2.5">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                              <Layers className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <div className="font-extrabold text-slate-900 dark:text-white text-xs">
-                                {req.leaveType?.name || 'General Leave'}
+                  {filteredRequests.map((req) => {
+                    const startInfo = parseDateInfo(req.startDate);
+                    const daysCount = calculateLeaveDays(req);
+                    const dateRangeText = formatDateRange(req.startDate, req.endDate);
+
+                    return (
+                      <div
+                        key={req.id}
+                        onClick={() => setSelectedReq(req)}
+                        className="bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs hover:border-sky-400/60 transition-all flex flex-col justify-between cursor-pointer"
+                      >
+                        <div className="space-y-2.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/40 flex items-center justify-center text-sky-600 dark:text-sky-400">
+                                <Layers className="w-4 h-4" />
                               </div>
-                              <div className="text-[10px] text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                              <div>
+                                <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                                  {req.leaveType?.name || 'General Leave'}
+                                </div>
+                                <div className="text-[10px] text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                              </div>
                             </div>
-                          </div>
-                          <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border shrink-0 ${req.status === 'APPROVED'
-                                ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border-sky-200/60 dark:border-sky-800/40'
-                                : req.status === 'REJECTED'
-                                  ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
-                                  : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs shrink-0 ${
+                                req.status === 'APPROVED'
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                                  : req.status === 'REJECTED'
+                                  ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                                  : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
                               }`}
-                          >
-                            {req.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3" />}
-                            {req.status === 'PENDING' && <Clock className="w-3 h-3" />}
-                            {req.status === 'REJECTED' && <XCircle className="w-3 h-3" />}
-                            <span>{req.status}</span>
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                          <span className="text-slate-500 font-medium">Duration:</span>
-                          <span className="font-extrabold text-sky-600 dark:text-sky-400">
-                            {formatLeaveDays(calculateLeaveDays(req))}
-                          </span>
-                        </div>
-
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
-                          <div className="font-semibold text-slate-700 dark:text-slate-300">
-                            {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
+                            >
+                              {req.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
+                              {req.status === 'PENDING' && <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
+                              {req.status === 'REJECTED' && <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />}
+                              <span>{req.status}</span>
+                            </span>
                           </div>
-                          {req.reason && <p className="line-clamp-2 text-slate-600 dark:text-slate-400">{req.reason}</p>}
-                        </div>
-                      </div>
 
-                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                        <span className="font-bold text-slate-500">Remarks:</span>
-                        <span className="text-right truncate max-w-[180px] font-medium text-slate-600 dark:text-slate-300">
-                          {req.status === 'APPROVED'
-                            ? `Approved by ${req.approvedBy?.firstName || 'HR Lead'}`
-                            : req.status === 'REJECTED'
+                          <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                            <span className="text-slate-500 font-medium">Duration:</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[10px] font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50">
+                              {formatLeaveDays(daysCount)}
+                            </span>
+                          </div>
+
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
+                            <div className="font-semibold text-slate-700 dark:text-slate-300">
+                              {dateRangeText}
+                            </div>
+                            {req.reason && <p className="line-clamp-2 text-slate-600 dark:text-slate-400">{req.reason}</p>}
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                          <span className="font-bold text-slate-500">Remarks:</span>
+                          <span className="text-right truncate max-w-[180px] font-medium text-slate-600 dark:text-slate-300">
+                            {req.status === 'APPROVED'
+                              ? `Approved by ${req.approvedBy?.firstName || 'HR Lead'}`
+                              : req.status === 'REJECTED'
                               ? req.rejectionReason || 'Declined by HR'
                               : 'Pending Supervisor Review'}
-                        </span>
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Desktop Table View (Hidden on Mobile) */}
+              {/* Desktop Table View */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-xs tracking-wider border-b border-slate-100 dark:border-slate-800">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="bg-slate-50/75 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                     <tr>
-                      <th className="py-3.5 px-6">Leave Category</th>
-                      <th className="py-3.5 px-4">Duration & Schedule</th>
-                      <th className="py-3.5 px-4">Submission Reason</th>
-                      <th className="py-3.5 px-4">Review Status</th>
-                      <th className="py-3.5 px-6 text-right">Approval Remarks</th>
+                      <th className="py-3.5 px-6">Leave Duration & Dates</th>
+                      <th className="py-3.5 px-4">Leave Policy</th>
+                      <th className="py-3.5 px-4">Reason / Notes</th>
+                      <th className="py-3.5 px-4">Status</th>
+                      <th className="py-3.5 px-6 text-right">Review Notes / Approver</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {filteredRequests.map((req) => (
-                      <tr
-                        key={req.id}
-                        onClick={() => setSelectedReq(req)}
-                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
-                      >
-                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                              <Layers className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <div className="font-extrabold text-slate-900 dark:text-white">
-                                {req.leaveType?.name || 'General Leave'}
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
+                    {filteredRequests.map((req) => {
+                      const startInfo = parseDateInfo(req.startDate);
+                      const daysCount = calculateLeaveDays(req);
+                      const dateRangeText = formatDateRange(req.startDate, req.endDate);
+
+                      return (
+                        <tr
+                          key={req.id}
+                          onClick={() => setSelectedReq(req)}
+                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group cursor-pointer"
+                        >
+                          {/* 1. Leave Duration & Dates Column */}
+                          <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
+                            <div className="flex items-center gap-3.5">
+                              {/* Date Number Badge */}
+                              <div className="w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-sky-400/50 shrink-0">
+                                <span className="text-[9px] font-black uppercase tracking-wider leading-none">
+                                  {startInfo.monthShort}
+                                </span>
+                                <span className="text-base font-black leading-tight mt-0.5">
+                                  {startInfo.dayNum}
+                                </span>
                               </div>
-                              <div className="text-xs text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
+                                    {dateRangeText}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[10px] font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50">
+                                    {formatLeaveDays(daysCount)}
+                                  </span>
+                                </div>
+                                <div className="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
+                                  <span>{startInfo.weekday ? `${startInfo.weekday} Start` : 'Scheduled'}</span>
+                                  <span>•</span>
+                                  <span>{req.dayType === 'HALF' ? 'Half Day' : 'Full Day'}</span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="font-bold text-slate-900 dark:text-white">
-                            {formatLeaveDays(calculateLeaveDays(req))}
-                          </div>
-                          <div className="text-xs text-slate-400 mt-0.5">
-                            {req.startDate ? req.startDate.split('T')[0] : ''} to {req.endDate ? req.endDate.split('T')[0] : ''}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate font-medium">
-                          {req.reason}
-                        </td>
-                        <td className="py-4 px-4">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${req.status === 'APPROVED'
-                                ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border-sky-200/60 dark:border-sky-800/40'
-                                : req.status === 'REJECTED'
-                                  ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40'
-                                  : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40'
+                          </td>
+
+                          {/* 2. Leave Policy Column */}
+                          <td className="py-4 px-4 font-mono">
+                            <div>
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-800/40 text-sky-700 dark:text-sky-300 text-xs font-bold">
+                                <span className="w-2 h-2 rounded-full bg-sky-500" />
+                                {req.leaveType?.name || 'General Leave'}
+                              </span>
+                              <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
+                                {req.leaveType?.isPaid !== false ? 'Paid Allowance' : 'Unpaid Leave'}
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* 3. Reason / Notes Column */}
+                          <td className="py-4 px-4 max-w-xs">
+                            <p
+                              className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed"
+                              title={req.reason}
+                            >
+                              {req.reason || (
+                                <span className="text-slate-400 italic">No notes or reason provided</span>
+                              )}
+                            </p>
+                          </td>
+
+                          {/* 4. Status Column */}
+                          <td className="py-4 px-4">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${
+                                req.status === 'APPROVED'
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                                  : req.status === 'REJECTED'
+                                  ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                                  : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
                               }`}
-                          >
-                            <span>{req.status}</span>
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right text-slate-500 dark:text-slate-400 text-xs font-medium">
-                          {req.status === 'APPROVED' ? (
-                            <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center justify-end gap-1">
-                              <UserCheck className="w-3.5 h-3.5" />
-                              <span>Approved by {req.approvedBy?.firstName || 'HR Lead'} {req.approvedBy?.lastName || ''}</span>
+                            >
+                              {req.status === 'APPROVED' && (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              )}
+                              {req.status === 'PENDING' && (
+                                <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                              )}
+                              {req.status === 'REJECTED' && (
+                                <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                              )}
+                              <span>{req.status}</span>
                             </span>
-                          ) : req.status === 'REJECTED' ? (
-                            <span className="text-rose-600 dark:text-rose-400 font-semibold">
-                              {req.rejectionReason ? `Declined: ${req.rejectionReason}` : 'Declined by HR'}
-                            </span>
-                          ) : (
-                            <span className="text-amber-600 dark:text-amber-400 font-medium">
-                              Pending Supervisor Review
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+
+                          {/* 5. Review Notes / Approver Column */}
+                          <td className="py-4 px-6 text-right text-xs font-medium">
+                            {req.status === 'APPROVED' ? (
+                              <div className="inline-flex flex-col items-end">
+                                <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1">
+                                  <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                  <span>Approved</span>
+                                </span>
+                                <span className="text-[10px] text-slate-400 mt-0.5">
+                                  by {req.approvedBy?.firstName || 'HR Lead'} {req.approvedBy?.lastName || ''}
+                                </span>
+                              </div>
+                            ) : req.status === 'REJECTED' ? (
+                              <div className="inline-flex flex-col items-end">
+                                <span className="text-rose-700 dark:text-rose-300 font-bold">
+                                  Declined
+                                </span>
+                                <span className="text-[10px] text-slate-400 mt-0.5 max-w-[200px] truncate" title={req.rejectionReason}>
+                                  {req.rejectionReason || 'Declined by HR'}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex flex-col items-end">
+                                <span className="text-amber-700 dark:text-amber-300 font-semibold flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-amber-500" />
+                                  <span>Awaiting Review</span>
+                                </span>
+                                <span className="text-[10px] text-slate-400 mt-0.5">
+                                  In HR Management Queue
+                                </span>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
