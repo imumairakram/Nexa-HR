@@ -457,7 +457,7 @@ const PublicHoliday = () => {
             </div>
             <button
               onClick={() => setIsAddOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Add Custom Holiday</span>
@@ -597,7 +597,7 @@ const PublicHoliday = () => {
                     key={id}
                     type="button"
                     onClick={() => setCategoryFilter(id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
@@ -624,12 +624,12 @@ const PublicHoliday = () => {
         }
         actionButton={
           <div className="flex items-center gap-2">
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-full border border-slate-200/80 dark:border-slate-700/80">
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-[12px] border border-slate-200/80 dark:border-slate-700/80">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
                 title="Table List View"
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                className={`p-1.5 rounded-[12px] transition-all cursor-pointer ${
                   viewMode === 'list'
                     ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
@@ -641,7 +641,7 @@ const PublicHoliday = () => {
                 type="button"
                 onClick={() => setViewMode('calendar')}
                 title="12-Month Calendar Grid View"
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                className={`p-1.5 rounded-[12px] transition-all cursor-pointer ${
                   viewMode === 'calendar'
                     ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
@@ -653,7 +653,7 @@ const PublicHoliday = () => {
             <button
               type="button"
               onClick={() => setIsAddOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Holiday</span>
@@ -692,7 +692,7 @@ const PublicHoliday = () => {
                     setCategoryFilter('ALL');
                     setSearchQuery('');
                   }}
-                  className="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 text-xs font-bold hover:bg-sky-100 dark:hover:bg-sky-900/60 border border-sky-200/80 dark:border-sky-800/60 transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 text-xs font-bold hover:bg-sky-100 dark:hover:bg-sky-900/60 border border-sky-200/80 dark:border-sky-800/60 transition-colors cursor-pointer"
                 >
                   Clear Filters & Search
                 </button>
@@ -729,7 +729,7 @@ const PublicHoliday = () => {
                           {h.isCustom && (
                             <button
                               onClick={() => handleDelete(h.id)}
-                              className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                              className="p-1.5 rounded-[12px] text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                               title="Delete Holiday"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -858,7 +858,7 @@ const PublicHoliday = () => {
                           {h.isCustom && (
                             <button
                               onClick={() => handleDelete(h.id)}
-                              className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                              className="p-1.5 rounded-[12px] text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
                               title="Remove Custom Holiday"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -997,7 +997,7 @@ const PublicHoliday = () => {
               <button
                 type="button"
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1065,7 +1065,7 @@ const PublicHoliday = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setForm({ ...form, type: cat.id })}
-                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
+                        className={`relative p-3.5 rounded-[12px] border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
                           isSelected
                             ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
                             : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
@@ -1154,7 +1154,7 @@ const PublicHoliday = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, recurringYearly: !form.recurringYearly })}
-                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
                         form.recurringYearly ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
@@ -1177,7 +1177,7 @@ const PublicHoliday = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, paidCoverage: !form.paidCoverage })}
-                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
                         form.paidCoverage ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
@@ -1200,7 +1200,7 @@ const PublicHoliday = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, autoWaivePenalty: !form.autoWaivePenalty })}
-                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
                         form.autoWaivePenalty ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
@@ -1289,7 +1289,7 @@ const PublicHoliday = () => {
                   <button
                     type="button"
                     onClick={() => setIsAddOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
                   >
                     Cancel
                   </button>

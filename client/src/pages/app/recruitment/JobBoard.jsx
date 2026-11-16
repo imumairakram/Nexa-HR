@@ -210,7 +210,7 @@ const JobBoard = () => {
             </div>
             <button
               onClick={() => setIsAddOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Candidate</span>
@@ -355,7 +355,7 @@ const JobBoard = () => {
                         {sIdx > 0 && (
                           <button
                             onClick={() => moveCandidate(c, stage.key, STAGES[sIdx - 1].key)}
-                            className="p-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-slate-900 cursor-pointer"
+                            className="p-1 rounded-[12px] bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-slate-900 cursor-pointer"
                             title={`Move back to ${STAGES[sIdx - 1].label}`}
                           >
                             <ChevronLeft className="w-3.5 h-3.5" />
@@ -365,7 +365,7 @@ const JobBoard = () => {
                         {sIdx < STAGES.length - 1 && (
                           <button
                             onClick={() => moveCandidate(c, stage.key, STAGES[sIdx + 1].key)}
-                            className="p-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 cursor-pointer ml-auto"
+                            className="p-1 rounded-[12px] bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 cursor-pointer ml-auto"
                             title={`Advance to ${STAGES[sIdx + 1].label}`}
                           >
                             <ChevronRight className="w-3.5 h-3.5" />
@@ -407,7 +407,7 @@ const JobBoard = () => {
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -464,7 +464,7 @@ const JobBoard = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

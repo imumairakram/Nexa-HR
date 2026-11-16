@@ -172,7 +172,7 @@ const ModernSearchBarSection = ({
                             onDateRangeChange && onDateRangeChange(opt.key);
                             setShowDateMenu(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
+                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
                             activeDateRange === opt.key
                               ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
                               : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -220,7 +220,7 @@ const ModernSearchBarSection = ({
                             onSortChange && onSortChange(opt.key, nextOrder);
                             setShowSortMenu(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
+                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
                             activeSort === opt.key
                               ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
                               : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -246,7 +246,7 @@ const ModernSearchBarSection = ({
                 <button
                   type="button"
                   onClick={() => onViewModeChange('list')}
-                  className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-9 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
                     viewMode === 'list'
                       ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                       : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -258,7 +258,7 @@ const ModernSearchBarSection = ({
                 <button
                   type="button"
                   onClick={() => onViewModeChange('grid')}
-                  className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-9 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
                     viewMode === 'grid'
                       ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                       : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'

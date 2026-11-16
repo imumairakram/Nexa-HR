@@ -325,7 +325,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-[8px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-blue-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-blue-200/60 dark:hover:border-slate-700 relative z-10"
+            className="p-1.5 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-blue-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-blue-200/60 dark:hover:border-slate-700 relative z-10"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -440,7 +440,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                     <button
                       type="button"
                       onClick={() => setChannel('EMAIL')}
-                      className={`p-3.5 rounded-[8px] text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${
+                      className={`p-3.5 rounded-[12px] text-left border transition-all cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden ${
                         channel === 'EMAIL'
                           ? 'bg-sky-50/90 dark:bg-blue-950/50 border-blue-500 text-slate-900 dark:text-white shadow-xs ring-1 ring-blue-500/30'
                           : 'bg-white/70 dark:bg-slate-800/60 backdrop-blur-sm border-[#E2E1DC]/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-sky-50/50 dark:hover:bg-slate-800 hover:border-blue-300/80'
@@ -475,7 +475,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                       type="button"
                       disabled={!registeredWhatsAppNumber && !userInfo?.hasPhone}
                       onClick={() => setChannel('WHATSAPP')}
-                      className={`p-3.5 rounded-[8px] text-left border transition-all flex items-center justify-between gap-3 relative overflow-hidden ${
+                      className={`p-3.5 rounded-[12px] text-left border transition-all flex items-center justify-between gap-3 relative overflow-hidden ${
                         !registeredWhatsAppNumber && !userInfo?.hasPhone
                           ? 'opacity-50 cursor-not-allowed bg-slate-100/80 dark:bg-slate-800/40 border-[#E2E1DC] dark:border-slate-700'
                           : channel === 'WHATSAPP'
@@ -549,14 +549,14 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[12px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || checkingUser || !email}
-                  className={`px-5 py-2.5 rounded-[8px] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`px-5 py-2.5 rounded-[12px] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                     channel === 'WHATSAPP' && !isHrOrAdmin
                       ? 'bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 hover:from-sky-500 hover:to-blue-600 shadow-sky-500/25'
                       : 'bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 shadow-sky-500/25'
@@ -665,14 +665,14 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[12px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || otpDigits.join('').length !== 6}
-                  className="px-5 py-2.5 rounded-[8px] bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 via-sky-600 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -764,14 +764,14 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[12px] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !newPassword || newPassword !== confirmPassword}
-                  className="px-5 py-2.5 rounded-[8px] bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -810,7 +810,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialRole = 'hr', initialEmail
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-3 rounded-[8px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer"
+                className="w-full py-3 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer"
               >
                 Return to Sign In
               </button>

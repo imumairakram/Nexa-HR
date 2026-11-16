@@ -561,7 +561,7 @@ const JobsWorkspace = () => {
             </button>
             <button
               onClick={() => navigate('/app/recruitment/pipeline')}
-              className="px-4 py-2.5 rounded-2xl bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="px-4 py-2.5 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <Users className="w-3.5 h-3.5 text-[#3CC1E6]" />
               <span>Go to ATS Pipeline</span>
@@ -753,7 +753,7 @@ const JobsWorkspace = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
+                className={`w-9 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
                   viewMode === 'grid'
                     ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                     : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -765,7 +765,7 @@ const JobsWorkspace = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
-                className={`w-9 h-7 rounded-[10px] flex items-center justify-center transition-all cursor-pointer ${
+                className={`w-9 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
                     : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
@@ -883,7 +883,7 @@ const JobsWorkspace = () => {
                       key={st.key}
                       type="button"
                       onClick={() => setStatusFilter(st.key)}
-                      className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                      className={`flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer ${
                         statusFilter === st.key
                           ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA] font-bold'
                           : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -919,7 +919,7 @@ const JobsWorkspace = () => {
                       key={s.key}
                       type="button"
                       onClick={() => setSortField(s.key)}
-                      className={`px-2 py-1.5 rounded-xl text-xs font-medium text-center transition-all cursor-pointer truncate ${
+                      className={`px-2 py-1.5 rounded-[12px] text-xs font-medium text-center transition-all cursor-pointer truncate ${
                         sortField === s.key
                           ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold border border-[#0A8FB5]/40'
                           : 'border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -954,7 +954,7 @@ const JobsWorkspace = () => {
                     onClick={() => {
                       setDeptFilter('ALL');
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer ${
                       deptFilter === 'ALL'
                         ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
                         : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -972,7 +972,7 @@ const JobsWorkspace = () => {
                         onClick={() => {
                           setDeptFilter(d);
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer ${
                           deptFilter === d
                             ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold'
                             : 'text-[#0E2A33] dark:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -990,7 +990,7 @@ const JobsWorkspace = () => {
               <button
                 type="button"
                 onClick={() => setShowMobileFilter(false)}
-                className="w-full py-2 rounded-xl bg-[#0A8FB5] text-white text-xs font-bold hover:bg-[#07617D] transition-colors cursor-pointer"
+                className="w-full py-2 rounded-[12px] bg-[#0A8FB5] text-white text-xs font-bold hover:bg-[#07617D] transition-colors cursor-pointer"
               >
                 Done
               </button>
@@ -1082,7 +1082,7 @@ const JobsWorkspace = () => {
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(job)}
-                        className={`ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold rounded-full px-2.5 py-0.5 cursor-pointer transition-all active:scale-95 ${
+                        className={`ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold rounded-[12px] px-2.5 py-0.5 cursor-pointer transition-all active:scale-95 ${
                           job.status === 'ACTIVE'
                             ? 'text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F] hover:bg-[#cceed9]'
                             : 'text-[#9A6100] dark:text-[#F0BE5A] bg-[#FBEFD3] dark:bg-[#33270B] hover:bg-[#f6e6bd]'
@@ -1183,7 +1183,7 @@ const JobsWorkspace = () => {
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(job)}
-                        className="w-[38px] h-[38px] rounded-[10px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5] hover:border-[#0E2A33] dark:hover:border-[#E6F2F5] transition-all cursor-pointer"
+                        className="w-[38px] h-[38px] rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5] hover:border-[#0E2A33] dark:hover:border-[#E6F2F5] transition-all cursor-pointer"
                         title="Edit job requisition"
                       >
                         <Edit3 className="w-4 h-4" />
@@ -1191,7 +1191,7 @@ const JobsWorkspace = () => {
                       <button
                         type="button"
                         onClick={() => handleDeleteJob(job.id)}
-                        className="w-[38px] h-[38px] rounded-[10px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] dark:hover:text-[#F07185] hover:border-[#C0354A] dark:hover:border-[#F07185] transition-all cursor-pointer"
+                        className="w-[38px] h-[38px] rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] dark:hover:text-[#F07185] hover:border-[#C0354A] dark:hover:border-[#F07185] transition-all cursor-pointer"
                         title="Delete job requisition"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1265,7 +1265,7 @@ const JobsWorkspace = () => {
                             <button
                               type="button"
                               onClick={() => handleToggleStatus(job)}
-                              className={`inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-2 py-0.5 cursor-pointer transition-all ${
+                              className={`inline-flex items-center gap-1.5 text-xs font-semibold rounded-[12px] px-2 py-0.5 cursor-pointer transition-all ${
                                 job.status === 'ACTIVE'
                                   ? 'text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F]'
                                   : 'text-[#9A6100] dark:text-[#F0BE5A] bg-[#FBEFD3] dark:bg-[#33270B]'
@@ -1280,7 +1280,7 @@ const JobsWorkspace = () => {
                               <button
                                 type="button"
                                 onClick={() => handleShareJob(job)}
-                                className="w-7 h-7 rounded-[8px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0A8FB5] transition-all cursor-pointer"
+                                className="w-7 h-7 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0A8FB5] transition-all cursor-pointer"
                                 title="Share Job"
                               >
                                 <Link2 className="w-3.5 h-3.5" />
@@ -1288,7 +1288,7 @@ const JobsWorkspace = () => {
                               <button
                                 type="button"
                                 onClick={() => handleOpenEdit(job)}
-                                className="w-7 h-7 rounded-[8px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] transition-all cursor-pointer"
+                                className="w-7 h-7 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] transition-all cursor-pointer"
                                 title="Edit Job Requisition"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
@@ -1296,7 +1296,7 @@ const JobsWorkspace = () => {
                               <button
                                 type="button"
                                 onClick={() => handleDeleteJob(job.id)}
-                                className="w-7 h-7 rounded-[8px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] transition-all cursor-pointer"
+                                className="w-7 h-7 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] transition-all cursor-pointer"
                                 title="Delete Job"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1345,7 +1345,7 @@ const JobsWorkspace = () => {
               <button
                 type="button"
                 onClick={() => setIsDrawerOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1538,7 +1538,7 @@ const JobsWorkspace = () => {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setIsDrawerOpen(false)}
-                  className="px-6 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-[12px] text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>

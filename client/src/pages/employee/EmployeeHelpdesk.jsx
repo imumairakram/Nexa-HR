@@ -512,7 +512,7 @@ const EmployeeHelpdesk = () => {
             </div>
             <button
               onClick={() => setIsNewTicketOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Create New Ticket</span>
@@ -654,7 +654,7 @@ const EmployeeHelpdesk = () => {
                     key={cat.id}
                     type="button"
                     onClick={() => setCategoryFilter(cat.id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                       categoryFilter === cat.id
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -683,7 +683,7 @@ const EmployeeHelpdesk = () => {
           <button
             type="button"
             onClick={() => setIsNewTicketOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Ticket</span>
@@ -802,7 +802,7 @@ const EmployeeHelpdesk = () => {
               <div className="pt-2">
                 <button
                   onClick={() => setIsNewTicketOpen(true)}
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                 >
                   <Plus className="w-4 h-4 stroke-[2.5]" />
                   <span>Create New Support Ticket</span>
@@ -816,7 +816,7 @@ const EmployeeHelpdesk = () => {
                     setStatusFilter('ALL');
                     setCategoryFilter('ALL');
                   }}
-                  className="px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
+                  className="px-5 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Reset Search & Filters</span>
@@ -916,7 +916,7 @@ const EmployeeHelpdesk = () => {
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setSelectedTicket(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shrink-0 ml-3"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shrink-0 ml-3"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -989,7 +989,7 @@ const EmployeeHelpdesk = () => {
                   type="button"
                   onClick={() => handleSendReply(selectedTicket.id)}
                   disabled={!replyText.trim() || isReplying}
-                  className="h-11 px-6 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 active:scale-[0.99] text-white text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 transition-all shadow-lg shadow-sky-600/25 shrink-0"
+                  className="h-11 px-6 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 active:scale-[0.99] text-white text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 transition-all shadow-lg shadow-sky-600/25 shrink-0"
                 >
                   {isReplying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   <span>{isReplying ? 'Sending...' : 'Reply'}</span>
@@ -1008,7 +1008,7 @@ const EmployeeHelpdesk = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedTicket(null)}
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
                   >
                     Close
                   </button>
@@ -1016,7 +1016,7 @@ const EmployeeHelpdesk = () => {
                     type="button"
                     onClick={() => handleToggleResolved(selectedTicket.id)}
                     disabled={isUpdatingStatus}
-                    className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 border ${
+                    className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[12px] text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 border ${
                       selectedTicket.status === 'RESOLVED'
                         ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60 shadow-xs'
                         : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shadow-xs'
@@ -1074,7 +1074,7 @@ const EmployeeHelpdesk = () => {
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setIsNewTicketOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1128,7 +1128,7 @@ const EmployeeHelpdesk = () => {
                           type="button"
                           key={p.id}
                           onClick={() => setNewTicketForm({ ...newTicketForm, priority: p.id })}
-                          className={`h-full px-2.5 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-between gap-1 text-left ${
+                          className={`h-full px-2.5 rounded-[12px] border text-center transition-all cursor-pointer flex items-center justify-between gap-1 text-left ${
                             isSelected
                               ? p.id === 'HIGH'
                                 ? 'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs ring-2 ring-rose-500/20'
@@ -1184,7 +1184,7 @@ const EmployeeHelpdesk = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setNewTicketForm({ ...newTicketForm, category: cat.id })}
-                        className={`relative cursor-pointer flex flex-col p-3 rounded-2xl transition-all text-left group ${
+                        className={`relative cursor-pointer flex flex-col p-3 rounded-[12px] transition-all text-left group ${
                           isSelected
                             ? 'border-2 border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 shadow-sm ring-4 ring-sky-500/10'
                             : 'border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800/80 hover:border-sky-300 dark:hover:border-sky-600 hover:shadow-md'
@@ -1320,7 +1320,7 @@ const EmployeeHelpdesk = () => {
                     type="button"
                     onClick={() => setIsNewTicketOpen(false)}
                     disabled={isSubmitting}
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>

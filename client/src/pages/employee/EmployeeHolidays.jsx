@@ -153,7 +153,7 @@ const EmployeeHolidays = () => {
             <button
               key={yr}
               onClick={() => setSelectedYear(yr)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 selectedYear === yr
                   ? 'bg-sky-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -174,7 +174,7 @@ const EmployeeHolidays = () => {
             <button
               onClick={() => setViewMode('list')}
               title="Schedule Table View"
-              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`p-2 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'list'
                   ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
@@ -185,7 +185,7 @@ const EmployeeHolidays = () => {
             <button
               onClick={() => setViewMode('calendar')}
               title="Calendar Grid View"
-              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`p-2 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'calendar'
                   ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
@@ -211,7 +211,7 @@ const EmployeeHolidays = () => {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                 filter === tab.id
                   ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'

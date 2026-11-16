@@ -272,7 +272,7 @@ const JobApplication = () => {
             <div className="flex items-center gap-2 w-full">
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="flex-1 px-3 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-105"
+                className="flex-1 px-3 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-105"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Applicant</span>
@@ -388,7 +388,7 @@ const JobApplication = () => {
             <button
               key={stg}
               onClick={() => setStageFilter(stg)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                 stageFilter === stg
                   ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
@@ -444,7 +444,7 @@ const JobApplication = () => {
 
                 <button
                   onClick={() => setSelectedApp(a)}
-                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-700 dark:text-slate-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-700 dark:text-slate-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Inspect Dossier</span>
@@ -503,7 +503,7 @@ const JobApplication = () => {
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => setSelectedApp(a)}
-                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-600 dark:text-slate-300 font-bold transition-all cursor-pointer flex items-center gap-1 text-[11px]"
+                        className="px-3 py-1.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-600 dark:text-slate-300 font-bold transition-all cursor-pointer flex items-center gap-1 text-[11px]"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Dossier</span>
@@ -543,7 +543,7 @@ const JobApplication = () => {
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -639,7 +639,7 @@ const JobApplication = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -675,7 +675,7 @@ const JobApplication = () => {
               </div>
               <button
                 onClick={() => setSelectedApp(null)}
-                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
+                className="p-2 rounded-[12px] hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -730,7 +730,7 @@ const JobApplication = () => {
                   <button
                     key={stg}
                     onClick={() => handleAdvanceStage(selectedApp.id, stg)}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-2 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                       selectedApp.stage === stg
                         ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -745,7 +745,7 @@ const JobApplication = () => {
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setSelectedApp(null)}
-                className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold hover:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer text-xs transition-colors"
+                className="px-6 py-2.5 rounded-[12px] bg-slate-900 dark:bg-slate-800 text-white font-bold hover:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer text-xs transition-colors"
               >
                 Close Dossier
               </button>

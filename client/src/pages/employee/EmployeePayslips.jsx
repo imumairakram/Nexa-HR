@@ -227,7 +227,7 @@ const EmployeePayslips = () => {
               onClick={() => {
                 if (latestSlip) handleDownload(latestSlip);
               }}
-              className={`w-full mt-1 px-5 py-2.5 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all ${
+              className={`w-full mt-1 px-5 py-2.5 rounded-[12px] font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all ${
                 latestSlip
                   ? 'bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-500/20 cursor-pointer hover:scale-105 active:scale-95'
                   : 'bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed shadow-none'
@@ -393,14 +393,14 @@ const EmployeePayslips = () => {
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         <button
                           onClick={() => setSelectedPayslip(ps)}
-                          className="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="py-2 px-3 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>View Slip</span>
                         </button>
                         <button
                           onClick={() => handleDownload(ps)}
-                          className="py-2 px-3 rounded-xl bg-slate-900 text-white dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                          className="py-2 px-3 rounded-[12px] bg-slate-900 text-white dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download</span>
@@ -468,14 +468,14 @@ const EmployeePayslips = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => setSelectedPayslip(ps)}
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                            className="p-2 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                             title="View Statement Breakdown"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDownload(ps)}
-                            className="p-2 rounded-xl bg-slate-900 text-white dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-colors cursor-pointer shadow-xs"
+                            className="p-2 rounded-[12px] bg-slate-900 text-white dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-colors cursor-pointer shadow-xs"
                             title="Download Official PDF"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -559,7 +559,7 @@ const EmployeePayslips = () => {
 
               <button
                 onClick={() => setSelectedPayslip(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -632,7 +632,7 @@ const EmployeePayslips = () => {
               </button>
               <button
                 onClick={() => handleDownload(selectedPayslip)}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-700 to-sky-600 hover:from-sky-600 hover:to-sky-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 text-xs"
+                className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-700 to-sky-600 hover:from-sky-600 hover:to-sky-500 text-white font-bold transition-all hover:scale-105 flex items-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 text-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>Download PDF</span>

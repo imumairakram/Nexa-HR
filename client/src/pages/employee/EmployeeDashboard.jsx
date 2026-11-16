@@ -545,7 +545,7 @@ const EmployeeDashboard = () => {
             <div className="w-full pt-2">
               <button
                 onClick={() => navigate('/employee/attendance')}
-                className="w-full py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 hover:scale-105 active:scale-95"
+                className="w-full py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 hover:scale-105 active:scale-95"
               >
                 <span>View Full Attendance History</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -618,7 +618,7 @@ const EmployeeDashboard = () => {
               onClick={toggleSalaryVisibility}
               title={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
               aria-label={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
-              className="p-1 -my-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center justify-center active:scale-90"
+              className="p-1 -my-1 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center justify-center active:scale-90"
             >
               {isSalaryHidden ? (
                 <EyeOff className="w-3.5 h-3.5" />
@@ -644,7 +644,7 @@ const EmployeeDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={() => navigate('/employee/leaves')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-[12px] bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
@@ -662,7 +662,7 @@ const EmployeeDashboard = () => {
 
         <button
           onClick={() => navigate('/employee/payslips')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-[12px] bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
@@ -680,7 +680,7 @@ const EmployeeDashboard = () => {
 
         <button
           onClick={() => navigate('/employee/helpdesk')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-[12px] bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
@@ -698,7 +698,7 @@ const EmployeeDashboard = () => {
 
         <button
           onClick={() => navigate('/employee/documents')}
-          className="p-5 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
+          className="p-5 rounded-[12px] bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-800 shadow-soft hover:border-sky-500/50 hover:shadow-md transition-all text-left flex items-start justify-between group cursor-pointer"
         >
           <div className="space-y-1">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
@@ -900,7 +900,7 @@ const EmployeeDashboard = () => {
 
               <button
                 onClick={() => setSelectedAnnouncement(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -929,7 +929,7 @@ const EmployeeDashboard = () => {
                   setSelectedAnnouncement(null);
                   navigate('/employee/announcements');
                 }}
-                className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold cursor-pointer transition-all shadow-md shadow-sky-600/20"
+                className="px-5 py-2.5 rounded-[12px] bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold cursor-pointer transition-all shadow-md shadow-sky-600/20"
               >
                 Go to Announcements Feed
               </button>

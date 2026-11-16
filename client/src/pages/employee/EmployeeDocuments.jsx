@@ -925,7 +925,7 @@ const EmployeeDocuments = () => {
             </div>
             <button
               onClick={() => setIsUploadOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Upload Certificate</span>
@@ -1083,7 +1083,7 @@ const EmployeeDocuments = () => {
                     key={id}
                     type="button"
                     onClick={() => setTypeFilter(id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -1110,7 +1110,7 @@ const EmployeeDocuments = () => {
             <button
               type="button"
               onClick={() => setIsUploadOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Upload Document</span>
@@ -1148,7 +1148,7 @@ const EmployeeDocuments = () => {
                     setActiveTab('personal');
                     setTypeFilter('ALL');
                   }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'personal'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                       : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -1162,7 +1162,7 @@ const EmployeeDocuments = () => {
                     setActiveTab('policies');
                     setTypeFilter('ALL');
                   }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'policies'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                       : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -1213,7 +1213,7 @@ const EmployeeDocuments = () => {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsUploadOpen(true)}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
                     <span>Upload Document to Vault</span>
@@ -1320,21 +1320,21 @@ const EmployeeDocuments = () => {
                               <div className="flex items-center justify-end gap-2">
                                 <button
                                   onClick={() => setSelectedDoc(doc)}
-                                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-600 dark:hover:text-sky-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+                                  className="p-2 rounded-[12px] bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-600 dark:hover:text-sky-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
                                   title="Preview Details"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDownload(doc)}
-                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold border border-slate-900 dark:border-white shadow-xs transition-all active:scale-95 cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold border border-slate-900 dark:border-white shadow-xs transition-all active:scale-95 cursor-pointer"
                                 >
                                   <Download className="w-3 h-3 stroke-[2.2]" />
                                   <span>Download</span>
                                 </button>
                                 <button
                                   onClick={() => handleDeleteDoc(doc.id)}
-                                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+                                  className="p-2 rounded-[12px] bg-slate-50 dark:bg-slate-800/80 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
                                   title="Delete Document"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1392,21 +1392,21 @@ const EmployeeDocuments = () => {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setSelectedDoc(doc)}
-                            className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer"
                             title="Preview Details"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteDoc(doc.id)}
-                            className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
                             title="Delete Document"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDownload(doc)}
-                            className="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+                            className="px-2.5 py-1 rounded-[12px] bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
                           >
                             <Download className="w-3 h-3" />
                             <span>Download</span>
@@ -1449,7 +1449,7 @@ const EmployeeDocuments = () => {
                     setActiveTab('personal');
                     setTypeFilter('ALL');
                   }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'personal'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                       : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -1463,7 +1463,7 @@ const EmployeeDocuments = () => {
                     setActiveTab('policies');
                     setTypeFilter('ALL');
                   }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'policies'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                       : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -1559,7 +1559,7 @@ const EmployeeDocuments = () => {
                           <td className="py-4 px-6 text-right whitespace-nowrap">
                             <button
                               onClick={() => handleDownload(pol)}
-                              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                              className="px-4 py-1.5 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                             >
                               <Download className="w-3.5 h-3.5" />
                               <span>Download Handbook</span>
@@ -1611,7 +1611,7 @@ const EmployeeDocuments = () => {
 
                       <button
                         onClick={() => handleDownload(pol)}
-                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                        className="px-4 py-2 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download Handbook</span>
@@ -1655,7 +1655,7 @@ const EmployeeDocuments = () => {
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setIsUploadOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1733,7 +1733,7 @@ const EmployeeDocuments = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setUploadForm({ ...uploadForm, type: cat.id })}
-                        className={`relative cursor-pointer flex flex-col p-3 rounded-2xl transition-all text-left group ${
+                        className={`relative cursor-pointer flex flex-col p-3 rounded-[12px] transition-all text-left group ${
                           isSelected
                             ? 'border-2 border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 shadow-sm ring-4 ring-sky-500/10'
                             : 'border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800/80 hover:border-sky-300 dark:hover:border-sky-600 hover:shadow-md'
@@ -1913,7 +1913,7 @@ const EmployeeDocuments = () => {
                   <button
                     type="button"
                     onClick={() => setIsUploadOpen(false)}
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1967,7 +1967,7 @@ const EmployeeDocuments = () => {
               <button
                 type="button"
                 onClick={() => setSelectedDoc(null)}
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 relative z-10"
+                className="w-9 h-9 rounded-[12px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 relative z-10"
                 aria-label="Close dialog"
               >
                 <X className="w-4 h-4" />
@@ -1997,7 +1997,7 @@ const EmployeeDocuments = () => {
                     <button
                       type="button"
                       onClick={() => handleCopyId(selectedDoc.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer"
+                      className="p-1.5 rounded-[12px] text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer"
                       title="Copy Record ID"
                     >
                       {copiedId ? (
@@ -2057,7 +2057,7 @@ const EmployeeDocuments = () => {
               <button
                 type="button"
                 onClick={() => setSelectedDoc(null)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                className="px-5 py-2.5 rounded-[12px] text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-all cursor-pointer"
               >
                 Close
               </button>
@@ -2067,7 +2067,7 @@ const EmployeeDocuments = () => {
                   handleDownload(selectedDoc);
                   setSelectedDoc(null);
                 }}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 via-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-lg shadow-sky-500/25 active:scale-95 transition-all"
+                className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 via-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-lg shadow-sky-500/25 active:scale-95 transition-all"
               >
                 <Download className="w-4 h-4 stroke-[2.2]" />
                 <span>Download Secure Copy</span>

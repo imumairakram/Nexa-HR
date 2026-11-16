@@ -54,7 +54,7 @@ export default function DemoToast() {
           <button
             type="button"
             onClick={() => setToast(null)}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-[12px] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
             aria-label="Dismiss alert"
           >
             <X className="w-4 h-4" />

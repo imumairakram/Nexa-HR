@@ -369,7 +369,7 @@ const Announcement = () => {
             </div>
             <button
               onClick={() => setIsPostModalOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Create Announcement</span>
@@ -508,7 +508,7 @@ const Announcement = () => {
                     key={key}
                     type="button"
                     onClick={() => setCategoryFilter(key)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80'
@@ -534,7 +534,7 @@ const Announcement = () => {
           <button
             type="button"
             onClick={() => setIsPostModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Post Circular</span>
@@ -600,7 +600,7 @@ const Announcement = () => {
                   <div className="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                     <button
                       onClick={() => setSelectedNotice(item)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 transition-all cursor-pointer shadow-xs active:scale-95"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 transition-all cursor-pointer shadow-xs active:scale-95"
                     >
                       <Eye className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                       <span>Read Full Notice</span>
@@ -612,7 +612,7 @@ const Announcement = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => togglePin(item.id, item.pinned)}
-                    className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                    className={`p-2.5 rounded-[12px] transition-all cursor-pointer border ${
                       item.pinned
                         ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
                         : 'bg-slate-50 dark:bg-slate-800/70 text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200/80 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -624,7 +624,7 @@ const Announcement = () => {
 
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-700 transition-all cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                    className="p-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-700 transition-all cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/40"
                     title="Delete Notice"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -668,7 +668,7 @@ const Announcement = () => {
               <button
                 type="button"
                 onClick={() => setIsPostModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -745,7 +745,7 @@ const Announcement = () => {
                         key={p.id}
                         type="button"
                         onClick={() => setForm((prev) => ({ ...prev, priority: p.id }))}
-                        className={`py-2.5 px-3 rounded-2xl border text-center transition-all cursor-pointer font-bold text-xs ${
+                        className={`py-2.5 px-3 rounded-[12px] border text-center transition-all cursor-pointer font-bold text-xs ${
                           isSelected
                             ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
                             : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
@@ -787,7 +787,7 @@ const Announcement = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setForm((p) => ({ ...p, category: cat.id }))}
-                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
+                        className={`relative p-3.5 rounded-[12px] border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
                           isSelected
                             ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
                             : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
@@ -932,7 +932,7 @@ const Announcement = () => {
                   <button
                     type="button"
                     onClick={() => setIsPostModalOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -997,7 +997,7 @@ const Announcement = () => {
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setSelectedNotice(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1066,7 +1066,7 @@ const Announcement = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedNotice(null)}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold shadow-md active:scale-[0.99] transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold shadow-md active:scale-[0.99] transition-all cursor-pointer"
                 >
                   Close Notice
                 </button>

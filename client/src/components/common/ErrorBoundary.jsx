@@ -65,7 +65,7 @@ class ErrorBoundaryInner extends React.Component {
                   this.setState({ hasError: false, error: null, errorInfo: null });
                   window.location.href = '/app/dashboard';
                 }}
-                className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="flex-1 py-3 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <Home className="w-4 h-4" />
                 <span>Dashboard</span>

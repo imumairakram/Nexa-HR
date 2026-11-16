@@ -432,7 +432,7 @@ const UserAccessControl = () => {
           </div>
           <button
             onClick={() => navigate('/app/dashboard')}
-            className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-md cursor-pointer transition-all hover:scale-105"
+            className="w-full py-3 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-md cursor-pointer transition-all hover:scale-105"
           >
             Return to Dashboard
           </button>
@@ -688,7 +688,7 @@ const UserAccessControl = () => {
                             key={key}
                             type="button"
                             onClick={() => setFilterType(key)}
-                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
                                 ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
@@ -728,7 +728,7 @@ const UserAccessControl = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedDept('ALL')}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                           selectedDept === 'ALL'
                             ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
@@ -763,7 +763,7 @@ const UserAccessControl = () => {
                             key={d.id}
                             type="button"
                             onClick={() => setSelectedDept(d.name)}
-                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
                                 ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
@@ -802,7 +802,7 @@ const UserAccessControl = () => {
                             setFilterType('ALL');
                             setShowFilterMenu(false);
                           }}
-                          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
+                          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-[12px] text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-all cursor-pointer"
                         >
                           <RotateCcw className="w-3 h-3" />
                           <span>Reset All Filters</span>
@@ -1033,7 +1033,7 @@ const UserAccessControl = () => {
                 <div className="flex items-center p-1 bg-slate-100/80 dark:bg-slate-800/90 rounded-2xl border border-slate-200/70 dark:border-slate-700/70">
                   <button
                     onClick={() => setActiveTab('permissions')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'permissions'
                         ? 'bg-sky-500 text-white shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -1043,7 +1043,7 @@ const UserAccessControl = () => {
                   </button>
                   <button
                     onClick={() => setActiveTab('audit')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'audit'
                         ? 'bg-sky-500 text-white shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -1088,7 +1088,7 @@ const UserAccessControl = () => {
                             <button
                               type="button"
                               onClick={() => handleToggleModule(module.id, !allEnabled)}
-                              className={`text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                              className={`text-[11px] font-bold px-3 py-1.5 rounded-[12px] transition-all cursor-pointer ${
                                 allEnabled
                                   ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700'
                                   : 'bg-sky-500 hover:bg-sky-600 text-white shadow-xs'
@@ -1122,7 +1122,7 @@ const UserAccessControl = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleToggleFeature(feat.key)}
-                                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-[12px] border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                                     isAllowed ? 'bg-sky-500 shadow-sm shadow-sky-500/25' : 'bg-slate-200 dark:bg-slate-700'
                                   }`}
                                 >

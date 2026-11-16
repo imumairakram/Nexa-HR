@@ -733,7 +733,7 @@ NexaHR Workforce Systems`;
         actionButton={
           <button
             onClick={fetchEmployeesData}
-            className="p-2.5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 shadow-sm cursor-pointer transition-all"
+            className="p-2.5 rounded-[12px] bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 shadow-sm cursor-pointer transition-all"
             title="Refresh database records"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -802,7 +802,7 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => navigate('/app/hr/new-employee')}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -814,7 +814,7 @@ NexaHR Workforce Systems`;
             <button
               type="button"
               onClick={() => navigate('/app/hr/new-employee')}
-              className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
               <span>Onboard Employee</span>
@@ -943,7 +943,7 @@ NexaHR Workforce Systems`;
               <button
                 type="button"
                 onClick={() => setSelectedDept('ALL')}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                   selectedDept === 'ALL'
                     ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80'
@@ -962,7 +962,7 @@ NexaHR Workforce Systems`;
                   key={dept.name}
                   type="button"
                   onClick={() => setSelectedDept(dept.name)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                     selectedDept === dept.name
                       ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80'
@@ -988,7 +988,7 @@ NexaHR Workforce Systems`;
           <button
             type="button"
             onClick={() => navigate('/app/hr/new-employee')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <UserPlus className="w-3.5 h-3.5" />
             <span>Add Employee</span>
@@ -1021,7 +1021,7 @@ NexaHR Workforce Systems`;
                 setSearchTerm('');
                 setSelectedDept('ALL');
               }}
-              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-all"
+              className="px-4 py-2 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-all"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset All Filters</span>
@@ -1212,7 +1212,7 @@ NexaHR Workforce Systems`;
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setIsEditOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1233,7 +1233,7 @@ NexaHR Workforce Systems`;
                     key={tab.id}
                     type="button"
                     onClick={() => setEditTab(tab.id)}
-                    className={`flex-1 py-2.5 px-3 rounded-[10px] transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold ${
+                    className={`flex-1 py-2.5 px-3 rounded-[12px] transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold ${
                       isSelected
                         ? 'bg-gradient-to-r from-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25 font-bold'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
@@ -1670,7 +1670,7 @@ NexaHR Workforce Systems`;
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setSelectedEmployee(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1826,7 +1826,7 @@ NexaHR Workforce Systems`;
               <button
                 type="button"
                 onClick={() => setCreatedCreds(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -1946,7 +1946,7 @@ NexaHR Workforce Systems`;
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setEmployeeToDelete(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

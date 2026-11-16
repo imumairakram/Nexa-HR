@@ -652,7 +652,7 @@ const EmployeeProfile = () => {
           <button
             type="button"
             onClick={() => setToastMsg('')}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-auto -mr-1 cursor-pointer shrink-0"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-[12px] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-auto -mr-1 cursor-pointer shrink-0"
             aria-label="Dismiss toast"
           >
             <X className="w-3.5 h-3.5" />
@@ -724,39 +724,40 @@ const EmployeeProfile = () => {
                     {formData.firstName || 'Employee'} {formData.lastName || ''}
                   </h2>
                   {formData.empCode && (
-                    <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20 text-slate-600 dark:text-slate-300 text-xs font-mono font-bold">
+                    <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-[12px] border border-white/20 text-xs font-mono font-bold shadow-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5" />
                       <span>{formData.empCode}</span>
                     </span>
                   )}
                   {formData.employmentType && (
-                    <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20 text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                    <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-[12px] border border-white/20 text-xs font-semibold shadow-xs">
                       <span>{formData.employmentType}</span>
                     </span>
                   )}
                 </div>
 
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  {formData.designation || 'Team Member'} <span className="text-slate-400 dark:text-slate-500">•</span> {formData.department || 'Operations'}
+                <p className="text-sm font-medium text-white/90">
+                  {formData.designation || 'Team Member'} <span className="text-white/40">•</span> {formData.department || 'Operations'}
                 </p>
 
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs pt-1">
-                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
-                    <Mail className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs pt-1 text-white/85">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <Mail className="w-3.5 h-3.5 text-[#7CD1EB]" />
                     <span>{formData.email || 'Email Not Added'}</span>
                   </span>
-                  <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
-                    <Phone className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <span className="hidden sm:inline text-white/40">•</span>
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <Phone className="w-3.5 h-3.5 text-emerald-300" />
                     <span>{formData.phone || 'Phone Not Added'}</span>
                   </span>
-                  <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium" title="Assigned Office Work Location">
-                    <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <span className="hidden sm:inline text-white/40">•</span>
+                  <span className="flex items-center gap-1.5 font-medium" title="Assigned Office Work Location">
+                    <Building2 className="w-3.5 h-3.5 text-[#7CD1EB]" />
                     <span>{formData.workLocation || 'Corporate Office'}</span>
                   </span>
-                  <span className="hidden sm:inline text-slate-400 dark:text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium" title="Residential Home Address">
-                    <Home className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+                  <span className="hidden sm:inline text-white/40">•</span>
+                  <span className="flex items-center gap-1.5 font-medium" title="Residential Home Address">
+                    <Home className="w-3.5 h-3.5 text-amber-300" />
                     <span>{formData.address || 'Home Address Not Added'}</span>
                   </span>
                 </div>
@@ -1026,7 +1027,7 @@ const EmployeeProfile = () => {
                     <button
                       type="submit"
                       disabled={isGuest || isSavingPassword}
-                      className={`px-6 py-2.5 rounded-2xl font-bold transition-all shadow-md flex items-center gap-2 ${isGuest
+                      className={`px-6 py-2.5 rounded-[12px] font-bold transition-all shadow-md flex items-center gap-2 ${isGuest
                           ? 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400 cursor-not-allowed'
                           : 'bg-slate-900 hover:bg-slate-800 dark:bg-rose-600 dark:hover:bg-rose-500 text-white cursor-pointer hover:scale-105 disabled:opacity-50'
                         }`}
@@ -1140,7 +1141,7 @@ const EmployeeProfile = () => {
                       <button
                         type="button"
                         onClick={() => setIsEditingBank(true)}
-                        className="px-2.5 py-1 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/60 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        className="px-2.5 py-1 rounded-[12px] bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/60 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
                         title="Edit Bank Details"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -1150,7 +1151,7 @@ const EmployeeProfile = () => {
                       <button
                         type="button"
                         onClick={() => setIsEditingBank(false)}
-                        className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        className="px-2.5 py-1 rounded-[12px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
                         title="Cancel Editing"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -1342,7 +1343,7 @@ const EmployeeProfile = () => {
                           setIsEditingBank(false);
                           if (currentUser) populateUserData(currentUser);
                         }}
-                        className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-all"
+                        className="px-4 py-2 rounded-[12px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-all"
                       >
                         Cancel
                       </button>

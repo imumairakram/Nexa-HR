@@ -66,7 +66,7 @@ const EmployeeBottomNav = () => {
                       navigate(item.path);
                       setIsMoreOpen(false);
                     }}
-                    className="p-3 rounded-[8px] bg-slate-50 dark:bg-slate-800/80 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-700 dark:hover:text-sky-300 flex flex-col items-center gap-1.5 text-center transition-all cursor-pointer"
+                    className="p-3 rounded-[12px] bg-slate-50 dark:bg-slate-800/80 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-700 dark:hover:text-sky-300 flex flex-col items-center gap-1.5 text-center transition-all cursor-pointer"
                   >
                     <Icon className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                     <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 leading-tight">
@@ -106,7 +106,7 @@ const EmployeeBottomNav = () => {
           {/* More trigger */}
           <button
             onClick={() => setIsMoreOpen(true)}
-            className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[8px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer"
+            className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[12px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer"
           >
             <MoreHorizontal className="w-4 h-4" />
             <span className="text-[10px] tracking-tight">More</span>

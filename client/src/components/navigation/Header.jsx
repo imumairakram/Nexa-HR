@@ -50,7 +50,7 @@ const Header = () => {
         {/* Quick Web Clock Widget */}
         <button
           onClick={toggleClock}
-          className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-xs font-semibold transition-all shadow-sm ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[12px] text-xs font-semibold transition-all shadow-sm ${
             clockedIn
               ? 'bg-teal-700 text-white hover:bg-teal-800'
               : 'bg-pastelOrange-DEFAULT text-slate-900 hover:bg-orange-200'

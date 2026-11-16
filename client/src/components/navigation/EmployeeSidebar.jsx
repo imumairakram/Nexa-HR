@@ -162,7 +162,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
               toggleSidebar();
             }}
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-            className="w-8 h-8 rounded-[8px] bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-[12px] bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shadow-xs border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shrink-0"
           >
             {isCollapsed ? (
               <ChevronRight className="w-4 h-4 stroke-[2.5]" />
@@ -224,8 +224,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
           title={`Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
           className={`flex items-center transition-all cursor-pointer ${
             isCollapsed
-              ? 'w-11 h-11 rounded-[8px] justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              : 'w-full gap-3 px-3 py-2 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              ? 'w-11 h-11 rounded-[12px] justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              : 'w-full gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           {resolvedTheme === 'dark' ? (
@@ -242,8 +242,8 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
           title="Sign Out"
           className={`flex items-center transition-all cursor-pointer ${
             isCollapsed
-              ? 'w-11 h-11 rounded-[8px] justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              : 'w-full gap-3 px-3 py-2 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              ? 'w-11 h-11 rounded-[12px] justify-center mx-auto text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              : 'w-full gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
@@ -350,7 +350,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
             >
               {resolvedTheme === 'dark' ? (
                 <Sun className="w-4 h-4 text-amber-400 stroke-[2] shrink-0" />
@@ -364,7 +364,7 @@ const EmployeeSidebar = ({ isCollapsed = false, toggleSidebar }) => {
             <button
               type="button"
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400 transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400 transition-all cursor-pointer"
             >
               <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
               <span>Sign Out</span>

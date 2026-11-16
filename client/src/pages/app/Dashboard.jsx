@@ -349,7 +349,7 @@ const Dashboard = () => {
           (mobileDashboardTitle === 'Admin Dashboard' || isHrPortal) && simulatePunchEnabled ? (
             <button
               onClick={() => setIsPunchModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-2xl shadow-sm shadow-sky-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-extrabold rounded-[12px] shadow-sm shadow-sky-500/20 transition-all cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5" />
               <span>Simulate Punch</span>
@@ -504,7 +504,7 @@ const Dashboard = () => {
                   <button
                     key={tf.id}
                     onClick={() => setTrendTimeframe(tf.id)}
-                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-[12px] transition-all cursor-pointer ${
                       trendTimeframe === tf.id
                         ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -605,7 +605,7 @@ const Dashboard = () => {
                   <button
                     key={tf.id}
                     onClick={() => setDeptTimeframe(tf.id)}
-                    className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-[12px] transition-all cursor-pointer ${
                       deptTimeframe === tf.id
                         ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -847,7 +847,7 @@ const Dashboard = () => {
               </div>
               <button
                 onClick={() => setIsPunchModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -898,7 +898,7 @@ const Dashboard = () => {
                 <button
                   type="button"
                   onClick={() => setIsPunchModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-[12px] transition-all cursor-pointer"
                 >
                   Cancel
                 </button>

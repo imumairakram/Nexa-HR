@@ -211,7 +211,7 @@ const Payroll = () => {
             <div className="flex flex-col w-full gap-2">
               <button
                 onClick={() => setIsRunModalOpen(true)}
-                className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
               >
                 <Zap className="w-3.5 h-3.5" />
                 <span>Run Payroll Batch</span>
@@ -229,7 +229,7 @@ const Payroll = () => {
           <div className="sm:hidden pt-1 flex items-center gap-2">
             <button
               onClick={() => setIsRunModalOpen(true)}
-              className="flex-1 py-3 px-4 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="flex-1 py-3 px-4 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <Zap className="w-3.5 h-3.5" />
               <span>Run Payroll</span>
@@ -325,7 +325,7 @@ const Payroll = () => {
 
           <button
             onClick={() => navigate('/app/payroll/payslips')}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold rounded-2xl transition-all cursor-pointer"
+            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold rounded-[12px] transition-all cursor-pointer"
           >
             View All Individual Payslips
           </button>
@@ -383,7 +383,7 @@ const Payroll = () => {
 
                     <button
                       onClick={() => navigate('/app/payroll/payslips')}
-                      className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all cursor-pointer text-center"
+                      className="w-full py-2 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all cursor-pointer text-center"
                     >
                       Inspect Slips
                     </button>
@@ -429,7 +429,7 @@ const Payroll = () => {
                       <td className="py-4 px-6 text-right">
                         <button
                           onClick={() => navigate('/app/payroll/payslips')}
-                          className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all cursor-pointer"
                         >
                           Inspect Slips
                         </button>
@@ -461,7 +461,7 @@ const Payroll = () => {
             <div className="pt-2">
               <button
                 onClick={() => setIsRunModalOpen(true)}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>Run Payroll Batch</span>
@@ -509,7 +509,7 @@ const Payroll = () => {
               </div>
               <button
                 onClick={() => setIsRunModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -570,7 +570,7 @@ const Payroll = () => {
                 <button
                   type="button"
                   onClick={() => setIsRunModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                  className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>

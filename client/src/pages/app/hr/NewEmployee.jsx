@@ -366,7 +366,7 @@ const NewEmployee = () => {
             </div>
             <button
               onClick={() => navigate('/app/employees')}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <span>Back to Directory</span>
             </button>
@@ -1028,7 +1028,7 @@ const NewEmployee = () => {
                       setToastMsg('Applied standard Nexa#XXXX preset');
                       setTimeout(() => setToastMsg(''), 2000);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
+                    className="px-2.5 py-1 rounded-[12px] bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
                   >
                     Nexa#Random
                   </button>
@@ -1039,7 +1039,7 @@ const NewEmployee = () => {
                       setToastMsg('Applied standard corporate Nexa@2026! preset');
                       setTimeout(() => setToastMsg(''), 2000);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
+                    className="px-2.5 py-1 rounded-[12px] bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
                   >
                     Nexa@2026!
                   </button>
@@ -1050,7 +1050,7 @@ const NewEmployee = () => {
                       setToastMsg('Applied TempPassword123! preset');
                       setTimeout(() => setToastMsg(''), 2000);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
+                    className="px-2.5 py-1 rounded-[12px] bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold cursor-pointer transition-colors"
                   >
                     TempPassword123!
                   </button>
@@ -1155,7 +1155,7 @@ const NewEmployee = () => {
             type="button"
             onClick={handlePrev}
             disabled={currentStep === 1}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all ${
+            className={`px-5 py-2.5 rounded-[12px] font-bold text-xs flex items-center gap-2 transition-all ${
               currentStep === 1 ? 'opacity-30 cursor-not-allowed' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 cursor-pointer'
             }`}
           >

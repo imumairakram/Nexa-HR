@@ -656,7 +656,7 @@ const Leaves = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedEmployee('ALL')}
-                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
                     selectedEmployee === 'ALL'
                       ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -672,7 +672,7 @@ const Leaves = () => {
                       key={emp.id}
                       type="button"
                       onClick={() => setSelectedEmployee(emp.id)}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
                         isSelected
                           ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -699,7 +699,7 @@ const Leaves = () => {
                       key={typeName}
                       type="button"
                       onClick={() => setLeaveTypeFilter(typeName)}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
                         isSelected
                           ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -724,7 +724,7 @@ const Leaves = () => {
                     key={opt.key}
                     type="button"
                     onClick={() => setDateRange(opt.key)}
-                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                    className={`px-2.5 py-1.5 rounded-[12px] text-xs font-semibold text-left transition-all cursor-pointer truncate ${
                       dateRange === opt.key
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
                         : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
@@ -824,7 +824,7 @@ const Leaves = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedEmployee('ALL')}
-                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                  className="px-3.5 py-1.5 rounded-[12px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                 >
                   <Users className="w-3.5 h-3.5 text-slate-400" />
                   <span>View All Employees</span>
@@ -990,7 +990,7 @@ const Leaves = () => {
                                   type="button"
                                   onClick={() => handleUpdateStatus(req.id, 'APPROVED')}
                                   disabled={submitting}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95 disabled:opacity-50"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95 disabled:opacity-50"
                                 >
                                   <Check className="w-3.5 h-3.5" />
                                   <span>Approve</span>
@@ -999,7 +999,7 @@ const Leaves = () => {
                                   type="button"
                                   onClick={() => handleUpdateStatus(req.id, 'REJECTED')}
                                   disabled={submitting}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white text-xs font-bold transition-all cursor-pointer border border-rose-200/70 dark:border-rose-800/50 shadow-2xs active:scale-95 disabled:opacity-50"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white text-xs font-bold transition-all cursor-pointer border border-rose-200/70 dark:border-rose-800/50 shadow-2xs active:scale-95 disabled:opacity-50"
                                 >
                                   <X className="w-3.5 h-3.5" />
                                   <span>Reject</span>
@@ -1149,7 +1149,7 @@ const Leaves = () => {
                               type="button"
                               onClick={() => handleUpdateStatus(req.id, 'APPROVED')}
                               disabled={submitting}
-                              className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-2xs text-center flex items-center justify-center gap-1.5"
+                              className="py-2 px-3 rounded-[12px] bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-2xs text-center flex items-center justify-center gap-1.5"
                             >
                               <Check className="w-3.5 h-3.5" />
                               <span>Approve</span>
@@ -1158,7 +1158,7 @@ const Leaves = () => {
                               type="button"
                               onClick={() => handleUpdateStatus(req.id, 'REJECTED')}
                               disabled={submitting}
-                              className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 border border-rose-200/60 dark:border-rose-800/50"
+                              className="py-2 px-3 rounded-[12px] bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 border border-rose-200/60 dark:border-rose-800/50"
                             >
                               <X className="w-3.5 h-3.5" />
                               <span>Reject</span>
@@ -1201,7 +1201,7 @@ const Leaves = () => {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsApplyOpen(true)}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
                     <span>Record Leave on Employee Behalf</span>
@@ -1218,7 +1218,7 @@ const Leaves = () => {
                       setDateRange('ALL');
                       setSelectedEmployee('ALL');
                     }}
-                    className="px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
+                    className="px-5 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reset All Filters</span>
@@ -1264,7 +1264,7 @@ const Leaves = () => {
               <button
                 type="button"
                 onClick={() => setIsApplyOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1441,7 +1441,7 @@ const Leaves = () => {
                   <button
                     type="button"
                     onClick={() => setIsApplyOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
                   >
                     Cancel
                   </button>

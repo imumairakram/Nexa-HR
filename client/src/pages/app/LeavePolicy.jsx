@@ -550,7 +550,7 @@ const LeavePolicy = () => {
             </div>
             <button
               onClick={() => setIsAddOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Create New Policy</span>
@@ -630,7 +630,7 @@ const LeavePolicy = () => {
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-sky-500/20 cursor-pointer transition-all hover:scale-105"
+          className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-[12px] flex items-center gap-1.5 shadow-md shadow-sky-500/20 cursor-pointer transition-all hover:scale-105"
         >
           <Plus className="w-4 h-4" />
           <span>Add Leave Policy</span>
@@ -686,7 +686,7 @@ const LeavePolicy = () => {
                 <button
                   type="button"
                   onClick={() => setViewingPolicy(p)}
-                  className="flex-1 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-blue-950/60 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
+                  className="flex-1 py-2 px-2.5 rounded-[12px] bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-blue-950/60 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
                   title="View Policy Details"
                 >
                   <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
@@ -696,7 +696,7 @@ const LeavePolicy = () => {
                 <button
                   type="button"
                   onClick={() => openEditModal(p)}
-                  className="flex-1 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 dark:bg-slate-800/60 dark:hover:bg-emerald-950/60 text-slate-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
+                  className="flex-1 py-2 px-2.5 rounded-[12px] bg-slate-50 hover:bg-emerald-50 dark:bg-slate-800/60 dark:hover:bg-emerald-950/60 text-slate-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
                   title="Edit Policy"
                 >
                   <Edit2 className="w-3.5 h-3.5 stroke-[2.2]" />
@@ -706,7 +706,7 @@ const LeavePolicy = () => {
                 <button
                   type="button"
                   onClick={() => setDeletingPolicy(p)}
-                  className="py-2 px-3 rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800/60 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold transition-all flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
+                  className="py-2 px-3 rounded-[12px] bg-slate-50 hover:bg-rose-50 dark:bg-slate-800/60 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold transition-all flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
                   title="Delete Policy"
                 >
                   <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
@@ -742,7 +742,7 @@ const LeavePolicy = () => {
               <button
                 type="button"
                 onClick={() => setIsAddOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -810,7 +810,7 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, type: 'PAID' })}
-                      className={`py-3 px-4 rounded-2xl border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      className={`py-3 px-4 rounded-[12px] border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                         form.type === 'PAID'
                           ? 'bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-400/30'
                           : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-emerald-300'
@@ -823,7 +823,7 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, type: 'UNPAID' })}
-                      className={`py-3 px-4 rounded-2xl border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      className={`py-3 px-4 rounded-[12px] border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                         form.type === 'UNPAID'
                           ? 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/25 ring-2 ring-amber-400/30'
                           : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-amber-300'
@@ -890,7 +890,7 @@ const LeavePolicy = () => {
                     type="button"
                     onClick={() => setIsAddOpen(false)}
                     disabled={submitting}
-                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -955,7 +955,7 @@ const LeavePolicy = () => {
               </div>
               <button
                 onClick={() => setViewingPolicy(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1010,7 +1010,7 @@ const LeavePolicy = () => {
               <button
                 type="button"
                 onClick={() => setViewingPolicy(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
               >
                 Close
               </button>
@@ -1021,7 +1021,7 @@ const LeavePolicy = () => {
                   setViewingPolicy(null);
                   openEditModal(p);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                className="px-5 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
               >
                 <Edit2 className="w-3.5 h-3.5" />
                 <span>Edit This Policy</span>
@@ -1056,7 +1056,7 @@ const LeavePolicy = () => {
               <button
                 type="button"
                 onClick={() => setEditingPolicy(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1124,7 +1124,7 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setEditForm({ ...editForm, type: 'PAID' })}
-                      className={`py-3 px-4 rounded-2xl border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      className={`py-3 px-4 rounded-[12px] border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                         editForm.type === 'PAID'
                           ? 'bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-400/30'
                           : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-emerald-300'
@@ -1137,7 +1137,7 @@ const LeavePolicy = () => {
                     <button
                       type="button"
                       onClick={() => setEditForm({ ...editForm, type: 'UNPAID' })}
-                      className={`py-3 px-4 rounded-2xl border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      className={`py-3 px-4 rounded-[12px] border font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                         editForm.type === 'UNPAID'
                           ? 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/25 ring-2 ring-amber-400/30'
                           : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-amber-300'
@@ -1204,7 +1204,7 @@ const LeavePolicy = () => {
                     type="button"
                     onClick={() => setEditingPolicy(null)}
                     disabled={submittingEdit}
-                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -1256,7 +1256,7 @@ const LeavePolicy = () => {
                 type="button"
                 onClick={() => setDeletingPolicy(null)}
                 disabled={submittingDelete}
-                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

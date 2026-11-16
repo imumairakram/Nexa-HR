@@ -708,7 +708,7 @@ const EmployeeAttendance = () => {
                   key={st.id}
                   type="button"
                   onClick={() => setStatusFilter(st.id)}
-                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
                     statusFilter === st.id
                       ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'

@@ -463,7 +463,7 @@ const EmployeeLeaves = () => {
             </div>
             <button
               onClick={() => setIsApplyOpen(true)}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
               <span>Apply for Leave</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -573,7 +573,7 @@ const EmployeeLeaves = () => {
           <button
             type="button"
             onClick={() => setIsApplyOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Apply for Leave</span>
@@ -591,7 +591,7 @@ const EmployeeLeaves = () => {
                     key={typeName}
                     type="button"
                     onClick={() => setTypeFilter(typeName)}
-                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${typeFilter === typeName
+                    className={`px-2.5 py-1.5 rounded-[12px] text-xs font-semibold text-left transition-all cursor-pointer truncate ${typeFilter === typeName
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
                         : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                       }`}
@@ -609,7 +609,7 @@ const EmployeeLeaves = () => {
                   setTypeFilter('ALL');
                   setDateRange('ALL');
                 }}
-                className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+                className="w-full py-2 rounded-[12px] bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
               >
                 Reset All Filters
               </button>
@@ -808,7 +808,7 @@ const EmployeeLeaves = () => {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsApplyOpen(true)}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
                     <span>Apply for Leave</span>
@@ -821,7 +821,7 @@ const EmployeeLeaves = () => {
                       setStatusFilter('ALL');
                       setSearchQuery('');
                     }}
-                    className="px-5 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
+                    className="px-5 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reset Search & Filters</span>
@@ -864,7 +864,7 @@ const EmployeeLeaves = () => {
               </div>
               <button
                 onClick={() => setSelectedReq(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-1.5 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -938,7 +938,7 @@ const EmployeeLeaves = () => {
             <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setSelectedReq(null)}
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-bold text-xs"
+                className="px-4 py-2 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-bold text-xs"
               >
                 Close
               </button>
@@ -972,7 +972,7 @@ const EmployeeLeaves = () => {
               <button
                 type="button"
                 onClick={() => setIsApplyOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1032,7 +1032,7 @@ const EmployeeLeaves = () => {
                           key={d.id}
                           type="button"
                           onClick={() => setLeaveForm((prev) => ({ ...prev, dayType: d.id }))}
-                          className={`py-2 px-3 rounded-xl border text-center transition-all cursor-pointer font-bold text-xs ${
+                          className={`py-2 px-3 rounded-[12px] border text-center transition-all cursor-pointer font-bold text-xs ${
                             isSelected
                               ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
                               : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
@@ -1158,7 +1158,7 @@ const EmployeeLeaves = () => {
                   <button
                     type="button"
                     onClick={() => setIsApplyOpen(false)}
-                    className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
                   >
                     Cancel
                   </button>

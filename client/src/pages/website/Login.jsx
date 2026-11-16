@@ -292,7 +292,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('hr')}
-                className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'hr'
+                className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-[12px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'hr'
                   ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
@@ -305,7 +305,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleTabChange('employee')}
-                className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
+                className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-[12px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
                   ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 shadow-sm border border-slate-200/50 dark:border-slate-600/50'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
@@ -474,7 +474,7 @@ const Login = () => {
                     type="button"
                     disabled={loading}
                     onClick={() => handleGuestLogin(loginRole)}
-                    className="w-full py-3 px-4 rounded-2xl border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm bg-sky-50/70 hover:bg-sky-100/90 dark:bg-sky-950/30 dark:hover:bg-sky-900/40 border-sky-200/80 dark:border-sky-800/60 text-sky-950 dark:text-sky-200"
+                    className="w-full py-3 px-4 rounded-[12px] border transition-all duration-200 flex items-center justify-between group cursor-pointer active:scale-[0.99] shadow-sm bg-sky-50/70 hover:bg-sky-100/90 dark:bg-sky-950/30 dark:hover:bg-sky-900/40 border-sky-200/80 dark:border-sky-800/60 text-sky-950 dark:text-sky-200"
                   >
                     <div className="flex items-center gap-2.5 text-left">
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-sky-500 text-white shadow-sky-500/30 shadow-md">
@@ -595,7 +595,7 @@ const Login = () => {
                 </div>
                 <button
                   type="button"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md font-semibold text-[8px] transition-colors cursor-pointer"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-[12px] font-semibold text-[8px] transition-colors cursor-pointer"
                 >
                   Live Roster
                 </button>
@@ -662,7 +662,7 @@ const Login = () => {
 
               <button
                 type="button"
-                className="w-full mt-2.5 bg-slate-900 hover:bg-slate-800 text-white py-1 rounded-md font-semibold text-[8px] transition-colors text-center cursor-pointer"
+                className="w-full mt-2.5 bg-slate-900 hover:bg-slate-800 text-white py-1 rounded-[12px] font-semibold text-[8px] transition-colors text-center cursor-pointer"
               >
                 Review Department Roster
               </button>
@@ -753,7 +753,7 @@ const Login = () => {
                 type="button"
                 onClick={() => setActiveSlide(index)}
                 aria-label={`Go to slide ${index + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${activeSlide === index
+                className={`h-1.5 rounded-[12px] transition-all duration-500 cursor-pointer ${activeSlide === index
                   ? 'w-10 sm:w-14 bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
                   : 'w-6 sm:w-8 bg-white/25 hover:bg-white/45'
                   }`}

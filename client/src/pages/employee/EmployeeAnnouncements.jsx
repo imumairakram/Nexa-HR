@@ -475,7 +475,7 @@ const EmployeeAnnouncements = () => {
               <div className="w-full space-y-2 pt-1">
                 <button
                   onClick={() => setSelectedItem(heroNotice)}
-                  className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+                  className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
                 >
                   <span>Read Full Notice</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -483,7 +483,7 @@ const EmployeeAnnouncements = () => {
 
                 <button
                   onClick={() => toggleAcknowledge(heroNotice.id)}
-                  className={`w-full px-4 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                  className={`w-full px-4 py-2 rounded-[12px] text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
                     heroNotice.acknowledged
                       ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/50 font-bold'
                       : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
@@ -566,7 +566,7 @@ const EmployeeAnnouncements = () => {
                     onClick={() => {
                       setFilter(cat.id);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
@@ -658,7 +658,7 @@ const EmployeeAnnouncements = () => {
                         <button
                           key={aIdx}
                           onClick={() => handleDownloadAttachment(att)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700"
                         >
                           <Paperclip className="w-3 h-3 text-sky-500" />
                           <span>{att.name}</span>
@@ -673,7 +673,7 @@ const EmployeeAnnouncements = () => {
                     <div className="flex items-center gap-2.5">
                       <button
                         onClick={() => setSelectedItem(item)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 transition-all cursor-pointer shadow-xs active:scale-95"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200/80 dark:border-sky-800/80 transition-all cursor-pointer shadow-xs active:scale-95"
                       >
                         <Eye className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                         <span>Read Full Notice</span>
@@ -681,7 +681,7 @@ const EmployeeAnnouncements = () => {
 
                       <button
                         onClick={() => toggleAcknowledge(item.id)}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs active:scale-95 ${
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] text-xs font-bold border transition-all cursor-pointer shadow-xs active:scale-95 ${
                           item.acknowledged
                             ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white'
                             : 'bg-white text-slate-800 dark:bg-[#1E293B] dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 hover:text-sky-600 dark:hover:text-sky-400'
@@ -705,7 +705,7 @@ const EmployeeAnnouncements = () => {
                 <button
                   onClick={() => togglePin(item.id)}
                   title={item.pinned ? 'Unpin Notice' : 'Pin Notice to Top'}
-                  className={`p-2.5 rounded-xl transition-all cursor-pointer shrink-0 border ${
+                  className={`p-2.5 rounded-[12px] transition-all cursor-pointer shrink-0 border ${
                     item.pinned
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
                       : 'bg-slate-50 dark:bg-slate-800/70 text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200/80 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -735,7 +735,7 @@ const EmployeeAnnouncements = () => {
                   setFilter('ALL');
                   setSearchQuery('');
                 }}
-                className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-sky-600 text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-[12px] bg-slate-900 dark:bg-sky-600 text-white text-xs font-bold cursor-pointer"
               >
                 Reset All Filters
               </button>
@@ -783,7 +783,7 @@ const EmployeeAnnouncements = () => {
                 type="button"
                 aria-label="Close modal"
                 onClick={() => setSelectedItem(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -873,7 +873,7 @@ const EmployeeAnnouncements = () => {
                         <button
                           type="button"
                           onClick={() => handleDownloadAttachment(att)}
-                          className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-xs"
+                          className="px-3 py-1.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-xs"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download</span>
@@ -898,14 +898,14 @@ const EmployeeAnnouncements = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedItem(null)}
-                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
                 >
                   Close
                 </button>
                 <button
                   type="button"
                   onClick={() => toggleAcknowledge(selectedItem.id)}
-                  className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.99] ${
+                  className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-[12px] text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.99] ${
                     selectedItem.acknowledged
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white'
                       : 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100'

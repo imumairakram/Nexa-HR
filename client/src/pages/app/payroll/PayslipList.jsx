@@ -243,7 +243,7 @@ const PayslipList = () => {
                 setToastMsg('Exporting zip package containing all official PDF payslips...');
                 setTimeout(() => setToastMsg(''), 3000);
               }}
-              className="w-full px-5 py-2.5 rounded-2xl bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Batch Archive</span>
@@ -357,7 +357,7 @@ const PayslipList = () => {
                       key={amt || 'any'}
                       type="button"
                       onClick={() => setMinAmount(amt)}
-                      className={`px-2 py-1.5 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer ${
+                      className={`px-2 py-1.5 rounded-[12px] text-xs font-semibold text-center transition-all cursor-pointer ${
                         minAmount === amt
                           ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
                           : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
@@ -379,7 +379,7 @@ const PayslipList = () => {
                       key={dept}
                       type="button"
                       onClick={() => setDeptFilter(dept)}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate ${
+                      className={`px-2.5 py-1.5 rounded-[12px] text-xs font-semibold text-left transition-all cursor-pointer truncate ${
                         deptFilter === dept
                           ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
                           : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
@@ -398,7 +398,7 @@ const PayslipList = () => {
                     setMinAmount(null);
                     setDeptFilter('ALL');
                   }}
-                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+                  className="w-full py-2 rounded-[12px] bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
                 >
                   Reset All Filters
                 </button>
@@ -466,7 +466,7 @@ const PayslipList = () => {
 
                 <button
                   onClick={() => setSelectedSlip(p)}
-                  className="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Inspect Slip</span>
@@ -515,7 +515,7 @@ const PayslipList = () => {
                   <td className="py-4 px-6 text-right">
                     <button
                       onClick={() => setSelectedSlip(p)}
-                      className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ml-auto"
+                      className="px-3.5 py-1.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ml-auto"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>Inspect Slip</span>
@@ -545,7 +545,7 @@ const PayslipList = () => {
               </div>
               <button
                 onClick={() => setSelectedSlip(null)}
-                className="p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
+                className="p-2 rounded-[12px] hover:bg-white/80 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -584,14 +584,14 @@ const PayslipList = () => {
                 onClick={() => {
                   window.print();
                 }}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-2 cursor-pointer transition-colors"
+                className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print PDF</span>
               </button>
               <button
                 onClick={() => setSelectedSlip(null)}
-                className="px-6 py-2.5 rounded-xl bg-sky-500 text-white font-bold text-xs hover:bg-sky-600 cursor-pointer shadow-md shadow-sky-500/25 transition-all"
+                className="px-6 py-2.5 rounded-[12px] bg-sky-500 text-white font-bold text-xs hover:bg-sky-600 cursor-pointer shadow-md shadow-sky-500/25 transition-all"
               >
                 Close
               </button>
