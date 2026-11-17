@@ -78,8 +78,6 @@ const SEARCH_SHORTCUTS = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/app/dashboard', category: 'Pages' },
   { label: 'New Employee Onboarding', icon: User, path: '/app/hr/new-employee', category: 'HR' },
   { label: 'Company Directory & Team', icon: Users, path: '/app/employees', category: 'HR' },
-  { label: 'Department Management', icon: Building2, path: '/app/departments', category: 'HR' },
-  { label: 'Designations & Roles', icon: Building2, path: '/app/departments', category: 'HR' },
   { label: 'Attendance & Logs', icon: Clock, path: '/app/attendance', category: 'Attendance' },
   { label: 'Employment Status', icon: User, path: '/app/employment-status', category: 'Attendance' },
   { label: 'Leave Requests', icon: FileText, path: '/app/leaves', category: 'Leaves' },
@@ -451,8 +449,6 @@ const AppPageHeader = ({
     if (lower.includes('recruitment settings')) return 'Recruitment Settings';
     if (lower.includes('workspace')) return 'Jobs Workspace';
     if (lower.includes('recruitment') || lower.includes('job')) return 'Recruitment';
-    if (lower.includes('department')) return 'Departments';
-    if (lower.includes('designation')) return 'Departments';
     if (lower.includes('access control') || lower.includes('permission')) return 'Access Control';
     if (lower.includes('setting')) return 'Settings';
     if (lower.includes('profile')) return 'My Profile';

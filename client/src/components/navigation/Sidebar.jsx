@@ -40,7 +40,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
   const [openMenus, setOpenMenus] = useState(() => {
     const path = location.pathname;
     return {
-      hr: path.includes('/app/hr') || path === '/app/employees' || path === '/app/departments',
+      hr: path.includes('/app/hr') || path === '/app/employees',
       payroll: path.includes('/app/payroll'),
       recruitment: path.includes('/app/recruitment'),
     };
@@ -139,7 +139,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       children: [
         { label: 'New Employee', path: '/app/hr/new-employee' },
         { label: 'Company Directory & Team', path: '/app/employees' },
-        { label: 'Department', path: '/app/departments' },
       ],
     },
 

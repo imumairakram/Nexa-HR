@@ -11,7 +11,6 @@ import Employees from './pages/app/Employees';
 import Attendance from './pages/app/Attendance';
 import Leaves from './pages/app/Leaves';
 import Payroll from './pages/app/Payroll';
-import Departments from './pages/app/Departments';
 import Settings from './pages/app/Settings';
 import Profile from './pages/app/Profile';
 import UserAccessControl from './pages/app/UserAccessControl';
@@ -101,12 +100,13 @@ function App() {
           <Route path="hr/employee-list" element={<Navigate to="/app/employees" replace />} />
           <Route path="hr/directory" element={<Navigate to="/app/employees" replace />} />
           <Route path="hr/roles" element={<Navigate to="/app/employees" replace />} />
-          <Route path="hr/department" element={<Navigate to="/app/departments" replace />} />
-          <Route path="hr/departments" element={<Navigate to="/app/departments" replace />} />
-          <Route path="hr/designation" element={<Navigate to="/app/departments" replace />} />
-          <Route path="hr/designations" element={<Navigate to="/app/departments" replace />} />
-          <Route path="designation" element={<Navigate to="/app/departments" replace />} />
-          <Route path="designations" element={<Navigate to="/app/departments" replace />} />
+          <Route path="hr/department" element={<Navigate to="/app/employees" replace />} />
+          <Route path="hr/departments" element={<Navigate to="/app/employees" replace />} />
+          <Route path="hr/designation" element={<Navigate to="/app/employees" replace />} />
+          <Route path="hr/designations" element={<Navigate to="/app/employees" replace />} />
+          <Route path="designation" element={<Navigate to="/app/employees" replace />} />
+          <Route path="designations" element={<Navigate to="/app/employees" replace />} />
+          <Route path="departments" element={<Navigate to="/app/employees" replace />} />
 
           {/* Attendance & Schedule */}
           <Route path="attendance" element={<Attendance />} />
@@ -157,7 +157,6 @@ function App() {
           <Route path="recruitment/job-experience" element={<Navigate to="/app/recruitment/settings" replace />} />
 
           {/* System */}
-          <Route path="departments" element={<Departments />} />
           <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
           <Route
