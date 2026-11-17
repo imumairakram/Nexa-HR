@@ -644,17 +644,16 @@ const JobsWorkspace = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. REDESIGNED SEARCHBAR & TOOLBAR CONTROLS (UNIFIED TOOLBAR + SEARCHBAR)  */}
+      {/* 3. UNIFIED SINGLE-ROW SEARCHBAR & TOOLBAR CONTROLS                         */}
       {/* ========================================================================= */}
-      <div className="space-y-2.5">
-        {/* Unified Toolbar Row: Status Tabs (Left) & Actions (Right) */}
-        <div className="flex items-center justify-between gap-3 flex-wrap">
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 sm:gap-2.5 w-full relative" ref={mobileFilterRef}>
           {/* Left: Status Tabs (Desktop/Tablet) */}
-          <div className="hidden md:flex items-center gap-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs max-w-full overflow-x-auto no-scrollbar scrollbar-none">
+          <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0 overflow-x-auto no-scrollbar scrollbar-none">
             <button
               type="button"
               onClick={() => setStatusFilter('ALL')}
-              className={`px-3 py-1.5 rounded-[12px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 statusFilter === 'ALL'
                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                   : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -675,7 +674,7 @@ const JobsWorkspace = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('ACTIVE')}
-              className={`px-3 py-1.5 rounded-[12px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 statusFilter === 'ACTIVE'
                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                   : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -696,7 +695,7 @@ const JobsWorkspace = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('PAUSED')}
-              className={`px-3 py-1.5 rounded-[12px] text-[13.5px] font-medium flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 statusFilter === 'PAUSED'
                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                   : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -715,82 +714,8 @@ const JobsWorkspace = () => {
             </button>
           </div>
 
-          {/* Right: Controls (Sort + Department + View Toggles + New Opening CTA) */}
-          <div className="flex items-center justify-end gap-2.5 sm:gap-3 flex-wrap ml-auto">
-            {/* Sort Dropdown */}
-            <div className="relative shrink-0 hidden md:block">
-              <select
-                value={sortField}
-                onChange={(e) => setSortField(e.target.value)}
-                className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-[13.5px] font-medium rounded-[12px] pl-3.5 pr-8 py-2 shadow-2xs focus:outline-none cursor-pointer"
-              >
-                <option value="recent">Sort: Date</option>
-                <option value="title">Sort: Title</option>
-                <option value="applicants">Sort: Applicants</option>
-              </select>
-              <ChevronDown className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            {/* Department Dropdown (visible on tablet/desktop) */}
-            <div className="relative hidden md:block">
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-[13.5px] font-medium rounded-[12px] pl-3.5 pr-8 py-2 shadow-2xs focus:outline-none cursor-pointer"
-              >
-                <option value="ALL">All departments</option>
-                {allDepartmentNames.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            {/* View Toggles Capsule */}
-            <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`w-9 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
-                    : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
-                }`}
-                title="Card view"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('table')}
-                className={`w-9 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
-                    : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
-                }`}
-                title="List view"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* New Opening CTA */}
-            <button
-              type="button"
-              onClick={handleOpenCreate}
-              className="bg-[#0A8FB5] hover:bg-[#07617D] text-white font-semibold text-[13.5px] px-4 py-2 rounded-[12px] flex items-center gap-1.5 shadow-xs transition-all cursor-pointer shrink-0"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>New opening</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Row 3: Full-width Search Input Container + Mobile Filter Button */}
-        <div className="flex items-center gap-2 sm:gap-2.5 w-full relative" ref={mobileFilterRef}>
-          <div className="flex-1 min-w-0 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-2.5 shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
+          {/* Middle: Search Input Container (Adjusted Width with flex-1) */}
+          <div className="flex-1 min-w-0 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] px-3 sm:px-3.5 py-2 flex items-center gap-2 shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
             <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
             <input
               ref={searchInputRef}
@@ -798,7 +723,7 @@ const JobsWorkspace = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search job requisitions, skills, locations"
-              className="w-full bg-transparent border-0 outline-none text-xs sm:text-[13.5px] text-[#0E2A33] dark:text-[#E6F2F5] placeholder-[#5B727B]/70 min-w-0"
+              className="w-full bg-transparent border-0 outline-none text-xs sm:text-[13px] text-[#0E2A33] dark:text-[#E6F2F5] placeholder-[#5B727B]/70 min-w-0"
             />
             {searchQuery && (
               <button
@@ -817,32 +742,104 @@ const JobsWorkspace = () => {
                   setSearchQuery((prev) => (prev ? `${prev.trim()} type:full_time` : 'type:full_time'));
                 }
               }}
-              className="hidden sm:inline-block text-xs text-[#5B727B] hover:text-[#0A8FB5] dark:text-[#8FA8B1] dark:hover:text-[#3CC1E6] shrink-0 cursor-pointer font-medium transition-colors whitespace-nowrap"
+              className="hidden xl:inline-block text-xs text-[#5B727B] hover:text-[#0A8FB5] dark:text-[#8FA8B1] dark:hover:text-[#3CC1E6] shrink-0 cursor-pointer font-medium transition-colors whitespace-nowrap"
             >
               Try type:full_time
             </button>
-            <kbd className="hidden sm:inline-flex text-[11px] font-medium bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] px-1.5 py-0.5 rounded-[6px] shrink-0 select-none">
+            <kbd className="hidden 2xl:inline-flex text-[11px] font-medium bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] px-1.5 py-0.5 rounded-[6px] shrink-0 select-none">
               ⌘K
             </kbd>
           </div>
 
-          {/* Mobile Filter Button */}
-          <button
-            type="button"
-            onClick={() => setShowMobileFilter((prev) => !prev)}
-            className={`md:hidden flex items-center justify-center gap-1.5 h-[38px] px-3 rounded-[12px] border text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 ${
-              deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent' || showMobileFilter
-                ? 'bg-[#E1F4FA] dark:bg-[#12333D] border-[#0A8FB5] dark:border-[#3CC1E6] text-[#07617D] dark:text-[#3CC1E6]'
-                : 'bg-white dark:bg-[#112229] border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5]'
-            }`}
-            title="Filter & sort options"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
-            <span>Filter</span>
-            {(deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent') && (
-              <span className="w-2 h-2 rounded-full bg-[#0A8FB5] dark:bg-[#3CC1E6]" />
-            )}
-          </button>
+          {/* Right: Controls (Sort + Department + View Toggles + New Opening CTA) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 justify-end">
+            {/* Sort Dropdown */}
+            <div className="relative shrink-0 hidden md:block">
+              <select
+                value={sortField}
+                onChange={(e) => setSortField(e.target.value)}
+                className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-xs sm:text-[13px] font-medium rounded-[12px] pl-3 pr-7 py-2 shadow-2xs focus:outline-none cursor-pointer whitespace-nowrap"
+              >
+                <option value="recent">Sort: Date</option>
+                <option value="title">Sort: Title</option>
+                <option value="applicants">Sort: Applicants</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+
+            {/* Department Dropdown (visible on tablet/desktop) */}
+            <div className="relative shrink-0 hidden md:block">
+              <select
+                value={deptFilter}
+                onChange={(e) => setDeptFilter(e.target.value)}
+                className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-xs sm:text-[13px] font-medium rounded-[12px] pl-3 pr-7 py-2 shadow-2xs focus:outline-none cursor-pointer max-w-[150px] truncate"
+              >
+                <option value="ALL">All departments</option>
+                {allDepartmentNames.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+
+            {/* View Toggles Capsule */}
+            <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`w-8 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                    : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
+                }`}
+                title="Card view"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`w-8 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                    : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
+                }`}
+                title="List view"
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* New Opening CTA */}
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              className="bg-[#0A8FB5] hover:bg-[#07617D] text-white font-semibold text-xs sm:text-[13px] px-3.5 py-2 rounded-[12px] flex items-center gap-1.5 shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>New opening</span>
+            </button>
+
+            {/* Mobile Filter Button */}
+            <button
+              type="button"
+              onClick={() => setShowMobileFilter((prev) => !prev)}
+              className={`md:hidden flex items-center justify-center gap-1.5 h-[38px] px-3 rounded-[12px] border text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 ${
+                deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent' || showMobileFilter
+                  ? 'bg-[#E1F4FA] dark:bg-[#12333D] border-[#0A8FB5] dark:border-[#3CC1E6] text-[#07617D] dark:text-[#3CC1E6]'
+                  : 'bg-white dark:bg-[#112229] border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5]'
+              }`}
+              title="Filter & sort options"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
+              <span>Filter</span>
+              {(deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent') && (
+                <span className="w-2 h-2 rounded-full bg-[#0A8FB5] dark:bg-[#3CC1E6]" />
+              )}
+            </button>
+          </div>
 
           {/* Mobile Filter Popover Drawer (Status + Sort + Department) */}
           {showMobileFilter && (
