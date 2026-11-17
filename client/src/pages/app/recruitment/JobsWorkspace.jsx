@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import { JobCardSkeleton, TableSkeleton } from '../../../components/common/Skeleton';
+import JobCard from './JobCard';
 import { api } from '../../../services/api';
 import {
   Briefcase,
@@ -1057,148 +1058,48 @@ const JobsWorkspace = () => {
             )}
           </div>
         </>
+      ) : jobs.length === 0 ? (
+        /* STEP 7: Single page-level empty state when zero jobs overall */
+        <div className="py-16 px-6 text-center border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[24px] bg-white dark:bg-[#112229] mt-4 flex flex-col items-center justify-center max-w-xl mx-auto shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] flex items-center justify-center mb-4">
+            <Briefcase className="w-7 h-7 stroke-[1.8]" />
+          </div>
+          <h3 className="text-lg font-bold text-[#0E2A33] dark:text-[#E6F2F5] mb-1">
+            No job postings yet
+          </h3>
+          <p className="text-sm text-[#5B727B] dark:text-[#8FA8B1] max-w-sm mb-6 leading-relaxed">
+            Create your first job requisition to publish openings, track applicants, and accelerate your recruitment pipeline.
+          </p>
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-[12px] bg-[#0A8FB5] hover:bg-[#07617D] dark:bg-[#3CC1E6] dark:hover:bg-[#7FD8F1] text-white dark:text-[#06222B] font-semibold text-sm transition-all cursor-pointer shadow-sm hover:shadow active:scale-98 focus-visible:ring-2 focus-visible:ring-[#0A8FB5] focus-visible:outline-none"
+          >
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>Create job</span>
+          </button>
+        </div>
       ) : (
         <>
-          {/* VIEW 1: REDESIGNED POSTED JOB CARDS (MATCHING SAMPLE IMAGE) */}
+          {/* VIEW 1: REDESIGNED POSTED JOB CARDS (COMPACT & SCANNABLE) */}
           {(viewMode === 'grid' || viewMode === 'table') && (
             <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-4 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
               {sortedJobs.length > 0 ? (
                 sortedJobs.map((job) => (
-                  <article
+                  <JobCard
                     key={job.id}
-                    className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[20px] p-5 shadow-[0_1px_2px_rgba(14,42,51,0.06),0_8px_24px_-12px_rgba(14,42,51,0.14)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)] flex flex-col gap-3.5 relative transition-all hover:border-[#0A8FB5]/50 group"
-                  >
-                    {/* Header: Briefcase Icon + Dept Badge + Active/Paused Status Pill */}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-[42px] h-[42px] rounded-[12px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] flex items-center justify-center shrink-0">
-                        <Briefcase className="w-[18px] h-[18px] stroke-[1.8]" />
-                      </div>
-                      <span className="text-[13px] font-semibold text-[#07617D] dark:text-[#3CC1E6] bg-[#E1F4FA] dark:bg-[#12333D] rounded-[8px] px-2.5 py-1 truncate max-w-[200px]">
-                        {job.dept || job.department || 'General'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(job)}
-                        className={`ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold rounded-[12px] px-2.5 py-0.5 cursor-pointer transition-all active:scale-95 ${
-                          job.status === 'ACTIVE'
-                            ? 'text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F] hover:bg-[#cceed9]'
-                            : 'text-[#9A6100] dark:text-[#F0BE5A] bg-[#FBEFD3] dark:bg-[#33270B] hover:bg-[#f6e6bd]'
-                        }`}
-                        title="Click to toggle status"
-                      >
-                        <span
-                          className={`w-[7px] h-[7px] rounded-full ${
-                            job.status === 'ACTIVE'
-                              ? 'bg-[#157A45] dark:bg-[#5FD08C]'
-                              : 'bg-[#9A6100] dark:bg-[#F0BE5A]'
-                          }`}
-                        />
-                        <span>{job.status === 'ACTIVE' ? 'Active' : 'Paused'}</span>
-                      </button>
-                    </div>
-
-                    {/* Job Title */}
-                    <h3 className="text-[20px] font-bold text-[#0E2A33] dark:text-[#E6F2F5] leading-tight tracking-tight">
-                      {job.title}
-                    </h3>
-
-                    {/* Meta Chips */}
-                    <div className="flex flex-wrap gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-[13px] border border-[#DCE6EA] dark:border-[#223840] bg-[#F5F8F9] dark:bg-[#0D1B21] rounded-[10px] px-2.5 py-1 text-[#0E2A33] dark:text-[#E6F2F5]">
-                        <MapPin className="w-[15px] h-[15px] text-[#5B727B] dark:text-[#8FA8B1]" />
-                        <span>{job.location}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-[13px] border border-[#DCE6EA] dark:border-[#223840] bg-[#F5F8F9] dark:bg-[#0D1B21] rounded-[10px] px-2.5 py-1 text-[#0E2A33] dark:text-[#E6F2F5]">
-                        <Briefcase className="w-[15px] h-[15px] text-[#5B727B] dark:text-[#8FA8B1]" />
-                        <span>{job.type}</span>
-                      </span>
-                      {job.experience && (
-                        <span className="inline-flex items-center gap-1.5 text-[13px] border border-[#DCE6EA] dark:border-[#223840] bg-[#F5F8F9] dark:bg-[#0D1B21] rounded-[10px] px-2.5 py-1 text-[#0E2A33] dark:text-[#E6F2F5]">
-                          <Clock className="w-[15px] h-[15px] text-[#5B727B] dark:text-[#8FA8B1]" />
-                          <span>{job.experience}</span>
-                        </span>
-                      )}
-                      {job.salary && (
-                        <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F] rounded-[10px] px-2.5 py-1">
-                          <Banknote className="w-[15px] h-[15px] text-current" />
-                          <span>{job.salary}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-[14px] text-[#5B727B] dark:text-[#8FA8B1] line-clamp-2 leading-relaxed">
-                      {job.description}
-                    </p>
-
-                    {/* Pipeline Segment Bar */}
-                    <div className="border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[14px] px-3 py-2.5 flex items-center gap-3 bg-[#F5F8F9] dark:bg-[#0D1B21]">
-                      <div className="flex gap-1 flex-1">
-                        {[0, 1, 2, 3].map((step) => (
-                          <span
-                            key={step}
-                            className={`h-1.5 flex-1 rounded-full ${
-                              (job.applicants || 0) > step
-                                ? 'bg-[#0A8FB5] dark:bg-[#3CC1E6]'
-                                : 'bg-[#DCE6EA] dark:bg-[#223840]'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-[13px] text-[#5B727B] dark:text-[#8FA8B1] whitespace-nowrap">
-                        {(job.applicants || 0) === 0
-                          ? 'No applicants yet. Share the link to start the pipeline.'
-                          : `${job.applicants} applicant${job.applicants > 1 ? 's' : ''} in pipeline`}
-                      </p>
-                    </div>
-
-                    {/* Footer: Applicants CTA + Share CTA + Edit & Delete Buttons */}
-                    <div className="flex items-center gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => navigate('/app/recruitment/pipeline')}
-                        className="inline-flex items-center gap-2.5 h-[42px] px-3.5 pl-3 rounded-[12px] bg-[#0A8FB5] hover:bg-[#07617D] dark:bg-[#3CC1E6] dark:hover:bg-[#7FD8F1] text-white dark:text-[#06222B] font-semibold text-[14px] transition-all cursor-pointer"
-                      >
-                        <Users className="w-[18px] h-[18px]" />
-                        <span>Applicants</span>
-                        <b className="bg-white/25 dark:bg-black/20 rounded-[8px] px-2 py-0.5 font-bold text-xs">
-                          {job.applicants || 0}
-                        </b>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleShareJob(job)}
-                        className="inline-flex items-center gap-2 h-[42px] px-3.5 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] hover:border-[#0A8FB5] dark:hover:border-[#3CC1E6] text-[#0E2A33] dark:text-[#E6F2F5] text-[14px] font-medium transition-all cursor-pointer"
-                      >
-                        <Link2 className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1]" />
-                        <span>Share</span>
-                      </button>
-
-                      <span className="flex-1" />
-
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(job)}
-                        className="w-[38px] h-[38px] rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5] hover:border-[#0E2A33] dark:hover:border-[#E6F2F5] transition-all cursor-pointer"
-                        title="Edit job requisition"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteJob(job.id)}
-                        className="w-[38px] h-[38px] rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] dark:hover:text-[#F07185] hover:border-[#C0354A] dark:hover:border-[#F07185] transition-all cursor-pointer"
-                        title="Delete job requisition"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </article>
+                    job={job}
+                    onViewApplicants={() => navigate('/app/recruitment/pipeline')}
+                    onShare={handleShareJob}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDeleteJob}
+                    onToggleStatus={handleToggleStatus}
+                  />
                 ))
               ) : (
                 <div className="col-span-full py-12 text-center text-[#5B727B] dark:text-[#8FA8B1] text-sm border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[20px] bg-white dark:bg-[#112229]">
-                  No postings match these filters. Clear the search or pick another department.
+                  <p className="font-medium text-[#0E2A33] dark:text-[#E6F2F5] mb-1">No matching postings</p>
+                  <p className="text-xs">Try adjusting your search query, status, or department filter.</p>
                 </div>
               )}
             </div>
