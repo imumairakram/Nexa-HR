@@ -1022,18 +1022,18 @@ const EmployeeProfile = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <span className="text-[11px] text-slate-400">Requires minimum 10 characters with uppercase, lowercase, number & symbol</span>
                     <button
                       type="submit"
                       disabled={isGuest || isSavingPassword}
-                      className={`px-6 py-2.5 rounded-[12px] font-bold transition-all shadow-md flex items-center gap-2 ${isGuest
+                      className={`shrink-0 whitespace-nowrap px-6 py-2.5 rounded-[12px] font-bold transition-all shadow-md flex items-center justify-center gap-2 self-end sm:self-auto ${isGuest
                           ? 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400 cursor-not-allowed'
                           : 'bg-slate-900 hover:bg-slate-800 dark:bg-rose-600 dark:hover:bg-rose-500 text-white cursor-pointer hover:scale-105 disabled:opacity-50'
                         }`}
                     >
-                      {isSavingPassword ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Key className="w-3.5 h-3.5" />}
-                      <span>{isGuest ? 'Password Locked for Demo' : 'Update Password'}</span>
+                      {isSavingPassword ? <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Key className="w-3.5 h-3.5 shrink-0" />}
+                      <span className="whitespace-nowrap">{isGuest ? 'Password Locked for Demo' : 'Update Password'}</span>
                     </button>
                   </div>
                 </form>
