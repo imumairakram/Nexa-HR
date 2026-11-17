@@ -833,7 +833,11 @@ ${doc.description || 'This document serves as an official verified corporate rec
         d.department?.toLowerCase().includes(q) ||
         d.type?.toLowerCase().includes(q);
 
-      const matchesType = typeFilter === 'ALL' || d.type === typeFilter;
+      const matchesType =
+        typeFilter === 'ALL' ||
+        d.type === typeFilter ||
+        (typeFilter === 'CONTRACT' && (d.type === 'CONTRACT' || d.type === 'EMPLOYMENT_CONTRACT')) ||
+        (typeFilter === 'EMPLOYMENT_CONTRACT' && (d.type === 'CONTRACT' || d.type === 'EMPLOYMENT_CONTRACT'));
       const matchesDept =
         deptFilter === 'ALL' || d.department?.toLowerCase().includes(deptFilter.toLowerCase());
 
@@ -908,8 +912,14 @@ ${doc.description || 'This document serves as an official verified corporate rec
   const classificationCounts = useMemo(() => {
     const counts = { ALL: issuedDocs.length };
     CLASSIFICATION_OPTIONS.forEach((c) => {
-      counts[c.id] = issuedDocs.filter((d) => d.type === c.id).length;
+      counts[c.id] = issuedDocs.filter((d) => {
+        if (c.id === 'CONTRACT') {
+          return d.type === 'CONTRACT' || d.type === 'EMPLOYMENT_CONTRACT';
+        }
+        return d.type === c.id;
+      }).length;
     });
+    counts['EMPLOYMENT_CONTRACT'] = counts['CONTRACT'] || 0;
     return counts;
   }, [issuedDocs]);
 
@@ -1285,28 +1295,6 @@ ${doc.description || 'This document serves as an official verified corporate rec
         }
         viewMode={activeTab === 'issued' ? viewMode : ''}
         onViewModeChange={activeTab === 'issued' ? setViewMode : null}
-        statusTabs={
-          activeTab === 'issued'
-            ? [
-                { key: 'ALL', label: 'All Issued', count: issuedDocs.length },
-                { key: 'OFFER_LETTER', label: 'Offer Letters', count: classificationCounts['OFFER_LETTER'] || 0 },
-                { key: 'EMPLOYMENT_CONTRACT', label: 'Contracts', count: classificationCounts['EMPLOYMENT_CONTRACT'] || 0 },
-                { key: 'EXPERIENCE_LETTER', label: 'Experience', count: classificationCounts['EXPERIENCE_LETTER'] || 0 },
-                { key: 'NDA', label: 'NDA', count: classificationCounts['NDA'] || 0 },
-              ]
-            : [
-                { key: 'ALL', label: 'All Policies', count: companyPolicies.length },
-                { key: 'GOVERNANCE', label: 'Governance', count: policyCategoryCounts['GOVERNANCE'] || 0 },
-                { key: 'SECURITY', label: 'Security', count: policyCategoryCounts['SECURITY'] || 0 },
-                { key: 'WORKPLACE', label: 'Workplace', count: policyCategoryCounts['WORKPLACE'] || 0 },
-                { key: 'COMPENSATION', label: 'Compensation', count: policyCategoryCounts['COMPENSATION'] || 0 },
-              ]
-        }
-        activeStatus={activeTab === 'issued' ? typeFilter : policyCategoryFilter}
-        onStatusChange={(st) => {
-          if (activeTab === 'issued') setTypeFilter(st);
-          else setPolicyCategoryFilter(st);
-        }}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder={
@@ -1316,14 +1304,31 @@ ${doc.description || 'This document serves as an official verified corporate rec
         }
         searchHint={activeTab === 'issued' ? 'type:offer_letter' : 'cat:governance'}
         filterTags={[
-          ...(activeTab === 'issued' && typeFilter !== 'ALL' && !['OFFER_LETTER', 'EMPLOYMENT_CONTRACT', 'EXPERIENCE_LETTER', 'NDA'].includes(typeFilter)
-            ? [{ key: 'type', label: `type: ${CLASSIFICATION_OPTIONS.find((c) => c.id === typeFilter)?.label || typeFilter}` }]
+          ...(activeTab === 'issued' && typeFilter !== 'ALL'
+            ? [{
+                key: 'type',
+                label: 'type',
+                value:
+                  typeFilter === 'CONTRACT' || typeFilter === 'EMPLOYMENT_CONTRACT'
+                    ? 'Contracts'
+                    : typeFilter === 'OFFER_LETTER'
+                    ? 'Offer Letters'
+                    : typeFilter === 'EXPERIENCE_LETTER'
+                    ? 'Experience'
+                    : typeFilter === 'NDA'
+                    ? 'NDA'
+                    : CLASSIFICATION_OPTIONS.find((c) => c.id === typeFilter)?.label || typeFilter,
+              }]
             : []),
           ...(activeTab === 'issued' && deptFilter !== 'ALL'
-            ? [{ key: 'dept', label: `dept: ${deptFilter}` }]
+            ? [{ key: 'dept', label: 'dept', value: deptFilter }]
             : []),
-          ...(activeTab === 'policies' && policyCategoryFilter !== 'ALL' && !['GOVERNANCE', 'SECURITY', 'WORKPLACE', 'COMPENSATION'].includes(policyCategoryFilter)
-            ? [{ key: 'policyCat', label: `cat: ${POLICY_CATEGORIES.find((c) => c.id === policyCategoryFilter)?.label || policyCategoryFilter}` }]
+          ...(activeTab === 'policies' && policyCategoryFilter !== 'ALL'
+            ? [{
+                key: 'policyCat',
+                label: 'cat',
+                value: POLICY_CATEGORIES.find((c) => c.id === policyCategoryFilter)?.label || policyCategoryFilter,
+              }]
             : []),
         ]}
         onRemoveTag={(tag) => {
@@ -1373,26 +1378,148 @@ ${doc.description || 'This document serves as an official verified corporate rec
               <>
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                    Classification
+                    Document Type
                   </span>
-                  <div className="space-y-0.5 max-h-36 overflow-y-auto">
-                    {CLASSIFICATION_OPTIONS.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setTypeFilter(cat.id)}
-                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
-                          typeFilter === cat.id
-                            ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                        }`}
-                      >
-                        <span className="truncate">{cat.label}</span>
+                  <div className="space-y-0.5 max-h-52 overflow-y-auto custom-scrollbar">
+                    {/* All Issued */}
+                    <button
+                      type="button"
+                      onClick={() => setTypeFilter('ALL')}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                        typeFilter === 'ALL'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>All Issued</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
                         <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
-                          {classificationCounts[cat.id] || 0}
+                          {issuedDocs.length}
                         </span>
-                      </button>
-                    ))}
+                        {typeFilter === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                      </div>
+                    </button>
+
+                    {/* Offer Letters */}
+                    <button
+                      type="button"
+                      onClick={() => setTypeFilter('OFFER_LETTER')}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                        typeFilter === 'OFFER_LETTER'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Offer Letters</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                          {classificationCounts['OFFER_LETTER'] || 0}
+                        </span>
+                        {typeFilter === 'OFFER_LETTER' && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                      </div>
+                    </button>
+
+                    {/* Contracts */}
+                    <button
+                      type="button"
+                      onClick={() => setTypeFilter('CONTRACT')}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                        typeFilter === 'CONTRACT' || typeFilter === 'EMPLOYMENT_CONTRACT'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FileCheck className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Contracts</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                          {(classificationCounts['CONTRACT'] || 0) + (classificationCounts['EMPLOYMENT_CONTRACT'] || 0)}
+                        </span>
+                        {(typeFilter === 'CONTRACT' || typeFilter === 'EMPLOYMENT_CONTRACT') && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                      </div>
+                    </button>
+
+                    {/* Experience */}
+                    <button
+                      type="button"
+                      onClick={() => setTypeFilter('EXPERIENCE_LETTER')}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                        typeFilter === 'EXPERIENCE_LETTER'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Award className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Experience</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                          {classificationCounts['EXPERIENCE_LETTER'] || 0}
+                        </span>
+                        {typeFilter === 'EXPERIENCE_LETTER' && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                      </div>
+                    </button>
+
+                    {/* NDA */}
+                    <button
+                      type="button"
+                      onClick={() => setTypeFilter('NDA')}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                        typeFilter === 'NDA'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                        <span>NDA</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                          {classificationCounts['NDA'] || 0}
+                        </span>
+                        {typeFilter === 'NDA' && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                      </div>
+                    </button>
+
+                    {/* Other classifications */}
+                    {CLASSIFICATION_OPTIONS.filter(
+                      (cat) => !['OFFER_LETTER', 'CONTRACT', 'EXPERIENCE_LETTER', 'NDA'].includes(cat.id)
+                    ).map((cat) => {
+                      const CatIcon = cat.icon || FileText;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setTypeFilter(cat.id)}
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                            typeFilter === cat.id
+                              ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <CatIcon className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="truncate">{cat.label}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                              {classificationCounts[cat.id] || 0}
+                            </span>
+                            {typeFilter === cat.id && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1434,24 +1561,55 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 )}
               </>
             ) : (
-              <div className="space-y-0.5 max-h-52 overflow-y-auto">
-                {POLICY_CATEGORIES.map((cat) => (
+              <div className="space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  Policy Category
+                </span>
+                <div className="space-y-0.5 max-h-56 overflow-y-auto custom-scrollbar">
                   <button
-                    key={cat.id}
                     type="button"
-                    onClick={() => setPolicyCategoryFilter(cat.id)}
+                    onClick={() => setPolicyCategoryFilter('ALL')}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
-                      policyCategoryFilter === cat.id
+                      policyCategoryFilter === 'ALL'
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
-                    <span>{cat.label}</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
-                      {policyCategoryCounts[cat.id] || 0}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                      <span>All Policies</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                        {companyPolicies.length}
+                      </span>
+                      {policyCategoryFilter === 'ALL' && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                    </div>
                   </button>
-                ))}
+
+                  {POLICY_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setPolicyCategoryFilter(cat.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[12px] text-xs font-semibold cursor-pointer transition-all ${
+                        policyCategoryFilter === cat.id
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="truncate">{cat.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-[12px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                          {policyCategoryCounts[cat.id] || 0}
+                        </span>
+                        {policyCategoryFilter === cat.id && <Check className="w-3.5 h-3.5 text-sky-500 shrink-0" />}
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
