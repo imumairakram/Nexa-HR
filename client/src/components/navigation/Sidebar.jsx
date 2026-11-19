@@ -173,7 +173,6 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       children: [
         { label: 'Workspace', path: '/app/recruitment/workspace' },
         { label: 'ATS Pipeline', path: '/app/recruitment/pipeline' },
-        { label: 'Settings', path: '/app/recruitment/settings' },
       ],
     },
 

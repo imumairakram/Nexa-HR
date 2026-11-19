@@ -38,7 +38,6 @@ import Documents from './pages/app/Documents';
 // Unified Recruitment Module
 import JobsWorkspace from './pages/app/recruitment/JobsWorkspace';
 import ATSPipeline from './pages/app/recruitment/ATSPipeline';
-import RecruitmentSettings from './pages/app/recruitment/RecruitmentSettings';
 
 // Employee Portal Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -142,7 +141,6 @@ function App() {
           <Route path="recruitment" element={<Navigate to="/app/recruitment/workspace" replace />} />
           <Route path="recruitment/workspace" element={<JobsWorkspace />} />
           <Route path="recruitment/pipeline" element={<ATSPipeline />} />
-          <Route path="recruitment/settings" element={<RecruitmentSettings />} />
 
           {/* Legacy recruitment route redirects */}
           <Route path="recruitment/jobs" element={<Navigate to="/app/recruitment/workspace" replace />} />
@@ -150,11 +148,11 @@ function App() {
           <Route path="recruitment/board" element={<Navigate to="/app/recruitment/workspace" replace />} />
           <Route path="recruitment/applications" element={<Navigate to="/app/recruitment/pipeline" replace />} />
           <Route path="recruitment/interviews" element={<Navigate to="/app/recruitment/pipeline" replace />} />
-          <Route path="recruitment/job-category" element={<Navigate to="/app/recruitment/settings" replace />} />
-          <Route path="recruitment/job-type" element={<Navigate to="/app/recruitment/settings" replace />} />
-          <Route path="recruitment/job-location" element={<Navigate to="/app/recruitment/settings" replace />} />
-          <Route path="recruitment/job-skills" element={<Navigate to="/app/recruitment/settings" replace />} />
-          <Route path="recruitment/job-experience" element={<Navigate to="/app/recruitment/settings" replace />} />
+          <Route path="recruitment/job-category" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/job-type" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/job-location" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/job-skills" element={<Navigate to="/app/recruitment/workspace" replace />} />
+          <Route path="recruitment/job-experience" element={<Navigate to="/app/recruitment/workspace" replace />} />
 
           {/* System */}
           <Route path="settings" element={<Settings />} />
