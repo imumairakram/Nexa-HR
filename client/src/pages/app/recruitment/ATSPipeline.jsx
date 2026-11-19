@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { TableSkeleton } from '../../../components/common/Skeleton';
 import { api } from '../../../services/api';
 import { isDemoSessionActive, showDemoToast } from '../../../demo/demoSession';
+import PipelineToolbar from './PipelineToolbar';
+import PipelineSummary from './PipelineSummary';
+import KanbanColumn from './KanbanColumn';
+import CandidateCard from './CandidateCard';
+import PipelineEmptyState from './PipelineEmptyState';
 import {
   Users,
   Search,
@@ -42,125 +48,19 @@ import {
 } from 'lucide-react';
 
 const STAGES = [
-  { key: 'APPLIED', label: '1. Sourced & Applied', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300', dot: 'bg-blue-500', border: 'border-blue-200 dark:border-blue-900/60' },
-  { key: 'SCREENING', label: '2. Screening Call', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300', dot: 'bg-amber-500', border: 'border-amber-200 dark:border-amber-900/60' },
-  { key: 'INTERVIEWING', label: '3. Technical Interview', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300', dot: 'bg-purple-500', border: 'border-purple-200 dark:border-purple-900/60' },
-  { key: 'OFFER', label: '4. Offer Extended', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300', dot: 'bg-indigo-500', border: 'border-sky-200 dark:border-indigo-900/60' },
-  { key: 'HIRED', label: '5. Signed & Hired', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300', dot: 'bg-emerald-500', border: 'border-emerald-200 dark:border-emerald-900/60' },
+  { key: 'APPLIED', name: 'Sourced & Applied', label: 'Sourced & Applied', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300', dot: 'bg-blue-500', border: 'border-blue-200 dark:border-blue-900/60' },
+  { key: 'SCREENING', name: 'Screening Call', label: 'Screening Call', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300', dot: 'bg-amber-500', border: 'border-amber-200 dark:border-amber-900/60' },
+  { key: 'INTERVIEWING', name: 'Technical Interview', label: 'Technical Interview', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300', dot: 'bg-purple-500', border: 'border-purple-200 dark:border-purple-900/60' },
+  { key: 'OFFER', name: 'Offer Extended', label: 'Offer Extended', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300', dot: 'bg-indigo-500', border: 'border-sky-200 dark:border-indigo-900/60' },
+  { key: 'HIRED', name: 'Signed & Hired', label: 'Signed & Hired', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300', dot: 'bg-emerald-500', border: 'border-emerald-200 dark:border-emerald-900/60' },
 ];
 
 const DEFAULT_APPLICATIONS = [];
 
 const DEFAULT_INTERVIEWS = [];
 
-
-// Memoized Candidate Card to eliminate unnecessary Kanban rerenders during drag-drop
-const CandidateCard = React.memo(({
-  c,
-  sIdx,
-  draggedCandidateId,
-  onDragStart,
-  onClick,
-  onMoveStage,
-  onOpenSchedule,
-}) => {
-  return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, c.id)}
-      onClick={() => onClick(c)}
-      className={`group bg-white dark:bg-[#1E293B] rounded-2xl p-4 shadow-sm hover:shadow-md border border-slate-200/70 dark:border-slate-800 transition-all cursor-grab active:cursor-grabbing space-y-2.5 ${
-        draggedCandidateId === c.id ? 'opacity-40 scale-95 border-sky-500' : ''
-      }`}
-    >
-      {/* Card Header: Avatar / Code & Rating */}
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] font-bold text-slate-400">
-          {c.applicationId || c.id}
-        </span>
-        <div className="flex items-center gap-1.5">
-          {(c.source === 'GMAIL' || typeof c.aiScore === 'number') && (
-            <span
-              className={`px-2 py-0.5 rounded-[8px] text-[10px] font-bold tabular-nums flex items-center gap-1 ${
-                (c.aiScore || 0) >= 85
-                  ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
-                  : (c.aiScore || 0) >= 70
-                  ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
-                  : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
-              }`}
-              title={`AI Score: ${c.aiScore || 0}/100`}
-            >
-              <Sparkles className="w-2.5 h-2.5" />
-              <span>{c.aiScore || 0} AI</span>
-            </span>
-          )}
-          <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md">
-            <Star className="w-3 h-3 fill-amber-400 stroke-amber-400" />
-            <span>{c.rating}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Name & Role */}
-      <div>
-        <h5 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-tight">
-          {c.name}
-        </h5>
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-          {c.role}
-        </p>
-      </div>
-
-      {/* Interview Badge if scheduled */}
-      {c.interview && (
-        <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-800/40 flex items-center gap-1.5 text-[10px] text-purple-700 dark:text-purple-300 font-bold">
-          <Video className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
-          <span className="truncate">{c.interview.date} • {c.interview.time}</span>
-        </div>
-      )}
-
-      {/* Experience and Location */}
-      <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-        <span>{c.experience}</span>
-        <span>{(c.location || '').split('/')[0].trim()}</span>
-      </div>
-
-      {/* Quick Stage Shifter Arrows */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex items-center justify-between pt-1"
-      >
-        <button
-          disabled={sIdx === 0}
-          onClick={() => onMoveStage(c.id, STAGES[sIdx - 1].key)}
-          className="p-1 rounded-[12px] text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-          title="Move Previous Stage"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-        </button>
-
-        <button
-          onClick={() => onOpenSchedule(c)}
-          className="text-[10px] font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
-        >
-          <Calendar className="w-3 h-3" />
-          <span>Interview</span>
-        </button>
-
-        <button
-          disabled={sIdx === STAGES.length - 1}
-          onClick={() => onMoveStage(c.id, STAGES[sIdx + 1].key)}
-          className="p-1 rounded-[12px] text-slate-400 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-          title="Advance Stage"
-        >
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </div>
-  );
-});
-
 const ATSPipeline = () => {
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [interviews, setInterviews] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -686,85 +586,21 @@ const handleViewResume = async (candidateId) => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. TOOLBAR & VIEW CONTROLS */}
+      {/* 2. REDESIGNED TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <input
-            type="text"
-            placeholder="Search candidates by name, role, tech stack..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] pl-10 pr-4 py-2.5 text-xs sm:text-[13.5px] font-medium text-[#0E2A33] dark:text-[#E6F2F5] placeholder-[#5B727B]/70 focus:outline-none focus:border-[#0A8FB5] dark:focus:border-[#3CC1E6] transition-all shadow-2xs"
-          />
-          <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* Filters and View Switcher */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Role Filter */}
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] px-3.5 py-2 text-xs sm:text-[13.5px] font-medium text-[#0E2A33] dark:text-[#E6F2F5] focus:outline-none shadow-2xs cursor-pointer"
-          >
-            <option value="ALL">All Roles ({candidates.length})</option>
-            {uniqueRoles.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-
-          {/* View Mode Tabs */}
-          <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs">
-            <button
-              onClick={() => setCurrentView('kanban')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
-                currentView === 'kanban' ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]' : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5]'
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Kanban</span>
-            </button>
-            <button
-              onClick={() => setCurrentView('interviews')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
-                currentView === 'interviews' ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]' : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5]'
-              }`}
-            >
-              <CalendarDays className="w-3.5 h-3.5" />
-              <span>Interviews ({interviews.length})</span>
-            </button>
-            <button
-              onClick={() => setCurrentView('table')}
-              className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
-                currentView === 'table' ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]' : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5]'
-              }`}
-            >
-              <List className="w-3.5 h-3.5" />
-              <span>All Roster</span>
-            </button>
-            <button
-              onClick={handleOpenScreenedOut}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 border-l border-slate-200 dark:border-slate-800 ml-1 pl-3"
-              title="View low-score, unmatched, or error candidates stored for audit"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-              <span>AI Screened-Out ({screenedOutCount || screenedOutCandidates.length})</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <PipelineToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        roleFilter={roleFilter}
+        onRoleFilterChange={setRoleFilter}
+        uniqueRoles={uniqueRoles}
+        totalCandidates={candidates.length}
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        interviewsCount={interviews.length}
+        screenedOutCount={screenedOutCount || screenedOutCandidates.length}
+        onOpenScreenedOut={handleOpenScreenedOut}
+      />
 
       {/* ========================================================================= */}
       {/* 3. MAIN ATS VIEWS */}
@@ -783,63 +619,54 @@ const handleViewResume = async (candidateId) => {
         </div>
       ) : (
         <>
-          {/* VIEW 1: UNIFIED KANBAN BOARD WITH DRAG & DROP (Always on mobile if table selected) */}
+          {/* VIEW 1: REDESIGNED COMPACT KANBAN BOARD (OR TABLE ON MOBILE) */}
           {(currentView === 'kanban' || currentView === 'table') && (
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start ${currentView === 'table' ? 'md:hidden' : ''}`}>
-              {STAGES.map((stage, sIdx) => {
-                const stageCandidates = filteredCandidates.filter((c) => c.stage === stage.key);
-                const isOver = dragOverStage === stage.key;
+            <div className={`space-y-3.5 ${currentView === 'table' ? 'md:hidden' : ''}`}>
+              {candidates.length === 0 ? (
+                /* STEP 4: Page-level centered empty state when total candidates is 0 */
+                <PipelineEmptyState onViewJobs={() => navigate('/app/recruitment/workspace')} />
+              ) : (
+                <>
+                  {/* STEP 6: Optional pipeline summary strip */}
+                  <PipelineSummary stages={STAGES} candidates={candidates} />
 
-                return (
-                  <div
-                    key={stage.key}
-                    onDragOver={(e) => handleDragOver(e, stage.key)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, stage.key)}
-                    className={`rounded-[28px] p-4 bg-slate-50/70 dark:bg-slate-900/50 border transition-all duration-200 flex flex-col min-h-[500px] ${
-                      isOver
-                        ? 'border-sky-500 dark:border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/40 dark:bg-sky-950/20'
-                        : `${stage.border}`
-                    }`}
-                  >
-                    {/* Stage Header */}
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 dark:border-slate-800 mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2.5 h-2.5 rounded-full ${stage.dot}`}></span>
-                        <h4 className="text-xs font-extrabold text-slate-800 dark:text-slate-200 truncate">
-                          {stage.label}
-                        </h4>
-                      </div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${stage.badge}`}>
-                        {stageCandidates.length}
-                      </span>
+                  {/* Filtered empty notice if search yields no results */}
+                  {filteredCandidates.length === 0 ? (
+                    <div className="py-12 text-center text-[#5B727B] dark:text-[#8FA8B1] text-sm border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[20px] bg-white dark:bg-[#112229]">
+                      <p className="font-medium text-[#0E2A33] dark:text-[#E6F2F5] mb-1">No matching candidates found</p>
+                      <p className="text-xs">Try adjusting your search query or role filter.</p>
                     </div>
+                  ) : (
+                    /* STEP 3: Neutral 16px radius columns with snap on mobile and vertical scroll */
+                    <div className="flex lg:grid lg:grid-cols-5 gap-3.5 sm:gap-4 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-thin items-start">
+                      {STAGES.map((stage, sIdx) => {
+                        const stageCandidates = filteredCandidates.filter(
+                          (c) => c.stage === stage.key || (stage.key === 'INTERVIEWING' && c.stage === 'INTERVIEW')
+                        );
+                        const isOver = dragOverStage === stage.key;
 
-                    {/* Candidate Cards Column */}
-                    <div className="space-y-3 flex-1 overflow-y-auto pr-0.5">
-                      {stageCandidates.length > 0 ? (
-                        stageCandidates.map((c) => (
-                          <CandidateCard
-                            key={c.id}
-                            c={c}
+                        return (
+                          <KanbanColumn
+                            key={stage.key}
+                            stage={stage}
                             sIdx={sIdx}
+                            stages={STAGES}
+                            candidates={stageCandidates}
                             draggedCandidateId={draggedCandidateId}
+                            isOver={isOver}
                             onDragStart={handleDragStart}
-                            onClick={handleOpenDetail}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            onCandidateClick={handleOpenDetail}
                             onMoveStage={moveCandidateStage}
-                            onOpenSchedule={handleOpenSchedule}
                           />
-                        ))
-                      ) : (
-                        <div className="py-10 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-400">
-                          <Users className="w-6 h-6 stroke-1 mb-1" />
-                          <span className="text-[10px] font-semibold">Drop candidates here</span>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
-                  </div>
-                );
-              })}
+                  )}
+                </>
+              )}
             </div>
           )}
 
