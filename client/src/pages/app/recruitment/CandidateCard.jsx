@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Sparkles,
   Video,
   Mail,
   Eye,
@@ -42,31 +41,9 @@ const getInitials = (name = '') => {
 };
 
 /**
- * Helper to extract tech-stack chips
- */
-const getTechStack = (candidate) => {
-  if (Array.isArray(candidate.tags) && candidate.tags.length > 0) {
-    return candidate.tags.filter(Boolean);
-  }
-  if (typeof candidate.tags === 'string' && candidate.tags.trim()) {
-    return candidate.tags.split(',').map((t) => t.trim()).filter(Boolean);
-  }
-  // Fallbacks: detect keywords from role or summary
-  const text = `${candidate.role || ''} ${candidate.resumeSummary || ''}`.toLowerCase();
-  const known = [
-    'React', 'Node.js', 'TypeScript', 'JavaScript', 'Python',
-    'AWS', 'Figma', 'Docker', 'PostgreSQL', 'SQL', 'GraphQL',
-    'Next.js', 'Tailwind', 'DevOps', 'Go', 'Java'
-  ];
-  const matched = known.filter((k) => text.includes(k.toLowerCase()));
-  if (matched.length > 0) return matched;
-  return [candidate.experience || '3+ yrs'];
-};
-
-/**
  * CandidateCard
  * Compact, scannable Kanban card with drag-and-drop, quick actions on hover,
- * AI score ring/badge, tech chips with overflow, and relative applied date.
+ * clean percentage score display, and relative applied date.
  */
 const CandidateCard = React.memo(({
   c,
@@ -102,9 +79,6 @@ const CandidateCard = React.memo(({
   }, [isMoveMenuOpen]);
 
   const initials = getInitials(c.name);
-  const techStack = getTechStack(c);
-  const visibleTech = techStack.slice(0, 2);
-  const overflowTechCount = techStack.length - visibleTech.length;
   const relativeDate = formatRelativeTime(c.appliedDate || c.createdAt);
   const isBeingDragged = draggedCandidateId === c.id;
 
@@ -129,7 +103,7 @@ const CandidateCard = React.memo(({
         isBeingDragged ? 'opacity-40 scale-95 border-[#0A8FB5] dark:border-[#3CC1E6] ring-2 ring-[#0A8FB5]/30' : ''
       }`}
     >
-      {/* Top Row: Avatar + Name + AI Score */}
+      {/* Top Row: Avatar + Name + AI Score (Number and percentage symbol only) */}
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           {/* Avatar with Initials */}
@@ -148,20 +122,19 @@ const CandidateCard = React.memo(({
           </div>
         </div>
 
-        {/* AI Score Badge / Ring */}
+        {/* AI Score: Number and percentage symbol only */}
         {aiScore !== null && (
           <span
-            className={`px-1.5 py-0.5 rounded-[6px] text-[10px] font-bold tabular-nums flex items-center gap-1 shrink-0 ${
+            className={`text-xs font-bold tabular-nums shrink-0 ${
               aiScore >= 85
-                ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                ? 'text-emerald-600 dark:text-emerald-400'
                 : aiScore >= 70
-                ? 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/30'
-                : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30'
+                ? 'text-[#0A8FB5] dark:text-[#3CC1E6]'
+                : 'text-amber-600 dark:text-amber-400'
             }`}
             title={`AI Fit Score: ${aiScore}%`}
           >
-            <Sparkles className="w-2.5 h-2.5" />
-            <span>{aiScore}%</span>
+            {aiScore}%
           </span>
         )}
       </div>
@@ -174,39 +147,13 @@ const CandidateCard = React.memo(({
         </div>
       )}
 
-      {/* Tech Stack Chips + Relative Date */}
-      <div className="flex items-center justify-between gap-1 mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-        {/* Tech Chips */}
-        <div className="flex items-center gap-1 flex-wrap min-w-0">
-          {visibleTech.map((tech) => (
-            <span
-              key={tech}
-              className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] truncate max-w-[85px]"
-            >
-              {tech}
-            </span>
-          ))}
-          {overflowTechCount > 0 && (
-            <span className="text-[10px] font-semibold px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-              +{overflowTechCount}
-            </span>
-          )}
-        </div>
-
-        {/* Relative Date */}
-        {relativeDate && (
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium whitespace-nowrap shrink-0">
-            {relativeDate}
-          </span>
-        )}
-      </div>
-
-      {/* Hover Quick Actions Bar */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
-      >
-        <div className="flex items-center gap-1">
+      {/* Footer: Quick Actions (on hover) & Relative Date */}
+      <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between min-h-[26px]">
+        {/* Left: Quick Actions (visible on hover) */}
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
+        >
           {/* View Profile */}
           <button
             type="button"
@@ -235,58 +182,72 @@ const CandidateCard = React.memo(({
           )}
         </div>
 
-        {/* Move to Stage Menu */}
-        <div className="relative" ref={menuRef}>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMoveMenuOpen((prev) => !prev)}
-            }
-            className={`flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-md transition-colors cursor-pointer ${
-              isMoveMenuOpen
-                ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
-                : 'text-slate-400 hover:text-[#0E2A33] dark:hover:text-[#E6F2F5] hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-            title="Move to another stage"
-            aria-label="Move candidate to stage"
-            aria-expanded={isMoveMenuOpen}
+        {/* Right side: Move to Stage Menu (visible on hover) + Relative Date */}
+        <div className="flex items-center gap-2">
+          {/* Move to Stage Menu */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
+            ref={menuRef}
           >
-            <ArrowRightLeft className="w-3 h-3" />
-            <span className="text-[10px]">Move</span>
-          </button>
-
-          {/* Move to Stage Dropdown Menu */}
-          {isMoveMenuOpen && (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-white dark:bg-[#16272E] border border-[#DCE6EA] dark:border-[#223840] shadow-lg p-1 z-30 animate-in fade-in zoom-in-95"
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMoveMenuOpen((prev) => !prev);
+              }}
+              className={`flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-md transition-colors cursor-pointer ${
+                isMoveMenuOpen
+                  ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
+                  : 'text-slate-400 hover:text-[#0E2A33] dark:hover:text-[#E6F2F5] hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="Move to another stage"
+              aria-label="Move candidate to stage"
+              aria-expanded={isMoveMenuOpen}
             >
-              <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
-                Move to stage
+              <ArrowRightLeft className="w-3 h-3" />
+              <span className="text-[10px]">Move</span>
+            </button>
+
+            {/* Move to Stage Dropdown Menu */}
+            {isMoveMenuOpen && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-white dark:bg-[#16272E] border border-[#DCE6EA] dark:border-[#223840] shadow-lg p-1 z-30 animate-in fade-in zoom-in-95"
+              >
+                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+                  Move to stage
+                </div>
+                <div className="py-1 space-y-0.5">
+                  {stages
+                    .filter((s) => s.key !== c.stage && !(s.key === 'INTERVIEWING' && c.stage === 'INTERVIEW'))
+                    .map((s) => (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => {
+                          setIsMoveMenuOpen(false);
+                          onMoveStage(c.id, s.key);
+                        }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21] hover:text-[#0A8FB5] flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                          <span className="truncate">{s.name || s.label}</span>
+                        </span>
+                        <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
+                      </button>
+                    ))}
+                </div>
               </div>
-              <div className="py-1 space-y-0.5">
-                {stages
-                  .filter((s) => s.key !== c.stage && !(s.key === 'INTERVIEWING' && c.stage === 'INTERVIEW'))
-                  .map((s) => (
-                    <button
-                      key={s.key}
-                      type="button"
-                      onClick={() => {
-                        setIsMoveMenuOpen(false);
-                        onMoveStage(c.id, s.key);
-                      }}
-                      className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21] hover:text-[#0A8FB5] flex items-center justify-between transition-colors cursor-pointer"
-                    >
-                      <span className="flex items-center gap-1.5 truncate">
-                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                        <span className="truncate">{s.name || s.label}</span>
-                      </span>
-                      <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
-                    </button>
-                  ))}
-              </div>
-            </div>
+            )}
+          </div>
+
+          {/* Relative Date */}
+          {relativeDate && (
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium whitespace-nowrap">
+              {relativeDate}
+            </span>
           )}
         </div>
       </div>
