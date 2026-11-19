@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search,
   UserPlus,
   Users,
-  Filter,
   Mail,
   Phone,
   Building2,
   Briefcase,
-  Grid,
-  List,
   X,
   CheckCircle2,
   AlertCircle,
@@ -21,26 +17,20 @@ import {
   Eye,
   Edit3,
   MapPin,
-  Lock,
   UserCheck,
-  HeartHandshake,
-  ArrowRight,
-  TrendingUp,
   Check,
-  Sparkles,
   Copy,
   KeyRound,
-  ShieldAlert,
   Trash2,
   UserX,
   Home,
-  ChevronDown,
   RotateCcw,
 } from 'lucide-react';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import { EmployeeCardSkeleton } from '../../components/common/Skeleton';
 import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
+import { useRegionalSettings } from '../../context/RegionalSettingsContext';
 import { api } from '../../services/api';
 
 const DEFAULT_BLANK_AVATAR = '/blank-profile-picture.png';
@@ -157,6 +147,7 @@ const formatSalary = (salaryStructure, rawSalary) => {
 
 const Employees = () => {
   const navigate = useNavigate();
+  const { formatCurrency } = useRegionalSettings();
   const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
   const [departments, setDepartments] = useState(() => api.getCached('/departments')?.data?.departments || []);
   const [designations, setDesignations] = useState(() => api.getCached('/designations')?.data?.designations || []);
@@ -530,6 +521,8 @@ NexaHR Workforce Systems`;
       setSubmitting(false);
     }
   };
+
+  const handleSaveEdit = handleEditSubmit;
 
 
   // Status tabs & counts
