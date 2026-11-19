@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
-import { JobCardSkeleton, TableSkeleton } from '../../../components/common/Skeleton';
+import { JobCardSkeleton } from '../../../components/common/Skeleton';
 import JobCard from './JobCard';
 import { api } from '../../../services/api';
 import {
@@ -22,17 +22,12 @@ import {
   TrendingUp,
   ArrowRight,
   ExternalLink,
-  Edit3,
-  Trash2,
-  LayoutGrid,
-  List,
   ShieldCheck,
   ChevronRight,
   ChevronDown,
   SlidersHorizontal,
   Building2,
   Share2,
-  Link2,
   Loader2,
   AlertCircle,
 } from 'lucide-react';
@@ -52,7 +47,6 @@ const JobsWorkspace = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [sortField, setSortField] = useState('recent'); // 'recent' | 'title' | 'applicants'
   const [sortOrder, setSortOrder] = useState('desc'); // 'asc' | 'desc'
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
   const [toastMsg, setToastMsg] = useState('');
 
   // Side-drawer state (Create / Edit)
@@ -645,12 +639,13 @@ const JobsWorkspace = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. UNIFIED SINGLE-ROW SEARCHBAR & TOOLBAR CONTROLS                         */}
+      {/* 3. TOOLBAR CONTROLS (ROW 1: STATUS & ACTIONS, ROW 2: SEARCH & DEPT FILTER) */}
       {/* ========================================================================= */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 sm:gap-2.5 w-full relative" ref={mobileFilterRef}>
-          {/* Left: Status Tabs (Desktop/Tablet) */}
-          <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0 overflow-x-auto no-scrollbar scrollbar-none">
+      <div className="space-y-2.5">
+        {/* ROW 1: Status Filter Tabs (Left) & Actions/Sort (Right) */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 w-full relative" ref={mobileFilterRef}>
+          {/* Left: Status Tabs */}
+          <div className="flex items-center gap-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0 overflow-x-auto no-scrollbar scrollbar-none max-w-full">
             <button
               type="button"
               onClick={() => setStatusFilter('ALL')}
@@ -715,47 +710,10 @@ const JobsWorkspace = () => {
             </button>
           </div>
 
-          {/* Middle: Search Input Container (Adjusted Width with flex-1) */}
-          <div className="flex-1 min-w-0 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] px-3 sm:px-3.5 py-2 flex items-center gap-2 shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
-            <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search job requisitions, skills, locations"
-              className="w-full bg-transparent border-0 outline-none text-xs sm:text-[13px] text-[#0E2A33] dark:text-[#E6F2F5] placeholder-[#5B727B]/70 min-w-0"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-white p-0.5 rounded-full cursor-pointer shrink-0"
-                title="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                if (!searchQuery.toLowerCase().includes('type:full_time')) {
-                  setSearchQuery((prev) => (prev ? `${prev.trim()} type:full_time` : 'type:full_time'));
-                }
-              }}
-              className="hidden xl:inline-block text-xs text-[#5B727B] hover:text-[#0A8FB5] dark:text-[#8FA8B1] dark:hover:text-[#3CC1E6] shrink-0 cursor-pointer font-medium transition-colors whitespace-nowrap"
-            >
-              Try type:full_time
-            </button>
-            <kbd className="hidden 2xl:inline-flex text-[11px] font-medium bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] px-1.5 py-0.5 rounded-[6px] shrink-0 select-none">
-              ⌘K
-            </kbd>
-          </div>
-
-          {/* Right: Controls (Sort + Department + View Toggles + New Opening CTA) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 justify-end">
+          {/* Right: Controls (Sort + New Opening CTA + Mobile Filter) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 justify-end ml-auto">
             {/* Sort Dropdown */}
-            <div className="relative shrink-0 hidden md:block">
+            <div className="relative shrink-0 hidden sm:block">
               <select
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value)}
@@ -766,51 +724,6 @@ const JobsWorkspace = () => {
                 <option value="applicants">Sort: Applicants</option>
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            {/* Department Dropdown (visible on tablet/desktop) */}
-            <div className="relative shrink-0 hidden md:block">
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-xs sm:text-[13px] font-medium rounded-[12px] pl-3 pr-7 py-2 shadow-2xs focus:outline-none cursor-pointer max-w-[150px] truncate"
-              >
-                <option value="ALL">All departments</option>
-                {allDepartmentNames.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            {/* View Toggles Capsule */}
-            <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`w-8 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
-                    : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
-                }`}
-                title="Card view"
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('table')}
-                className={`w-8 h-7 rounded-[12px] flex items-center justify-center transition-all cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6]'
-                    : 'text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] dark:hover:text-[#E6F2F5]'
-                }`}
-                title="List view"
-              >
-                <List className="w-3.5 h-3.5" />
-              </button>
             </div>
 
             {/* New Opening CTA */}
@@ -827,7 +740,7 @@ const JobsWorkspace = () => {
             <button
               type="button"
               onClick={() => setShowMobileFilter((prev) => !prev)}
-              className={`md:hidden flex items-center justify-center gap-1.5 h-[38px] px-3 rounded-[12px] border text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 ${
+              className={`sm:hidden flex items-center justify-center gap-1.5 h-[38px] px-3 rounded-[12px] border text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 ${
                 deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent' || showMobileFilter
                   ? 'bg-[#E1F4FA] dark:bg-[#12333D] border-[#0A8FB5] dark:border-[#3CC1E6] text-[#07617D] dark:text-[#3CC1E6]'
                   : 'bg-white dark:bg-[#112229] border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5]'
@@ -996,6 +909,63 @@ const JobsWorkspace = () => {
           )}
         </div>
 
+        {/* ROW 2: Searchbar (Left) & All Department Dropdown (Right) */}
+        <div className="flex items-center gap-2 sm:gap-2.5 w-full">
+          {/* Search Input Container */}
+          <div className="flex-1 min-w-0 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] px-3 sm:px-3.5 py-2 flex items-center gap-2 shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
+            <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search job requisitions, skills, locations"
+              className="w-full bg-transparent border-0 outline-none text-xs sm:text-[13px] text-[#0E2A33] dark:text-[#E6F2F5] placeholder-[#5B727B]/70 min-w-0"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-white p-0.5 rounded-full cursor-pointer shrink-0"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (!searchQuery.toLowerCase().includes('type:full_time')) {
+                  setSearchQuery((prev) => (prev ? `${prev.trim()} type:full_time` : 'type:full_time'));
+                }
+              }}
+              className="hidden sm:inline-block text-xs text-[#5B727B] hover:text-[#0A8FB5] dark:text-[#8FA8B1] dark:hover:text-[#3CC1E6] shrink-0 cursor-pointer font-medium transition-colors whitespace-nowrap"
+            >
+              Try type:full_time
+            </button>
+            <kbd className="hidden md:inline-flex text-[11px] font-medium bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] px-1.5 py-0.5 rounded-[6px] shrink-0 select-none">
+              ⌘K
+            </kbd>
+          </div>
+
+          {/* Department Dropdown */}
+          <div className="relative shrink-0">
+            <select
+              value={deptFilter}
+              onChange={(e) => setDeptFilter(e.target.value)}
+              className="appearance-none bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] text-xs sm:text-[13px] font-medium rounded-[12px] pl-3 pr-7 py-2 shadow-2xs focus:outline-none cursor-pointer max-w-[150px] sm:max-w-[200px] truncate"
+            >
+              <option value="ALL">All departments</option>
+              {allDepartmentNames.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-[#5B727B] dark:text-[#8FA8B1] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+        </div>
+
         {/* Active Filter Tags (Mobile Only) */}
         {(deptFilter !== 'ALL' || statusFilter !== 'ALL' || sortField !== 'recent') && (
           <div className="md:hidden flex items-center gap-1.5 flex-wrap pt-0.5">
@@ -1046,18 +1016,7 @@ const JobsWorkspace = () => {
       {/* 4. ACTIVE JOBS DISPLAY (ZERO-LAYOUT-SHIFT SKELETONS) */}
       {/* ========================================================================= */}
       {loading ? (
-        <>
-          <div className="md:hidden">
-            <JobCardSkeleton count={6} />
-          </div>
-          <div className="hidden md:block">
-            {viewMode === 'table' ? (
-              <TableSkeleton rows={6} cols={6} />
-            ) : (
-              <JobCardSkeleton count={6} />
-            )}
-          </div>
-        </>
+        <JobCardSkeleton count={6} />
       ) : jobs.length === 0 ? (
         /* STEP 7: Single page-level empty state when zero jobs overall */
         <div className="py-16 px-6 text-center border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[24px] bg-white dark:bg-[#112229] mt-4 flex flex-col items-center justify-center max-w-xl mx-auto shadow-sm">
@@ -1080,142 +1039,27 @@ const JobsWorkspace = () => {
           </button>
         </div>
       ) : (
-        <>
-          {/* VIEW 1: REDESIGNED POSTED JOB CARDS (COMPACT & SCANNABLE) */}
-          {(viewMode === 'grid' || viewMode === 'table') && (
-            <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-4 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
-              {sortedJobs.length > 0 ? (
-                sortedJobs.map((job) => (
-                  <JobCard
-                    key={job.id}
-                    job={job}
-                    onViewApplicants={() => navigate('/app/recruitment/pipeline')}
-                    onShare={handleShareJob}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleDeleteJob}
-                    onToggleStatus={handleToggleStatus}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full py-12 text-center text-[#5B727B] dark:text-[#8FA8B1] text-sm border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[20px] bg-white dark:bg-[#112229]">
-                  <p className="font-medium text-[#0E2A33] dark:text-[#E6F2F5] mb-1">No matching postings</p>
-                  <p className="text-xs">Try adjusting your search query, status, or department filter.</p>
-                </div>
-              )}
+        /* POSTED JOB CARDS GRID (COMPACT & SCANNABLE) */
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-4">
+          {sortedJobs.length > 0 ? (
+            sortedJobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                onViewApplicants={() => navigate('/app/recruitment/pipeline')}
+                onShare={handleShareJob}
+                onEdit={handleOpenEdit}
+                onDelete={handleDeleteJob}
+                onToggleStatus={handleToggleStatus}
+              />
+            ))
+          ) : (
+            <div className="col-span-full py-12 text-center text-[#5B727B] dark:text-[#8FA8B1] text-sm border border-dashed border-[#DCE6EA] dark:border-[#223840] rounded-[20px] bg-white dark:bg-[#112229]">
+              <p className="font-medium text-[#0E2A33] dark:text-[#E6F2F5] mb-1">No matching postings</p>
+              <p className="text-xs">Try adjusting your search query, status, or department filter.</p>
             </div>
           )}
-
-          {/* VIEW 2: DATA TABLE VIEW (Desktop Only) */}
-          {viewMode === 'table' && (
-            <div className="hidden md:block mt-4 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[20px] shadow-[0_1px_2px_rgba(14,42,51,0.06),0_8px_24px_-12px_rgba(14,42,51,0.14)] overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-[#DCE6EA] dark:border-[#223840] text-[11px] font-bold text-[#5B727B] dark:text-[#8FA8B1] uppercase tracking-wider bg-[#F5F8F9] dark:bg-[#0D1B21]">
-                      <th className="py-3.5 px-5">Job Title & Requisition</th>
-                      <th className="py-3.5 px-5">Department</th>
-                      <th className="py-3.5 px-5">Location</th>
-                      <th className="py-3.5 px-5">Contract</th>
-                      <th className="py-3.5 px-5">Compensation</th>
-                      <th className="py-3.5 px-5">Candidates</th>
-                      <th className="py-3.5 px-5">Status</th>
-                      <th className="py-3.5 px-5 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#DCE6EA] dark:divide-[#223840] text-xs">
-                    {sortedJobs.length > 0 ? (
-                      sortedJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-[#F5F8F9]/50 dark:hover:bg-[#0D1B21]/50 transition-colors">
-                          <td className="py-3.5 px-5 font-bold text-[#0E2A33] dark:text-[#E6F2F5]">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-[10px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] flex items-center justify-center shrink-0">
-                                <Briefcase className="w-4 h-4 stroke-[1.8]" />
-                              </div>
-                              <div>
-                                <p className="leading-snug">{job.title}</p>
-                                {job.posted && <p className="text-[10px] text-[#5B727B] dark:text-[#8FA8B1] font-normal mt-0.5">Posted {job.posted}</p>}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-5 text-[#5B727B] dark:text-[#8FA8B1]">
-                            <span className="text-[11px] font-semibold text-[#07617D] dark:text-[#3CC1E6] bg-[#E1F4FA] dark:bg-[#12333D] rounded-[6px] px-2 py-0.5">
-                              {job.dept || job.department || 'General'}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-5 text-[#5B727B] dark:text-[#8FA8B1]">{job.location}</td>
-                          <td className="py-3.5 px-5">
-                            <span className="font-medium text-[#0E2A33] dark:text-[#E6F2F5] bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] px-2 py-0.5 rounded-[8px]">
-                              {job.type}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-5 font-semibold text-[#157A45] dark:text-[#5FD08C]">{job.salary}</td>
-                          <td className="py-3.5 px-5">
-                            <button
-                              type="button"
-                              onClick={() => navigate('/app/recruitment/pipeline')}
-                              className="font-bold text-[#0A8FB5] hover:text-[#07617D] dark:text-[#3CC1E6] flex items-center gap-1.5 cursor-pointer"
-                            >
-                              <Users className="w-3.5 h-3.5" />
-                              <span>{job.applicants || 0}</span>
-                            </button>
-                          </td>
-                          <td className="py-3.5 px-5">
-                            <button
-                              type="button"
-                              onClick={() => handleToggleStatus(job)}
-                              className={`inline-flex items-center gap-1.5 text-xs font-semibold rounded-[12px] px-2 py-0.5 cursor-pointer transition-all ${
-                                job.status === 'ACTIVE'
-                                  ? 'text-[#157A45] dark:text-[#5FD08C] bg-[#DDF3E6] dark:bg-[#12301F]'
-                                  : 'text-[#9A6100] dark:text-[#F0BE5A] bg-[#FBEFD3] dark:bg-[#33270B]'
-                              }`}
-                            >
-                              <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'ACTIVE' ? 'bg-[#157A45] dark:bg-[#5FD08C]' : 'bg-[#9A6100] dark:bg-[#F0BE5A]'}`} />
-                              <span>{job.status === 'ACTIVE' ? 'Active' : 'Paused'}</span>
-                            </button>
-                          </td>
-                          <td className="py-3.5 px-5 text-right">
-                            <div className="inline-flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => handleShareJob(job)}
-                                className="w-7 h-7 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0A8FB5] transition-all cursor-pointer"
-                                title="Share Job"
-                              >
-                                <Link2 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEdit(job)}
-                                className="w-7 h-7 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#0E2A33] transition-all cursor-pointer"
-                                title="Edit Job Requisition"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteJob(job.id)}
-                                className="w-7 h-7 rounded-[12px] border border-[#DCE6EA] dark:border-[#223840] bg-white dark:bg-[#112229] flex items-center justify-center text-[#5B727B] dark:text-[#8FA8B1] hover:text-[#C0354A] transition-all cursor-pointer"
-                                title="Delete Job"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={8} className="py-10 text-center text-[#5B727B] dark:text-[#8FA8B1] text-xs">
-                          No postings match these filters.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </>
+        </div>
       )}
 
       {/* ========================================================================= */}
