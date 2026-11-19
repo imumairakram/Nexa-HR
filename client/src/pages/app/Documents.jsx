@@ -43,6 +43,7 @@ import {
   FileCode,
   HardDrive,
   Filter,
+  Loader2,
 } from 'lucide-react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -1976,48 +1977,51 @@ ${doc.description || 'This document serves as an official verified corporate rec
       )}
 
       {/* ========================================================================= */}
-      {/* 6. MODAL: ISSUE DOCUMENT TO EMPLOYEE */}
+      {/* 6. MODAL: ISSUE DOCUMENT TO EMPLOYEE (MATCHED TO NEW TICKET CARD UI) */}
       {/* ========================================================================= */}
       {isIssueModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-4xl sm:max-w-5xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            {/* Header */}
-            <div className="px-6 sm:px-7 py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B]">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 ring-4 ring-sky-100/70 dark:ring-teal-950/60">
-                  <FileText className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <FileText className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Issue Document to Employee
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     Generate offer letters, employment contracts, NDAs, and increment letters with automated delivery.
                   </p>
                 </div>
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsIssueModalOpen(false)}
-                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Form Body */}
-            <form onSubmit={handleIssueSubmit} className="overflow-y-auto p-6 sm:p-7 space-y-4 text-xs">
-              {/* Employee Selection & Reference Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Recipient Employee <span className="text-rose-500">*</span>
-                  </label>
+            <form onSubmit={handleIssueSubmit} className="space-y-6">
+              {/* Row 1: Employee Selection & Reference Code */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-sky-500" />
+                      Recipient Employee <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <select
                     required
                     value={issueForm.employeeId}
                     onChange={(e) => handleEmployeeChange(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="">Select Employee...</option>
                     {employees.map((emp) => (
@@ -2028,60 +2032,67 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Reference Code / Tracking ID
-                  </label>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <FileCode className="w-3.5 h-3.5 text-sky-500" />
+                      Reference Code / Tracking ID
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={issueForm.referenceNumber}
                     onChange={(e) => setIssueForm({ ...issueForm, referenceNumber: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-sky-500/20 outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-mono text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
               </div>
 
               {/* Dynamic Employee Details Card when Selected */}
               {selectedEmployeeObj && (
-                <div className="p-3.5 rounded-2xl bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-800/50 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-sky-500 text-white font-extrabold text-sm flex items-center justify-center shrink-0">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-sky-50/40 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-sky-950/20 border border-slate-200/80 dark:border-slate-700/80 flex items-start gap-3.5 shadow-xs">
+                  <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400 font-extrabold text-sm shadow-xs">
                     {selectedEmployeeObj.firstName?.[0] || 'E'}
                   </div>
-                  <div className="min-w-0 flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-                    <div>
-                      <div className="text-slate-400 font-medium">Full Name</div>
-                      <div className="font-bold text-slate-800 dark:text-slate-100 truncate">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
                         {selectedEmployeeObj.firstName} {selectedEmployeeObj.lastName}
-                      </div>
+                      </h4>
+                      <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide uppercase bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">
+                        {selectedEmployeeObj.employeeCode}
+                      </span>
                     </div>
-                    <div>
-                      <div className="text-slate-400 font-medium">Designation</div>
-                      <div className="font-bold text-slate-800 dark:text-slate-100 truncate">
-                        {selectedEmployeeObj.profile?.designation?.title || 'Team Member'}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-slate-400 font-medium">Department</div>
-                      <div className="font-bold text-slate-800 dark:text-slate-100 truncate">
+                    <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
+                        {selectedEmployeeObj.profile?.designation?.title || selectedEmployeeObj.role}
+                      </span>
+                      <span className="text-slate-300 dark:text-slate-600">•</span>
+                      <span className="text-slate-500 dark:text-slate-400 truncate">
                         {selectedEmployeeObj.profile?.department?.name || 'Operations'}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-slate-400 font-medium">Email Address</div>
-                      <div className="font-bold text-slate-800 dark:text-slate-100 truncate font-mono">
+                      </span>
+                      <span className="text-slate-300 dark:text-slate-600">•</span>
+                      <span className="font-mono text-slate-500 dark:text-slate-400 truncate text-[11px]">
                         {selectedEmployeeObj.email || 'N/A'}
-                      </div>
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Classification Selector */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Document Classification <span className="text-rose-500">*</span>
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-sky-500" />
+                    Document Classification <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-xs font-medium text-slate-400">
+                    Select document taxonomy
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {CLASSIFICATION_OPTIONS.map((cat) => {
                     const CatIcon = cat.icon;
                     const isSelected = issueForm.type === cat.id;
@@ -2090,23 +2101,39 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         type="button"
                         key={cat.id}
                         onClick={() => handleTypeSelect(cat.id)}
-                        className={`p-3 rounded-[12px] text-left border transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        className={`relative p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
                           isSelected
-                            ? 'bg-sky-50/80 dark:bg-sky-950/60 border-teal-500 text-teal-950 dark:text-white ring-2 ring-sky-500/20 shadow-xs'
-                            : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                            ? 'bg-sky-50/60 dark:bg-sky-950/40 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
+                            : 'bg-slate-50/40 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                         }`}
                       >
-                        <div className="flex items-center justify-between w-full">
-                          <CatIcon
-                            className={`w-4 h-4 ${
-                              isSelected ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'
+                        <div className="flex items-center justify-between mb-2">
+                          <div
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                             }`}
-                          />
-                          {isSelected && <span className="w-2 h-2 rounded-full bg-sky-500" />}
+                          >
+                            <CatIcon className="w-4 h-4" />
+                          </div>
+                          {isSelected && (
+                            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200 dark:ring-sky-900" />
+                          )}
                         </div>
                         <div>
-                          <div className="font-bold text-[11px] leading-tight">{cat.label}</div>
-                          <div className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{cat.desc}</div>
+                          <p
+                            className={`text-xs font-bold leading-tight ${
+                              isSelected
+                                ? 'text-sky-700 dark:text-sky-300'
+                                : 'text-slate-800 dark:text-slate-200'
+                            }`}
+                          >
+                            {cat.label}
+                          </p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 truncate">
+                            {cat.desc}
+                          </p>
                         </div>
                       </button>
                     );
@@ -2115,63 +2142,75 @@ ${doc.description || 'This document serves as an official verified corporate rec
               </div>
 
               {/* Title & Issuing Authority */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Document Title <span className="text-rose-500">*</span>
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-sky-500" />
+                      Document Title <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <input
                     type="text"
                     required
                     value={issueForm.title}
                     onChange={(e) => setIssueForm({ ...issueForm, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Issuing Authority / Department
-                  </label>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-sky-500" />
+                      Issuing Authority / Department
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={issueForm.issuer}
                     onChange={(e) => setIssueForm({ ...issueForm, issuer: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
               </div>
 
               {/* Issue Date & Expiry Date */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Issue / Verification Date
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-sky-500" />
+                      Issue / Verification Date
+                    </label>
+                  </div>
                   <input
                     type="date"
                     value={issueForm.issueDate}
                     onChange={(e) => setIssueForm({ ...issueForm, issueDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner cursor-pointer"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Expiry / Validity Deadline (Optional)
-                  </label>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-sky-500" />
+                      Expiry / Validity Deadline (Optional)
+                    </label>
+                  </div>
                   <input
                     type="date"
                     value={issueForm.expiryDate}
                     onChange={(e) => setIssueForm({ ...issueForm, expiryDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner cursor-pointer"
                   />
                 </div>
               </div>
 
               {/* Terms & Description */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                   Key Terms / Stated Conditions / Executive Message
                 </label>
                 <textarea
@@ -2179,84 +2218,121 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   value={issueForm.description}
                   onChange={(e) => setIssueForm({ ...issueForm, description: e.target.value })}
                   placeholder="Enter key terms, compensation details, designation scope, or special covenants..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none leading-relaxed"
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all resize-none shadow-inner leading-relaxed"
                 />
               </div>
 
-              {/* Optional File Attachment */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Attach Official PDF / Document Copy (Optional)
-                </label>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleIssueFileSelect}
-                  accept=".pdf,.docx,.doc,.png,.jpg,.jpeg"
-                  className="hidden"
-                />
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="p-3.5 rounded-2xl border-2 border-dashed border-sky-300 dark:border-sky-700/60 bg-sky-50/40 dark:bg-sky-950/20 hover:bg-sky-50/70 transition-all cursor-pointer flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Upload className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {issueForm.fileName ? issueForm.fileName : 'Click to upload certified PDF or agreement file'}
-                    </span>
+              {/* Grid: File Attachment & Automated Email Notification */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Optional File Attachment */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Upload className="w-3.5 h-3.5 text-sky-500" />
+                      Attach Document Copy (Optional)
+                    </label>
                   </div>
-                  {issueForm.fileName ? (
-                    <span className="text-[11px] font-mono text-sky-700 dark:text-sky-300 font-bold">
-                      {issueForm.size}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-slate-400">PDF, DOCX up to 10MB</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Automated Email Notification Callout */}
-              <div className="p-3.5 rounded-2xl bg-sky-50/80 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
-                  <div>
-                    <span className="font-bold text-slate-900 dark:text-white block">
-                      Dispatch Automated Email to Employee
-                    </span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Send official NexaHR branded notification with document reference and direct portal link.
-                    </span>
-                  </div>
-                </div>
-
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
-                    type="checkbox"
-                    checked={issueForm.notifyEmployee}
-                    onChange={(e) => setIssueForm({ ...issueForm, notifyEmployee: e.target.checked })}
-                    className="sr-only peer"
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleIssueFileSelect}
+                    accept=".pdf,.docx,.doc,.png,.jpg,.jpeg"
+                    className="hidden"
                   />
-                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-500"></div>
-                </label>
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-4 rounded-2xl border-2 border-dashed border-sky-300/80 dark:border-sky-700/60 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-sky-50/50 dark:hover:bg-sky-950/30 transition-all cursor-pointer flex items-center justify-between min-h-[76px]"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
+                        <Upload className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                          {issueForm.fileName ? issueForm.fileName : 'Attach certified PDF or agreement file'}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5 truncate">
+                          {issueForm.fileName ? `Uploaded file size: ${issueForm.size}` : 'PDF, DOCX up to 10MB'}
+                        </div>
+                      </div>
+                    </div>
+                    {issueForm.fileName && (
+                      <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0 ml-2">
+                        {issueForm.size}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Automated Email Notification Callout */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-sky-500" />
+                      Automated Delivery
+                    </label>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4 min-h-[76px]">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
+                          Dispatch Automated Notification
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
+                          Send NexaHR branded notification to staff
+                        </span>
+                      </div>
+                    </div>
+
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={issueForm.notifyEmployee}
+                        onChange={(e) => setIssueForm({ ...issueForm, notifyEmployee: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-10 h-5.5 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-500"></div>
+                    </label>
+                  </div>
+                </div>
               </div>
 
-              {/* Modal Footer */}
-              <div className="flex items-center justify-end pt-3 border-t border-teal-100 dark:border-teal-900/40 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsIssueModalOpen(false)}
-                  className="px-5 py-2.5 rounded-[12px] text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 hover:from-teal-500 hover:to-emerald-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-sky-500/30 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
-                >
-                  <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                  <span>{submitting ? 'Issuing Document...' : 'Issue & Dispatch Document'}</span>
-                </button>
+              {/* Modal Footer: Trust text + Action buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Enterprise cryptographic issuance & automated staff notification</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsIssueModalOpen(false)}
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Issuing Document...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 stroke-[2.5]" />
+                        <span>Issue & Dispatch Document</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -2264,58 +2340,67 @@ ${doc.description || 'This document serves as an official verified corporate rec
       )}
 
       {/* ========================================================================= */}
-      {/* 7. MODAL: PUBLISH COMPANY POLICY */}
+      {/* 7. MODAL: PUBLISH COMPANY POLICY (MATCHED TO NEW TICKET CARD UI) */}
       {/* ========================================================================= */}
       {isPolicyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl max-w-3xl sm:max-w-4xl lg:max-w-5xl w-full shadow-2xl border border-sky-200/70 dark:border-sky-800/50 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="px-6 sm:px-7 py-4.5 border-b border-sky-200/50 dark:border-sky-800/40 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B]">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30">
-                  <BookOpen className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <BookOpen className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Publish Company Policy
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     Broadcast organizational charters, ethics guidelines, and operational policies.
                   </p>
                 </div>
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsPolicyModalOpen(false)}
-                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handlePolicySubmit} className="overflow-y-auto p-6 space-y-4 text-xs">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Policy Title <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Artificial Intelligence & Data Governance Charter"
-                  value={policyForm.title}
-                  onChange={(e) => setPolicyForm({ ...policyForm, title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 outline-none"
-                />
-              </div>
+            <form onSubmit={handlePolicySubmit} className="space-y-6">
+              {/* Row 1: Title & Category */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-sky-500" />
+                      Policy Title <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Artificial Intelligence & Data Governance Charter"
+                    value={policyForm.title}
+                    onChange={(e) => setPolicyForm({ ...policyForm, title: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Category Classification
-                  </label>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-sky-500" />
+                      Category Classification
+                    </label>
+                  </div>
                   <select
                     value={policyForm.category}
                     onChange={(e) => setPolicyForm({ ...policyForm, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none focus:ring-2 focus:ring-sky-500/20"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     {POLICY_CATEGORIES.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -2324,29 +2409,36 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     ))}
                   </select>
                 </div>
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Version Tag
-                  </label>
+              {/* Row 2: Version Tag & Target Department */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <FileCode className="w-3.5 h-3.5 text-sky-500" />
+                      Version Tag
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={policyForm.version}
                     onChange={(e) => setPolicyForm({ ...policyForm, version: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold font-mono text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Target Department / Scope
-                  </label>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-sky-500" />
+                      Target Department / Scope
+                    </label>
+                  </div>
                   <select
                     value={policyForm.department}
                     onChange={(e) => setPolicyForm({ ...policyForm, department: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
                   >
                     <option value="Company-Wide (All Offices)">Company-Wide (All Offices)</option>
                     {departments.map((dept) => (
@@ -2356,22 +2448,27 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     ))}
                   </select>
                 </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Issuing Board / Authority
-                  </label>
-                  <input
-                    type="text"
-                    value={policyForm.issuer}
-                    onChange={(e) => setPolicyForm({ ...policyForm, issuer: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none"
-                  />
-                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+              {/* Row 3: Issuing Authority */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Building className="w-3.5 h-3.5 text-sky-500" />
+                    Issuing Board / Authority
+                  </label>
+                </div>
+                <input
+                  type="text"
+                  value={policyForm.issuer}
+                  onChange={(e) => setPolicyForm({ ...policyForm, issuer: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                />
+              </div>
+
+              {/* Summary Description */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                   Policy Summary & Core Guidelines <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -2380,15 +2477,18 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   value={policyForm.description}
                   onChange={(e) => setPolicyForm({ ...policyForm, description: e.target.value })}
                   placeholder="Outline operational guidelines, compliance rules, and employee responsibilities..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium outline-none leading-relaxed"
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all resize-none shadow-inner leading-relaxed"
                 />
               </div>
 
               {/* Policy File Upload */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Attach Official Policy Document (Optional)
-                </label>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5 text-sky-500" />
+                    Attach Official Policy Document (Optional)
+                  </label>
+                </div>
                 <input
                   type="file"
                   ref={policyFileInputRef}
@@ -2398,37 +2498,62 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 />
                 <div
                   onClick={() => policyFileInputRef.current?.click()}
-                  className="p-3.5 rounded-2xl border-2 border-dashed border-sky-300 dark:border-sky-700/60 bg-sky-50/40 dark:bg-sky-950/20 hover:bg-sky-50/70 transition-all cursor-pointer flex items-center justify-between"
+                  className="p-4 rounded-2xl border-2 border-dashed border-sky-300/80 dark:border-sky-700/60 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-sky-50/50 dark:hover:bg-sky-950/30 transition-all cursor-pointer flex items-center justify-between min-h-[76px]"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Upload className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {policyForm.fileName ? policyForm.fileName : 'Click to attach handbook or PDF policy'}
-                    </span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 text-sky-600 dark:text-sky-400">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {policyForm.fileName ? policyForm.fileName : 'Click to attach handbook or PDF policy'}
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5 truncate">
+                        {policyForm.fileName ? `Uploaded file size: ${policyForm.size}` : 'PDF, DOCX up to 10MB'}
+                      </div>
+                    </div>
                   </div>
                   {policyForm.fileName && (
-                    <span className="text-[11px] font-mono text-sky-700 dark:text-sky-300 font-bold">
+                    <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0 ml-2">
                       {policyForm.size}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center justify-end pt-3 border-t border-teal-100 dark:border-teal-900/40 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsPolicyModalOpen(false)}
-                  className="px-5 py-2.5 rounded-[12px] text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white text-xs font-black shadow-md cursor-pointer disabled:opacity-50"
-                >
-                  {submitting ? 'Publishing...' : 'Publish Corporate Policy'}
-                </button>
+              {/* Footer: Trust text + Action buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Verified organization-wide policy charter broadcast</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsPolicyModalOpen(false)}
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Publishing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 stroke-[2.5]" />
+                        <span>Publish Corporate Policy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
