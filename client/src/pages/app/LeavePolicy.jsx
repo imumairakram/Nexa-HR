@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { LeaveCardSkeleton } from '../../components/common/Skeleton';
+import LeavePolicyCard from './LeavePolicyCard';
 import {
   CalendarDays,
   Plus,
@@ -643,76 +644,15 @@ const LeavePolicy = () => {
       {loading ? (
         <LeaveCardSkeleton count={6} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
           {policies.map((p) => (
-            <div
+            <LeavePolicyCard
               key={p.id}
-              className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 hover:border-blue-300/60 dark:hover:border-blue-700/60 transition-all flex flex-col justify-between space-y-4 group hover:shadow-lg"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <span
-                    className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${p.type === 'PAID'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
-                      }`}
-                  >
-                    {p.type} LEAVE
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">{p.code}</span>
-                </div>
-
-                <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{p.name}</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed line-clamp-2">
-                  {p.description}
-                </p>
-
-                <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-2 text-xs border border-slate-100 dark:border-slate-800/60">
-                  <div className="flex justify-between font-bold">
-                    <span className="text-slate-400">Allowed Quota:</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-black text-sm">{p.days} Days / Year</span>
-                  </div>
-                  <div className="flex justify-between font-medium text-slate-600 dark:text-slate-300">
-                    <span className="text-slate-400">Wage Status:</span>
-                    <span className={p.type === 'PAID' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-amber-600 dark:text-amber-400 font-bold'}>
-                      {p.type === 'PAID' ? '100% Paid' : 'Unpaid'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD ACTION BUTTONS: READ (VIEW), UPDATE (EDIT), DELETE */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setViewingPolicy(p)}
-                  className="flex-1 py-2 px-2.5 rounded-[12px] bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-blue-950/60 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
-                  title="View Policy Details"
-                >
-                  <Eye className="w-3.5 h-3.5 stroke-[2.2]" />
-                  <span>View</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => openEditModal(p)}
-                  className="flex-1 py-2 px-2.5 rounded-[12px] bg-slate-50 hover:bg-emerald-50 dark:bg-slate-800/60 dark:hover:bg-emerald-950/60 text-slate-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
-                  title="Edit Policy"
-                >
-                  <Edit2 className="w-3.5 h-3.5 stroke-[2.2]" />
-                  <span>Edit</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setDeletingPolicy(p)}
-                  className="py-2 px-3 rounded-[12px] bg-slate-50 hover:bg-rose-50 dark:bg-slate-800/60 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold transition-all flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 cursor-pointer shadow-2xs hover:shadow-sm"
-                  title="Delete Policy"
-                >
-                  <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
-                </button>
-              </div>
-            </div>
+              policy={p}
+              onView={(policy) => setViewingPolicy(policy)}
+              onEdit={(policy) => openEditModal(policy)}
+              onDelete={(policy) => setDeletingPolicy(policy)}
+            />
           ))}
         </div>
       )}
@@ -1247,7 +1187,7 @@ const LeavePolicy = () => {
                 Delete Leave Policy?
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Are you sure you want to delete <span className="font-bold text-slate-800 dark:text-slate-200">"{deletingPolicy.name}"</span> (<span className="font-mono font-bold text-rose-600 dark:text-rose-400">{deletingPolicy.code}</span>)? Employees will no longer be eligible to request this leave category.
+                Delete this leave policy? Employees currently assigned to it may be affected.
               </p>
             </div>
 
