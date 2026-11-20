@@ -67,7 +67,7 @@ export const parseDateInfo = (dateStr) => {
       const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
       return { monthShort, dayNum, formatted, weekday };
     }
-  } catch {}
+  } catch { }
   return { monthShort: 'DAY', dayNum: '--', formatted: dateStr, weekday: '' };
 };
 
@@ -615,8 +615,8 @@ const EmployeeLeaves = () => {
                     type="button"
                     onClick={() => setTypeFilter(typeName)}
                     className={`px-2.5 py-1.5 rounded-[12px] text-xs font-semibold text-left transition-all cursor-pointer truncate ${typeFilter === typeName
-                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                       }`}
                   >
                     {typeName === 'ALL' ? 'All Policies' : typeName}
@@ -701,13 +701,12 @@ const EmployeeLeaves = () => {
                               </div>
                             </div>
                             <span
-                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs shrink-0 ${
-                                req.status === 'APPROVED'
-                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
-                                  : req.status === 'REJECTED'
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs shrink-0 ${req.status === 'APPROVED'
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                                : req.status === 'REJECTED'
                                   ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
                                   : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
-                              }`}
+                                }`}
                             >
                               {req.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
                               {req.status === 'PENDING' && <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
@@ -737,8 +736,8 @@ const EmployeeLeaves = () => {
                             {req.status === 'APPROVED'
                               ? `Approved by ${req.approvedBy?.firstName || 'HR Lead'}`
                               : req.status === 'REJECTED'
-                              ? req.rejectionReason || 'Declined by HR'
-                              : 'Pending Supervisor Review'}
+                                ? req.rejectionReason || 'Declined by HR'
+                                : 'Pending Supervisor Review'}
                           </span>
                         </div>
                       </div>
@@ -829,13 +828,12 @@ const EmployeeLeaves = () => {
                           {/* 4. Status Column */}
                           <td className="py-4 px-4">
                             <span
-                              className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase ${
-                                req.status === 'APPROVED'
-                                  ? 'text-emerald-600 dark:text-emerald-400'
-                                  : req.status === 'REJECTED'
+                              className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase ${req.status === 'APPROVED'
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : req.status === 'REJECTED'
                                   ? 'text-rose-600 dark:text-rose-400'
                                   : 'text-amber-600 dark:text-amber-400'
-                              }`}
+                                }`}
                             >
                               {req.status === 'APPROVED' && (
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -971,13 +969,12 @@ const EmployeeLeaves = () => {
                       {selectedReq.leaveType?.name || 'Leave Record'}
                     </h2>
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs ${
-                        selectedReq.status === 'APPROVED'
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs ${selectedReq.status === 'APPROVED'
                           ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
                           : selectedReq.status === 'REJECTED'
-                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
-                      }`}
+                            ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
+                        }`}
                     >
                       {selectedReq.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
                       {selectedReq.status === 'PENDING' && <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
@@ -1063,13 +1060,12 @@ const EmployeeLeaves = () => {
 
               {/* Row 3: Audit & Supervisor Notes */}
               <div
-                className={`p-4 sm:p-5 rounded-2xl border space-y-2 shadow-xs ${
-                  selectedReq.status === 'APPROVED'
+                className={`p-4 sm:p-5 rounded-2xl border space-y-2 shadow-xs ${selectedReq.status === 'APPROVED'
                     ? 'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-200/80 dark:border-emerald-800/50'
                     : selectedReq.status === 'REJECTED'
-                    ? 'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-200/80 dark:border-rose-800/50'
-                    : 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-200/80 dark:border-amber-800/50'
-                }`}
+                      ? 'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-200/80 dark:border-rose-800/50'
+                      : 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-200/80 dark:border-amber-800/50'
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
@@ -1077,13 +1073,12 @@ const EmployeeLeaves = () => {
                     Audit & Supervisor Notes
                   </span>
                   <span
-                    className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-[12px] border ${
-                      selectedReq.status === 'APPROVED'
+                    className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-[12px] border ${selectedReq.status === 'APPROVED'
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60'
                         : selectedReq.status === 'REJECTED'
-                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
-                        : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
-                    }`}
+                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
+                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
+                      }`}
                   >
                     {selectedReq.status === 'APPROVED' ? 'Approved' : selectedReq.status === 'REJECTED' ? 'Declined' : 'Pending Review'}
                   </span>
@@ -1218,11 +1213,10 @@ const EmployeeLeaves = () => {
                           key={d.id}
                           type="button"
                           onClick={() => setLeaveForm((prev) => ({ ...prev, dayType: d.id }))}
-                          className={`py-2 px-3 rounded-[12px] border text-center transition-all cursor-pointer font-bold text-xs ${
-                            isSelected
-                              ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
-                              : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
-                          }`}
+                          className={`py-2 px-3 rounded-[12px] border text-center transition-all cursor-pointer font-bold text-xs ${isSelected
+                            ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
+                            : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
+                            }`}
                         >
                           <div>{d.label}</div>
                           <div className={`text-[10px] font-normal opacity-80 ${isSelected ? 'text-white' : 'text-slate-400'}`}>

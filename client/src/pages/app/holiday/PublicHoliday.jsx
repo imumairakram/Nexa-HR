@@ -299,7 +299,7 @@ const PublicHoliday = () => {
           const m = parseInt(parts[1], 10) - 1;
           if (m >= 0 && m < 12) counts[m]++;
         }
-      } catch (e) {}
+      } catch (e) { }
     });
     return months.map((m, idx) => ({
       value: counts[idx],
@@ -320,7 +320,7 @@ const PublicHoliday = () => {
           const q = Math.floor(m / 3);
           if (q >= 0 && q < 4) qCounts[q]++;
         }
-      } catch (e) {}
+      } catch (e) { }
     });
     return [
       { value: qCounts[0], label: 'Q1' },
@@ -597,22 +597,20 @@ const PublicHoliday = () => {
                     key={id}
                     type="button"
                     onClick={() => setCategoryFilter(id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${
-                      isSelected
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[12px] text-xs font-semibold transition-all cursor-pointer ${isSelected
                         ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 truncate pr-2">
                       <ItemIcon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
                       <span className="truncate">{label}</span>
                     </div>
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
-                        isSelected
+                      className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 ${isSelected
                           ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
                           : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                      }`}
+                        }`}
                     >
                       {count}
                     </span>
@@ -629,11 +627,10 @@ const PublicHoliday = () => {
                 type="button"
                 onClick={() => setViewMode('list')}
                 title="Table List View"
-                className={`p-1.5 rounded-[12px] transition-all cursor-pointer ${
-                  viewMode === 'list'
+                className={`p-1.5 rounded-[12px] transition-all cursor-pointer ${viewMode === 'list'
                     ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <List className="w-3.5 h-3.5" />
               </button>
@@ -641,11 +638,10 @@ const PublicHoliday = () => {
                 type="button"
                 onClick={() => setViewMode('calendar')}
                 title="12-Month Calendar Grid View"
-                className={`p-1.5 rounded-[12px] transition-all cursor-pointer ${
-                  viewMode === 'calendar'
+                className={`p-1.5 rounded-[12px] transition-all cursor-pointer ${viewMode === 'calendar'
                     ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-2xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <Grid className="w-3.5 h-3.5" />
               </button>
@@ -706,9 +702,8 @@ const PublicHoliday = () => {
                   {filteredHolidays.map((h) => (
                     <div
                       key={h.id}
-                      className={`bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs transition-all flex flex-col justify-between ${
-                        h.status === 'ACTIVE_TODAY' ? 'ring-2 ring-sky-500/40 bg-sky-50/20' : ''
-                      }`}
+                      className={`bg-slate-50/70 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs transition-all flex flex-col justify-between ${h.status === 'ACTIVE_TODAY' ? 'ring-2 ring-sky-500/40 bg-sky-50/20' : ''
+                        }`}
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-start justify-between gap-2">
@@ -766,104 +761,103 @@ const PublicHoliday = () => {
 
               {/* Desktop Table View (Hidden on Mobile) */}
               <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-black uppercase text-slate-400 tracking-wider bg-slate-50/60 dark:bg-slate-800/40">
-                    <th className="py-4 px-6">Date & Day</th>
-                    <th className="py-4 px-6">Holiday Title & Details</th>
-                    <th className="py-4 px-6">Category</th>
-                    <th className="py-4 px-6">Duty Status</th>
-                    <th className="py-4 px-6 text-right">Observance Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-medium">
-                  {filteredHolidays.map((h) => (
-                    <tr
-                      key={h.id}
-                      className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors group ${
-                        h.status === 'ACTIVE_TODAY' ? 'bg-sky-50/40 dark:bg-sky-950/20' : ''
-                      }`}
-                    >
-                      {/* Column 1: Date & Day Badge */}
-                      <td className="py-4 px-6 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className="w-11 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                            <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
-                              {h.monthShort}
-                            </span>
-                            <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
-                              {h.dayNum}
-                            </span>
-                          </div>
-                          <div>
-                            <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.day}</div>
-                            <div className="text-[11px] text-slate-400 font-mono">{h.displayDate}</div>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Column 2: Holiday Title & Details */}
-                      <td className="py-4 px-6">
-                        <div className="space-y-1 max-w-md">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                              {h.name}
-                            </span>
-                            {h.isCustom && (
-                              <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
-                                • Company Special
-                              </span>
-                            )}
-                            {h.isIslamic && (
-                              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                                ({h.hijriDateText || 'Islamic Lunar'})
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed line-clamp-1">
-                            {h.description || 'Official paid gazetted holiday across all company duty stations.'}
-                          </p>
-                        </div>
-                      </td>
-
-                      {/* Column 3: Category */}
-                      <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                          {h.type}
-                        </span>
-                      </td>
-
-                      {/* Column 4: Duty / Pay Status */}
-                      <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                          Paid Non-Working Day
-                        </span>
-                      </td>
-
-                      {/* Column 5: Status & Actions */}
-                      <td className="py-4 px-6 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
-                            {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
-                          </span>
-
-                          {h.isCustom && (
-                            <button
-                              onClick={() => handleDelete(h.id)}
-                              className="p-1.5 rounded-[12px] text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
-                              title="Remove Custom Holiday"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-black uppercase text-slate-400 tracking-wider bg-slate-50/60 dark:bg-slate-800/40">
+                      <th className="py-4 px-6">Date & Day</th>
+                      <th className="py-4 px-6">Holiday Title & Details</th>
+                      <th className="py-4 px-6">Category</th>
+                      <th className="py-4 px-6">Duty Status</th>
+                      <th className="py-4 px-6 text-right">Observance Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-medium">
+                    {filteredHolidays.map((h) => (
+                      <tr
+                        key={h.id}
+                        className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors group ${h.status === 'ACTIVE_TODAY' ? 'bg-sky-50/40 dark:bg-sky-950/20' : ''
+                          }`}
+                      >
+                        {/* Column 1: Date & Day Badge */}
+                        <td className="py-4 px-6 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                              <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
+                                {h.monthShort}
+                              </span>
+                              <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
+                                {h.dayNum}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.day}</div>
+                              <div className="text-[11px] text-slate-400 font-mono">{h.displayDate}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Column 2: Holiday Title & Details */}
+                        <td className="py-4 px-6">
+                          <div className="space-y-1 max-w-md">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-black text-slate-900 dark:text-white text-sm group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                {h.name}
+                              </span>
+                              {h.isCustom && (
+                                <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
+                                  • Company Special
+                                </span>
+                              )}
+                              {h.isIslamic && (
+                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                  ({h.hijriDateText || 'Islamic Lunar'})
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed line-clamp-1">
+                              {h.description || 'Official paid gazetted holiday across all company duty stations.'}
+                            </p>
+                          </div>
+                        </td>
+
+                        {/* Column 3: Category */}
+                        <td className="py-4 px-6 whitespace-nowrap">
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            {h.type}
+                          </span>
+                        </td>
+
+                        {/* Column 4: Duty / Pay Status */}
+                        <td className="py-4 px-6 whitespace-nowrap">
+                          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                            Paid Non-Working Day
+                          </span>
+                        </td>
+
+                        {/* Column 5: Status & Actions */}
+                        <td className="py-4 px-6 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                              {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
+                            </span>
+
+                            {h.isCustom && (
+                              <button
+                                onClick={() => handleDelete(h.id)}
+                                className="p-1.5 rounded-[12px] text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                                title="Remove Custom Holiday"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -922,13 +916,12 @@ const PublicHoliday = () => {
                           <div
                             key={day}
                             title={hasHoliday ? matchingHolidays.map((h) => `${h.name} (${h.hijriDateText || h.type})`).join(' • ') : ''}
-                            className={`h-7 rounded-xl flex items-center justify-center font-bold text-[11px] transition-all cursor-default ${
-                              hasHoliday
+                            className={`h-7 rounded-xl flex items-center justify-center font-bold text-[11px] transition-all cursor-default ${hasHoliday
                                 ? 'bg-sky-600 text-white shadow-xs font-black'
                                 : isWeekend
-                                ? 'text-slate-400 dark:text-slate-500 font-medium'
-                                : 'text-slate-700 dark:text-slate-300'
-                            }`}
+                                  ? 'text-slate-400 dark:text-slate-500 font-medium'
+                                  : 'text-slate-700 dark:text-slate-300'
+                              }`}
                           >
                             {day}
                           </div>
@@ -1057,11 +1050,10 @@ const PublicHoliday = () => {
                         key={cat.id}
                         type="button"
                         onClick={() => setForm({ ...form, type: cat.id })}
-                        className={`relative p-3.5 rounded-[12px] border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
-                          isSelected
+                        className={`relative p-3.5 rounded-[12px] border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${isSelected
                             ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
                             : 'bg-slate-50/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-sky-300'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
@@ -1146,14 +1138,12 @@ const PublicHoliday = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, recurringYearly: !form.recurringYearly })}
-                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
-                        form.recurringYearly ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
-                      }`}
+                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${form.recurringYearly ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
+                        }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
-                          form.recurringYearly ? 'right-1' : 'left-1'
-                        }`}
+                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${form.recurringYearly ? 'right-1' : 'left-1'
+                          }`}
                       />
                     </button>
                   </div>
@@ -1169,14 +1159,12 @@ const PublicHoliday = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, paidCoverage: !form.paidCoverage })}
-                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
-                        form.paidCoverage ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
-                      }`}
+                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${form.paidCoverage ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                        }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
-                          form.paidCoverage ? 'right-1' : 'left-1'
-                        }`}
+                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${form.paidCoverage ? 'right-1' : 'left-1'
+                          }`}
                       />
                     </button>
                   </div>
@@ -1192,14 +1180,12 @@ const PublicHoliday = () => {
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, autoWaivePenalty: !form.autoWaivePenalty })}
-                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
-                        form.autoWaivePenalty ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
-                      }`}
+                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${form.autoWaivePenalty ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
+                        }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${
-                          form.autoWaivePenalty ? 'right-1' : 'left-1'
-                        }`}
+                        className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 shadow-xs ${form.autoWaivePenalty ? 'right-1' : 'left-1'
+                          }`}
                       />
                     </button>
                   </div>
