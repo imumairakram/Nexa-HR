@@ -328,7 +328,7 @@ const JobSkills = () => {
                   <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">{s.category}</td>
                   <td className="py-4 px-4 font-medium text-slate-500">{s.assessmentsCount} Assessments</td>
                   <td className="py-4 px-4 text-right">
-                    <span className="px-2.5 py-0.5 rounded-[12px] bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 text-[10px] font-bold">
+                    <span className="text-xs font-bold text-sky-600 dark:text-sky-400">
                       {s.level}
                     </span>
                   </td>

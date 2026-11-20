@@ -1723,12 +1723,12 @@ ${doc.description || 'This document serves as an official verified corporate rec
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <div className="flex flex-col gap-1 items-start">
-                              <span className="px-2.5 py-0.5 rounded-[12px] text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60">
+                            <div className="flex flex-col gap-0.5 items-start">
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                 {doc.typeLabel || doc.type}
                               </span>
                               {doc.uploadedBy === 'EMPLOYEE' && (
-                                <span className="px-2 py-0.5 rounded-[12px] text-[9px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
                                   Employee Upload
                                 </span>
                               )}
@@ -1744,9 +1744,8 @@ ${doc.description || 'This document serves as an official verified corporate rec
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-[12px] text-[10px] font-black uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/70 flex items-center gap-1.5 w-fit">
-                              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
-                              <span>{doc.status || 'VERIFIED'}</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                              {doc.status || 'VERIFIED'}
                             </span>
                           </td>
 

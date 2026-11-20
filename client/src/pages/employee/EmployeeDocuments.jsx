@@ -1272,7 +1272,7 @@ const EmployeeDocuments = () => {
                                     <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-bold">
                                       {doc.referenceNumber || `#${doc.id}`}
                                     </span>
-                                    <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[9px] font-mono font-bold uppercase border border-slate-200/60 dark:border-slate-700/60">
+                                    <span className="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">
                                       PDF
                                     </span>
                                   </div>
@@ -1281,9 +1281,7 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span
-                                className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap-1.5 ${typeInfo.badgeBg} ${typeInfo.badgeColor} border ${typeInfo.badgeBorder}`}
-                              >
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                                 {doc.typeLabel || doc.type?.replace(/_/g, ' ') || 'Document'}
                               </span>
                             </td>
@@ -1305,14 +1303,14 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 font-mono text-[11px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
+                              <span className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
                                 {doc.size || '1.2 MB'}
                               </span>
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80">
-                                <span>{doc.status || 'Verified'}</span>
+                              <span className="text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                                {doc.status || 'Verified'}
                               </span>
                             </td>
 
@@ -1534,7 +1532,7 @@ const EmployeeDocuments = () => {
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                               {pol.categoryLabel || pol.category}
                             </span>
                           </td>
@@ -1551,7 +1549,7 @@ const EmployeeDocuments = () => {
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="px-2 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 font-mono text-[11px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
+                            <span className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
                               {pol.size}
                             </span>
                           </td>

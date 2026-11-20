@@ -828,11 +828,10 @@ const EmployeeAttendance = () => {
                               </span>
                             ) : (
                               <div>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] border text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700">
-                                  <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500" />
+                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                   {log.checkIn}
                                 </span>
-                                <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
+                                <div className="text-[10px] text-slate-400 font-sans mt-0.5">
                                   {isLate ? 'Late Arrival Flagged' : 'On-Time Shift Start'}
                                 </div>
                               </div>
@@ -847,11 +846,10 @@ const EmployeeAttendance = () => {
                               </span>
                             ) : (
                               <div>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-800/60">
-                                  <span className="w-2 h-2 rounded-full bg-sky-500 dark:bg-sky-400" />
+                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                   {log.checkOut}
                                 </span>
-                                <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
+                                <div className="text-[10px] text-slate-400 font-sans mt-0.5">
                                   {log.checkOut !== '--:--' ? 'Shift Completed' : 'Shift Active'}
                                 </div>
                               </div>
@@ -860,15 +858,15 @@ const EmployeeAttendance = () => {
 
                           {/* 4. Status Column (Right aligned) */}
                           <td className="py-4 px-6 text-right">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold border bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200/80 dark:border-slate-700 shadow-2xs">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">
                               {log.status === 'PRESENT' && (
-                                <CheckCircle2 className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                               )}
                               {isLate && (
-                                <AlertTriangle className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                               )}
                               {isLeave && (
-                                <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                                <Calendar className="w-3.5 h-3.5 text-sky-500" />
                               )}
                               <span>{isLate ? 'Late Arrival' : isLeave ? 'On Leave' : log.status === 'PRESENT' ? 'Present' : log.status}</span>
                             </span>

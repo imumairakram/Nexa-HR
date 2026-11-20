@@ -810,13 +810,13 @@ const PublicHoliday = () => {
                               {h.name}
                             </span>
                             {h.isCustom && (
-                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/60">
-                                Company Special
+                              <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
+                                • Company Special
                               </span>
                             )}
                             {h.isIslamic && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 flex items-center">
-                                <span>{h.hijriDateText || 'Islamic Lunar'}</span>
+                              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                ({h.hijriDateText || 'Islamic Lunar'})
                               </span>
                             )}
                           </div>
@@ -828,31 +828,23 @@ const PublicHoliday = () => {
 
                       {/* Column 3: Category */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center px-3 py-1 rounded-[12px] text-xs font-bold border bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700">
-                          <span>{h.type}</span>
+                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                          {h.type}
                         </span>
                       </td>
 
                       {/* Column 4: Duty / Pay Status */}
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className="inline-flex items-center text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-[12px] border border-sky-200/60 dark:border-sky-800/60">
-                          <span>Paid Non-Working Day</span>
+                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                          Paid Non-Working Day
                         </span>
                       </td>
 
                       {/* Column 5: Status & Actions */}
                       <td className="py-4 px-6 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold border ${
-                              h.status === 'ACTIVE_TODAY'
-                                ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border-sky-300 animate-pulse'
-                                : h.status === 'UPCOMING'
-                                ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border-sky-200 dark:border-sky-800'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200/80 dark:border-slate-700'
-                            }`}
-                          >
-                            <span>{h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}</span>
+                          <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                            {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
                           </span>
 
                           {h.isCustom && (

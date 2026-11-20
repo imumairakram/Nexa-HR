@@ -486,14 +486,14 @@ const JobApplication = () => {
                     </span>
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                    <span className={`text-xs font-bold ${
                       a.stage === 'HIRED'
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                        ? 'text-emerald-600 dark:text-emerald-400'
                         : a.stage === 'OFFER'
-                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                        ? 'text-indigo-600 dark:text-indigo-400'
                         : a.stage === 'INTERVIEWING'
-                        ? 'bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
-                        : 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                        ? 'text-purple-600 dark:text-purple-400'
+                        : 'text-blue-600 dark:text-blue-400'
                     }`}>
                       {a.stage}
                     </span>

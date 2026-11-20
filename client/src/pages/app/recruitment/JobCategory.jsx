@@ -302,7 +302,7 @@ const JobCategory = () => {
                   <td className="py-4 px-4 font-mono text-xs text-blue-600 font-bold">{c.code}</td>
                   <td className="py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">{c.lead}</td>
                   <td className="py-4 px-4">
-                    <span className="px-2.5 py-0.5 rounded-[12px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                       {c.status}
                     </span>
                   </td>

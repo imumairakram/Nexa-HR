@@ -508,8 +508,8 @@ const PayslipList = () => {
                     PKR {p.net.toLocaleString()}
                   </td>
                   <td className="py-4 px-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold">
-                      <span>{p.status}</span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      {p.status}
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">

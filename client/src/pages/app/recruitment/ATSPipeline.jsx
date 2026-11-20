@@ -770,17 +770,15 @@ const handleViewResume = async (candidateId) => {
                               <span className="text-slate-400 font-normal">• {iv.time}</span>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-slate-600 dark:text-slate-300">
-                            <span className="bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl font-semibold">
-                              {iv.type}
-                            </span>
+                          <td className="py-4 px-6 text-slate-700 dark:text-slate-300 font-semibold text-xs">
+                            {iv.type}
                           </td>
                           <td className="py-4 px-6">
                             <span
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              className={`text-xs font-bold ${
                                 iv.status === 'SCHEDULED'
-                                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
-                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  ? 'text-purple-600 dark:text-purple-400'
+                                  : 'text-emerald-600 dark:text-emerald-400'
                               }`}
                             >
                               {iv.status}
@@ -848,29 +846,19 @@ const handleViewResume = async (candidateId) => {
                             <td className="py-4 px-6">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold">{c.experience}</span>
-                                <span className="text-[10px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md flex items-center">
-                                  {c.rating}
+                                <span className="text-xs font-bold text-amber-500">
+                                  ★ {c.rating}
                                 </span>
                                 {(c.source === 'GMAIL' || typeof c.aiScore === 'number') && (
-                                  <span
-                                    className={`px-2 py-0.5 rounded-[8px] text-[10px] font-bold tabular-nums flex items-center gap-1 ${
-                                      (c.aiScore || 0) >= 85
-    ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
-    : (c.aiScore || 0) >= 70
-    ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
-    : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
-                                    }`}
-                                    title={`AI Screening Score: ${c.aiScore || 0}/100`}
-                                  >
-                                    <Sparkles className="w-2.5 h-2.5" />
-                                    <span>{c.aiScore || 0} AI</span>
+                                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    • {c.aiScore || 0}% AI
                                   </span>
                                 )}
                               </div>
                             </td>
                             <td className="py-4 px-6 text-slate-600 dark:text-slate-300">{c.location}</td>
                             <td className="py-4 px-6">
-                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${stObj.badge}`}>
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                 {stObj.label}
                               </span>
                             </td>

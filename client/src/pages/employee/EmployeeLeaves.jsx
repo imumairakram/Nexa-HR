@@ -789,8 +789,8 @@ const EmployeeLeaves = () => {
                                   <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
                                     {dateRangeText}
                                   </span>
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[10px] font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/50">
-                                    {formatLeaveDays(daysCount)}
+                                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                                    ({formatLeaveDays(daysCount)})
                                   </span>
                                 </div>
                                 <div className="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
@@ -805,11 +805,10 @@ const EmployeeLeaves = () => {
                           {/* 2. Leave Policy Column */}
                           <td className="py-4 px-4 font-mono">
                             <div>
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-800/40 text-sky-700 dark:text-sky-300 text-xs font-bold">
-                                <span className="w-2 h-2 rounded-full bg-sky-500" />
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
                                 {req.leaveType?.name || 'General Leave'}
                               </span>
-                              <div className="text-[10px] text-slate-400 font-sans mt-0.5 pl-1">
+                              <div className="text-[10px] text-slate-400 font-sans mt-0.5">
                                 {req.leaveType?.isPaid !== false ? 'Paid Allowance' : 'Unpaid Leave'}
                               </div>
                             </div>
@@ -830,12 +829,12 @@ const EmployeeLeaves = () => {
                           {/* 4. Status Column */}
                           <td className="py-4 px-4">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase border shadow-2xs ${
+                              className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase ${
                                 req.status === 'APPROVED'
-                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                                  ? 'text-emerald-600 dark:text-emerald-400'
                                   : req.status === 'REJECTED'
-                                  ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
-                                  : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
+                                  ? 'text-rose-600 dark:text-rose-400'
+                                  : 'text-amber-600 dark:text-amber-400'
                               }`}
                             >
                               {req.status === 'APPROVED' && (
