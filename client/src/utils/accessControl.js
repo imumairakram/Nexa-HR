@@ -92,7 +92,7 @@ export const FEATURE_MODULES = [
 ];
 
 // Helper to construct all feature keys set to a specific boolean value
-const createAllFeaturesMap = (value = true) => {
+export const createAllFeaturesMap = (value = true) => {
   const map = {};
   FEATURE_MODULES.forEach((mod) => {
     mod.features.forEach((f) => {
@@ -276,9 +276,118 @@ export const saveUserFeatureAccess = (userId, permissions, presetKey = 'CUSTOM',
 
     // Dispatch event so active components can re-evaluate permissions
     window.dispatchEvent(new Event('nexahr_user_access_updated'));
+    window.dispatchEvent(new Event('nexahr_access_control_updated'));
     return true;
   } catch (e) {
     console.error('Failed to save user feature access:', e);
+    return false;
+  }
+};
+
+/**
+ * Reset user feature permissions back to system role default
+ */
+export const resetUserFeatureAccess = (userId, role = 'EMPLOYEE', performedBy = 'System Admin') => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const allUserAccess = JSON.parse(raw);
+      delete allUserAccess[userId];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allUserAccess));
+    }
+
+    // Record audit log entry
+    addSecurityAuditLog({
+      userId,
+      action: `Feature permissions reset to ${role} system default`,
+      performedBy,
+    });
+
+    window.dispatchEvent(new Event('nexahr_user_access_updated'));
+    window.dispatchEvent(new Event('nexahr_access_control_updated'));
+    return getUserFeatureAccess(userId, role);
+  } catch (e) {
+    console.error('Failed to reset user feature access:', e);
+    return getUserFeatureAccess(userId, role);
+  }
+};
+
+/**
+ * Total number of features available in the catalog
+ */
+export const getTotalFeaturesCount = () => {
+  return FEATURE_MODULES.reduce((sum, mod) => sum + (mod.features ? mod.features.length : 0), 0);
+};
+
+/**
+ * Count how many features are enabled in a permissions map
+ */
+export const getEnabledFeaturesCount = (permissions = {}) => {
+  if (!permissions) return 0;
+  return Object.values(permissions).filter(Boolean).length;
+};
+
+/**
+ * Get permission coverage metrics for a given user
+ */
+export const getUserPermissionCoverage = (userId, role = 'EMPLOYEE') => {
+  const access = getUserFeatureAccess(userId, role);
+  const total = getTotalFeaturesCount();
+  const enabled = getEnabledFeaturesCount(access.permissions);
+  const percent = total > 0 ? Math.round((enabled / total) * 100) : 0;
+  return {
+    enabled,
+    total,
+    percent,
+    isCustom: access.isCustom,
+    presetKey: access.presetKey,
+    permissions: access.permissions,
+  };
+};
+
+/**
+ * Retrieve security authorization audit logs
+ */
+export const getSecurityAuditLogs = () => {
+  try {
+    const raw = localStorage.getItem('nexahr_security_audit_logs');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.warn('Error reading audit logs:', e);
+    return [];
+  }
+};
+
+/**
+ * Record a new security audit log
+ */
+export const addSecurityAuditLog = ({ userId, action, performedBy = 'System Admin', targetName = '' }) => {
+  try {
+    const auditLogs = getSecurityAuditLogs();
+    const newLog = {
+      id: `SEC-AUD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      userId,
+      targetName,
+      action,
+      performedBy,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem('nexahr_security_audit_logs', JSON.stringify([newLog, ...auditLogs.slice(0, 99)]));
+    return newLog;
+  } catch (e) {
+    console.warn('Failed to add security audit log:', e);
+    return null;
+  }
+};
+
+/**
+ * Clear all security audit logs
+ */
+export const clearSecurityAuditLogs = () => {
+  try {
+    localStorage.removeItem('nexahr_security_audit_logs');
+    return true;
+  } catch {
     return false;
   }
 };
