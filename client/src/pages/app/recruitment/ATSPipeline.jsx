@@ -45,6 +45,7 @@ import {
   Building2,
   Bot,
   Sparkles,
+  AlertTriangle,
 } from 'lucide-react';
 
 const STAGES = [
@@ -54,6 +55,13 @@ const STAGES = [
   { key: 'OFFER', name: 'Offer Extended', label: 'Offer Extended', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300', dot: 'bg-indigo-500', border: 'border-sky-200 dark:border-indigo-900/60' },
   { key: 'HIRED', name: 'Signed & Hired', label: 'Signed & Hired', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300', dot: 'bg-emerald-500', border: 'border-emerald-200 dark:border-emerald-900/60' },
 ];
+
+const getCandidateInitials = (name = '') => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '??';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
 
 const DEFAULT_APPLICATIONS = [];
 
@@ -1175,155 +1183,186 @@ const handleViewResume = async (candidateId) => {
       </AnimatePresence>
 
       {/* ========================================================================= */}
-      {/* 4.5. AI SCREENED-OUT & AUDIT DRAWER */}
+      {/* 4.5. AI SCREENED-OUT APPLICATIONS MODAL (NEW TICKET CARD UI ARCHITECTURE) */}
       {/* ========================================================================= */}
-      <AnimatePresence>
-        {isScreenedOutOpen && (
-          <div className="fixed inset-0 z-50 overflow-hidden">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsScreenedOutOpen(false)}
-              className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity"
-            />
-            <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="w-screen max-w-xl bg-white dark:bg-[#1E293B] shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800"
-              >
-                {/* Header */}
-                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                      <ShieldCheck className="w-5 h-5 stroke-[2]" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                        AI Screened-Out Applications
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {screenedOutCandidates.length} candidate(s) below threshold, unmatched, or flagged for review
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsScreenedOutOpen(false)}
-                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+      {isScreenedOutOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg shadow-amber-500/25 ring-4 ring-amber-100 dark:ring-amber-950/50 shrink-0">
+                  <ShieldCheck className="w-6 h-6 stroke-[2.2]" />
                 </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    AI Screened-Out Applications
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    {screenedOutCandidates.length} candidate(s) below threshold, unmatched, or flagged for manual review
+                  </p>
+                </div>
+              </div>
 
-                {/* Candidate List */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                  {screenedOutCandidates.length > 0 ? (
-                    screenedOutCandidates.map((app) => (
-                      <div
-                        key={app.id}
-                        className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                                {app.name}
-                              </h4>
-                              <span className="font-mono text-[10px] text-slate-400 font-bold">
-                                {app.applicationId}
-                              </span>
-                            </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                              {app.role} • {app.email}
-                            </p>
-                          </div>
-                          <span
-                            className={`px-2.5 py-1 rounded-[8px] text-xs font-bold tabular-nums ${
-                              app.aiScore !== null && app.aiScore !== undefined
-                                ? app.aiScore >= 85
-    ? 'bg-amber-500 text-[#1C2321] dark:bg-amber-400 dark:text-[#0F1715] border border-amber-600/40'
-    : app.aiScore >= 70
-    ? 'bg-teal-700 text-white dark:bg-teal-600 dark:text-white border border-teal-800'
-    : 'bg-[#ECEAE4] text-[#1C2321] dark:bg-[#273834] dark:text-[#F1F5F4] border border-[#E2E0D8] dark:border-[#384E48]'
-                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                            }`}
-                          >
-                            {app.aiScore !== null && app.aiScore !== undefined
-                              ? `Score: ${app.aiScore}/100`
-                              : app.aiStatus || 'REVIEW'}
-                          </span>
+              <button
+                type="button"
+                onClick={() => setIsScreenedOutOpen(false)}
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Candidate List Body */}
+            <div className="flex-1 overflow-y-auto pr-1 space-y-4 no-scrollbar my-1">
+              {screenedOutCandidates.length > 0 ? (
+                screenedOutCandidates.map((app) => (
+                  <div
+                    key={app.id}
+                    className="p-5 sm:p-6 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700/80 hover:border-amber-400/50 dark:hover:border-amber-500/50 transition-all space-y-4 shadow-xs"
+                  >
+                    {/* Top Row: Avatar, Name, ID, Role, AI Score */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="w-11 h-11 rounded-2xl bg-amber-100/80 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 font-extrabold text-sm flex items-center justify-center shrink-0 border border-amber-200/60 dark:border-amber-800/40">
+                          {getCandidateInitials(app.name)}
                         </div>
-
-                        {app.aiSummary && (
-                          <p className="text-xs text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-900/50 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                            {app.aiSummary}
-                          </p>
-                        )}
-
-                        {app.notes && (
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
-                            {app.notes}
-                          </p>
-                        )}
-
-                        {Array.isArray(app.aiGaps) && app.aiGaps.length > 0 && (
-                          <div className="text-[11px] text-amber-700 dark:text-amber-400 space-y-0.5">
-                            <span className="font-bold">Gaps Identified:</span>{' '}
-                            {app.aiGaps.slice(0, 2).join('; ')}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-tight">
+                              {app.name}
+                            </h4>
+                            <span className="px-2 py-0.5 rounded-md font-mono text-[11px] font-bold bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80">
+                              {app.applicationId}
+                            </span>
+                            {app.experience && (
+                              <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                {app.experience}
+                              </span>
+                            )}
                           </div>
-                        )}
-
-                        <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                          {app.resumeUrl ? (
-                            <button
-                              type="button"
-                              onClick={() => handleViewResume(app.id)}
-                              className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>View CV</span>
-                            </button>
-                          ) : (
-                            <span className="text-[11px] text-slate-400">No CV link</span>
-                          )}
-
-                          <button
-                            onClick={() => handleOverrideCandidate(app.id)}
-                            className="px-3 py-1.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                          >
-                            <UserCheck className="w-3.5 h-3.5" />
-                            <span>Override & Add to Pipeline</span>
-                          </button>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                            <span className="font-semibold text-slate-700 dark:text-slate-300">{app.role}</span>
+                            <span>•</span>
+                            <span>{app.email}</span>
+                            {app.phone && (
+                              <>
+                                <span>•</span>
+                                <span>{app.phone}</span>
+                              </>
+                            )}
+                          </p>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="py-16 text-center text-slate-400 text-xs flex flex-col items-center justify-center space-y-2">
-                      <ShieldCheck className="w-8 h-8 stroke-1 text-slate-300 dark:text-slate-600" />
-                      <p className="font-semibold">No screened-out applications recorded</p>
-                      <p className="text-[11px] text-slate-500">
-                        All candidate applications received through Gmail met or exceeded the threshold.
-                      </p>
-                    </div>
-                  )}
-                </div>
 
-                <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex justify-end">
-                  <button
-                    onClick={() => setIsScreenedOutOpen(false)}
-                    className="px-4 py-2 rounded-[12px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer"
-                  >
-                    Close
-                  </button>
+                      {/* AI Score Badge */}
+                      <span
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold tabular-nums border shadow-xs shrink-0 flex items-center gap-1.5 ${
+                          app.aiScore !== null && app.aiScore !== undefined
+                            ? app.aiScore >= 70
+                              ? 'bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800'
+                              : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                        }`}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>
+                          {app.aiScore !== null && app.aiScore !== undefined
+                            ? `Score: ${app.aiScore}/100`
+                            : app.aiStatus || 'REVIEW'}
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* Gaps Alert Box if present */}
+                    {Array.isArray(app.aiGaps) && app.aiGaps.length > 0 && (
+                      <div className="p-3.5 rounded-xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/40 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-300">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-extrabold uppercase tracking-wide text-[10px] text-amber-700 dark:text-amber-400 block mb-0.5">
+                            Screening Gaps Identified
+                          </span>
+                          <p className="font-medium leading-relaxed">
+                            {app.aiGaps.join('; ')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* AI Summary / Resume summary */}
+                    {(app.aiSummary || app.resumeSummary) && (
+                      <div className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {app.aiSummary || app.resumeSummary}
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {app.notes && (
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+                        {app.notes}
+                      </p>
+                    )}
+
+                    {/* Actions Footer */}
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-200/70 dark:border-slate-800">
+                      {app.resumeUrl ? (
+                        <button
+                          type="button"
+                          onClick={() => handleViewResume(app.id)}
+                          className="text-xs font-bold text-[#0A8FB5] hover:text-[#07617D] dark:text-[#3CC1E6] hover:underline flex items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span>View Full CV</span>
+                        </button>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
+                          No CV link attached
+                        </span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleOverrideCandidate(app.id)}
+                        className="px-4 py-2 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-sky-500/25 cursor-pointer"
+                      >
+                        <UserCheck className="w-4 h-4 stroke-[2.2]" />
+                        <span>Override & Add to Pipeline</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-16 text-center text-slate-400 text-xs flex flex-col items-center justify-center space-y-2">
+                  <ShieldCheck className="w-10 h-10 stroke-1 text-slate-300 dark:text-slate-600" />
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No screened-out applications recorded</p>
+                  <p className="text-xs text-slate-500 max-w-sm">
+                    All candidate applications received through automated parsing met or exceeded the threshold.
+                  </p>
                 </div>
-              </motion.div>
+              )}
+            </div>
+
+            {/* Footer: Trust text + Action buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800 shrink-0">
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Automated AI candidate qualification • NexaHR Talent Engine</span>
+              </div>
+
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsScreenedOutOpen(false)}
+                  className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 5. SCHEDULE INTERVIEW MODAL */}
