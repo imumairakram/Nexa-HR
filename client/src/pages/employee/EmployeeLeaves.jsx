@@ -951,105 +951,185 @@ const EmployeeLeaves = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 4. DETAIL INSPECTION MODAL */}
+      {/* 4. DETAIL INSPECTION MODAL (NEW TICKET CARD UI ARCHITECTURE) */}
       {/* ========================================================================= */}
       {selectedReq && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
-                  <FileText className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-2xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4">
+                {/* Glowing Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <CalendarDays className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                    {selectedReq.leaveType?.name || 'Leave Request'}
-                  </h4>
-                  <p className="text-[11px] text-slate-400 font-mono">REQ ID: {selectedReq.id}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedReq(null)}
-                className="p-1.5 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-5 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60">
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">Status</div>
-                  <div className="mt-1">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
+                      {selectedReq.leaveType?.name || 'Leave Record'}
+                    </h2>
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${selectedReq.status === 'APPROVED'
-                          ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 border border-sky-200/60'
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs ${
+                        selectedReq.status === 'APPROVED'
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
                           : selectedReq.status === 'REJECTED'
-                            ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-200/60'
-                            : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200/60'
-                        }`}
+                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
+                      }`}
                     >
-                      {selectedReq.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3" />}
-                      {selectedReq.status === 'PENDING' && <Clock className="w-3 h-3" />}
-                      {selectedReq.status === 'REJECTED' && <XCircle className="w-3 h-3" />}
+                      {selectedReq.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
+                      {selectedReq.status === 'PENDING' && <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
+                      {selectedReq.status === 'REJECTED' && <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />}
                       <span>{selectedReq.status}</span>
                     </span>
                   </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
+                    REQ ID: #{selectedReq.id}
+                  </p>
+                </div>
+              </div>
+
+              {/* Close Action */}
+              <button
+                type="button"
+                aria-label="Close modal"
+                onClick={() => setSelectedReq(null)}
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </header>
+
+            {/* Modal Body */}
+            <div className="space-y-4 text-xs">
+              {/* Row 1: Key Metrics (Duration & Status Overview) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Card 1: Duration & Policy */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-sky-500" />
+                      Approved Duration
+                    </span>
+                    <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-[12px] border border-sky-200/60 dark:border-sky-800/40">
+                      {selectedReq.leaveType?.isPaid !== false ? 'Paid Allowance' : 'Unpaid Leave'}
+                    </span>
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                    {formatLeaveDays(calculateLeaveDays(selectedReq))}
+                  </div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                    {selectedReq.dayType === 'HALF' ? 'Half-Day Session' : 'Full-Day Allocation'} • {selectedReq.leaveType?.name || 'General Leave'}
+                  </div>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60">
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">Duration</div>
-                  <div className="font-black text-sm text-slate-900 dark:text-white mt-1">
-                    {formatLeaveDays(calculateLeaveDays(selectedReq))}
+                {/* Card 2: Schedule Window & Calendar */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-sky-500" />
+                      Schedule Window
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      Calendar Span
+                    </span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                    {formatDateRange(selectedReq.startDate, selectedReq.endDate)}
+                  </div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                    {selectedReq.startDate ? selectedReq.startDate.split('T')[0] : ''} → {selectedReq.endDate ? selectedReq.endDate.split('T')[0] : ''}
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-700/60 space-y-1">
-                <div className="text-[10px] text-slate-400 font-bold uppercase">Schedule Window</div>
-                <div className="text-slate-900 dark:text-white font-semibold">
-                  {selectedReq.startDate ? selectedReq.startDate.split('T')[0] : ''} to{' '}
-                  {selectedReq.endDate ? selectedReq.endDate.split('T')[0] : ''}
+              {/* Row 2: Submission Reason */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-sky-500" />
+                    Submission Reason
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    Employee Statement
+                  </span>
                 </div>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
+                  {selectedReq.reason || <span className="italic text-slate-400">No specific reason provided</span>}
+                </p>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-700/60 space-y-1">
-                <div className="text-[10px] text-slate-400 font-bold uppercase">Submission Reason</div>
-                <div className="text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
-                  {selectedReq.reason}
+              {/* Row 3: Audit & Supervisor Notes */}
+              <div
+                className={`p-4 sm:p-5 rounded-2xl border space-y-2 shadow-xs ${
+                  selectedReq.status === 'APPROVED'
+                    ? 'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-200/80 dark:border-emerald-800/50'
+                    : selectedReq.status === 'REJECTED'
+                    ? 'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-200/80 dark:border-rose-800/50'
+                    : 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-200/80 dark:border-amber-800/50'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                    <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />
+                    Audit & Supervisor Notes
+                  </span>
+                  <span
+                    className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-[12px] border ${
+                      selectedReq.status === 'APPROVED'
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60'
+                        : selectedReq.status === 'REJECTED'
+                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60'
+                        : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/60'
+                    }`}
+                  >
+                    {selectedReq.status === 'APPROVED' ? 'Approved' : selectedReq.status === 'REJECTED' ? 'Declined' : 'Pending Review'}
+                  </span>
                 </div>
-              </div>
-
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-700/60 space-y-1">
-                <div className="text-[10px] text-slate-400 font-bold uppercase">Audit & Supervisor Notes</div>
-                <div className="text-slate-700 dark:text-slate-200 font-medium">
+                <div className="text-xs sm:text-sm font-medium">
                   {selectedReq.status === 'APPROVED' ? (
-                    <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Approved by {selectedReq.approvedBy?.firstName || 'HR Lead'} {selectedReq.approvedBy?.lastName || ''}</span>
-                    </span>
+                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-semibold">
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                      <span>
+                        Approved by {selectedReq.approvedBy?.firstName || 'System'} {selectedReq.approvedBy?.lastName || 'Administrator'}
+                      </span>
+                    </div>
                   ) : selectedReq.status === 'REJECTED' ? (
-                    <span className="text-rose-600 dark:text-rose-400 font-semibold">
-                      Declined: {selectedReq.rejectionReason || 'Declined by HR Management'}
-                    </span>
+                    <div className="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-semibold">
+                      <XCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                      <span>
+                        Declined: {selectedReq.rejectionReason || 'Declined by HR Management'}
+                      </span>
+                    </div>
                   ) : (
-                    <span className="text-amber-600 dark:text-amber-400 font-medium">
-                      Awaiting Supervisor Review & Quota Approval
-                    </span>
+                    <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-medium">
+                      <Clock className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                      <span>
+                        Awaiting Supervisor Review & Operational Quota Clearance
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+            {/* Modal Actions Footer */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 mt-6">
+              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Official HR Leave Workflow Dossier</span>
+              </div>
               <button
+                type="button"
                 onClick={() => setSelectedReq(null)}
-                className="px-4 py-2 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-bold text-xs"
+                className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-bold shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all cursor-pointer"
               >
                 Close
               </button>
-            </div>
-          </div>
+            </footer>
+          </main>
         </div>
       )}
 
