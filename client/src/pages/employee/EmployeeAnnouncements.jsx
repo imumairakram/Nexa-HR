@@ -717,29 +717,56 @@ const EmployeeAnnouncements = () => {
             </div>
           ))
         ) : (
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center">
-              <Megaphone className="w-6 h-6" />
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-12 sm:p-16 text-center border border-slate-100 dark:border-slate-800 space-y-5 shadow-sm">
+            <div className="relative inline-flex">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sky-500/10 via-sky-500/15 to-sky-500/20 dark:from-sky-500/20 dark:via-sky-500/20 dark:to-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-700/50 shadow-xl shadow-sky-500/10">
+                <Megaphone className="w-10 h-10 stroke-[1.6]" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-md">
+                <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+              </div>
             </div>
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
-              {announcements.length === 0 ? 'No Announcements Published Yet' : 'No matching circulars found'}
-            </h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              {announcements.length === 0
-                ? 'There are currently no official company notices or circulars posted by HR.'
-                : 'Try adjusting your search terms or switch category filters to view other company announcements.'}
-            </p>
-            {announcements.length > 0 && (
-              <button
-                onClick={() => {
-                  setFilter('ALL');
-                  setSearchQuery('');
-                }}
-                className="px-4 py-2 rounded-[12px] bg-slate-900 dark:bg-sky-600 text-white text-xs font-bold cursor-pointer"
-              >
-                Reset All Filters
-              </button>
+
+            <div className="space-y-2 max-w-lg mx-auto">
+              <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                {searchQuery || filter !== 'ALL'
+                  ? 'No Matching Circulars Found'
+                  : 'No Announcements Published Yet'}
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                {searchQuery || filter !== 'ALL'
+                  ? 'No corporate announcements match your active search terms or category criteria. Try resetting your search query or filters.'
+                  : 'There are currently no official company notices or circulars posted by HR. Important organizational bulletins, townhalls, and holiday schedules will appear here.'}
+              </p>
+            </div>
+
+            {(searchQuery || filter !== 'ALL') && (
+              <div className="flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilter('ALL');
+                    setSearchQuery('');
+                  }}
+                  className="px-4 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset All Filters</span>
+                </button>
+              </div>
             )}
+
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
+              <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Verified HR Circulars</span>
+              </span>
+              <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Direct Employee Notification</span>
+              </span>
+              <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span>Compliance Acknowledgments</span>
+              </span>
+            </div>
           </div>
         )}
       </div>
