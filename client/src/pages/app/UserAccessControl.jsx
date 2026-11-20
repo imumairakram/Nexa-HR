@@ -823,7 +823,7 @@ const UserAccessControl = () => {
 
                   {/* Dropdown Menu */}
                   {showFilterMenu && (
-                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-sky-100/90 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
+                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-sky-100/90 dark:border-slate-700 shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto no-scrollbar">
                       {/* Clearance Section */}
                       <div className="px-3.5 py-1.5 border-b border-slate-100 dark:border-slate-700/60">
                         <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
@@ -1030,7 +1030,7 @@ const UserAccessControl = () => {
             </div>
 
             {/* Employee List */}
-            <div className="space-y-2 max-h-[640px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[640px] overflow-y-auto no-scrollbar">
               {filteredEmployees.map((emp) => {
                 const isSelected = emp.id === selectedUserId;
                 const coverage = getUserPermissionCoverage(emp.id, emp.role);
@@ -1463,7 +1463,7 @@ const UserAccessControl = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                    <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1 no-scrollbar">
                       {auditLogs.map((log) => (
                         <div
                           key={log.id}
