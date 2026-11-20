@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   MoreHorizontal,
   Users,
@@ -165,55 +166,58 @@ export const JobCardMenu = ({ job, onEdit, onToggleStatus, onDelete, onDuplicate
         </div>
       )}
 
-      {/* Delete Confirmation Modal Dialog */}
-      {showConfirmDelete && (
-        <div
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
-          onClick={() => setShowConfirmDelete(false)}
-        >
+      {/* Delete Confirmation Modal Dialog (Portaled to body to prevent stacking context clipping) */}
+      {showConfirmDelete &&
+        typeof document !== 'undefined' &&
+        createPortal(
           <div
-            className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[20px] p-5 sm:p-6 max-w-sm w-full shadow-2xl space-y-4 animate-in zoom-in-95 duration-150 text-left"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="confirm-delete-title"
+            className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
+            onClick={() => setShowConfirmDelete(false)}
           >
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-[#C0354A] dark:text-[#F07185] flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 stroke-[2]" />
+            <div
+              className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[24px] p-6 max-w-sm w-full shadow-2xl space-y-4 animate-in zoom-in-95 duration-150 text-left"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="confirm-delete-title"
+            >
+              <div className="flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-[#C0354A] dark:text-[#F07185] flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-5 h-5 stroke-[2]" />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <h4 id="confirm-delete-title" className="text-base font-bold text-[#0E2A33] dark:text-[#E6F2F5]">
+                    Delete this job?
+                  </h4>
+                  <p className="text-xs text-[#5B727B] dark:text-[#8FA8B1] leading-relaxed">
+                    This will also remove its applicants. This action cannot be undone.
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1 flex-1">
-                <h4 id="confirm-delete-title" className="text-base font-bold text-[#0E2A33] dark:text-[#E6F2F5]">
-                  Delete this job?
-                </h4>
-                <p className="text-xs text-[#5B727B] dark:text-[#8FA8B1] leading-relaxed">
-                  This will also remove its applicants. This action cannot be undone.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#DCE6EA] dark:border-[#223840]">
-              <button
-                type="button"
-                onClick={() => setShowConfirmDelete(false)}
-                className="px-3.5 py-1.5 rounded-[10px] text-xs font-semibold text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#12333D] transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowConfirmDelete(false);
-                  onDelete(job.id);
-                }}
-                className="px-4 py-1.5 rounded-[10px] bg-[#C0354A] hover:bg-[#a82c3f] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
-              >
-                Delete Job
-              </button>
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#DCE6EA] dark:border-[#223840]">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmDelete(false)}
+                  className="px-4 py-2 rounded-[12px] text-xs font-semibold text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#12333D] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowConfirmDelete(false);
+                    onDelete(job.id);
+                  }}
+                  className="px-4.5 py-2 rounded-[12px] bg-[#C0354A] hover:bg-[#a82c3f] text-white text-xs font-semibold shadow-md shadow-rose-600/20 active:scale-95 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                >
+                  Delete Job
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
