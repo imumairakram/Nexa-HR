@@ -46,6 +46,7 @@ import {
   Bot,
   Sparkles,
   AlertTriangle,
+  Layers,
 } from 'lucide-react';
 
 const STAGES = [
@@ -1485,86 +1486,80 @@ const handleViewResume = async (candidateId) => {
       {/* 6. ADD CANDIDATE MODAL */}
       {/* ========================================================================= */}
       {/* ========================================================================= */}
-      {/* 6. STITCH-INSPIRED LUXURY ADD CANDIDATE MODAL */}
+      {/* 6. ADD CANDIDATE MODAL (NEW TICKET CARD UI ARCHITECTURE) */}
       {/* ========================================================================= */}
       {isAddCandidateOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-5xl w-full shadow-2xl border border-sky-200/70 dark:border-slate-700/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Modal Header */}
-            <div className="px-6 sm:px-7 py-4 sm:py-4.5 border-b border-sky-100 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-sky-50/90 via-sky-100/70 to-blue-50/60 dark:from-sky-950/40 dark:via-sky-900/30 dark:to-[#1E293B] relative z-10">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20 ring-4 ring-sky-500/15">
-                  <UserPlus className="w-5 h-5 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <div className="relative z-10 w-full max-w-5xl lg:max-w-6xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Header: Icon, Titles, Close */}
+            <div className="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/50 shrink-0">
+                  <UserPlus className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     Add Candidate to Pipeline
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5 whitespace-nowrap">
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     Configure profile information, evaluation stage, duty station, and interview automation.
                   </p>
                 </div>
               </div>
+
               <button
+                type="button"
                 onClick={() => setIsAddCandidateOpen(false)}
-                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
-            <form onSubmit={handleAddCandidate} className="overflow-y-auto flex-1 p-6 sm:p-7 space-y-4 custom-scrollbar text-xs relative z-10">
-              {/* Section 1: Basic Information */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Candidate Full Name */}
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+            {/* Form Body */}
+            <form onSubmit={handleAddCandidate} className="space-y-6">
+              {/* Row 1: Candidate Full Name & Target Role */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <User className="w-3.5 h-3.5 text-sky-500" />
                     Candidate Full Name <span className="text-rose-500">*</span>
                   </label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. John"
-                      value={newCandidateForm.name}
-                      onChange={(e) => setNewCandidateForm({ ...newCandidateForm, name: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. John Doe"
+                    value={newCandidateForm.name}
+                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
                 </div>
 
-                {/* Target Role */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-sky-500" />
                       Target Role <span className="text-rose-500">*</span>
                     </label>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
                       {newCandidateForm.department || 'Active Requisition'}
                     </span>
                   </div>
-                  <div className="relative">
-                    <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Senior React & Node Engineer"
-                      value={newCandidateForm.role}
-                      onChange={(e) => setNewCandidateForm({ ...newCandidateForm, role: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Senior React & Node Engineer"
+                    value={newCandidateForm.role}
+                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, role: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
                 </div>
               </div>
 
-              {/* Section 2: Interactive Classification Category Segmented Cards */}
-              <div className="space-y-2">
-                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+              {/* Row 2: Classification Category / Initial Stage */}
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2.5">
+                  <Layers className="w-3.5 h-3.5 text-sky-500" />
                   Classification Category / Initial Stage
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1574,40 +1569,30 @@ const handleViewResume = async (candidateId) => {
                       title: '1. Sourced & Applied',
                       desc: 'Inbound application or direct sourcing',
                       icon: FileText,
-                      activeClass: 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-500 ring-2 ring-blue-500/20 text-blue-900 dark:text-blue-100',
-                      iconClass: 'text-blue-600 dark:text-blue-400',
                     },
                     {
                       key: 'SCREENING',
                       title: '2. Screening Call',
                       desc: 'Recruiter culture & compensation screening',
                       icon: Phone,
-                      activeClass: 'bg-amber-50/80 dark:bg-amber-950/50 border-amber-500 ring-2 ring-amber-500/20 text-amber-900 dark:text-amber-100',
-                      iconClass: 'text-amber-600 dark:text-amber-400',
                     },
                     {
                       key: 'INTERVIEWING',
                       title: '3. Technical Interview',
                       desc: 'Live coding & system design panel review',
                       icon: Video,
-                      activeClass: 'bg-purple-50/80 dark:bg-purple-950/50 border-purple-500 ring-2 ring-purple-500/20 text-purple-900 dark:text-purple-100',
-                      iconClass: 'text-purple-600 dark:text-purple-400',
                     },
                     {
                       key: 'OFFER',
                       title: '4. Offer Extended',
                       desc: 'Formal compensation package discussion',
                       icon: ShieldCheck,
-                      activeClass: 'bg-indigo-50/80 dark:bg-indigo-950/50 border-sky-500 ring-2 ring-indigo-500/20 text-indigo-900 dark:text-indigo-100',
-                      iconClass: 'text-indigo-600 dark:text-indigo-400',
                     },
                     {
                       key: 'HIRED',
                       title: '5. Signed & Hired',
                       desc: 'Offer accepted, contract signed & onboarding',
                       icon: CheckCircle2,
-                      activeClass: 'bg-emerald-50/80 dark:bg-emerald-950/50 border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-900 dark:text-emerald-100',
-                      iconClass: 'text-emerald-600 dark:text-emerald-400',
                     },
                   ].map((cat) => {
                     const Icon = cat.icon;
@@ -1617,23 +1602,33 @@ const handleViewResume = async (candidateId) => {
                         key={cat.key}
                         type="button"
                         onClick={() => setNewCandidateForm({ ...newCandidateForm, stage: cat.key })}
-                        className={`p-3.5 rounded-[12px] border text-left transition-all cursor-pointer flex items-start gap-3 relative ${
+                        className={`p-3.5 rounded-2xl border transition-all text-left flex items-start gap-3.5 cursor-pointer ${
                           isSelected
-                            ? cat.activeClass
-                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                            ? 'border-[#0A8FB5] bg-sky-50/70 dark:bg-sky-950/40 ring-2 ring-[#0A8FB5]/20 shadow-xs'
+                            : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-600'
                         }`}
                       >
-                        <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-white dark:bg-slate-900 shadow-xs' : 'bg-slate-100 dark:bg-slate-700/60'}`}>
-                          <Icon className={`w-4 h-4 ${isSelected ? cat.iconClass : 'text-slate-500'}`} />
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+                            isSelected
+                              ? 'bg-white dark:bg-slate-800 border-sky-300 dark:border-sky-700 shadow-xs text-[#0A8FB5]'
+                              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="font-extrabold text-xs text-slate-900 dark:text-white flex items-center justify-between">
-                            <span>{cat.title}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />}
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-xs font-extrabold text-slate-900 dark:text-white truncate">
+                              {cat.title}
+                            </span>
+                            {isSelected && (
+                              <span className="w-2 h-2 rounded-full bg-[#0A8FB5] shrink-0" />
+                            )}
                           </div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium truncate">
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                             {cat.desc}
-                          </div>
+                          </p>
                         </div>
                       </button>
                     );
@@ -1641,121 +1636,110 @@ const handleViewResume = async (candidateId) => {
                 </div>
               </div>
 
-              {/* Section 3: Scope & Target Applicability */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+              {/* Row 3: Duty Stations & Target Departments */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <MapPin className="w-3.5 h-3.5 text-sky-500" />
                     Duty Stations / Locations
                   </label>
-                  <div className="relative">
-                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <select
-                      value={newCandidateForm.location}
-                      onChange={(e) => setNewCandidateForm({ ...newCandidateForm, location: e.target.value })}
-                      className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
-                    >
-                      <option value="All Duty Stations (HQ + Regional + Remote)">All Duty Stations (HQ + Regional + Remote)</option>
-                      <option value="Islamabad HQ / Hybrid">Islamabad HQ / Hybrid</option>
-                      <option value="Karachi Regional Hub">Karachi Regional Hub</option>
-                      <option value="Lahore Regional Office">Lahore Regional Office</option>
-                      <option value="Remote & Distributed">Remote & Distributed</option>
-                    </select>
-                  </div>
+                  <select
+                    value={newCandidateForm.location}
+                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, location: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                  >
+                    <option value="All Duty Stations (HQ + Regional + Remote)">All Duty Stations (HQ + Regional + Remote)</option>
+                    <option value="Islamabad HQ / Hybrid">Islamabad HQ / Hybrid</option>
+                    <option value="Karachi Regional Hub">Karachi Regional Hub</option>
+                    <option value="Lahore Regional Office">Lahore Regional Office</option>
+                    <option value="Remote & Distributed">Remote & Distributed</option>
+                  </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Building2 className="w-3.5 h-3.5 text-sky-500" />
                     Target Departments
                   </label>
-                  <div className="relative">
-                    <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <select
-                      value={newCandidateForm.department}
-                      onChange={(e) => setNewCandidateForm({ ...newCandidateForm, department: e.target.value })}
-                      className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer appearance-none"
-                    >
-                      <option value="Organization-Wide (All Employees)">Organization-Wide (All Employees)</option>
-                      {departments.length > 0 ? (
-                        departments.map((d) => (
-                          <option key={d.id} value={d.name}>
-                            {d.name}
-                          </option>
-                        ))
-                      ) : (
-                        <>
-                          <option value="Engineering & DevOps">Engineering & DevOps</option>
-                          <option value="Product & Design">Product & Design</option>
-                          <option value="People Operations & HR">People Operations & HR</option>
-                          <option value="Finance & Accounts">Finance & Accounts</option>
-                        </>
-                      )}
-                    </select>
-                  </div>
+                  <select
+                    value={newCandidateForm.department}
+                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, department: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner"
+                  >
+                    <option value="Organization-Wide (All Employees)">Organization-Wide (All Employees)</option>
+                    {departments.length > 0 ? (
+                      departments.map((d) => (
+                        <option key={d.id} value={d.name}>
+                          {d.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Engineering & DevOps">Engineering & DevOps</option>
+                        <option value="Product & Design">Product & Design</option>
+                        <option value="People Operations & HR">People Operations & HR</option>
+                        <option value="Finance & Accounts">Finance & Accounts</option>
+                      </>
+                    )}
+                  </select>
                 </div>
               </div>
 
-              {/* Section 4: Contact Information */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+              {/* Row 4: Contact Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Mail className="w-3.5 h-3.5 text-sky-500" />
                     Email Address
                   </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="email"
-                      placeholder="sarah@example.com"
-                      value={newCandidateForm.email}
-                      onChange={(e) => setNewCandidateForm({ ...newCandidateForm, email: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
-                    />
-                  </div>
+                  <input
+                    type="email"
+                    placeholder="sarah@example.com"
+                    value={newCandidateForm.email}
+                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-slate-800 dark:text-slate-200 font-bold">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Phone className="w-3.5 h-3.5 text-sky-500" />
                     Phone & WhatsApp
                   </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="text"
-                      placeholder="+92 300 1234567"
-                      value={newCandidateForm.phone}
-                      onChange={(e) => setNewCandidateForm({ ...newCandidateForm, phone: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="+92 300 1234567"
+                    value={newCandidateForm.phone}
+                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                  />
                 </div>
               </div>
 
-              {/* Section 5: Smart Policy & Automation Glassmorphic Card */}
-              <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-slate-800/70 dark:via-slate-800/40 dark:to-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-3.5 relative overflow-hidden">
-                <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/70 dark:border-slate-700/60">
+              {/* Row 5: Smart Policy & Automation Card */}
+              <div className="p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-slate-700/80">
                   <div className="flex items-center gap-2 font-black text-slate-900 dark:text-white text-xs">
                     <Bot className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span>Candidate Screening & Pipeline Automation</span>
                   </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
-                    
-<span>Smart Orchestration Active</span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/80 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800">
+                    Smart Orchestration Active
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                   {/* Toggle 1: Fast-track */}
-                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Fast-Track Screening</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                        Priority interviewer queue.
-                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Priority interviewer queue.</div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setNewCandidateForm({ ...newCandidateForm, fastTrack: !newCandidateForm.fastTrack })}
-                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
-                        newCandidateForm.fastTrack ? 'bg-sky-600' : 'bg-slate-300 dark:bg-slate-700'
+                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                        newCandidateForm.fastTrack ? 'bg-[#0A8FB5]' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div
@@ -1767,17 +1751,15 @@ const handleViewResume = async (candidateId) => {
                   </div>
 
                   {/* Toggle 2: Automated Receipt */}
-                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Auto Receipt Notice</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                        Send email confirmation.
-                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Send email confirmation.</div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setNewCandidateForm({ ...newCandidateForm, emailConfirm: !newCandidateForm.emailConfirm })}
-                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
+                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
                         newCandidateForm.emailConfirm ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
@@ -1790,17 +1772,15 @@ const handleViewResume = async (candidateId) => {
                   </div>
 
                   {/* Toggle 3: Skills Assessment */}
-                  <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">Skills Assessment</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                        Dispatch screening test.
-                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Dispatch screening test.</div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setNewCandidateForm({ ...newCandidateForm, autoAssessment: !newCandidateForm.autoAssessment })}
-                      className={`w-11 h-6 rounded-[12px] transition-colors relative cursor-pointer shrink-0 ${
+                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
                         newCandidateForm.autoAssessment ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
@@ -1814,39 +1794,44 @@ const handleViewResume = async (candidateId) => {
                 </div>
               </div>
 
-              {/* Section 6: Resume / Profile Summary */}
-              <div className="space-y-1.5">
-                <label className="block text-slate-800 dark:text-slate-200 font-bold">
+              {/* Row 6: Resume / Profile Summary */}
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mb-2">
+                  <FileText className="w-3.5 h-3.5 text-sky-500" />
                   Resume / Profile Summary
                 </label>
-                <div className="relative">
-                  <FileText className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                  <textarea
-                    rows={3}
-                    placeholder="Outline key achievements, tech stack expertise, previous employers..."
-                    value={newCandidateForm.resumeSummary}
-                    onChange={(e) => setNewCandidateForm({ ...newCandidateForm, resumeSummary: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-400 resize-none"
-                  />
-                </div>
+                <textarea
+                  rows={3}
+                  placeholder="Outline key achievements, tech stack expertise, previous employers..."
+                  value={newCandidateForm.resumeSummary}
+                  onChange={(e) => setNewCandidateForm({ ...newCandidateForm, resumeSummary: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner resize-none"
+                />
               </div>
 
-              {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={() => setIsAddCandidateOpen(false)}
-                  className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
-                >
-                  <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
-                  <span>Add Candidate</span>
-                </button>
+              {/* Footer: Trust text + Action buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Direct pipeline injection into NexaHR applicant evaluation engine</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddCandidateOpen(false)}
+                    className="px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all cursor-pointer"
+                  >
+                    <UserPlus className="w-4 h-4 stroke-[2.2]" />
+                    <span>Add Candidate</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
