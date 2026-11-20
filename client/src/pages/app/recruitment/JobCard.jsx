@@ -284,7 +284,7 @@ export const JobCard = ({
   };
 
   return (
-    <article className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[18px] sm:rounded-[20px] p-4 sm:p-4.5 shadow-[0_1px_2px_rgba(14,42,51,0.06),0_8px_24px_-12px_rgba(14,42,51,0.14)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)] flex flex-col justify-between gap-3 relative transition-all duration-200 hover:shadow-md hover:border-[#0A8FB5]/50 hover:-translate-y-0.5 group text-left">
+    <article className="bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[18px] sm:rounded-[20px] p-4 sm:p-4.5 shadow-[0_1px_2px_rgba(14,42,51,0.06),0_8px_24px_-12px_rgba(14,42,51,0.14)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)] flex flex-col justify-between gap-3 relative transition-all duration-200 hover:shadow-md hover:border-[#0A8FB5]/50 hover:-translate-y-0.5 group text-left self-start w-full">
       <div className="space-y-2">
         {/* Row 1: Department tag (left), status badge "● Active/Closed" (right), then "⋯" icon button */}
         <div className="flex items-center justify-between gap-2">

@@ -1040,7 +1040,7 @@ const JobsWorkspace = () => {
         </div>
       ) : (
         /* POSTED JOB CARDS GRID (COMPACT & SCANNABLE) */
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4.5 mt-4 items-start">
           {sortedJobs.length > 0 ? (
             sortedJobs.map((job) => (
               <JobCard
