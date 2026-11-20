@@ -3,8 +3,6 @@ import {
   Search,
   X,
   LayoutGrid,
-  CalendarDays,
-  List,
   ShieldCheck,
   ChevronDown,
 } from 'lucide-react';
@@ -12,7 +10,7 @@ import {
 /**
  * PipelineToolbar
  * - Left: Search input (full width on mobile), Role dropdown.
- * - Right: Segmented control (Board, Interviews, Roster) + AI Screened-Out button.
+ * - Right: Board view indicator + AI Screened-Out button.
  */
 const PipelineToolbar = ({
   searchQuery,
@@ -73,59 +71,18 @@ const PipelineToolbar = ({
         </div>
       </div>
 
-      {/* Right: Segmented Control (Board / Interviews / Roster) + AI Screened-Out Button */}
+      {/* Right: Board & AI Screened-Out Button */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scrollbar-none pb-0.5 md:pb-0 shrink-0">
-        {/* Segmented Control */}
+        {/* Board View Button */}
         <div className="flex items-center bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] p-1 shadow-2xs shrink-0">
           <button
             type="button"
-            onClick={() => onViewChange('kanban')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-              currentView === 'kanban'
-                ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA] shadow-xs'
-                : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
-            }`}
-            aria-pressed={currentView === 'kanban'}
+            onClick={() => onViewChange && onViewChange('kanban')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-xs font-semibold bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA] shadow-xs cursor-pointer whitespace-nowrap"
+            aria-pressed={true}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             <span>Board</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onViewChange('interviews')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-              currentView === 'interviews'
-                ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA] shadow-xs'
-                : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
-            }`}
-            aria-pressed={currentView === 'interviews'}
-          >
-            <CalendarDays className="w-3.5 h-3.5" />
-            <span>Interviews</span>
-            <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                currentView === 'interviews'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-              }`}
-            >
-              {interviewsCount}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onViewChange('table')}
-            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-              currentView === 'table'
-                ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA] shadow-xs'
-                : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
-            }`}
-            aria-pressed={currentView === 'table'}
-          >
-            <List className="w-3.5 h-3.5" />
-            <span>Roster</span>
           </button>
         </div>
 

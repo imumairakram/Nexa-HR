@@ -575,15 +575,6 @@ const handleViewResume = async (candidateId) => {
               <span>Add Candidate</span>
             </button>
             <button
-              onClick={handleSyncGmail}
-              disabled={isSyncingGmail}
-              className="px-4 py-2.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold text-xs border border-sky-200/80 dark:border-sky-800/80 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-60"
-              title="Poll HR Gmail inbox and run AI ATS screening now"
-            >
-              <Sparkles className={`w-3.5 h-3.5 ${isSyncingGmail ? 'animate-spin' : 'text-sky-600 dark:text-sky-400'}`} />
-              <span>{isSyncingGmail ? 'Screening Gmail...' : 'Sync Gmail ATS'}</span>
-            </button>
-            <button
               onClick={loadData}
               className="px-4 py-2.5 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
