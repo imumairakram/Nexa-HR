@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { LeaveCardSkeleton } from '../../components/common/Skeleton';
-import LeavePolicyCard from './LeavePolicyCard';
+import LeavePolicyCard, { getPolicyIcon, isPaidPolicy } from './LeavePolicyCard';
 import {
   CalendarDays,
   Plus,
@@ -859,117 +859,167 @@ const LeavePolicy = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. MODAL: VIEW / READ POLICY DETAILS */}
+      {/* 5. MODAL: VIEW / READ POLICY DETAILS (NEW TICKET CARD UI ARCHITECTURE) */}
       {/* ========================================================================= */}
-      {viewingPolicy && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="bg-white/90 dark:bg-[#1E293B]/90 backdrop-blur-2xl rounded-3xl max-w-2xl w-full shadow-2xl border border-blue-200/60 dark:border-blue-800/60 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-60 h-60 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      {viewingPolicy && (() => {
+        const isPaid = isPaidPolicy(viewingPolicy);
+        const PolicyIcon = getPolicyIcon(viewingPolicy);
 
-            {/* Header */}
-            <div className="px-6 py-4.5 border-b border-blue-100/80 dark:border-blue-800/60 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-blue-950/60 dark:via-indigo-950/40 dark:to-[#1E293B] relative z-10">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/25 ring-4 ring-sky-500/15">
-                  <Eye className="w-5 h-5 stroke-[2.2]" />
+        return (
+          <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+            <main className="relative z-10 w-full max-w-2xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-8 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+                <div className="flex items-center gap-4">
+                  {/* Glowing Icon Badge */}
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                    <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                      <PolicyIcon className="w-6 h-6 stroke-[2.2]" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
+                        {viewingPolicy.name}
+                      </h2>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs ${
+                          isPaid
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                            : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50'
+                        }`}
+                      >
+                        {isPaid ? 'Paid Policy' : 'Unpaid Policy'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
+                      Statutory Leave Policy Specification & Guidelines
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
-                      {viewingPolicy.name}
-                    </h3>
-                    <span
-                      className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase ${
-                        viewingPolicy.type === 'PAID'
-                          ? 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                          : 'bg-rose-100/80 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+
+                {/* Close Action */}
+                <button
+                  type="button"
+                  aria-label="Close modal"
+                  onClick={() => setViewingPolicy(null)}
+                  className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </header>
+
+              {/* Modal Body */}
+              <div className="space-y-4 text-xs">
+                {/* Row 1: Key Metrics (Annual Quota, Policy Code, Wage Compensation) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Card 1: Annual Quota */}
+                  <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5 shadow-xs">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Annual Quota
+                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                        {viewingPolicy.days ?? 0}
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400">Days / Yr</span>
+                    </div>
+                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                      Statutory Allocation
+                    </div>
+                  </div>
+
+                  {/* Card 2: Policy Code */}
+                  <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5 shadow-xs">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Policy Code
+                    </span>
+                    <div className="text-xl sm:text-2xl font-black font-mono text-sky-600 dark:text-sky-400 tracking-tight">
+                      {viewingPolicy.code || 'N/A'}
+                    </div>
+                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                      System Reference Tag
+                    </div>
+                  </div>
+
+                  {/* Card 3: Wage Compensation */}
+                  <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5 shadow-xs">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Compensation
+                    </span>
+                    <div
+                      className={`text-base sm:text-lg font-black tracking-tight ${
+                        isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
                       }`}
                     >
-                      {viewingPolicy.type}
+                      {isPaid ? '100% Fully Paid' : 'Unpaid Leave'}
+                    </div>
+                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                      {isPaid ? 'Zero Salary Deductions' : 'Unpaid Sabbatical'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Eligibility & Documentation Summary */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-sky-500" />
+                      Eligibility & Documentation Summary
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      Corporate Guidelines
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                    Statutory Leave Policy Specification & Guidelines
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-wrap">
+                    {viewingPolicy.description || 'No special eligibility requirements provided. Standard company leave terms apply.'}
                   </p>
                 </div>
-              </div>
-              <button
-                onClick={() => setViewingPolicy(null)}
-                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-xs relative z-10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Content Body */}
-            <div className="overflow-y-auto flex-1 p-6 space-y-5 custom-scrollbar text-xs relative z-10">
-              {/* Telemetry Metric Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50">
-                  <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Annual Quota</div>
-                  <div className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
-                    {viewingPolicy.days} <span className="text-xs font-semibold text-slate-400">Days / Yr</span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50">
-                  <div className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">Policy Code</div>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-white mt-0.5">
-                    {viewingPolicy.code}
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 col-span-2 sm:col-span-1">
-                  <div className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Compensation</div>
-                  <div className="text-sm font-black text-slate-900 dark:text-white mt-1">
-                    {viewingPolicy.type === 'PAID' ? '100% Fully Paid' : 'Unpaid Leave'}
-                  </div>
+                {/* Row 3: System Identifier Dossier */}
+                <div className="p-3.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span className="font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-slate-400" />
+                    Policy Identifier:
+                  </span>
+                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                    {viewingPolicy.id}
+                  </span>
                 </div>
               </div>
 
-              {/* Policy Description / Eligibility Summary */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 space-y-2">
-                <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
-                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Eligibility & Documentation Summary</span>
+              {/* Modal Actions Footer */}
+              <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
+                <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Official HR Leave Policy Dossier</span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-wrap">
-                  {viewingPolicy.description || 'No special eligibility requirements provided. Standard company leave terms apply.'}
-                </p>
-              </div>
-
-              {/* System Metadata */}
-              <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
-                <span>Policy Identifier:</span>
-                <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{viewingPolicy.id}</span>
-              </div>
-            </div>
-
-            {/* Modal Actions Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 px-6 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40">
-              <button
-                type="button"
-                onClick={() => setViewingPolicy(null)}
-                className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const p = viewingPolicy;
-                  setViewingPolicy(null);
-                  openEditModal(p);
-                }}
-                className="px-5 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-                <span>Edit This Policy</span>
-              </button>
-            </div>
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setViewingPolicy(null)}
+                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const p = viewingPolicy;
+                      setViewingPolicy(null);
+                      openEditModal(p);
+                    }}
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-bold shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit This Policy</span>
+                  </button>
+                </div>
+              </footer>
+            </main>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ========================================================================= */}
       {/* 6. MODAL: UPDATE / EDIT LEAVE POLICY (NEW TICKET CARD DESIGN) */}
