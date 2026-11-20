@@ -1649,23 +1649,67 @@ ${doc.description || 'This document serves as an official verified corporate rec
               <TableSkeleton rows={5} cols={6} />
             </div>
           ) : filteredIssuedDocs.length === 0 ? (
-            <div className="p-12 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center border border-sky-200/60 dark:border-sky-800/60 shadow-2xs">
-                <FolderOpen className="w-6 h-6" />
+            <div className="p-12 sm:p-16 text-center space-y-5">
+              <div className="relative inline-flex">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sky-500/10 via-sky-500/15 to-sky-500/20 dark:from-sky-500/20 dark:via-sky-500/20 dark:to-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-700/50 shadow-xl shadow-sky-500/10">
+                  <FileText className="w-10 h-10 stroke-[1.6]" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-md">
+                  <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+                </div>
               </div>
-              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">No documents matched your criteria</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                {issuedDocs.length === 0
-                  ? 'No documents have been issued to employees yet. Click "Issue Document" to dispatch the first letter.'
-                  : 'No documents match your active search filters. Try clearing your search query or changing filters.'}
-              </p>
-              <button
-                onClick={() => setIsIssueModalOpen(true)}
-                className="px-4 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5 transition-all"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Issue New Document</span>
-              </button>
+
+              <div className="space-y-2 max-w-lg mx-auto">
+                <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  {searchQuery || typeFilter !== 'ALL' || deptFilter !== 'ALL' || activeDateRange !== 'ALL'
+                    ? 'No Matching Documents Found'
+                    : 'No Issued Documents Yet'}
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  {searchQuery || typeFilter !== 'ALL' || deptFilter !== 'ALL' || activeDateRange !== 'ALL'
+                    ? 'No issued documents match your active search keywords or filter criteria. Try clearing search query or resetting filters.'
+                    : 'No documents have been issued to employees yet. Create and dispatch corporate offer letters, increment contracts, and NDA agreements directly to team members.'}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsIssueModalOpen(true)}
+                  className="px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold text-xs shadow-lg shadow-sky-600/25 active:scale-95 transition-all inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>Issue New Document</span>
+                </button>
+
+                {(searchQuery || typeFilter !== 'ALL' || deptFilter !== 'ALL' || activeDateRange !== 'ALL') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setTypeFilter('ALL');
+                      setDeptFilter('ALL');
+                      setActiveDateRange('ALL');
+                    }}
+                    className="px-4 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset All Filters</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
+                <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <span>Cryptographic PDF Verification</span>
+                </span>
+                <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <span>Digital Employee Sign-off</span>
+                </span>
+                <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <span>Audit Trail Logging</span>
+                </span>
+              </div>
             </div>
           ) : (
             <>
@@ -1899,23 +1943,65 @@ ${doc.description || 'This document serves as an official verified corporate rec
               ))}
             </div>
           ) : filteredPolicies.length === 0 ? (
-            <div className="p-12 text-center space-y-3 bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-100 dark:border-slate-800">
-              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 mx-auto flex items-center justify-center">
-                <BookOpen className="w-6 h-6" />
+            <div className="p-12 sm:p-16 text-center space-y-5 bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-100 dark:border-slate-800">
+              <div className="relative inline-flex">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sky-500/10 via-sky-500/15 to-sky-500/20 dark:from-sky-500/20 dark:via-sky-500/20 dark:to-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/70 dark:border-sky-700/50 shadow-xl shadow-sky-500/10">
+                  <BookOpen className="w-10 h-10 stroke-[1.6]" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-md">
+                  <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+                </div>
               </div>
-              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">No policies found</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                {companyPolicies.length === 0
-                  ? 'No company policies have been published yet. Click "Publish Policy" to issue your first charter.'
-                  : 'No policies match your search filters.'}
-              </p>
-              <button
-                onClick={() => setIsPolicyModalOpen(true)}
-                className="px-4 py-2 rounded-[12px] bg-sky-500 text-white font-bold text-xs cursor-pointer shadow-xs inline-flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Publish New Policy</span>
-              </button>
+
+              <div className="space-y-2 max-w-lg mx-auto">
+                <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  {searchQuery || policyCategoryFilter !== 'ALL'
+                    ? 'No Matching Policies Found'
+                    : 'No Company Policies Yet'}
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  {searchQuery || policyCategoryFilter !== 'ALL'
+                    ? 'No company policies match your active search keyword or category filter. Try clearing filters.'
+                    : 'No company policies have been published yet. Publish your first corporate employee handbook, code of conduct, or compliance charter.'}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPolicyModalOpen(true)}
+                  className="px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold text-xs shadow-lg shadow-sky-600/25 active:scale-95 transition-all inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>Publish New Policy</span>
+                </button>
+
+                {(searchQuery || policyCategoryFilter !== 'ALL') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setPolicyCategoryFilter('ALL');
+                    }}
+                    className="px-4 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset All Filters</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
+                <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <span>Organization-Wide Publishing</span>
+                </span>
+                <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <span>Version Compliance Tracking</span>
+                </span>
+                <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                  <span>Department Target Rules</span>
+                </span>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
