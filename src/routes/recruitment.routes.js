@@ -42,7 +42,7 @@ const {
 // Require authentication for all recruitment endpoints
 router.use(verifyToken);
 
-const canManageRecruitment = checkRole('ADMIN', 'HR_MANAGER', 'EMPLOYEE', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+const canManageRecruitment = checkRole('ADMIN', 'HR_MANAGER', 'EMPLOYEE', 'SUPER_ADMIN');
 
 // --- Telemetry, Seeding & Wiping ---
 router.get('/stats', cacheService.middleware({ ttlSeconds: 60, tags: ['recruitment', 'recruitment-stats'] }), getRecruitmentStats);
@@ -60,7 +60,7 @@ router.delete('/jobs/:id', blockDemo, canManageRecruitment, deleteJobOpening);
 // --- Candidate Applications & Pipeline ---
 router.get('/applications', cacheService.middleware({ ttlSeconds: 30, tags: ['recruitment', 'recruitment-apps'] }), getApplications);
 router.get('/applications/:id', getApplicationById);
-const canViewResumes = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+const canViewResumes = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN');
 router.get('/applications/:id/resume', canViewResumes, getApplicationResume);
 router.post('/applications', blockDemo, canManageRecruitment, createApplication);
 router.put('/applications/:id', blockDemo, canManageRecruitment, updateApplication);

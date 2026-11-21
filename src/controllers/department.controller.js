@@ -53,7 +53,7 @@ const getDepartments = async (req, res) => {
     let departments = await prisma.department.findMany({
       include: {
         _count: {
-          select: { profiles: { where: nonDemoRelationWhere }, designations: true },
+          select: { profiles: { where: { user: { deletedAt: null, isDemo: false } } }, designations: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -81,7 +81,7 @@ const getDepartments = async (req, res) => {
       departments = await prisma.department.findMany({
         include: {
           _count: {
-            select: { profiles: { where: nonDemoRelationWhere }, designations: true },
+            select: { profiles: { where: { user: { deletedAt: null, isDemo: false } } }, designations: true },
           },
         },
         orderBy: { createdAt: 'desc' },
@@ -111,6 +111,7 @@ const getDepartmentById = async (req, res) => {
       include: {
         designations: true,
         profiles: {
+          where: { user: { deletedAt: null, isDemo: false } },
           include: {
             user: {
               select: { id: true, firstName: true, lastName: true, email: true, role: true },

@@ -17,11 +17,11 @@ const cacheService = require('../services/cache.service');
 
 router.use(verifyToken);
 
-const canManageLeaves = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+const canManageLeaves = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN');
 
 // Smart handler for requests: managers get full company leave requests; employees get their personal leave requests
 const handleGetLeaveRequests = (req, res, next) => {
-  const isElevatedRole = ['ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN'].includes(req.user?.role);
+  const isElevatedRole = ['ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'].includes(req.user?.role);
   if (isElevatedRole && req.query.mine !== 'true') {
     return getCompanyLeaveRequests(req, res, next);
   }

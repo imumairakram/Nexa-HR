@@ -18,8 +18,20 @@ const nonDemoRelationWhere = {
   },
 };
 
+// Filter for soft-deleted accounts
+const nonDeletedUsersWhere = {
+  deletedAt: null,
+};
+
+const nonDeletedRelationWhere = {
+  user: {
+    deletedAt: null,
+  },
+};
+
 module.exports = {
   nonDemoUsersWhere,
   nonDemoRelationWhere,
+  nonDeletedUsersWhere,
+  nonDeletedRelationWhere,
 };
-

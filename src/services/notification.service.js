@@ -216,7 +216,7 @@ async function broadcastInAppNotification({
   targetRoles = null, // e.g. ['EMPLOYEE', 'HR_MANAGER', 'ADMIN']
 }) {
   try {
-    const where = { isActive: true, ...nonDemoUsersWhere };
+    const where = { isActive: true, deletedAt: null, ...nonDemoUsersWhere };
     if (targetRoles && Array.isArray(targetRoles)) {
       where.role = { in: targetRoles };
     }

@@ -181,7 +181,7 @@ const login = async (req, res) => {
       },
     });
 
-    if (!user) {
+    if (!user || user.deletedAt) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials.',
@@ -567,7 +567,7 @@ const checkRecoveryUser = async (req, res) => {
     });
 
     // Constant-structure & timing safe: Always return 200 with identical shape and plausible fake hints
-    if (!user || !user.isActive || user.isDemo) {
+    if (!user || !user.isActive || user.isDemo || user.deletedAt) {
       crypto.createHash('sha256').update(identifier).digest('hex');
       const fakeMaskedEmail = maskEmail(identifier.includes('@') ? identifier : `${identifier}@corporate.local`);
       return res.status(200).json({
@@ -660,7 +660,7 @@ const forgotPassword = async (req, res) => {
     }
 
     // Timing attack & enumeration safe: Always return uniform response
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || user.deletedAt) {
       const fakeDestination = deliveryChannel === 'WHATSAPP' ? '+** *** ****' : maskEmail(identifier.includes('@') ? identifier : `${identifier}@corporate.local`);
       return res.status(200).json({
         success: true,
@@ -863,7 +863,7 @@ const verifyResetOtp = async (req, res) => {
       });
     }
 
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || user.deletedAt) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired OTP code. Please request a new code.',
@@ -1023,7 +1023,7 @@ const resetPassword = async (req, res) => {
       where: { id: targetUserId },
     });
 
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || user.deletedAt) {
       return res.status(403).json({
         success: false,
         message: 'Associated user account is deactivated or unavailable.',

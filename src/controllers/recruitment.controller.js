@@ -547,7 +547,7 @@ const getApplicationById = async (req, res) => {
 
 /**
  * Securely stream or provide signed access to candidate CV / resume
- * Protected by verifyToken + RBAC (checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN'))
+ * Protected by verifyToken + RBAC (checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN'))
  */
 const getApplicationResume = async (req, res) => {
   try {

@@ -13,7 +13,7 @@ const cacheService = require('../services/cache.service');
 
 router.use(verifyToken);
 
-const canManageDepartments = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+const canManageDepartments = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN');
 
 router.post('/', canManageDepartments, createDepartment);
 router.get('/', cacheService.middleware({ ttlSeconds: 120, tags: ['departments'] }), getDepartments);

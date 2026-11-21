@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 const { hashPassword } = require('../utils/password');
 const { uploadToCloudinary } = require('../config/cloudinary');
 const { sendOnboardingWelcomeEmail } = require('../services/notification.service');
@@ -69,21 +70,44 @@ const onboardEmployee = async (req, res) => {
     // Check if email already exists
     const existingEmail = await prisma.user.findFirst({
       where: { email: cleanEmail },
+      include: { profile: true, salaryStructure: true },
     });
 
-    if (existingEmail) {
+    if (existingEmail && !existingEmail.deletedAt) {
       return res.status(409).json({
         success: false,
         message: `An employee account with email '${cleanEmail}' already exists in the system.`,
       });
     }
 
+    const isReonboarding = Boolean(existingEmail && existingEmail.deletedAt);
+
+    // Require explicit restore confirmation when re-onboarding a soft-deleted employee
+    if (isReonboarding && !req.body.restoreConfirmed) {
+      return res.status(409).json({
+        success: false,
+        code: 'RESTORE_CONFIRMATION_REQUIRED',
+        requiresRestoreConfirmation: true,
+        message: `An archived employee account with email '${cleanEmail}' already exists. Please confirm account restoration by setting restoreConfirmed: true.`,
+        data: {
+          employeeId: existingEmail.id,
+          email: existingEmail.email,
+          previousRole: existingEmail.role,
+        },
+      });
+    }
+
+    // Preserve previous role unless caller explicitly specified a role override
+    const targetRole = isReonboarding
+      ? (req.body.role ? resolvedRole : existingEmail.role)
+      : resolvedRole;
+
     // Auto-resolve employee code collision
-    let cleanEmpCode = (employeeCode || `EMP-${Math.floor(1000 + Math.random() * 9000)}`).trim();
+    let cleanEmpCode = (employeeCode || (isReonboarding ? existingEmail.employeeCode : `EMP-${Math.floor(1000 + Math.random() * 9000)}`)).trim();
     const existingCode = await prisma.user.findFirst({
       where: { employeeCode: cleanEmpCode },
     });
-    if (existingCode) {
+    if (existingCode && (!isReonboarding || existingCode.id !== existingEmail.id)) {
       cleanEmpCode = `EMP-${Math.floor(10000 + Math.random() * 90000)}`;
     }
 
@@ -129,68 +153,173 @@ const onboardEmployee = async (req, res) => {
         resolvedDesigId = desig.id;
       }
 
-      // 3. Create User with resolvedRole
-      const newUser = await tx.user.create({
-        data: {
-          employeeCode: cleanEmpCode,
-          email: cleanEmail,
-          password: hashedPassword,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          phone: phone ? phone.trim() : null,
-          role: resolvedRole,
-          isActive: true,
-          mustChangePassword: req.body.mustChangePassword !== undefined ? Boolean(req.body.mustChangePassword) : true,
-        },
-      });
-
-      // 4. Create Employee Profile with separate residential address and office workLocation
-      const resolvedOffice = (workLocation || location || 'Islamabad HQ & Innovation Lab').trim();
-      const newProfile = await tx.employeeProfile.create({
-        data: {
-          userId: newUser.id,
-          gender: gender || null,
-          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-          joiningDate: joiningDate ? new Date(joiningDate) : new Date(),
-          employmentType: employmentType || 'FULL_TIME',
-          shift: shift || 'General Morning (09:00 - 17:30)',
-          address: address ? address.trim() : null,
-          workLocation: resolvedOffice,
-          emergencyContact: emergencyContact ? emergencyContact.trim() : null,
-          departmentId: resolvedDeptId,
-          designationId: resolvedDesigId,
-          bankName: bankName ? bankName.trim() : 'Standard Chartered Bank',
-          accountTitle: accountTitle ? accountTitle.trim() : `${firstName} ${lastName}`.trim(),
-          accountNumber: accountNumber ? accountNumber.trim() : null,
-          branchCode: branchCode ? branchCode.trim() : null,
-          payoutMethod: payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer',
-          ntnNumber: ntnNumber ? ntnNumber.trim() : null,
-        },
-        include: {
-          department: { select: { id: true, name: true, code: true } },
-          designation: { select: { id: true, title: true } },
-        },
-      });
-
-      // 5. Create Salary Structure if provided
-      const parsedSalary = parseFloat(basicSalary || salary || 0);
-      let newSalaryStructure = null;
-      if (parsedSalary > 0) {
-        newSalaryStructure = await tx.salaryStructure.create({
+      // 3. Create or Restore User
+      let userRecord;
+      if (isReonboarding) {
+        userRecord = await tx.user.update({
+          where: { id: existingEmail.id },
           data: {
-            userId: newUser.id,
-            basicSalary: parsedSalary,
-            housingAllowance: parseFloat(housingAllowance || 0),
-            transportAllowance: parseFloat(transportAllowance || 0),
-            otherAllowances: parseFloat(otherAllowances || 0),
-            taxDeductions: parseFloat(taxDeductions || 0),
-            otherDeductions: parseFloat(otherDeductions || 0),
+            deletedAt: null,
+            isActive: true,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            phone: phone ? phone.trim() : existingEmail.phone,
+            password: hashedPassword,
+            role: targetRole,
+            mustChangePassword: req.body.mustChangePassword !== undefined ? Boolean(req.body.mustChangePassword) : true,
+            employeeCode: cleanEmpCode,
+          },
+        });
+
+        // Audit log entry for employee re-onboarding restore
+        await tx.payrollAuditLog.create({
+          data: {
+            action: 'EMPLOYEE_REONBOARDED_RESTORE',
+            entity: 'User',
+            entityId: existingEmail.id,
+            actorId: req.user?.userId || existingEmail.id,
+            actorEmail: req.user?.email || cleanEmail,
+            beforeState: { role: existingEmail.role, deletedAt: existingEmail.deletedAt },
+            afterState: { role: targetRole, deletedAt: null },
+          },
+        });
+      } else {
+        userRecord = await tx.user.create({
+          data: {
+            employeeCode: cleanEmpCode,
+            email: cleanEmail,
+            password: hashedPassword,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            phone: phone ? phone.trim() : null,
+            role: resolvedRole,
+            isActive: true,
+            mustChangePassword: req.body.mustChangePassword !== undefined ? Boolean(req.body.mustChangePassword) : true,
           },
         });
       }
 
-      return { user: newUser, profile: newProfile, salaryStructure: newSalaryStructure };
+      // 4. Create or Upsert Employee Profile
+      const resolvedOffice = (workLocation || location || 'Islamabad HQ & Innovation Lab').trim();
+      let profileRecord;
+      if (isReonboarding) {
+        profileRecord = await tx.employeeProfile.upsert({
+          where: { userId: existingEmail.id },
+          update: {
+            gender: gender || null,
+            dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+            joiningDate: joiningDate ? new Date(joiningDate) : new Date(),
+            employmentType: employmentType || 'FULL_TIME',
+            shift: shift || 'General Morning (09:00 - 17:30)',
+            address: address ? address.trim() : null,
+            workLocation: resolvedOffice,
+            emergencyContact: emergencyContact ? emergencyContact.trim() : null,
+            departmentId: resolvedDeptId,
+            designationId: resolvedDesigId,
+            bankName: bankName ? bankName.trim() : 'Standard Chartered Bank',
+            accountTitle: accountTitle ? accountTitle.trim() : `${firstName} ${lastName}`.trim(),
+            accountNumber: accountNumber ? accountNumber.trim() : null,
+            branchCode: branchCode ? branchCode.trim() : null,
+            payoutMethod: payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer',
+            ntnNumber: ntnNumber ? ntnNumber.trim() : null,
+          },
+          create: {
+            userId: existingEmail.id,
+            gender: gender || null,
+            dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+            joiningDate: joiningDate ? new Date(joiningDate) : new Date(),
+            employmentType: employmentType || 'FULL_TIME',
+            shift: shift || 'General Morning (09:00 - 17:30)',
+            address: address ? address.trim() : null,
+            workLocation: resolvedOffice,
+            emergencyContact: emergencyContact ? emergencyContact.trim() : null,
+            departmentId: resolvedDeptId,
+            designationId: resolvedDesigId,
+            bankName: bankName ? bankName.trim() : 'Standard Chartered Bank',
+            accountTitle: accountTitle ? accountTitle.trim() : `${firstName} ${lastName}`.trim(),
+            accountNumber: accountNumber ? accountNumber.trim() : null,
+            branchCode: branchCode ? branchCode.trim() : null,
+            payoutMethod: payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer',
+            ntnNumber: ntnNumber ? ntnNumber.trim() : null,
+          },
+          include: {
+            department: { select: { id: true, name: true, code: true } },
+            designation: { select: { id: true, title: true } },
+          },
+        });
+      } else {
+        profileRecord = await tx.employeeProfile.create({
+          data: {
+            userId: userRecord.id,
+            gender: gender || null,
+            dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+            joiningDate: joiningDate ? new Date(joiningDate) : new Date(),
+            employmentType: employmentType || 'FULL_TIME',
+            shift: shift || 'General Morning (09:00 - 17:30)',
+            address: address ? address.trim() : null,
+            workLocation: resolvedOffice,
+            emergencyContact: emergencyContact ? emergencyContact.trim() : null,
+            departmentId: resolvedDeptId,
+            designationId: resolvedDesigId,
+            bankName: bankName ? bankName.trim() : 'Standard Chartered Bank',
+            accountTitle: accountTitle ? accountTitle.trim() : `${firstName} ${lastName}`.trim(),
+            accountNumber: accountNumber ? accountNumber.trim() : null,
+            branchCode: branchCode ? branchCode.trim() : null,
+            payoutMethod: payoutMethod ? payoutMethod.trim() : 'Direct Bank Transfer',
+            ntnNumber: ntnNumber ? ntnNumber.trim() : null,
+          },
+          include: {
+            department: { select: { id: true, name: true, code: true } },
+            designation: { select: { id: true, title: true } },
+          },
+        });
+      }
+
+      // 5. Create or Upsert Salary Structure
+      const parsedSalary = parseFloat(basicSalary || salary || 0);
+      let structureRecord = null;
+      if (parsedSalary > 0) {
+        if (isReonboarding) {
+          structureRecord = await tx.salaryStructure.upsert({
+            where: { userId: existingEmail.id },
+            update: {
+              basicSalary: parsedSalary,
+              housingAllowance: parseFloat(housingAllowance || 0),
+              transportAllowance: parseFloat(transportAllowance || 0),
+              otherAllowances: parseFloat(otherAllowances || 0),
+              taxDeductions: parseFloat(taxDeductions || 0),
+              otherDeductions: parseFloat(otherDeductions || 0),
+              effectiveDate: new Date(),
+            },
+            create: {
+              userId: existingEmail.id,
+              basicSalary: parsedSalary,
+              housingAllowance: parseFloat(housingAllowance || 0),
+              transportAllowance: parseFloat(transportAllowance || 0),
+              otherAllowances: parseFloat(otherAllowances || 0),
+              taxDeductions: parseFloat(taxDeductions || 0),
+              otherDeductions: parseFloat(otherDeductions || 0),
+            },
+          });
+        } else {
+          structureRecord = await tx.salaryStructure.create({
+            data: {
+              userId: userRecord.id,
+              basicSalary: parsedSalary,
+              housingAllowance: parseFloat(housingAllowance || 0),
+              transportAllowance: parseFloat(transportAllowance || 0),
+              otherAllowances: parseFloat(otherAllowances || 0),
+              taxDeductions: parseFloat(taxDeductions || 0),
+              otherDeductions: parseFloat(otherDeductions || 0),
+            },
+          });
+        }
+      }
+
+      return { user: userRecord, profile: profileRecord, salaryStructure: structureRecord };
     });
+
+    cacheService.invalidateTags(['employees', 'dashboard', 'payroll']);
 
     // Send Welcome Email with Login Credentials to the newly onboarded employee
     const empFullName = `${result.user.firstName} ${result.user.lastName}`.trim();
@@ -227,8 +356,11 @@ const onboardEmployee = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: `Employee onboarded successfully! ${emailSentMsg}`,
+      message: isReonboarding
+        ? `Employee account previously terminated has been successfully restored and re-onboarded! ${emailSentMsg}`
+        : `Employee onboarded successfully! ${emailSentMsg}`,
       data: {
+        isRestored: isReonboarding,
         employee: {
           id: result.user.id,
           employeeCode: result.user.employeeCode,
@@ -274,6 +406,7 @@ const getEmployees = async (req, res) => {
 
     const whereClause = {
       ...nonDemoUsersWhere,
+      deletedAt: null,
     };
 
     if (departmentId && departmentId !== 'ALL') {
@@ -385,6 +518,7 @@ const getEmployeeById = async (req, res) => {
         phone: true,
         role: true,
         isActive: true,
+        deletedAt: true,
         createdAt: true,
         profile: {
           include: {
@@ -396,7 +530,7 @@ const getEmployeeById = async (req, res) => {
       },
     });
 
-    if (!user) {
+    if (!user || user.deletedAt) {
       return res.status(404).json({
         success: false,
         message: 'Employee not found.',
@@ -696,7 +830,7 @@ const deleteEmployee = async (req, res) => {
       where: { id },
     });
 
-    if (!user) {
+    if (!user || user.deletedAt) {
       return res.status(404).json({
         success: false,
         message: 'Employee not found.',
@@ -717,7 +851,7 @@ const deleteEmployee = async (req, res) => {
     // The last active ADMIN can never be deleted (neither by themselves nor anyone else)
     if (user.role === 'ADMIN' && user.isActive) {
       const activeAdminCount = await prisma.user.count({
-        where: { role: 'ADMIN', isActive: true, isDemo: false },
+        where: { role: 'ADMIN', isActive: true, isDemo: false, deletedAt: null },
       });
       if (activeAdminCount <= 1) {
         return res.status(403).json({
@@ -727,10 +861,18 @@ const deleteEmployee = async (req, res) => {
       }
     }
 
-    // Delete user and cascading profiles
-    await prisma.user.delete({
+    // Soft delete user and deactivate
+    await prisma.user.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+        isActive: false,
+      },
     });
+
+    // Invalidate user and employee caches
+    cacheService.invalidateUser(id);
+    cacheService.invalidateTags(['employees', 'users', 'dashboard']);
 
     return res.status(200).json({
       success: true,

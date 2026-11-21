@@ -10,7 +10,7 @@ const cacheService = require('../services/cache.service');
 
 router.use(verifyToken);
 
-const canAccessAdminDashboard = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
+const canAccessAdminDashboard = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN');
 
 // Admin / HR Dashboard Portal (Fast 60s cache, auto-invalidated on any mutation)
 router.get('/admin', canAccessAdminDashboard, cacheService.middleware({ ttlSeconds: 60, tags: ['dashboard'] }), getAdminDashboard);
