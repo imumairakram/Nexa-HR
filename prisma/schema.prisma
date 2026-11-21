@@ -15,9 +15,18 @@ datasource db {
 // ====================================================
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
   HR_MANAGER
   EMPLOYEE
+  PAYROLL_ADMIN
+  PAYROLL_APPROVER
+}
+
+enum RuleStatus {
+  DRAFT
+  VERIFIED
+  RETIRED
 }
 
 enum AttendanceStatus {
@@ -73,6 +82,7 @@ model User {
   isActive     Boolean  @default(true)
   mustChangePassword Boolean @default(true)
   isDemo       Boolean  @default(false)
+  deletedAt    DateTime? @map("deleted_at")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -81,7 +91,15 @@ model User {
   leaveRequests   LeaveRequest[]   @relation("UserLeaveRequests")
   approvedLeaves  LeaveRequest[]   @relation("ApprovedLeaves")
   salaryStructure SalaryStructure?
+  legacyPayslips  LegacyPayslip[]
   payslips        Payslip[]
+  compensations   EmployeeCompensation[]
+  bankAccounts    EmployeeBankAccount[]
+  adjustments     Adjustment[]
+  calculatedPayRuns PayRun[]       @relation("RunCalculatedBy")
+  approvedPayRuns   PayRun[]       @relation("RunApprovedBy")
+  createdJournalEntries JournalEntry[]
+  payrollAuditLogs  PayrollAuditLog[]
   passwordResetTokens PasswordResetToken[]
   passwordResetOtps   PasswordResetOtp[]
   notifications   Notification[]
@@ -91,7 +109,10 @@ model User {
   vaultUploads        VaultDocument[]       @relation("VaultUploader")
   vaultIssuedDocs     VaultDocument[]       @relation("VaultIssuedTo")
   announcementAcks    AnnouncementAcknowledgment[]
+  verifiedTaxRules    TaxRuleSet[]          @relation("TaxRuleSetVerifiedBy")
+  verifiedContributionRules ContributionRule[] @relation("ContributionRuleVerifiedBy")
 
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -262,7 +283,7 @@ model SalaryStructure {
   @@map("salary_structures")
 }
 
-model Payslip {
+model LegacyPayslip {
   id                   String        @id @default(uuid())
   userId               String
   month                Int
@@ -280,7 +301,8 @@ model Payslip {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  newPayslips          Payslip[]
 
   @@unique([userId, month, year])
   @@index([year, month])
@@ -432,30 +454,34 @@ model TicketReply {
 // ====================================================
 
 model AccountTransaction {
-  id            String   @id @default(uuid())
-  voucherNumber String   @unique // e.g. "TXN-9402"
-  title         String
-  category      String   // INFRASTRUCTURE, PAYROLL, REVENUE, BENEFITS, HARDWARE, FACILITIES, MARKETING, OPERATIONS, TRAVEL, LEGAL, OTHER
-  type          String   @default("EXPENSE") // "EXPENSE" | "INCOME"
-  amount        Float
-  department    String   @default("Company-Wide")
-  date          DateTime @default(now())
-  time          String?
-  status        String   @default("VERIFIED") // "VERIFIED" | "PENDING" | "FLAGGED"
-  paymentMethod String   @default("Corp Visa") // "Corp Visa", "ACH Transfer", "Wire In", "Direct Deposit", "Petty Cash", "Corporate Check"
-  ref           String?  // Reference code e.g. "INV-AWS-2026-08"
-  taxDeductible Boolean  @default(true)
-  notes         String?
-  createdById   String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String            @id @default(uuid())
+  voucherNumber   String            @unique // e.g. "TXN-9402"
+  title           String
+  category        String            // INFRASTRUCTURE, PAYROLL, REVENUE, BENEFITS, HARDWARE, FACILITIES, MARKETING, OPERATIONS, TRAVEL, LEGAL, OTHER
+  type            String            @default("EXPENSE") // "EXPENSE" | "INCOME"
+  amount          Decimal           @db.Decimal(14, 2)
+  department      String            @default("Company-Wide")
+  date            DateTime          @default(now())
+  time            String?
+  status          String            @default("VERIFIED") // "VERIFIED" | "PENDING" | "FLAGGED"
+  paymentMethod   String            @default("Corp Visa") // "Corp Visa", "ACH Transfer", "Wire In", "Direct Deposit", "Petty Cash", "Corporate Check"
+  ref             String?           // Reference code e.g. "INV-AWS-2026-08"
+  taxDeductible   Boolean           @default(true)
+  notes           String?
+  source          String            @default("MANUAL") // "MANUAL", "PAYROLL", "REIMBURSEMENT"
+  journalEntryId  String?           @map("journal_entry_id")
+  createdById     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
-  createdBy     User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy       User?             @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  journalEntry    JournalEntry?     @relation(fields: [journalEntryId], references: [id])
 
   @@index([category])
   @@index([type])
   @@index([date])
   @@index([status])
+  @@index([source])
   @@map("account_transactions")
 }
 
@@ -632,4 +658,544 @@ model VaultDocument {
   @@index([uploadedById])
   @@index([createdAt])
   @@map("vault_documents")
+}
+
+// ====================================================
+// INTERNATIONAL PAYROLL & ENTERPRISE LEDGER ENUMS
+// ====================================================
+
+enum PayPeriodStatus {
+  OPEN
+  PROCESSING
+  LOCKED
+  CLOSED
+}
+
+enum PayRunType {
+  REGULAR
+  OFF_CYCLE
+  CORRECTION
+}
+
+enum PayRunStatus {
+  DRAFT
+  CALCULATING
+  CALCULATED
+  IN_REVIEW
+  APPROVED
+  PAID
+  CLOSED
+  VOID
+  REVERSED
+}
+
+enum PayComponentType {
+  EARNING
+  DEDUCTION
+  EMPLOYER_CONTRIBUTION
+  REIMBURSEMENT
+}
+
+enum ProrationBasis {
+  WORKING_DAYS
+  CALENDAR_DAYS
+  FIXED_30
+}
+
+enum ContributionBasis {
+  PERCENTAGE_OF_BASIC
+  PERCENTAGE_OF_GROSS
+  FIXED_AMOUNT
+}
+
+enum AdjustmentType {
+  BONUS
+  ARREARS
+  LOAN_DEDUCTION
+  ONE_OFF_DEDUCTION
+  EXPENSE_REIMBURSEMENT
+}
+
+enum AdjustmentStatus {
+  PENDING
+  APPROVED
+  APPLIED
+  CANCELLED
+}
+
+enum PaymentBatchStatus {
+  PENDING
+  EXPORTED
+  RECONCILED
+}
+
+enum LedgerAccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+// ====================================================
+// CORE INTERNATIONAL PAYROLL MODELS (PHASE 2)
+// ====================================================
+
+model LegalEntity {
+  id                String            @id @default(uuid())
+  code              String            @unique
+  name              String
+  country           String            @default("PAK") // ISO 3166-1 alpha-2 (e.g. "PK", "US")
+  defaultCurrency   String            @default("PKR") @map("default_currency") // ISO 4217
+  timezone          String            @default("Asia/Karachi")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  payGroups         PayGroup[]
+  taxRuleSets       TaxRuleSet[]
+  contributionRules ContributionRule[]
+  ledgerAccounts    LedgerAccount[]
+
+  @@map("legal_entities")
+}
+
+model PayGroup {
+  id              String                 @id @default(uuid())
+  legalEntityId   String                 @map("legal_entity_id")
+  name            String
+  code            String                 @unique
+  currency        String                 @default("PKR") // ISO 4217
+  prorationBasis  ProrationBasis         @default(FIXED_30) @map("proration_basis")
+  createdAt       DateTime               @default(now()) @map("created_at")
+  updatedAt       DateTime               @updatedAt @map("updated_at")
+
+  legalEntity     LegalEntity            @relation(fields: [legalEntityId], references: [id])
+  payPeriods      PayPeriod[]
+  compensations   EmployeeCompensation[]
+
+  @@map("pay_groups")
+}
+
+model PayPeriod {
+  id              String          @id @default(uuid())
+  payGroupId      String          @map("pay_group_id")
+  periodNumber    Int             @map("period_number") // 1-12
+  year            Int
+  startDate       DateTime        @map("start_date")
+  endDate         DateTime        @map("end_date")
+  paymentDueDate  DateTime        @map("payment_due_date")
+  status          PayPeriodStatus @default(OPEN)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  payGroup        PayGroup        @relation(fields: [payGroupId], references: [id])
+  payRuns         PayRun[]
+  payslips        Payslip[]
+  adjustments     Adjustment[]
+
+  @@unique([payGroupId, year, periodNumber])
+  @@index([status])
+  @@map("pay_periods")
+}
+
+model PayRun {
+  id                    String        @id @default(uuid())
+  payPeriodId           String        @map("pay_period_id")
+  runNumber             String        @unique @map("run_number") // e.g. "RUN-2026-11-001"
+  type                  PayRunType    @default(REGULAR)
+  status                PayRunStatus  @default(DRAFT)
+  idempotencyKey        String?       @unique @map("idempotency_key")
+
+  // Financial aggregates (Decimal)
+  totalGross            Decimal       @default(0.00) @db.Decimal(12, 2) @map("total_gross")
+  totalDeductions       Decimal       @default(0.00) @db.Decimal(12, 2) @map("total_deductions")
+  totalNet              Decimal       @default(0.00) @db.Decimal(12, 2) @map("total_net")
+  totalEmployerTax      Decimal       @default(0.00) @db.Decimal(12, 2) @map("total_employer_tax")
+
+  // Dual-control maker-checker
+  calculatedById        String?       @map("calculated_by_id")
+  calculatedAt          DateTime?     @map("calculated_at")
+  submittedById         String?       @map("submitted_by_id")
+  submittedAt           DateTime?     @map("submitted_at")
+  approvedById          String?       @map("approved_by_id")
+  approvedAt            DateTime?     @map("approved_at")
+  paidById              String?       @map("paid_by_id")
+  paidAt                DateTime?     @map("paid_at")
+  reversalReason        String?       @map("reversal_reason")
+
+  // Calculation Snapshot (JSON)
+  inputsSnapshot        Json?         @map("inputs_snapshot")
+  journalEntryId        String?       @map("journal_entry_id")
+
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  payPeriod             PayPeriod     @relation(fields: [payPeriodId], references: [id])
+  calculatedBy          User?         @relation("RunCalculatedBy", fields: [calculatedById], references: [id])
+  approvedBy            User?         @relation("RunApprovedBy", fields: [approvedById], references: [id])
+  journalEntry          JournalEntry? @relation(fields: [journalEntryId], references: [id])
+  payslips              Payslip[]
+  paymentBatches        PaymentBatch[]
+  adjustments           Adjustment[]
+
+  // Note: Backed by raw SQL partial unique index:
+  // CREATE UNIQUE INDEX unique_active_regular_pay_run ON pay_runs (pay_period_id) WHERE type = 'REGULAR' AND status NOT IN ('VOID', 'REVERSED');
+  @@index([payPeriodId])
+  @@index([status])
+  @@map("pay_runs")
+}
+
+model PayComponent {
+  id              String                          @id @default(uuid())
+  code            String                          @unique // e.g. "BASIC", "HOUSING", "TRANSPORT", "TAX_PAYE", "UNPAID_LEAVE"
+  name            String
+  type            PayComponentType
+  isTaxable       Boolean                         @default(true) @map("is_taxable")
+  isStatutory     Boolean                         @default(false) @map("is_statutory")
+  isActive        Boolean                         @default(true) @map("is_active")
+  createdAt       DateTime                        @default(now()) @map("created_at")
+  updatedAt       DateTime                        @updatedAt @map("updated_at")
+
+  payslipLines            PayslipLine[]
+  compensationComponents  EmployeeCompensationComponent[]
+  contributionRules       ContributionRule[]
+
+  @@map("pay_components")
+}
+
+model ContributionRule {
+  id                String            @id @default(uuid())
+  legalEntityId     String            @map("legal_entity_id")
+  componentId       String            @map("component_id")
+  country           String            // e.g. "PK"
+  code              String            @unique // e.g. "PK_EOBI_EMPLOYER"
+  name              String            // e.g. "EOBI Employer Contribution"
+  calculationBasis  ContributionBasis @default(PERCENTAGE_OF_BASIC) @map("calculation_basis")
+  employeeRate      Decimal           @default(0.0000) @db.Decimal(7, 4) @map("employee_rate")
+  employerRate      Decimal           @default(0.0000) @db.Decimal(7, 4) @map("employer_rate")
+  minCap            Decimal?          @db.Decimal(12, 2) @map("min_cap")
+  maxCap            Decimal?          @db.Decimal(12, 2) @map("max_cap")
+  effectiveFrom     DateTime          @map("effective_from")
+  effectiveTo       DateTime?         @map("effective_to")
+  status            RuleStatus        @default(DRAFT)
+  sourceReference   String?           @map("source_reference")
+  verifiedById      String?           @map("verified_by_id")
+  verifiedAt        DateTime?         @map("verified_at")
+  isActive          Boolean           @default(true) @map("is_active")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  legalEntity       LegalEntity       @relation(fields: [legalEntityId], references: [id])
+  component         PayComponent      @relation(fields: [componentId], references: [id])
+  verifiedBy        User?             @relation("ContributionRuleVerifiedBy", fields: [verifiedById], references: [id])
+
+  @@index([country, isActive])
+  @@index([status])
+  @@map("contribution_rules")
+}
+
+model EmployeeCompensation {
+  id              String                          @id @default(uuid())
+  userId          String                          @map("user_id")
+  payGroupId      String                          @map("pay_group_id")
+  currency        String                          @default("PKR") // ISO 4217
+  baseSalary      Decimal                         @db.Decimal(12, 2) @map("base_salary")
+  effectiveFrom   DateTime                        @map("effective_from")
+  effectiveTo     DateTime?                       @map("effective_to") // Half-open interval [effectiveFrom, effectiveTo)
+  version         Int                             @default(1)
+  isActive        Boolean                         @default(true) @map("is_active")
+  createdById     String                          @map("created_by_id")
+  createdAt       DateTime                        @default(now()) @map("created_at")
+  updatedAt       DateTime                        @updatedAt @map("updated_at")
+
+  user            User                            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  payGroup        PayGroup                        @relation(fields: [payGroupId], references: [id])
+  components      EmployeeCompensationComponent[]
+
+  @@index([userId, isActive])
+  @@index([userId, effectiveFrom, effectiveTo])
+  @@map("employee_compensations")
+}
+
+model EmployeeCompensationComponent {
+  id                     String               @id @default(uuid())
+  employeeCompensationId String               @map("employee_compensation_id")
+  componentId            String               @map("component_id")
+  amount                 Decimal              @db.Decimal(12, 2)
+  percentage             Decimal?             @db.Decimal(7, 4)
+  isDeduction            Boolean              @default(false) @map("is_deduction")
+  createdAt              DateTime             @default(now()) @map("created_at")
+
+  compensation           EmployeeCompensation @relation(fields: [employeeCompensationId], references: [id], onDelete: Cascade)
+  component              PayComponent         @relation(fields: [componentId], references: [id])
+
+  @@index([employeeCompensationId])
+  @@map("employee_compensation_components")
+}
+
+model EmployeeBankAccount {
+  id                     String   @id @default(uuid())
+  userId                 String   @map("user_id")
+  bankName               String   @map("bank_name")
+  accountTitle           String   @map("account_title")
+  accountNumberMasked    String   @map("account_number_masked")
+  accountNumberEncrypted String   @map("account_number_encrypted")
+  iban                   String?
+  branchCode             String?  @map("branch_code")
+  routingNumber          String?  @map("routing_number")
+  isPrimary              Boolean  @default(true) @map("is_primary")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@map("employee_bank_accounts")
+}
+
+model Payslip {
+  id                     String        @id @default(uuid())
+  payRunId               String        @map("pay_run_id")
+  userId                 String        @map("user_id")
+  periodId               String        @map("period_id")
+  payslipNumber          String        @unique @map("payslip_number")
+  currency               String        @default("PKR") // ISO 4217
+  status                 PayslipStatus @default(DRAFT)
+
+  // Financial aggregates (Decimal)
+  basicSalary            Decimal       @db.Decimal(12, 2) @map("basic_salary")
+  totalGross             Decimal       @db.Decimal(12, 2) @map("total_gross")
+  totalDeductions        Decimal       @db.Decimal(12, 2) @map("total_deductions")
+  netSalary              Decimal       @db.Decimal(12, 2) @map("net_salary")
+  employerContributions  Decimal       @default(0.00) @db.Decimal(12, 2) @map("employer_contributions")
+
+  // Required Attendance & Proration Fields (No defaults)
+  calendarDays           Int           @map("calendar_days")
+  workingDays            Int           @map("working_days")
+  daysWorked             Decimal       @db.Decimal(5, 2) @map("days_worked")
+  unpaidLeaveDays        Decimal       @db.Decimal(5, 2) @map("unpaid_leave_days")
+
+  isLegacy               Boolean       @default(false) @map("is_legacy")
+  legacyPayslipId        String?       @map("legacy_payslip_id")
+
+  generatedAt            DateTime      @default(now()) @map("generated_at")
+  paidAt                 DateTime?     @map("paid_at")
+
+  payRun                 PayRun        @relation(fields: [payRunId], references: [id], onDelete: Restrict)
+  user                   User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  period                 PayPeriod     @relation(fields: [periodId], references: [id])
+  legacyPayslip          LegacyPayslip? @relation(fields: [legacyPayslipId], references: [id])
+  lines                  PayslipLine[]
+  batchItems             PaymentBatchItem[]
+
+  @@unique([userId, periodId, payRunId])
+  @@index([payRunId])
+  @@index([userId, periodId])
+  @@index([status])
+  @@map("payslips_v2")
+}
+
+model PayslipLine {
+  id              String           @id @default(uuid())
+  payslipId       String           @map("payslip_id")
+  componentId     String?          @map("component_id")
+  componentCode   String           @map("component_code")
+  name            String
+  type            PayComponentType
+  amount          Decimal          @db.Decimal(12, 2)
+  isTaxable       Boolean          @default(true) @map("is_taxable")
+  rate            Decimal?         @db.Decimal(12, 4)
+  quantity        Decimal?         @db.Decimal(8, 2)
+  isLegacy        Boolean          @default(false) @map("is_legacy")
+  notes           String?
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  payslip         Payslip          @relation(fields: [payslipId], references: [id], onDelete: Restrict)
+  component       PayComponent?    @relation(fields: [componentId], references: [id])
+
+  @@index([payslipId])
+  @@map("payslip_lines_v2")
+}
+
+model TaxRuleSet {
+  id              String       @id @default(uuid())
+  legalEntityId   String       @map("legal_entity_id")
+  country         String       // e.g. "PK", "US"
+  name            String       // e.g. "FBR Pakistan Income Tax 2026-2027"
+  effectiveFrom   DateTime     @map("effective_from")
+  effectiveTo     DateTime?    @map("effective_to")
+  version         Int          @default(1)
+  isDefault       Boolean      @default(false) @map("is_default")
+  status          RuleStatus   @default(DRAFT)
+  sourceReference String?      @map("source_reference")
+  verifiedById    String?      @map("verified_by_id")
+  verifiedAt      DateTime?    @map("verified_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  legalEntity     LegalEntity  @relation(fields: [legalEntityId], references: [id])
+  verifiedBy      User?        @relation("TaxRuleSetVerifiedBy", fields: [verifiedById], references: [id])
+  slabs           TaxSlab[]
+
+  @@index([country, effectiveFrom])
+  @@index([status])
+  @@map("tax_rule_sets")
+}
+
+model TaxSlab {
+  id              String       @id @default(uuid())
+  taxRuleSetId    String       @map("tax_rule_set_id")
+  slabOrder       Int          @map("slab_order")
+  minAmount       Decimal      @db.Decimal(12, 2) @map("min_amount")
+  maxAmount       Decimal?     @db.Decimal(12, 2) @map("max_amount")
+  baseTax         Decimal      @default(0.00) @db.Decimal(12, 2) @map("base_tax")
+  ratePercentage  Decimal      @db.Decimal(7, 4) @map("rate_percentage") // 7,4 precision for fractional tax rates
+
+  taxRuleSet      TaxRuleSet   @relation(fields: [taxRuleSetId], references: [id], onDelete: Cascade)
+
+  @@index([taxRuleSetId, slabOrder])
+  @@map("tax_slabs")
+}
+
+model Adjustment {
+  id              String           @id @default(uuid())
+  userId          String           @map("user_id")
+  payPeriodId     String?          @map("pay_period_id")
+  payRunId        String?          @map("pay_run_id")
+  type            AdjustmentType
+  amount          Decimal          @db.Decimal(12, 2)
+  currency        String           @default("PKR")
+  status          AdjustmentStatus @default(PENDING)
+  notes           String?
+  createdById     String           @map("created_by_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  payPeriod       PayPeriod?       @relation(fields: [payPeriodId], references: [id])
+  payRun          PayRun?          @relation(fields: [payRunId], references: [id])
+
+  @@index([userId, status])
+  @@map("adjustments")
+}
+
+model PaymentBatch {
+  id              String              @id @default(uuid())
+  payRunId        String              @map("pay_run_id")
+  batchNumber     String              @unique @map("batch_number")
+  totalAmount     Decimal             @db.Decimal(12, 2) @map("total_amount")
+  currency        String              @default("PKR")
+  recordCount     Int                 @default(0) @map("record_count")
+  status          PaymentBatchStatus  @default(PENDING)
+  exportedAt      DateTime?           @map("exported_at")
+  createdById     String              @map("created_by_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  payRun          PayRun              @relation(fields: [payRunId], references: [id])
+  items           PaymentBatchItem[]
+
+  @@index([payRunId])
+  @@map("payment_batches")
+}
+
+model PaymentBatchItem {
+  id                      String             @id @default(uuid())
+  paymentBatchId          String             @map("payment_batch_id")
+  payslipId               String             @map("payslip_id")
+  amount                  Decimal            @db.Decimal(12, 2)
+  bankNameSnapshot        String             @map("bank_name_snapshot")
+  accountNumberSnapshot   String             @map("account_number_snapshot")
+  ibanSnapshot            String?            @map("iban_snapshot")
+  status                  PaymentBatchStatus @default(PENDING)
+  createdAt               DateTime           @default(now()) @map("created_at")
+
+  paymentBatch            PaymentBatch       @relation(fields: [paymentBatchId], references: [id], onDelete: Cascade)
+  payslip                 Payslip            @relation(fields: [payslipId], references: [id], onDelete: Restrict)
+
+  @@index([paymentBatchId])
+  @@index([payslipId])
+  @@map("payment_batch_items")
+}
+
+// ====================================================
+// DOUBLE-ENTRY GENERAL LEDGER MODELS
+// ====================================================
+
+model LedgerAccount {
+  id              String            @id @default(uuid())
+  legalEntityId   String            @map("legal_entity_id")
+  code            String            @unique // e.g. "5010-SALARY-EXPENSE", "2020-TAX-PAYABLE"
+  name            String
+  type            LedgerAccountType
+  currency        String            @default("PKR")
+  isActive        Boolean           @default(true) @map("is_active")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  legalEntity     LegalEntity       @relation(fields: [legalEntityId], references: [id])
+  journalLines    JournalLine[]
+
+  @@map("ledger_accounts")
+}
+
+model JournalEntry {
+  id                  String               @id @default(uuid())
+  entryNumber         String               @unique @map("entry_number") // e.g. "JE-2026-11-001"
+  postingDate         DateTime             @map("posting_date")
+  reference           String               // e.g. "PAYROLL-RUN-2026-11-001"
+  source              String               @default("PAYROLL") // "PAYROLL", "MANUAL", "ACCOUNTS"
+  isBalanced          Boolean              @default(true) @map("is_balanced")
+  reversesEntryId     String?              @unique @map("reverses_entry_id")
+  createdById         String               @map("created_by_id")
+  createdAt           DateTime             @default(now()) @map("created_at")
+
+  createdBy           User                 @relation(fields: [createdById], references: [id])
+  reversedEntry       JournalEntry?        @relation("ReversalEntry", fields: [reversesEntryId], references: [id], onDelete: Restrict)
+  reversalEntry       JournalEntry?        @relation("ReversalEntry")
+  payRuns             PayRun[]
+  lines               JournalLine[]
+  accountTransactions AccountTransaction[]
+
+  @@index([postingDate])
+  @@index([source])
+  @@map("journal_entries")
+}
+
+model JournalLine {
+  id              String            @id @default(uuid())
+  journalEntryId  String            @map("journal_entry_id")
+  accountId       String            @map("account_id")
+  debit           Decimal           @default(0.00) @db.Decimal(14, 2)
+  credit          Decimal           @default(0.00) @db.Decimal(14, 2)
+  description     String?
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  journalEntry    JournalEntry      @relation(fields: [journalEntryId], references: [id], onDelete: Restrict)
+  account         LedgerAccount     @relation(fields: [accountId], references: [id])
+
+  // Note: Backed by raw SQL check:
+  // ALTER TABLE journal_lines ADD CONSTRAINT chk_journal_line_debit_credit CHECK (debit >= 0 AND credit >= 0 AND (debit = 0 OR credit = 0));
+  @@index([journalEntryId])
+  @@index([accountId])
+  @@map("journal_lines")
+}
+
+model PayrollAuditLog {
+  id              String            @id @default(uuid())
+  actorId         String            @map("actor_id")
+  actorEmail      String            @map("actor_email")
+  action          String            // e.g. "PAY_RUN_CALCULATED", "PAYROLL_DUAL_CONTROL_OVERRIDDEN"
+  entity          String            // "PayRun", "Payslip", "EmployeeCompensation"
+  entityId        String            @map("entity_id")
+  beforeState     Json?             @map("before_state")
+  afterState      Json?             @map("after_state")
+  ipAddress       String?           @map("ip_address")
+  userAgent       String?           @map("user_agent")
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  actor           User              @relation(fields: [actorId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("payroll_audit_logs")
 }

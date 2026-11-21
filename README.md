@@ -647,6 +647,16 @@ NODE_ENV=development
 # PostgreSQL Connection String (Append PgBouncer tuning parameters)
 DATABASE_URL="postgresql://postgres:your_password@localhost:5432/nexahr?schema=public&connection_limit=10&pool_timeout=20"
 
+# Direct PostgreSQL Connection URL (Bypasses PgBouncer pooler for migrations & transactions)
+# Required for prisma migrate deploy, migrations, and schema modifications
+DIRECT_URL="postgresql://postgres:your_password@localhost:5432/nexahr?schema=public"
+
+# Database Security Role Recommendation:
+# In production, runtime application queries should connect using a non-superuser role (e.g., `nexahr_app`)
+# granted SELECT, INSERT, UPDATE, DELETE permissions on public tables, but lacking SUPERUSER or BYPASSRLS.
+# This strictly enforces table immutability triggers (journal_entries, journal_lines, payroll_audit_logs)
+# and ensures append-only ledger compliance.
+
 # JWT Authentication Secrets
 JWT_SECRET="nexahr_super_secure_jwt_secret_key_2026"
 JWT_EXPIRES_IN="1h"
@@ -925,6 +935,86 @@ npm test
 # Verify frontend production build and asset bundles
 npm --prefix client run build
 ```
+
+---
+
+## 🚀 Deployment & Rollback Architecture
+
+To ensure zero-downtime releases, institutional data integrity, and strict protection of append-only audit/ledger records, follow this verified enterprise deployment and rollback runbook. Never execute blind `prisma migrate deploy` or uncontrolled seed runs on production databases.
+
+### 1. Pre-Deployment Snapshot Backup
+Before applying any schema modifications or running migrations against the live database:
+```bash
+# 1. Take a full PostgreSQL snapshot via pg_dump or internal backup utility
+pg_dump "$DIRECT_URL" --format=custom --file="./backups/nexahr_pre_deploy_$(date +%Y%m%d_%H%M%S).dump"
+
+# 2. Or execute the application backup script
+node scripts/db-backup.js
+```
+
+### 2. Pre-Flight Status & Schema Diff Audit (Read-Only)
+Always verify the live database state in read-only mode prior to any mutating commands:
+```bash
+# Verify migration ledger consistency
+npx prisma migrate status
+
+# Generate and inspect the exact SQL diff between live DB and the current Prisma datamodel
+npx prisma migrate diff --from-url "$DIRECT_URL" --to-schema-datamodel prisma/schema.prisma --script
+```
+*Review the rendered SQL diff carefully. If unexpected table drops or column truncations are present, halt deployment immediately.*
+
+### 3. Baseline & Reconcile Procedure
+If a migration was previously applied out-of-band or needs to be marked as resolved without re-running its DDL:
+```bash
+# Mark an existing migration as applied (without re-executing SQL)
+npx prisma migrate resolve --applied "<migration_name>"
+
+# Mark a failed migration record as rolled back
+npx prisma migrate resolve --rolled-back "<migration_name>"
+```
+
+### 4. Authoritative Deployment Sequence
+Execute production deployments strictly in this chronological order:
+1. **Apply Prisma Migrations**:
+   ```bash
+   npx prisma migrate deploy
+   ```
+2. **Seed Statutory Rule Catalogs (Guarded)**:
+   The payroll catalog seeder is protected by environment guards to prevent accidental overrides. Run explicitly with:
+   ```bash
+   ALLOW_LIVE_SEED=true node scripts/seed-payroll-catalogs.js
+   ```
+3. **Deploy Backend API Service (Render / Container)**:
+   Deploy the Express application backend. Verify health endpoints:
+   ```bash
+   curl -f https://nexa-hr-backend-2ybt.onrender.com/api/health
+   ```
+4. **Deploy Frontend Client (Vercel / Edge CDN)**:
+   Build and deploy the React 19 client:
+   ```bash
+   npm --prefix client run build
+   ```
+
+### 5. Rollback Runbook (Per Component)
+
+* **Frontend Rollback**:
+  * In Vercel Dashboard, promote the previous instant deployment to Production, or run:
+    ```bash
+    vercel rollback
+    ```
+* **Backend Rollback**:
+  * In Render Dashboard (or container orchestrator), redeploy the previous successful commit SHA.
+* **Database Rollback**:
+  * If schema changes must be reverted:
+    1. Note: Append-only tables (`journal_entries`, `journal_lines`, `payroll_audit_logs`) have PostgreSQL immutability triggers. Reversals must be executed via accounting reversal entries rather than row deletions.
+    2. To restore table state from the pre-deployment custom dump:
+       ```bash
+       pg_restore --clean --if-exists -d "$DIRECT_URL" ./backups/nexahr_pre_deploy_<timestamp>.dump
+       ```
+    3. Re-synchronize Prisma migration history:
+       ```bash
+       npx prisma migrate resolve --rolled-back "<reverted_migration_name>"
+       ```
 
 ---
 
