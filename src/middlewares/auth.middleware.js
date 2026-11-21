@@ -42,17 +42,18 @@ const verifyToken = async (req, res, next) => {
           lastName: true,
           role: true,
           isActive: true,
+          deletedAt: true,
           employeeCode: true,
           isDemo: true,
           mustChangePassword: true,
         },
       });
-      if (user && user.isActive) {
+      if (user && user.isActive && !user.deletedAt) {
         cacheService.setCachedUser(decodedUserId, user);
       }
     }
 
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || user.deletedAt) {
       return res.status(401).json({
         success: false,
         message: 'Invalid session or user account is deactivated.',
