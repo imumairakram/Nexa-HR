@@ -129,10 +129,27 @@ const DEFAULT_SAMPLE_TXNS = [
 const seedDefaultTransactions = async (req, res) => {
   try {
     const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction && process.env.ALLOW_ACCOUNTS_SEED !== 'true') {
+    if (isProduction) {
       return res.status(403).json({
         success: false,
-        message: 'Seeding account transactions is disabled in production without explicit ALLOW_ACCOUNTS_SEED=true flag.',
+        code: 'ACTION_DISABLED_IN_PRODUCTION',
+        message: 'Seeding account transactions is permanently disabled in production environments.',
+      });
+    }
+
+    if (req.user?.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        code: 'SUPER_ADMIN_REQUIRED',
+        message: 'Access denied: Seeding account transactions requires the SUPER_ADMIN role.',
+      });
+    }
+
+    if (process.env.ALLOW_ACCOUNTS_SEED !== 'true') {
+      return res.status(403).json({
+        success: false,
+        code: 'ENV_FLAG_REQUIRED',
+        message: 'Seeding account transactions requires explicit ALLOW_ACCOUNTS_SEED=true environment flag.',
       });
     }
 
@@ -704,14 +721,32 @@ const batchUpdateStatus = async (req, res) => {
 const clearAllTransactions = async (req, res) => {
   try {
     const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction && process.env.ALLOW_ACCOUNTS_CLEAR !== 'true') {
+    if (isProduction) {
       return res.status(403).json({
         success: false,
-        message: 'Clearing corporate ledger transactions is disabled in production without explicit ALLOW_ACCOUNTS_CLEAR=true flag.',
+        code: 'ACTION_DISABLED_IN_PRODUCTION',
+        message: 'Clearing corporate ledger transactions is permanently disabled in production environments.',
+      });
+    }
+
+    if (req.user?.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        code: 'SUPER_ADMIN_REQUIRED',
+        message: 'Access denied: Clearing corporate ledger transactions requires the SUPER_ADMIN role.',
+      });
+    }
+
+    if (process.env.ALLOW_ACCOUNTS_CLEAR !== 'true') {
+      return res.status(403).json({
+        success: false,
+        code: 'ENV_FLAG_REQUIRED',
+        message: 'Clearing corporate ledger transactions requires explicit ALLOW_ACCOUNTS_CLEAR=true environment flag.',
       });
     }
 
     const deleted = await prisma.accountTransaction.deleteMany();
+    cacheService.invalidateTags(['accounts', 'dashboard']);
     return res.status(200).json({
       success: true,
       message: `Cleared all ${deleted.count} corporate ledger transactions.`,

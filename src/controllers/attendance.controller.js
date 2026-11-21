@@ -49,7 +49,7 @@ async function processAttendancePunch({ employeeCode, timestamp, type, sourceNot
     where: { employeeCode: employeeCode.trim() },
   });
 
-  if (!user) {
+  if (!user || user.deletedAt) {
     return res.status(404).json({
       success: false,
       message: `Employee with code '${employeeCode}' not found in system.`,
@@ -367,6 +367,10 @@ const getCompanyAttendance = async (req, res) => {
 
     const whereClause = {
       ...nonDemoRelationWhere,
+      user: {
+        ...nonDemoRelationWhere.user,
+        deletedAt: null,
+      },
     };
 
     if (date) {
@@ -480,7 +484,7 @@ const punchAllUsersToday = async (req, res) => {
     const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     const activeUsers = await prisma.user.findMany({
-      where: { isActive: true, ...nonDemoUsersWhere },
+      where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
       select: { id: true, firstName: true, lastName: true, employeeCode: true },
     });
 

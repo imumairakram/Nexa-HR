@@ -647,6 +647,16 @@ NODE_ENV=development
 # PostgreSQL Connection String (Append PgBouncer tuning parameters)
 DATABASE_URL="postgresql://postgres:your_password@localhost:5432/nexahr?schema=public&connection_limit=10&pool_timeout=20"
 
+# Direct PostgreSQL Connection URL (Bypasses PgBouncer pooler for migrations & transactions)
+# Required for prisma migrate deploy, migrations, and schema modifications
+DIRECT_URL="postgresql://postgres:your_password@localhost:5432/nexahr?schema=public"
+
+# Database Security Role Recommendation:
+# In production, runtime application queries should connect using a non-superuser role (e.g., `nexahr_app`)
+# granted SELECT, INSERT, UPDATE, DELETE permissions on public tables, but lacking SUPERUSER or BYPASSRLS.
+# This strictly enforces table immutability triggers (journal_entries, journal_lines, payroll_audit_logs)
+# and ensures append-only ledger compliance.
+
 # JWT Authentication Secrets
 JWT_SECRET="nexahr_super_secure_jwt_secret_key_2026"
 JWT_EXPIRES_IN="1h"

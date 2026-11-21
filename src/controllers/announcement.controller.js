@@ -33,7 +33,7 @@ const getAnnouncements = async (req, res) => {
 
     const [totalStaff, announcements] = await Promise.all([
       prisma.user.count({
-        where: { isActive: true, ...nonDemoUsersWhere },
+        where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
       }),
       prisma.announcement.findMany({
         where,
@@ -142,7 +142,7 @@ const createAnnouncement = async (req, res) => {
 
     // 2. Fetch all active employee emails and dispatch Corporate Email Broadcast
     const activeEmployees = await prisma.user.findMany({
-      where: { isActive: true, ...nonDemoUsersWhere },
+      where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
       select: { email: true, firstName: true, lastName: true },
     });
 
@@ -318,7 +318,7 @@ const acknowledgeAnnouncement = async (req, res) => {
         where: { announcementId: id },
       }),
       prisma.user.count({
-        where: { isActive: true, ...nonDemoUsersWhere },
+        where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
       }),
     ]);
 

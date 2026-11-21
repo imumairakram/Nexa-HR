@@ -18,7 +18,7 @@ const cacheService = require('../services/cache.service');
 router.use(verifyToken);
 
 const canManageAccounts = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN', 'COMPANY_ADMIN');
-const adminOnly = checkRole('ADMIN');
+const adminOrSuperAdmin = checkRole('ADMIN', 'SUPER_ADMIN');
 
 // Account Transactions & Financial Statistics
 router.get('/stats', canManageAccounts, cacheService.middleware({ ttlSeconds: 60, tags: ['accounts'] }), getTransactionStats);
@@ -28,15 +28,15 @@ router.put('/transactions/:id', blockDemo, canManageAccounts, updateTransaction)
 router.patch('/transactions/:id', blockDemo, canManageAccounts, updateTransaction);
 router.delete('/transactions/:id', blockDemo, canManageAccounts, deleteTransaction);
 
-// Clear All Transactions (Admin Only)
-router.post('/clear', blockDemo, adminOnly, clearAllTransactions);
-router.delete('/clear', blockDemo, adminOnly, clearAllTransactions);
+// Clear All Transactions (Disabled in production; requires SUPER_ADMIN + ALLOW_ACCOUNTS_CLEAR=true elsewhere)
+router.post('/clear', blockDemo, adminOrSuperAdmin, clearAllTransactions);
+router.delete('/clear', blockDemo, adminOrSuperAdmin, clearAllTransactions);
 
 // Batch Operations (Admin Only)
-router.post('/batch-delete', blockDemo, adminOnly, batchDeleteTransactions);
-router.post('/batch-status', blockDemo, adminOnly, batchUpdateStatus);
+router.post('/batch-delete', blockDemo, adminOrSuperAdmin, batchDeleteTransactions);
+router.post('/batch-status', blockDemo, adminOrSuperAdmin, batchUpdateStatus);
 
-// Seeding endpoint (Admin Only)
-router.post('/seed', blockDemo, adminOnly, seedDefaultTransactions);
+// Seeding endpoint (Disabled in production; requires SUPER_ADMIN + ALLOW_ACCOUNTS_SEED=true elsewhere)
+router.post('/seed', blockDemo, adminOrSuperAdmin, seedDefaultTransactions);
 
 module.exports = router;

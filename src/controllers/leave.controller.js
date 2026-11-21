@@ -299,6 +299,7 @@ const applyLeave = async (req, res) => {
         email: true,
         employeeCode: true,
         isActive: true,
+        deletedAt: true,
       },
     });
 
@@ -317,11 +318,12 @@ const applyLeave = async (req, res) => {
           email: true,
           employeeCode: true,
           isActive: true,
+          deletedAt: true,
         },
       });
     }
 
-    if (!targetUser) {
+    if (!targetUser || targetUser.deletedAt) {
       return res.status(404).json({
         success: false,
         message: 'Specified employee not found.',
@@ -459,7 +461,7 @@ const applyLeave = async (req, res) => {
 
       // 3. Dispatch Email to HR administrators
       const hrAdmins = await prisma.user.findMany({
-        where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true, ...nonDemoUsersWhere },
+        where: { role: { in: ['ADMIN', 'HR_MANAGER'] }, isActive: true, deletedAt: null, ...nonDemoUsersWhere },
         select: { email: true },
       });
       const adminEmails = hrAdmins.map((a) => a.email);
@@ -582,6 +584,10 @@ const getCompanyLeaveRequests = async (req, res) => {
 
     const whereClause = {
       ...nonDemoRelationWhere,
+      user: {
+        deletedAt: null,
+        isDemo: false,
+      },
     };
     if (status) {
       whereClause.status = status;

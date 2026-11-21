@@ -36,9 +36,10 @@ const CalculatePayroll = () => {
           const base = Number(ss.basicSalary || 0);
           const allowances = Number(ss.housingAllowance || 0) + Number(ss.transportAllowance || 0) + Number(ss.otherAllowances || 0);
           const overtime = 0;
-          const tax = Number(ss.taxDeductions || (base > 0 ? base * 0.15 : 0));
+          const hasTaxConfigured = ss.taxDeductions !== undefined && ss.taxDeductions !== null && ss.taxDeductions !== '';
+          const tax = hasTaxConfigured ? Number(ss.taxDeductions) : null;
           const otherDed = Number(ss.otherDeductions || 0);
-          const net = base > 0 ? Math.max(0, base + allowances + overtime - tax - otherDed) : 0;
+          const net = base > 0 ? Math.max(0, base + allowances + overtime - (tax ?? 0) - otherDed) : 0;
 
           return {
             id: emp.employeeCode || `EMP-${emp.id.slice(0, 4)}`,
@@ -49,6 +50,7 @@ const CalculatePayroll = () => {
             base,
             overtime,
             tax,
+            hasTaxConfigured,
             net,
             daysWorked: '22 / 22 Standard',
           };
@@ -67,7 +69,7 @@ const CalculatePayroll = () => {
   }, []);
 
   const totalGross = data.reduce((acc, d) => acc + d.base + d.overtime, 0);
-  const totalTax = data.reduce((acc, d) => acc + d.tax, 0);
+  const totalTax = data.reduce((acc, d) => acc + (d.tax || 0), 0);
   const totalNet = data.reduce((acc, d) => acc + d.net, 0);
 
   // Dynamic Sparkline Telemetry Points
@@ -83,7 +85,7 @@ const CalculatePayroll = () => {
     if (!data.length) return null;
     return data.slice(0, 7).map((d) => ({
       label: d.name.split(' ')[0] || 'Emp',
-      value: d.tax,
+      value: d.tax ?? 0,
     }));
   }, [data]);
 
@@ -312,7 +314,11 @@ const CalculatePayroll = () => {
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block uppercase">Tax Withheld</span>
-                      <span className="font-semibold text-rose-500">-PKR {row.tax.toLocaleString()}</span>
+                      {row.hasTaxConfigured ? (
+                        <span className="font-semibold text-rose-500">-PKR {row.tax.toLocaleString()}</span>
+                      ) : (
+                        <span className="font-semibold text-amber-500 dark:text-amber-400 italic">Not configured</span>
+                      )}
                     </div>
                   </div>
 
@@ -352,7 +358,13 @@ const CalculatePayroll = () => {
                     <td className="py-4 px-4 font-bold text-blue-600 dark:text-blue-400">{row.daysWorked}</td>
                     <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">PKR {row.base.toLocaleString()}</td>
                     <td className="py-4 px-4 font-semibold text-emerald-600">+PKR {row.overtime.toLocaleString()}</td>
-                    <td className="py-4 px-4 font-semibold text-rose-500">-PKR {row.tax.toLocaleString()}</td>
+                    <td className="py-4 px-4 font-semibold">
+                      {row.hasTaxConfigured ? (
+                        <span className="text-rose-500 font-semibold">-PKR {row.tax.toLocaleString()}</span>
+                      ) : (
+                        <span className="text-amber-500 dark:text-amber-400 font-medium italic">Not configured</span>
+                      )}
+                    </td>
                     <td className="py-4 px-4 text-right font-black text-slate-900 dark:text-white text-sm">
                       PKR {row.net.toLocaleString()}
                     </td>

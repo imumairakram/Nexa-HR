@@ -39,12 +39,13 @@ const getAdminDashboard = async (req, res) => {
       departmentsWithProfiles,
       monthAttendances,
     ] = await Promise.all([
-      prisma.user.count({ where: { isActive: true, ...nonDemoUsersWhere } }),
+      prisma.user.count({ where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere } }),
       prisma.department.count(),
       prisma.attendance.findMany({
         where: {
           date: { gte: startOfToday, lte: endOfToday },
           ...nonDemoRelationWhere,
+          user: { deletedAt: null, isDemo: false },
         },
         include: {
           user: {
@@ -63,9 +64,18 @@ const getAdminDashboard = async (req, res) => {
         },
         orderBy: { checkInTime: 'desc' },
       }),
-      prisma.leaveRequest.count({ where: { status: 'PENDING', ...nonDemoRelationWhere } }),
+      prisma.leaveRequest.count({
+        where: {
+          status: 'PENDING',
+          ...nonDemoRelationWhere,
+          user: { deletedAt: null, isDemo: false },
+        },
+      }),
       prisma.payslip.aggregate({
-        where: nonDemoRelationWhere,
+        where: {
+          ...nonDemoRelationWhere,
+          user: { deletedAt: null, isDemo: false },
+        },
         _sum: { grossSalary: true, netSalary: true, taxDeductions: true },
         _count: { id: true },
       }),
@@ -73,7 +83,7 @@ const getAdminDashboard = async (req, res) => {
         include: {
           profiles: {
             where: {
-              user: { isActive: true, ...nonDemoUsersWhere },
+              user: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
             },
             select: {
               id: true,
@@ -87,6 +97,7 @@ const getAdminDashboard = async (req, res) => {
         where: {
           date: { gte: thirtyDaysAgo, lte: endOfToday },
           ...nonDemoRelationWhere,
+          user: { deletedAt: null, isDemo: false },
         },
         select: {
           id: true,
@@ -443,6 +454,13 @@ const getEmployeeDashboard = async (req, res) => {
         },
       }),
     ]);
+
+    if (!user || user.deletedAt) {
+      return res.status(404).json({
+        success: false,
+        message: 'Employee profile not found.',
+      });
+    }
 
     let presentDays = 0;
     let lateDays = 0;

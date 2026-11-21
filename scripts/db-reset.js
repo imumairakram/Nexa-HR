@@ -102,7 +102,7 @@ async function getPublicTables(prismaClient) {
     FROM information_schema.tables 
     WHERE table_schema = 'public' 
       AND table_type = 'BASE TABLE'
-      AND table_name != '_prisma_migrations'
+      AND table_name NOT IN ('_prisma_migrations', 'journal_entries', 'journal_lines', 'payroll_audit_logs')
     ORDER BY table_name ASC;
   `;
   return tables.map((t) => t.table_name);
@@ -130,6 +130,13 @@ async function runReset(options = {}) {
 
   const targetMeta = parseDbTarget(targetDbUrl);
   const isExecuteRequested = options.isExecuteRequested || false;
+
+  const isLocal = ['localhost', '127.0.0.1', '::1'].includes(targetMeta.host.toLowerCase());
+  if (isExecuteRequested && !isLocal && process.env.NODE_ENV !== 'test') {
+    throw new Error(
+      `[SECURITY REJECTION] Database reset / wipe is strictly prohibited on non-local environments (${targetMeta.host}).`
+    );
+  }
   const isDryRun = options.isDryRun !== undefined ? options.isDryRun : !isExecuteRequested;
   const confirmFlag = options.confirmFlag || null;
   const typedInputOverride = options.typedInputOverride || null;
