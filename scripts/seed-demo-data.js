@@ -563,13 +563,13 @@ async function main() {
     const prevYear = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
 
     for (const u of allUsers) {
-      const exists = await prisma.payslip.findUnique({
+      const exists = await prisma.legacyPayslip.findUnique({
         where: { userId_month_year: { userId: u.id, month: prevMonth, year: prevYear } },
       });
 
       if (!exists) {
         const base = 120000;
-        await prisma.payslip.create({
+        await prisma.legacyPayslip.create({
           data: {
             userId: u.id,
             month: prevMonth,
