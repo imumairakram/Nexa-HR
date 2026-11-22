@@ -60,88 +60,7 @@ const LeavePolicy = () => {
     setLoading(true);
     try {
       const res = await api.getLeaveTypes().catch(() => null);
-      let apiTypes = res?.success && Array.isArray(res.data?.leaveTypes) ? res.data.leaveTypes : [];
-
-      let overrides = {};
-      try {
-        overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-      } catch (e) {
-        overrides = {};
-      }
-
-      let deleted = [];
-      try {
-        deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-      } catch (e) {
-        deleted = [];
-      }
-
-      let savedCustom = [];
-      try {
-        savedCustom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-      } catch (e) {
-        savedCustom = [];
-      }
-
-      // 1. Process apiTypes (skip deleted, merge overrides)
-      const processedApi = apiTypes
-        .filter(
-          (lt) =>
-            !deleted.includes(lt.id) &&
-            !deleted.includes(lt.code) &&
-            !deleted.includes(lt.code?.toUpperCase())
-        )
-        .map((lt) => {
-          const ov = overrides[lt.id] || overrides[lt.code] || overrides[lt.code?.toUpperCase()];
-          if (ov) {
-            return {
-              ...lt,
-              name: ov.name || lt.name,
-              code: ov.code || lt.code,
-              daysAllowed: ov.daysAllowed || ov.days || lt.daysAllowed,
-              days: ov.days || ov.daysAllowed || lt.daysAllowed,
-              isPaid: ov.isPaid !== undefined ? ov.isPaid : lt.isPaid,
-              type: ov.type || (ov.isPaid !== undefined ? (ov.isPaid ? 'PAID' : 'UNPAID') : lt.isPaid ? 'PAID' : 'UNPAID'),
-              description: ov.description !== undefined ? ov.description : lt.description,
-            };
-          }
-          return lt;
-        });
-
-      // 2. Process custom policies not yet returned by backend
-      const processedCustom = savedCustom
-        .filter(
-          (c) =>
-            !deleted.includes(c.id) &&
-            !deleted.includes(c.code) &&
-            !deleted.includes(c.code?.toUpperCase())
-        )
-        .filter(
-          (c) =>
-            !processedApi.some(
-              (apiItem) =>
-                apiItem.id === c.id ||
-                apiItem.code?.toUpperCase() === c.code?.toUpperCase()
-            )
-        )
-        .map((c) => {
-          const ov = overrides[c.id] || overrides[c.code] || overrides[c.code?.toUpperCase()];
-          if (ov) {
-            return {
-              ...c,
-              name: ov.name || c.name,
-              code: ov.code || c.code,
-              daysAllowed: ov.daysAllowed || ov.days || c.daysAllowed,
-              days: ov.days || ov.daysAllowed || c.daysAllowed,
-              isPaid: ov.isPaid !== undefined ? ov.isPaid : c.isPaid,
-              type: ov.type || (ov.isPaid !== undefined ? (ov.isPaid ? 'PAID' : 'UNPAID') : c.isPaid ? 'PAID' : 'UNPAID'),
-              description: ov.description !== undefined ? ov.description : c.description,
-            };
-          }
-          return c;
-        });
-
-      const combined = [...processedApi, ...processedCustom];
+      const apiTypes = res?.success && Array.isArray(res.data?.leaveTypes) ? res.data.leaveTypes : [];
 
       const colors = [
         'from-emerald-500 to-teal-600',
@@ -151,11 +70,12 @@ const LeavePolicy = () => {
         'from-slate-600 to-slate-800',
       ];
 
-      const mapped = combined.map((lt, idx) => ({
+      const mapped = apiTypes.map((lt, idx) => ({
         id: lt.id || `lt-${idx}`,
         name: lt.name,
         code: lt.code,
         days: lt.daysAllowed || lt.days || 12,
+        daysAllowed: lt.daysAllowed || lt.days || 12,
         type: (lt.isPaid !== undefined ? lt.isPaid : lt.type === 'PAID') ? 'PAID' : 'UNPAID',
         color: colors[idx % colors.length],
         description: lt.description || `${lt.name} entitlement governed by corporate human resources handbook.`,
@@ -201,67 +121,12 @@ const LeavePolicy = () => {
         description,
       };
 
-      let createdPolicy = null;
-      try {
-        const res = await api.createLeaveType(payload);
-        if (res?.success && res.data?.leaveType) {
-          createdPolicy = res.data.leaveType;
-        }
-      } catch (apiErr) {
-        console.warn('API createLeaveType returned an error, saving with local persistence fallback:', apiErr.message);
+      const res = await api.createLeaveType(payload);
+      if (res?.success === false) {
+        throw new Error(res?.message || 'Failed to create leave policy');
       }
 
-      const colors = [
-        'from-emerald-500 to-teal-600',
-        'from-blue-500 to-indigo-600',
-        'from-amber-500 to-orange-600',
-        'from-purple-500 to-pink-600',
-        'from-slate-600 to-slate-800',
-      ];
-
-      const finalPolicy = createdPolicy || {
-        id: `leave-type-${Date.now()}`,
-        name: policyName,
-        code: policyCode,
-        daysAllowed,
-        days: daysAllowed,
-        isPaid,
-        type: isPaid ? 'PAID' : 'UNPAID',
-        description,
-        color: colors[policies.length % colors.length],
-        createdAt: new Date().toISOString(),
-      };
-
-      // Unmark from deleted policies
-      try {
-        const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-        const cleaned = deleted.filter((d) => d !== policyCode && d !== finalPolicy.id);
-        localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(cleaned));
-      } catch (e) {}
-
-      // Save into custom list
-      try {
-        const savedCustom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-        const updatedCustom = [finalPolicy, ...savedCustom.filter((p) => p.code !== policyCode && p.id !== finalPolicy.id)];
-        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
-      } catch (e) {
-        console.error('localStorage save error:', e);
-      }
-
-      // Immediate UI update
-      setPolicies((prev) => [
-        {
-          id: finalPolicy.id,
-          name: policyName,
-          code: policyCode,
-          days: daysAllowed,
-          type: isPaid ? 'PAID' : 'UNPAID',
-          color: colors[prev.length % colors.length],
-          description,
-        },
-        ...prev.filter((p) => p.code !== policyCode && p.id !== finalPolicy.id),
-      ]);
-
+      await loadLeavePolicies();
       broadcastAppEvent('nexahr_leaves_updated');
       broadcastAppEvent('nexahr_notification_updated');
 
@@ -276,9 +141,8 @@ const LeavePolicy = () => {
       });
       setTimeout(() => setToastMsg(''), 3000);
     } catch (err) {
-      console.error('Unexpected error creating leave policy:', err);
-      setToastMsg(`Leave policy "${policyName}" registered!`);
-      setIsAddOpen(false);
+      console.error('Error creating leave policy:', err);
+      setToastMsg(err.message || `Failed to create policy "${policyName}".`);
       setTimeout(() => setToastMsg(''), 3000);
     } finally {
       setSubmitting(false);
@@ -307,7 +171,6 @@ const LeavePolicy = () => {
     const isPaid = editForm.type === 'PAID';
     const description = editForm.description.trim() || `${policyName} policy governed by company HR regulations.`;
     const targetId = editingPolicy.id;
-    const oldCode = editingPolicy.code;
 
     try {
       const payload = {
@@ -318,65 +181,12 @@ const LeavePolicy = () => {
         description,
       };
 
-      // 1. Immediately update UI state
-      setPolicies((prev) =>
-        prev.map((p) =>
-          p.id === targetId || (oldCode && p.code === oldCode)
-            ? {
-                ...p,
-                name: policyName,
-                code: policyCode,
-                days: daysAllowed,
-                daysAllowed,
-                type: isPaid ? 'PAID' : 'UNPAID',
-                isPaid,
-                description,
-              }
-            : p
-        )
-      );
-
-      // 2. Persist to localStorage overrides
-      try {
-        const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-        const overrideData = {
-          id: targetId,
-          name: policyName,
-          code: policyCode,
-          daysAllowed,
-          days: daysAllowed,
-          isPaid,
-          type: isPaid ? 'PAID' : 'UNPAID',
-          description,
-          updatedAt: Date.now(),
-        };
-        overrides[targetId] = overrideData;
-        if (oldCode) overrides[oldCode] = overrideData;
-        if (policyCode) overrides[policyCode] = overrideData;
-        localStorage.setItem('nexahr_leave_policy_overrides', JSON.stringify(overrides));
-
-        // Clean from deleted list if present
-        const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-        const cleaned = deleted.filter((d) => d !== targetId && d !== oldCode && d !== policyCode);
-        localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(cleaned));
-
-        // Update custom policies if present
-        const savedCustom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-        const updatedCustom = savedCustom.map((p) =>
-          p.id === targetId || p.code === oldCode
-            ? { ...p, name: policyName, code: policyCode, daysAllowed, isPaid, description }
-            : p
-        );
-        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
-      } catch (storageErr) {
-        console.warn('LocalStorage save warning:', storageErr);
+      const res = await api.updateLeaveType(targetId, payload);
+      if (res?.success === false) {
+        throw new Error(res?.message || 'Failed to update leave policy');
       }
 
-      // 3. Dispatch to API asynchronously (won't wipe local state if pending/404)
-      api.updateLeaveType(targetId, payload).catch((apiErr) => {
-        console.warn('Backend updateLeaveType request pending/error (persisted locally):', apiErr.message);
-      });
-
+      await loadLeavePolicies();
       broadcastAppEvent('nexahr_leaves_updated');
       broadcastAppEvent('nexahr_notification_updated');
 
@@ -385,8 +195,7 @@ const LeavePolicy = () => {
       setTimeout(() => setToastMsg(''), 3000);
     } catch (err) {
       console.error('Failed to update leave policy:', err);
-      setToastMsg(`Leave policy "${policyName}" updated!`);
-      setEditingPolicy(null);
+      setToastMsg(err.message || `Failed to update leave policy "${policyName}".`);
       setTimeout(() => setToastMsg(''), 3000);
     } finally {
       setSubmittingEdit(false);
@@ -399,36 +208,14 @@ const LeavePolicy = () => {
     setSubmittingDelete(true);
     const policyName = deletingPolicy.name;
     const policyId = deletingPolicy.id;
-    const policyCode = deletingPolicy.code;
 
     try {
-      // 1. Immediately remove from UI state
-      setPolicies((prev) => prev.filter((p) => p.id !== policyId && p.code !== policyCode));
-
-      // 2. Persist deletion to localStorage
-      try {
-        const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-        if (policyId && !deleted.includes(policyId)) deleted.push(policyId);
-        if (policyCode && !deleted.includes(policyCode)) deleted.push(policyCode);
-        localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(deleted));
-
-        const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-        delete overrides[policyId];
-        if (policyCode) delete overrides[policyCode];
-        localStorage.setItem('nexahr_leave_policy_overrides', JSON.stringify(overrides));
-
-        const savedCustom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-        const updatedCustom = savedCustom.filter((p) => p.id !== policyId && p.code !== policyCode);
-        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
-      } catch (storageErr) {
-        console.warn('LocalStorage delete warning:', storageErr);
+      const res = await api.deleteLeaveType(policyId);
+      if (res?.success === false) {
+        throw new Error(res?.message || 'Failed to delete leave policy');
       }
 
-      // 3. Dispatch deletion to API
-      api.deleteLeaveType(policyId).catch((apiErr) => {
-        console.warn('Backend deleteLeaveType pending/error (removed locally):', apiErr.message);
-      });
-
+      await loadLeavePolicies();
       broadcastAppEvent('nexahr_leaves_updated');
       broadcastAppEvent('nexahr_notification_updated');
 
@@ -437,7 +224,9 @@ const LeavePolicy = () => {
       setTimeout(() => setToastMsg(''), 3000);
     } catch (err) {
       console.error('Failed to delete leave policy:', err);
+      setToastMsg(err.message || `Failed to delete policy "${policyName}".`);
       setDeletingPolicy(null);
+      setTimeout(() => setToastMsg(''), 3000);
     } finally {
       setSubmittingDelete(false);
     }
@@ -500,7 +289,7 @@ const LeavePolicy = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
         title="Leave Policy Configuration"
-        subtitle="Establish company-wide paid time-off limits, parental allowances, and statutory leave quota rules."
+        subtitle="Establish company-wide paid time-off limits and statutory leave quota rules."
       />
 
       {toastMsg && (

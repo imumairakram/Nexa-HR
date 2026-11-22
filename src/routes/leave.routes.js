@@ -30,7 +30,7 @@ const handleGetLeaveRequests = (req, res, next) => {
 
 // Leave Types Configuration (Admin/HR)
 router.post('/types', canManageLeaves, createLeaveType);
-router.get('/types', cacheService.middleware({ ttlSeconds: 120, tags: ['leaves'] }), getLeaveTypes);
+router.get('/types', getLeaveTypes);
 router.get('/types/:id', canManageLeaves, getLeaveTypeById);
 router.put('/types/:id', canManageLeaves, updateLeaveType);
 router.patch('/types/:id', canManageLeaves, updateLeaveType);

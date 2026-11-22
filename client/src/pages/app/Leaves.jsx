@@ -85,14 +85,6 @@ export const formatLeaveDays = (days) => {
   return `${count} ${count === 1 ? 'day' : 'days'}`;
 };
 
-export const DEFAULT_LEAVE_TYPES = [
-  { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
-  { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-  { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-  { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
-  { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
-];
-
 const Leaves = () => {
   const [requests, setRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
   const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);

@@ -17,6 +17,15 @@ const clientCache = new Map();
 // In-Flight Promise Registry for Request Deduplication
 const inFlightRequests = new Map();
 
+// Clean up any stale legacy localStorage mock overrides
+if (typeof window !== 'undefined' && window.localStorage) {
+  try {
+    localStorage.removeItem('nexahr_leave_policy_overrides');
+    localStorage.removeItem('nexahr_deleted_leave_policies');
+    localStorage.removeItem('nexahr_custom_leave_policies');
+  } catch (e) {}
+}
+
 const DEFAULT_CACHE_TTL = 45 * 1000; // 45 seconds fresh
 const MAX_STALE_TTL = 120 * 1000; // 2 minutes max stale for SWR
 
@@ -495,65 +504,8 @@ export const api = {
 
   getLeaveTypes: async (options = {}) => {
     try {
-      const res = await fetchAPI('/leaves/types', options);
-      if (typeof window !== 'undefined' && window.localStorage) {
-        try {
-          const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-          const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-          const custom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-
-          let types = Array.isArray(res?.data?.leaveTypes) ? [...res.data.leaveTypes] : [];
-          // Filter out deleted items
-          types = types.filter(
-            (t) =>
-              !deleted.includes(t.id) &&
-              !deleted.includes(t.code) &&
-              !deleted.includes(t.code?.toUpperCase())
-          );
-          // Apply stored overrides
-          types = types.map((t) => {
-            const ov = overrides[t.id] || overrides[t.code] || overrides[t.code?.toUpperCase()];
-            if (ov) {
-              return {
-                ...t,
-                name: ov.name || t.name,
-                code: ov.code || t.code,
-                daysAllowed: ov.daysAllowed || ov.days || t.daysAllowed,
-                days: ov.days || ov.daysAllowed || t.daysAllowed,
-                isPaid: ov.isPaid !== undefined ? ov.isPaid : t.isPaid,
-                description: ov.description !== undefined ? ov.description : t.description,
-              };
-            }
-            return t;
-          });
-          // Merge custom created items
-          custom.forEach((c) => {
-            const cCode = c.code?.toUpperCase();
-            if (
-              !deleted.includes(c.id) &&
-              !deleted.includes(c.code) &&
-              !deleted.includes(cCode) &&
-              !types.some((t) => t.id === c.id || t.code?.toUpperCase() === cCode)
-            ) {
-              const ov = overrides[c.id] || overrides[c.code] || overrides[cCode];
-              types.push(ov ? { ...c, ...ov } : c);
-            }
-          });
-
-          return {
-            ...res,
-            data: {
-              ...res?.data,
-              leaveTypes: types,
-            },
-          };
-        } catch (e) {
-          // If merging throws, proceed with original response
-        }
-      }
-
+      const res = await fetchAPI('/leaves/types', { bypassCache: true, ...options });
       const resTypes = Array.isArray(res?.data?.leaveTypes) ? res.data.leaveTypes : [];
-
       return {
         ...res,
         data: {
@@ -562,20 +514,6 @@ export const api = {
         },
       };
     } catch (err) {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        try {
-          const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-          const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-          const custom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-          let fallback = [...custom];
-          fallback = fallback.filter((t) => !deleted.includes(t.id) && !deleted.includes(t.code));
-          fallback = fallback.map((t) => {
-            const ov = overrides[t.id] || overrides[t.code] || overrides[t.code?.toUpperCase()];
-            return ov ? { ...t, ...ov } : t;
-          });
-          return { success: true, data: { leaveTypes: fallback } };
-        } catch (e) {}
-      }
       return {
         success: true,
         data: {
@@ -590,13 +528,6 @@ export const api = {
   },
 
   createLeaveType: async (leaveData) => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-        const cleaned = deleted.filter((d) => d !== leaveData.code && d !== leaveData.code?.toUpperCase());
-        localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(cleaned));
-      } catch (e) {}
-    }
     const res = await fetchAPI('/leaves/types', {
       method: 'POST',
       body: JSON.stringify(leaveData),
@@ -608,94 +539,26 @@ export const api = {
   },
 
   updateLeaveType: async (id, leaveData) => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-        const updated = {
-          id,
-          name: leaveData.name,
-          code: leaveData.code?.toUpperCase(),
-          daysAllowed: leaveData.daysAllowed,
-          days: leaveData.daysAllowed,
-          isPaid: leaveData.isPaid,
-          type: leaveData.isPaid ? 'PAID' : 'UNPAID',
-          description: leaveData.description,
-          updatedAt: Date.now(),
-        };
-        overrides[id] = updated;
-        if (leaveData.code) {
-          overrides[leaveData.code] = updated;
-          overrides[leaveData.code.toUpperCase()] = updated;
-        }
-        localStorage.setItem('nexahr_leave_policy_overrides', JSON.stringify(overrides));
-
-        // Clean from deleted
-        const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-        const cleaned = deleted.filter((d) => d !== id && d !== leaveData.code && d !== leaveData.code?.toUpperCase());
-        localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(cleaned));
-
-        // Update in custom policies if present
-        const custom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-        const updatedCustom = custom.map((c) =>
-          c.id === id || c.code === leaveData.code || c.code?.toUpperCase() === leaveData.code?.toUpperCase()
-            ? { ...c, ...updated }
-            : c
-        );
-        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
-      } catch (e) {}
-    }
-
     invalidateClientCache('/leaves');
     invalidateClientCache('/dashboard');
     broadcastAppEvent('nexahr_leaves_updated');
 
-    try {
-      return await fetchAPI(`/leaves/types/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(leaveData),
-      });
-    } catch (err) {
-      console.warn('API updateLeaveType pending/error (persisted locally):', err.message);
-      return {
-        success: true,
-        message: 'Leave policy updated successfully.',
-        data: { leaveType: { id, ...leaveData } },
-      };
-    }
+    const res = await fetchAPI(`/leaves/types/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(leaveData),
+    });
+    return res;
   },
 
   deleteLeaveType: async (id) => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
-        if (!deleted.includes(id)) deleted.push(id);
-        localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(deleted));
-
-        const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
-        delete overrides[id];
-        localStorage.setItem('nexahr_leave_policy_overrides', JSON.stringify(overrides));
-
-        const custom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-        const updatedCustom = custom.filter((c) => c.id !== id);
-        localStorage.setItem('nexahr_custom_leave_policies', JSON.stringify(updatedCustom));
-      } catch (e) {}
-    }
-
     invalidateClientCache('/leaves');
     invalidateClientCache('/dashboard');
     broadcastAppEvent('nexahr_leaves_updated');
 
-    try {
-      return await fetchAPI(`/leaves/types/${id}`, {
-        method: 'DELETE',
-      });
-    } catch (err) {
-      console.warn('API deleteLeaveType pending/error (removed locally):', err.message);
-      return {
-        success: true,
-        message: 'Leave policy deleted successfully.',
-      };
-    }
+    const res = await fetchAPI(`/leaves/types/${id}`, {
+      method: 'DELETE',
+    });
+    return res;
   },
 
   createLeaveRequest: async (leaveData) => {

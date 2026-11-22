@@ -36,16 +36,6 @@ export const DEMO_LEAVE_TYPES = [
     description: 'Medical recuperation and doctor appointments with certified note.',
     color: '#EF4444', // Rose / Red
   },
-  {
-    id: 'lt-parental-04',
-    name: 'Parental / Family Leave',
-    code: 'PARENTAL',
-    daysAllowed: 60,
-    paid: true,
-    requiresApproval: true,
-    description: 'Parental bonding leave for new parents following birth or adoption.',
-    color: '#8B5CF6', // Purple
-  },
 ];
 
 export const DEMO_LEAVE_REQUESTS = [
