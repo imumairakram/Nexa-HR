@@ -269,6 +269,7 @@ const EmployeeLeaves = () => {
 
       return {
         type: lt.name,
+        code: lt.code,
         total: lt.daysAllowed,
         used: usedDays,
         pending: pendingDays,
@@ -370,22 +371,21 @@ const EmployeeLeaves = () => {
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
   const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
   const totalPendingRequests = stats.pending;
-  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
-  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation') || c.code?.toLowerCase().includes('annual')) || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical') || c.code?.toLowerCase().includes('sick')) || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const unpaidCard = quotaCards.find((c) => c.type?.toLowerCase().includes('unpaid') || c.type?.toLowerCase().includes('sabbatical') || c.code?.toLowerCase().includes('unpaid')) || { type: 'Unpaid Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
 
-  // Dynamic Sparkline Data for Leaves
-  const totalLeavesSparkData = useMemo(() => {
-    if (quotaCards.length > 0) {
-      return quotaCards.map((c) => ({
-        value: c.available,
-        label: c.type.split(' ')[0],
-        tooltip: `${c.type}: ${c.available} / ${c.total} Days Left (${c.used} Used)`,
-      }));
-    }
+  // Dynamic Sparkline Data for Unpaid Leaves
+  const unpaidSparkData = useMemo(() => {
+    const total = unpaidCard.total || 0;
+    const used = unpaidCard.used || 0;
+    const avail = unpaidCard.available || (total - used);
     return [
-      { value: 0, label: 'Leaves', tooltip: 'No Leave Quotas Allocated' },
+      { value: total, label: 'Quota', tooltip: `Unpaid Entitlement: ${total} Days` },
+      { value: avail, label: 'Available', tooltip: `Remaining Unpaid: ${avail} Days` },
+      { value: used, label: 'Taken', tooltip: `Unpaid Days Used: ${used} Days` },
     ];
-  }, [quotaCards]);
+  }, [unpaidCard]);
 
   const annualSparkData = useMemo(() => {
     const total = annualCard.total || 0;
@@ -490,19 +490,19 @@ const EmployeeLeaves = () => {
       {/* 2. TOP METRIC SPARKLINE CARDS */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Total Available Leaves */}
+        {/* Card 1: Dark Navy Card - Unpaid Leaves */}
         <SparkMetricCard
           variant="dark"
-          title="Total Leave Balance"
-          value={totalAvailableLeaves}
-          unit={totalAvailableLeaves === 1 ? 'Day' : 'Days'}
-          badgeText={`${totalAvailableLeaves}d Available`}
-          badgeType="positive"
-          badgeIcon="up"
-          subtext={`Quota: ${totalAllowedLeaves} Total Days`}
+          title="Unpaid Leaves"
+          value={unpaidCard.available}
+          unit={unpaidCard.total > 0 ? `/ ${unpaidCard.total}d` : (unpaidCard.available === 1 ? 'Day' : 'Days')}
+          badgeText={unpaidCard.total > 0 ? `${unpaidCard.percent}% Available` : (unpaidCard.used > 0 ? `${unpaidCard.used}d Used` : '0 Quota')}
+          badgeType={unpaidCard.total === 0 ? 'neutral' : unpaidCard.percent >= 50 ? 'positive' : 'warning'}
+          badgeIcon={unpaidCard.total === 0 ? 'dot' : unpaidCard.percent >= 50 ? 'up' : 'dot'}
+          subtext={unpaidCard.total > 0 ? `${unpaidCard.used} Days Used (Leave Without Pay)` : 'Discretionary Unpaid Absence'}
           chartColor="purple"
           presetWave="wave1"
-          dataPoints={totalLeavesSparkData}
+          dataPoints={unpaidSparkData}
           loading={loading}
         />
 
