@@ -417,7 +417,7 @@ const EmployeeAttendance = () => {
   // Dynamic Badges
   const card1Badge = useMemo(() => {
     if (totalDaysPresent === 0) {
-      return { text: '0d Logged', type: 'neutral', icon: 'dot', sub: 'Awaiting Punch-In' };
+      return { text: selectedMonthShortLabel, type: 'neutral', icon: 'dot', sub: `No Entries in ${selectedMonthShortLabel}` };
     }
     if (lateArrivals > 0) {
       return {
@@ -428,7 +428,7 @@ const EmployeeAttendance = () => {
       };
     }
     return { text: '100% Punctual', type: 'positive', icon: 'up', sub: '100% On-Time Record' };
-  }, [totalDaysPresent, lateArrivals, onTimePercentage]);
+  }, [totalDaysPresent, lateArrivals, onTimePercentage, selectedMonthShortLabel]);
 
   const card2Badge = useMemo(() => {
     if (lateArrivals === 0) {
@@ -464,11 +464,19 @@ const EmployeeAttendance = () => {
   }, [totalHoursLogged, totalOvertime, totalDaysPresent]);
 
   const card4Badge = useMemo(() => {
-    if (logs.length === 0) {
-      return { text: 'Standby', type: 'neutral', icon: 'dot', sub: 'IoT Terminals Ready' };
+    if (totalDaysPresent === 0) {
+      return { text: '100% Target', type: 'neutral', icon: 'dot', sub: '15 Mins Grace (09:15 AM)' };
     }
-    return { text: '100% Synced', type: 'positive', icon: 'dot', sub: 'Biometric IoT Hardware' };
-  }, [logs]);
+    if (lateArrivals > 0) {
+      return {
+        text: `${lateArrivals} Late Flag${lateArrivals > 1 ? 's' : ''}`,
+        type: onTimePercentage >= 80 ? 'warning' : 'negative',
+        icon: onTimePercentage >= 80 ? 'down' : 'down',
+        sub: `${totalDaysPresent - lateArrivals} of ${totalDaysPresent} Days On-Time`,
+      };
+    }
+    return { text: '100% Punctual', type: 'positive', icon: 'up', sub: 'Zero Late Arrivals Flagged' };
+  }, [totalDaysPresent, lateArrivals, onTimePercentage]);
 
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-white">
@@ -568,16 +576,16 @@ const EmployeeAttendance = () => {
       {/* 2. STATS ROW (EXACT HIGH-FIDELITY VECTOR SPARKLINE CARDS FOR ATTENDANCE) */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Verified Present */}
+        {/* Card 1: Dark Navy Card - Monthly Present */}
         <SparkMetricCard
           variant="dark"
-          title="Verified Present"
+          title="Monthly Present"
           value={totalDaysPresent}
           unit={totalDaysPresent === 1 ? 'Day' : 'Days'}
           badgeText={card1Badge.text}
           badgeType={card1Badge.type}
           badgeIcon={card1Badge.icon}
-          subtext={card1Badge.sub}
+          subtext={`Present in ${selectedMonthLabel}`}
           chartColor="purple"
           presetWave="wave1"
           dataPoints={presenceSparkData}
@@ -616,12 +624,12 @@ const EmployeeAttendance = () => {
           loading={loading}
         />
 
-        {/* Card 4: Light Card - Terminal Sync Logs */}
+        {/* Card 4: Light Card - On-Time Punctuality Rate */}
         <SparkMetricCard
           variant="light"
-          title="Biometric Logs"
-          value={logs.length}
-          unit={logs.length === 1 ? 'Entry' : 'Entries'}
+          title="On-Time Rate"
+          value={`${onTimePercentage}%`}
+          unit="Score"
           badgeText={card4Badge.text}
           badgeType={card4Badge.type}
           badgeIcon={card4Badge.icon}
