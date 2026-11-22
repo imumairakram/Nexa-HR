@@ -373,6 +373,7 @@ const EmployeeLeaves = () => {
   const totalPendingRequests = stats.pending;
   const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation') || c.code?.toLowerCase().includes('annual')) || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
   const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical') || c.code?.toLowerCase().includes('sick')) || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const casualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('casual') || c.code?.toLowerCase().includes('casual')) || { type: 'Casual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
   const unpaidCard = quotaCards.find((c) => c.type?.toLowerCase().includes('unpaid') || c.type?.toLowerCase().includes('sabbatical') || c.code?.toLowerCase().includes('unpaid')) || { type: 'Unpaid Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
 
   // Dynamic Sparkline Data for Unpaid Leaves
@@ -408,6 +409,17 @@ const EmployeeLeaves = () => {
       { value: used, label: 'Taken', tooltip: `Medical Leave Used: ${used} Days` },
     ];
   }, [sickCard]);
+
+  const casualSparkData = useMemo(() => {
+    const total = casualCard.total || 0;
+    const used = casualCard.used || 0;
+    const avail = casualCard.available || (total - used);
+    return [
+      { value: total, label: 'Quota', tooltip: `Casual Quota: ${total} Days` },
+      { value: Math.max(0, total - Math.round(used * 0.5)), label: 'Q2', tooltip: `Mid-Year: ${Math.max(0, total - Math.round(used * 0.5))} Days` },
+      { value: avail, label: 'Available', tooltip: `Current Available: ${avail} Days (${used} Taken)` },
+    ];
+  }, [casualCard]);
 
   const pendingSparkData = useMemo(() => {
     return [
@@ -538,19 +550,19 @@ const EmployeeLeaves = () => {
           loading={loading}
         />
 
-        {/* Card 4: Light Card - Pending Requests */}
+        {/* Card 4: Light Card - Casual Leave */}
         <SparkMetricCard
           variant="light"
-          title="Pending Requests"
-          value={totalPendingRequests}
-          unit={totalPendingRequests === 1 ? 'Request' : 'Requests'}
-          badgeText={totalPendingRequests > 0 ? `${totalPendingRequests} Under Review` : `${stats.approved} Approved`}
-          badgeType={totalPendingRequests > 0 ? 'warning' : 'positive'}
-          badgeIcon={totalPendingRequests > 0 ? 'dot' : 'up'}
-          subtext={`${stats.total} Total Submissions (${stats.approved} Approved, ${stats.rejected} Declined)`}
-          chartColor="rose"
+          title="Casual Leave"
+          value={casualCard.available}
+          unit={`/ ${casualCard.total}d`}
+          badgeText={casualCard.total > 0 ? `${casualCard.percent}% Available` : '0 Quota'}
+          badgeType={casualCard.total === 0 ? 'neutral' : casualCard.percent >= 50 ? 'positive' : 'warning'}
+          badgeIcon={casualCard.total === 0 ? 'dot' : casualCard.percent >= 50 ? 'up' : 'dot'}
+          subtext={casualCard.total > 0 ? `${casualCard.used} Days Used This Year` : 'Short Notice Personal Leave'}
+          chartColor="teal"
           presetWave="wave4"
-          dataPoints={pendingSparkData}
+          dataPoints={casualSparkData}
           loading={loading}
         />
       </div>
