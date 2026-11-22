@@ -376,17 +376,21 @@ const EmployeeLeaves = () => {
   const casualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('casual') || c.code?.toLowerCase().includes('casual')) || { type: 'Casual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
   const unpaidCard = quotaCards.find((c) => c.type?.toLowerCase().includes('unpaid') || c.type?.toLowerCase().includes('sabbatical') || c.code?.toLowerCase().includes('unpaid')) || { type: 'Unpaid Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
 
-  // Dynamic Sparkline Data for Unpaid Leaves
-  const unpaidSparkData = useMemo(() => {
-    const total = unpaidCard.total || 0;
-    const used = unpaidCard.used || 0;
-    const avail = unpaidCard.available || (total - used);
+  // Dynamic Sparkline Data for Total Leaves
+  const totalLeavesSparkData = useMemo(() => {
+    if (quotaCards.length > 0) {
+      return quotaCards.map((c) => ({
+        value: c.available,
+        label: c.type.split(' ')[0],
+        tooltip: `${c.type}: ${c.available} / ${c.total} Days Left (${c.used} Used)`,
+      }));
+    }
     return [
-      { value: total, label: 'Quota', tooltip: `Unpaid Entitlement: ${total} Days` },
-      { value: avail, label: 'Available', tooltip: `Remaining Unpaid: ${avail} Days` },
-      { value: used, label: 'Taken', tooltip: `Unpaid Days Used: ${used} Days` },
+      { value: totalAllowedLeaves, label: 'Quota', tooltip: `Total Quota: ${totalAllowedLeaves} Days` },
+      { value: totalAvailableLeaves, label: 'Available', tooltip: `Total Available: ${totalAvailableLeaves} Days` },
+      { value: Math.max(0, totalAllowedLeaves - totalAvailableLeaves), label: 'Used', tooltip: `Total Used: ${Math.max(0, totalAllowedLeaves - totalAvailableLeaves)} Days` },
     ];
-  }, [unpaidCard]);
+  }, [quotaCards, totalAllowedLeaves, totalAvailableLeaves]);
 
   const annualSparkData = useMemo(() => {
     const total = annualCard.total || 0;
@@ -502,19 +506,19 @@ const EmployeeLeaves = () => {
       {/* 2. TOP METRIC SPARKLINE CARDS */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Unpaid Leaves */}
+        {/* Card 1: Dark Navy Card - Total Leaves */}
         <SparkMetricCard
           variant="dark"
-          title="Unpaid Leaves"
-          value={unpaidCard.available}
-          unit={unpaidCard.total > 0 ? `/ ${unpaidCard.total}d` : (unpaidCard.available === 1 ? 'Day' : 'Days')}
-          badgeText={unpaidCard.total > 0 ? `${unpaidCard.percent}% Available` : (unpaidCard.used > 0 ? `${unpaidCard.used}d Used` : '0 Quota')}
-          badgeType={unpaidCard.total === 0 ? 'neutral' : unpaidCard.percent >= 50 ? 'positive' : 'warning'}
-          badgeIcon={unpaidCard.total === 0 ? 'dot' : unpaidCard.percent >= 50 ? 'up' : 'dot'}
-          subtext={unpaidCard.total > 0 ? `${unpaidCard.used} Days Used (Leave Without Pay)` : 'Discretionary Unpaid Absence'}
+          title="Total Leaves"
+          value={totalAvailableLeaves}
+          unit={totalAvailableLeaves === 1 ? 'Day' : 'Days'}
+          badgeText={`${totalAvailableLeaves}d Available`}
+          badgeType={totalAvailableLeaves > 0 ? 'positive' : 'neutral'}
+          badgeIcon={totalAvailableLeaves > 0 ? 'up' : 'dot'}
+          subtext={`Quota: ${totalAllowedLeaves} Total Days`}
           chartColor="purple"
           presetWave="wave1"
-          dataPoints={unpaidSparkData}
+          dataPoints={totalLeavesSparkData}
           loading={loading}
         />
 
