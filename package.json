@@ -20,7 +20,9 @@
     "install:all": "npm install && npm install --prefix client",
     "test": "node --require ./src/tests/setup.js --test src/tests/*.test.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "node scripts/guard-env.js && prisma migrate dev",
+    "prisma:push": "node scripts/guard-env.js && prisma db push",
+    "prisma:reset": "node scripts/guard-env.js && prisma migrate reset"
   },
   "keywords": [
     "hrm",

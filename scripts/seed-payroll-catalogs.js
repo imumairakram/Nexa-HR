@@ -24,7 +24,7 @@ const prisma = new PrismaClient(
   activeUrl ? { datasources: { db: { url: activeUrl } } } : undefined
 );
 
-// Configurable arguments or environment variables for LegalEntity
+// Mandatory configuration: require explicit code, name, and country arguments (no invented defaults)
 const args = process.argv.slice(2).reduce((acc, curr) => {
   if (curr.startsWith('--')) {
     const [k, v] = curr.replace(/^--/, '').split('=');
@@ -33,11 +33,19 @@ const args = process.argv.slice(2).reduce((acc, curr) => {
   return acc;
 }, {});
 
-const entityCode = process.env.LEGAL_ENTITY_CODE || args.code || 'LE-PK-001';
-const entityName = process.env.LEGAL_ENTITY_NAME || args.name || 'NexaHR Pakistan (Pvt) Ltd';
-const entityCountry = process.env.LEGAL_ENTITY_COUNTRY || args.country || 'PK';
-const entityCurrency = process.env.LEGAL_ENTITY_CURRENCY || args.currency || 'PKR';
-const entityTimezone = process.env.LEGAL_ENTITY_TIMEZONE || args.timezone || 'Asia/Karachi';
+const entityCode = process.env.LEGAL_ENTITY_CODE || (typeof args.code === 'string' ? args.code : null);
+const entityName = process.env.LEGAL_ENTITY_NAME || (typeof args.name === 'string' ? args.name : null);
+const entityCountry = process.env.LEGAL_ENTITY_COUNTRY || (typeof args.country === 'string' ? args.country : null);
+const entityCurrency = process.env.LEGAL_ENTITY_CURRENCY || (typeof args.currency === 'string' ? args.currency : 'PKR');
+const entityTimezone = process.env.LEGAL_ENTITY_TIMEZONE || (typeof args.timezone === 'string' ? args.timezone : 'Asia/Karachi');
+
+if (!entityCode || !entityName || !entityCountry) {
+  console.error('[CONFIG ERROR] Mandatory arguments missing!');
+  console.error('Usage: node scripts/seed-payroll-catalogs.js --code=<CODE> --name=<NAME> --country=<ISO-ALPHA2> [--currency=PKR] [--timezone=Asia/Karachi]');
+  console.error('Or set environment variables: LEGAL_ENTITY_CODE, LEGAL_ENTITY_NAME, LEGAL_ENTITY_COUNTRY.');
+  console.error('Invented default company names are strictly forbidden.');
+  process.exit(1);
+}
 
 async function seedPayrollCatalogs() {
   console.log('='.repeat(75));
@@ -293,13 +301,19 @@ async function seedPayrollCatalogs() {
     // -------------------------------------------------------------
     console.log('\n[5/7] Seeding Pakistan FBR Income Tax Rule Set & Slabs (Tax Year 2025 / FY 2024-25)...');
     const taxRuleSetName = 'Pakistan FBR Salaried Individuals Income Tax FY2024-25 (Tax Year 2025)';
-    const taxSourceRef = 'Pakistan Income Tax Ordinance 2001, First Schedule, Part I, Division I, as amended by Finance Act 2024 (Tax Year 2025 / FY 2024-25)';
+    const taxSourceRef = 'Pakistan Income Tax Ordinance 2001, First Schedule, Part I, Division I, amended by Finance Act 2024 (Official Gazette of Pakistan, URL: https://fbr.gov.pk)';
+
+    // Stable lookup by country + effectiveFrom + version
+    const effectiveFromDate = new Date('2024-07-01T00:00:00Z');
+    const effectiveToDate = new Date('2025-06-30T23:59:59Z');
+    const ruleSetVersion = 1;
 
     let taxRuleSet = await prisma.taxRuleSet.findFirst({
       where: {
         legalEntityId: legalEntity.id,
         country: entityCountry,
-        name: taxRuleSetName,
+        effectiveFrom: effectiveFromDate,
+        version: ruleSetVersion,
       },
     });
 
@@ -309,11 +323,11 @@ async function seedPayrollCatalogs() {
           legalEntityId: legalEntity.id,
           country: entityCountry,
           name: taxRuleSetName,
-          effectiveFrom: new Date('2024-07-01T00:00:00Z'),
-          effectiveTo: new Date('2025-06-30T23:59:59Z'),
-          version: 1,
+          effectiveFrom: effectiveFromDate,
+          effectiveTo: effectiveToDate,
+          version: ruleSetVersion,
           isDefault: true,
-          status: 'DRAFT',
+          status: 'DRAFT', // Remains DRAFT until formal compliance verification
           sourceReference: taxSourceRef,
         },
       });
@@ -321,11 +335,17 @@ async function seedPayrollCatalogs() {
       await prisma.taxRuleSet.update({
         where: { id: taxRuleSet.id },
         data: {
+          name: taxRuleSetName,
           status: 'DRAFT',
           sourceReference: taxSourceRef,
+          effectiveTo: effectiveToDate,
         },
       });
     }
+
+    // TODO: Tax Year 2027 / FY 2026-27 (2026-07-01 to 2027-06-30) tax slabs will be enacted by the Parliament of Pakistan in Finance Act 2026 (expected June 2026).
+    // In accordance with statutory compliance policy, no speculative or duplicated rates are seeded for future fiscal periods.
+    // The Phase 3 engine must refuse any non-VERIFIED rule sets and fail clearly if no VERIFIED rule set covers the target pay period.
 
     // Slabs per Pakistan Finance Act 2024 (First Schedule, Part I, Division I - Salaried Individuals)
     // Slab 1: Up to 600,000 -> 0%

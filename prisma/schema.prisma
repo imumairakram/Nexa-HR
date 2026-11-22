@@ -745,7 +745,7 @@ model LegalEntity {
   id                String            @id @default(uuid())
   code              String            @unique
   name              String
-  country           String            @default("PAK") // ISO 3166-1 alpha-2 (e.g. "PK", "US")
+  country           String            @default("PK") // ISO 3166-1 alpha-2 (e.g. "PK", "US")
   defaultCurrency   String            @default("PKR") @map("default_currency") // ISO 4217
   timezone          String            @default("Asia/Karachi")
   createdAt         DateTime          @default(now()) @map("created_at")

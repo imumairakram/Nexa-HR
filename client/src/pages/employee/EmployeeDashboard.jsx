@@ -97,7 +97,7 @@ const EmployeeDashboard = () => {
       if (dashRes.status === 'fulfilled' && dashRes.value?.data) {
         setDashboardData(dashRes.value.data);
       }
-      if (leaveRes.status === 'fulfilled' && leaveRes.value?.data?.leaveTypes) {
+      if (leaveRes.status === 'fulfilled' && Array.isArray(leaveRes.value?.data?.leaveTypes)) {
         setLeaveTypes(leaveRes.value.data.leaveTypes);
       }
       if (reqRes.status === 'fulfilled' && reqRes.value?.data?.leaveRequests) {

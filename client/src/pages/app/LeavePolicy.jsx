@@ -20,6 +20,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { broadcastAppEvent, subscribeAppEvent } from '../../utils/crossTabSync';
 
 const LeavePolicy = () => {
   const [policies, setPolicies] = useState([]);
@@ -140,16 +141,7 @@ const LeavePolicy = () => {
           return c;
         });
 
-      // 3. Fallback defaults if completely empty and user hasn't deleted all
-      let combined = [...processedApi, ...processedCustom];
-      if (combined.length === 0 && deleted.length === 0) {
-        combined = [
-          { id: 'def-1', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 14, isPaid: true, description: 'Standard statutory annual vacation leave entitlement.' },
-          { id: 'def-2', name: 'Medical & Sick Leave', code: 'SICK', daysAllowed: 10, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-          { id: 'def-3', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-          { id: 'def-4', name: 'Study Leave', code: 'STUDY', daysAllowed: 5, isPaid: true, description: 'Leave for educational examinations and professional certifications.' },
-        ];
-      }
+      const combined = [...processedApi, ...processedCustom];
 
       const colors = [
         'from-emerald-500 to-teal-600',
@@ -179,6 +171,10 @@ const LeavePolicy = () => {
 
   useEffect(() => {
     loadLeavePolicies();
+    const unsub = subscribeAppEvent('nexahr_leaves_updated', () => {
+      loadLeavePolicies();
+    });
+    return () => unsub();
   }, []);
 
   const totalDaysQuota = useMemo(() => {
@@ -265,6 +261,9 @@ const LeavePolicy = () => {
         },
         ...prev.filter((p) => p.code !== policyCode && p.id !== finalPolicy.id),
       ]);
+
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
 
       setToastMsg(`Leave policy "${policyName}" registered successfully!`);
       setIsAddOpen(false);
@@ -378,6 +377,9 @@ const LeavePolicy = () => {
         console.warn('Backend updateLeaveType request pending/error (persisted locally):', apiErr.message);
       });
 
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
+
       setToastMsg(`Leave policy "${policyName}" updated successfully!`);
       setEditingPolicy(null);
       setTimeout(() => setToastMsg(''), 3000);
@@ -426,6 +428,9 @@ const LeavePolicy = () => {
       api.deleteLeaveType(policyId).catch((apiErr) => {
         console.warn('Backend deleteLeaveType pending/error (removed locally):', apiErr.message);
       });
+
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
 
       setToastMsg(`Leave policy "${policyName}" deleted successfully.`);
       setDeletingPolicy(null);
@@ -643,7 +648,7 @@ const LeavePolicy = () => {
       {/* ========================================================================= */}
       {loading ? (
         <LeaveCardSkeleton count={6} />
-      ) : (
+      ) : policies.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
           {policies.map((p) => (
             <LeavePolicyCard
@@ -654,6 +659,25 @@ const LeavePolicy = () => {
               onDelete={(policy) => setDeletingPolicy(policy)}
             />
           ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+          <div className="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-4 border border-sky-100 dark:border-sky-900/40">
+            <CalendarDays className="w-7 h-7" />
+          </div>
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
+            No Leave Policies Defined
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mb-6">
+            All company leave policies have been cleared. Employees currently have 0 allocated leave quota days.
+          </p>
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md shadow-sky-500/20 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create First Policy</span>
+          </button>
         </div>
       )}
 

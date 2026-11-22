@@ -1,6 +1,7 @@
 // Centralized High-Performance API Client for NexaHR Frontend Integration
 // Features: In-memory SWR caching, in-flight deduplication, and instant mutation invalidation.
 import { startSession, isSessionValid, clearSession } from '../utils/session';
+import { broadcastAppEvent } from '../utils/crossTabSync';
 import {
   isDemoSessionActive,
   showDemoToast,
@@ -539,16 +540,6 @@ export const api = {
             }
           });
 
-          if (!types || types.length === 0) {
-            types = [
-              { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
-              { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-              { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-              { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
-              { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
-            ];
-          }
-
           return {
             ...res,
             data: {
@@ -561,15 +552,7 @@ export const api = {
         }
       }
 
-      const resTypes = Array.isArray(res?.data?.leaveTypes) && res.data.leaveTypes.length > 0
-        ? res.data.leaveTypes
-        : [
-            { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
-            { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-            { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-            { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
-            { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
-          ];
+      const resTypes = Array.isArray(res?.data?.leaveTypes) ? res.data.leaveTypes : [];
 
       return {
         ...res,
@@ -584,14 +567,7 @@ export const api = {
           const overrides = JSON.parse(localStorage.getItem('nexahr_leave_policy_overrides') || '{}');
           const deleted = JSON.parse(localStorage.getItem('nexahr_deleted_leave_policies') || '[]');
           const custom = JSON.parse(localStorage.getItem('nexahr_custom_leave_policies') || '[]');
-          let fallback = [
-            { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
-            { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-            { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-            { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
-            { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
-            ...custom,
-          ];
+          let fallback = [...custom];
           fallback = fallback.filter((t) => !deleted.includes(t.id) && !deleted.includes(t.code));
           fallback = fallback.map((t) => {
             const ov = overrides[t.id] || overrides[t.code] || overrides[t.code?.toUpperCase()];
@@ -603,13 +579,7 @@ export const api = {
       return {
         success: true,
         data: {
-          leaveTypes: [
-            { id: '5597bb84-f5d9-4215-aacf-b6b54d2a334b', name: 'Annual Paid Leave', code: 'ANNUAL', daysAllowed: 18, isPaid: true, description: 'Statutory annual vacation and leisure leave entitlement.' },
-            { id: '51dff8bd-044f-4d4a-9b9f-1f4d45829442', name: 'Medical / Sick Leave', code: 'SICK', daysAllowed: 12, isPaid: true, description: 'Medical recovery leave requiring certificate for 3+ days.' },
-            { id: '5396b4f6-9e59-4e95-96e4-64eff6f91006', name: 'Casual Leave', code: 'CASUAL', daysAllowed: 10, isPaid: true, description: 'Short notice personal contingency leave.' },
-            { id: '49699223-7cd8-46ec-a561-37fe717205fa', name: 'Maternity / Parental Leave', code: 'PARENTAL', daysAllowed: 90, isPaid: true, description: 'Statutory maternity, paternity, and child care entitlement.' },
-            { id: '60342682-3578-47d8-be90-a4abe3adf6c1', name: 'Unpaid Leave / Sabbatical', code: 'UNPAID', daysAllowed: 30, isPaid: false, description: 'Discretionary leave without pay for extended absence.' },
-          ],
+          leaveTypes: [],
         },
       };
     }
@@ -627,10 +597,14 @@ export const api = {
         localStorage.setItem('nexahr_deleted_leave_policies', JSON.stringify(cleaned));
       } catch (e) {}
     }
-    return await fetchAPI('/leaves/types', {
+    const res = await fetchAPI('/leaves/types', {
       method: 'POST',
       body: JSON.stringify(leaveData),
     });
+    invalidateClientCache('/leaves');
+    invalidateClientCache('/dashboard');
+    broadcastAppEvent('nexahr_leaves_updated');
+    return res;
   },
 
   updateLeaveType: async (id, leaveData) => {
@@ -673,6 +647,7 @@ export const api = {
 
     invalidateClientCache('/leaves');
     invalidateClientCache('/dashboard');
+    broadcastAppEvent('nexahr_leaves_updated');
 
     try {
       return await fetchAPI(`/leaves/types/${id}`, {
@@ -708,6 +683,7 @@ export const api = {
 
     invalidateClientCache('/leaves');
     invalidateClientCache('/dashboard');
+    broadcastAppEvent('nexahr_leaves_updated');
 
     try {
       return await fetchAPI(`/leaves/types/${id}`, {

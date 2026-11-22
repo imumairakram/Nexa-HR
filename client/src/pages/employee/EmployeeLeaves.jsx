@@ -88,10 +88,7 @@ export const DEFAULT_LEAVE_TYPES = [
 ];
 
 const EmployeeLeaves = () => {
-  const [leaveTypes, setLeaveTypes] = useState(() => {
-    const cached = api.getCached('/leaves/types')?.data?.leaveTypes;
-    return Array.isArray(cached) && cached.length > 0 ? cached : DEFAULT_LEAVE_TYPES;
-  });
+  const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
   const [requests, setRequests] = useState(() => api.getCached('/leaves/my-requests')?.data?.leaveRequests || api.getCached('/leaves/requests')?.data?.leaveRequests || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/leaves/my-requests') && !api.hasCached('/leaves/requests'));
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -145,13 +142,15 @@ const EmployeeLeaves = () => {
         api.getMyLeaveRequests({}, opts),
       ]);
 
-      if (typesRes.status === 'fulfilled' && Array.isArray(typesRes.value?.data?.leaveTypes) && typesRes.value.data.leaveTypes.length > 0) {
+      if (typesRes.status === 'fulfilled' && Array.isArray(typesRes.value?.data?.leaveTypes)) {
         setLeaveTypes(typesRes.value.data.leaveTypes);
-        if (!leaveForm.leaveTypeId) {
-          setLeaveForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
+        if (typesRes.value.data.leaveTypes.length > 0) {
+          if (!leaveForm.leaveTypeId) {
+            setLeaveForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
+          }
+        } else {
+          setLeaveForm((prev) => ({ ...prev, leaveTypeId: '' }));
         }
-      } else {
-        setLeaveTypes((prev) => (Array.isArray(prev) && prev.length > 0 ? prev : DEFAULT_LEAVE_TYPES));
       }
       if (reqRes.status === 'fulfilled' && reqRes.value?.data?.leaveRequests) {
         setRequests(reqRes.value.data.leaveRequests);
@@ -234,7 +233,7 @@ const EmployeeLeaves = () => {
   };
 
   const activeLeaveTypes = useMemo(() => {
-    return Array.isArray(leaveTypes) && leaveTypes.length > 0 ? leaveTypes : DEFAULT_LEAVE_TYPES;
+    return Array.isArray(leaveTypes) ? leaveTypes : [];
   }, [leaveTypes]);
 
   // Compute live quota balances
@@ -379,8 +378,8 @@ const EmployeeLeaves = () => {
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
   const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
   const totalPendingRequests = stats.pending;
-  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || quotaCards[0] || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
-  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || quotaCards[1] || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation')) || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical')) || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
 
   // Dynamic Sparkline Data for Leaves
   const totalLeavesSparkData = useMemo(() => {
@@ -521,10 +520,10 @@ const EmployeeLeaves = () => {
           title="Annual Vacation"
           value={annualCard.available}
           unit={`/ ${annualCard.total}d`}
-          badgeText={`${annualCard.percent}% Available`}
-          badgeType={annualCard.percent >= 50 ? 'positive' : 'warning'}
-          badgeIcon={annualCard.percent >= 50 ? 'up' : 'dot'}
-          subtext={`${annualCard.used} Days Used This Year`}
+          badgeText={annualCard.total > 0 ? `${annualCard.percent}% Available` : '0 Quota'}
+          badgeType={annualCard.total === 0 ? 'neutral' : annualCard.percent >= 50 ? 'positive' : 'warning'}
+          badgeIcon={annualCard.total === 0 ? 'dot' : annualCard.percent >= 50 ? 'up' : 'dot'}
+          subtext={annualCard.total > 0 ? `${annualCard.used} Days Used This Year` : 'No Annual Quota Configured'}
           chartColor="coral"
           presetWave="wave2"
           dataPoints={annualSparkData}
@@ -537,10 +536,10 @@ const EmployeeLeaves = () => {
           title="Sick & Medical"
           value={sickCard.available}
           unit={`/ ${sickCard.total}d`}
-          badgeText={`${sickCard.percent}% Available`}
-          badgeType={sickCard.used === 0 ? 'positive' : 'neutral'}
-          badgeIcon={sickCard.used === 0 ? 'up' : 'dot'}
-          subtext={sickCard.used > 0 ? `${sickCard.used}d Used • Medical Allowance` : 'Full Medical Allowance'}
+          badgeText={sickCard.total > 0 ? `${sickCard.percent}% Available` : '0 Quota'}
+          badgeType={sickCard.total === 0 ? 'neutral' : sickCard.used === 0 ? 'positive' : 'neutral'}
+          badgeIcon={sickCard.total === 0 ? 'dot' : sickCard.used === 0 ? 'up' : 'dot'}
+          subtext={sickCard.total > 0 ? (sickCard.used > 0 ? `${sickCard.used}d Used • Medical Allowance` : 'Full Medical Allowance') : 'No Medical Quota Configured'}
           chartColor="amber"
           presetWave="wave3"
           dataPoints={sickSparkData}
@@ -1174,11 +1173,12 @@ const EmployeeLeaves = () => {
                 <div className="relative">
                   <select
                     required
+                    disabled={activeLeaveTypes.length === 0}
                     value={leaveForm.leaveTypeId}
                     onChange={(e) => setLeaveForm({ ...leaveForm, leaveTypeId: e.target.value })}
-                    className="w-full appearance-none px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner pr-10"
+                    className="w-full appearance-none px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all cursor-pointer shadow-inner pr-10 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <option value="">Select Leave Policy</option>
+                    <option value="">{activeLeaveTypes.length === 0 ? 'No Active Leave Policies Configured' : 'Select Leave Policy'}</option>
                     {activeLeaveTypes.map((lt) => (
                       <option
                         key={lt.id}
@@ -1193,6 +1193,12 @@ const EmployeeLeaves = () => {
                     <ChevronDown className="w-4 h-4" />
                   </div>
                 </div>
+                {activeLeaveTypes.length === 0 && (
+                  <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>No active leave policies are configured by management. Leave submission is currently suspended.</span>
+                  </p>
+                )}
               </div>
 
               {/* Row 2: Duration Type & Date Range Grid */}

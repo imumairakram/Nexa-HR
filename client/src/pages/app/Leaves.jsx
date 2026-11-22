@@ -95,10 +95,7 @@ export const DEFAULT_LEAVE_TYPES = [
 
 const Leaves = () => {
   const [requests, setRequests] = useState(() => api.getCached('/leaves/requests')?.data?.leaveRequests || []);
-  const [leaveTypes, setLeaveTypes] = useState(() => {
-    const cached = api.getCached('/leaves/types')?.data?.leaveTypes;
-    return Array.isArray(cached) && cached.length > 0 ? cached : DEFAULT_LEAVE_TYPES;
-  });
+  const [leaveTypes, setLeaveTypes] = useState(() => api.getCached('/leaves/types')?.data?.leaveTypes || []);
   const [employees, setEmployees] = useState(() => api.getCached('/employees')?.data?.employees || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/leaves/requests'));
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -115,7 +112,7 @@ const Leaves = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const activeLeaveTypes = useMemo(() => {
-    return Array.isArray(leaveTypes) && leaveTypes.length > 0 ? leaveTypes : DEFAULT_LEAVE_TYPES;
+    return Array.isArray(leaveTypes) ? leaveTypes : [];
   }, [leaveTypes]);
 
   // Apply on behalf form
@@ -149,13 +146,15 @@ const Leaves = () => {
       if (reqRes.status === 'fulfilled' && reqRes.value?.data?.leaveRequests) {
         setRequests(reqRes.value.data.leaveRequests);
       }
-      if (typesRes.status === 'fulfilled' && Array.isArray(typesRes.value?.data?.leaveTypes) && typesRes.value.data.leaveTypes.length > 0) {
+      if (typesRes.status === 'fulfilled' && Array.isArray(typesRes.value?.data?.leaveTypes)) {
         setLeaveTypes(typesRes.value.data.leaveTypes);
-        if (!applyForm.leaveTypeId) {
-          setApplyForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
+        if (typesRes.value.data.leaveTypes.length > 0) {
+          if (!applyForm.leaveTypeId) {
+            setApplyForm((prev) => ({ ...prev, leaveTypeId: prev.leaveTypeId || typesRes.value.data.leaveTypes[0].id }));
+          }
+        } else {
+          setApplyForm((prev) => ({ ...prev, leaveTypeId: '' }));
         }
-      } else {
-        setLeaveTypes((prev) => (Array.isArray(prev) && prev.length > 0 ? prev : DEFAULT_LEAVE_TYPES));
       }
       if (empRes.status === 'fulfilled' && empRes.value?.data?.employees) {
         setEmployees(empRes.value.data.employees);

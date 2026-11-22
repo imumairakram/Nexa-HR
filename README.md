@@ -976,24 +976,24 @@ npx prisma migrate resolve --rolled-back "<migration_name>"
 ### 4. Authoritative Deployment Sequence
 Execute production deployments strictly in this chronological order:
 1. **Apply Prisma Migrations**:
+   Run database schema migrations from CI/CD pipeline targeting the staging/production database directly:
    ```bash
    npx prisma migrate deploy
    ```
-2. **Seed Statutory Rule Catalogs (Guarded)**:
-   The payroll catalog seeder is protected by environment guards to prevent accidental overrides. Run explicitly with:
-   ```bash
-   ALLOW_LIVE_SEED=true node scripts/seed-payroll-catalogs.js
-   ```
-3. **Deploy Backend API Service (Render / Container)**:
-   Deploy the Express application backend. Verify health endpoints:
+2. **Deploy Backend API Service (Render / Container)**:
+   Deploy the Express application backend with environment credentials managed directly in the hosting provider dashboard (Render Secret Manager). Production credentials must never reside in local `.env` files. Verify health endpoints:
    ```bash
    curl -f https://nexa-hr-backend-2ybt.onrender.com/api/health
    ```
-4. **Deploy Frontend Client (Vercel / Edge CDN)**:
+3. **Deploy Frontend Client (Vercel / Edge CDN)**:
    Build and deploy the React 19 client:
    ```bash
    npm --prefix client run build
    ```
+
+> [!SECURITY]
+> **Production Credential Isolation & Environment Safety Guard**: 
+> Live Supabase database credentials must reside solely in the hosting provider secret manager (Render / Vercel). Local developer workstations, migration runners, and automated test suites must exclusively bind to databases adhering to the strict allowlist (`*_scratch`, `*_dev`, `*_test`). The scratch database should be hosted in an isolated local PostgreSQL instance or a completely separate Supabase scratch project, never sharing a cluster or instance with production. Connection URLs targeting non-allowlisted databases (e.g. `/postgres`) are automatically blocked and aborted by `src/utils/envGuard.js` unless `LIVE_OK=true` is explicitly provided in CI/CD deployment pipelines. Seeding and destructive scripts must never be executed against production environments.
 
 ### 5. Rollback Runbook (Per Component)
 
