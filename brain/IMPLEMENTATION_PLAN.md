@@ -94,7 +94,7 @@
 
 ### Phase 5: Leave Management & Policy Calculation Subsystem
 - **Deliverables:**
-  - Leave type registry with custom quotas (Annual, Sick, Casual, Maternity, Unpaid).
+  - Leave type registry with custom quotas (Annual, Sick, Casual, Unpaid).
   - Employee leave submission modal with balance validation and date conflict prevention.
   - HR adjudication dashboard with single-click approval, rejection with mandatory reason, and status badges.
   - Real-time leave balance ledger deduction and automated unpaid day flagging for payroll.

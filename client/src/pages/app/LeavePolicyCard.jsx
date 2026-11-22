@@ -6,7 +6,6 @@ import {
   Trash2,
   Sun,
   HeartPulse,
-  Baby,
   Coffee,
   Compass,
   GraduationCap,
@@ -25,14 +24,6 @@ export const getPolicyIcon = (policy) => {
   }
   if (name.includes('annual') || name.includes('vacation') || code.includes('annual')) {
     return Sun;
-  }
-  if (
-    name.includes('parental') ||
-    name.includes('maternity') ||
-    name.includes('paternity') ||
-    code.includes('parental')
-  ) {
-    return Baby;
   }
   if (name.includes('casual') || code.includes('casual')) {
     return Coffee;

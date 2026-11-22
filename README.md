@@ -106,7 +106,7 @@ The administrative headquarters designed for People Operations leaders, HR Manag
 
 * **Dynamic Leave & Policy Engine (`/app/leaves`, `/app/leave-policy`)**:
   * Full dynamic policy CRUD engine backed by PostgreSQL persistence (create, inspect, edit, or delete leave policies).
-  * Configurable annual quotas for Annual Paid Leave, Medical/Sick Leave, Casual Leave, and Parental Leave.
+  * Configurable annual quotas for Annual Paid Leave, Medical/Sick Leave, and Casual Leave.
   * Paid vs. unpaid classification affecting payroll deductions in real time.
   * Two-tier approval workflow with manager approval notes, timestamps, and rejection rationale tracking.
 
