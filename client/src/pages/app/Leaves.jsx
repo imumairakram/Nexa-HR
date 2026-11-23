@@ -248,9 +248,6 @@ const Leaves = () => {
         leaveTypeId: effectiveLeaveTypeId,
         reason: applyForm.reason.trim(),
       });
-      await fetchLeaveData(true);
-      broadcastAppEvent('nexahr_leaves_updated');
-      broadcastAppEvent('nexahr_notification_updated');
       setIsApplyOpen(false);
       setApplyForm({
         userId: employees[0]?.id || '',
@@ -260,6 +257,9 @@ const Leaves = () => {
         reason: '',
       });
       showToast('Leave request created successfully!');
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
+      fetchLeaveData(true);
     } catch (err) {
       console.error('Failed to create leave:', err);
       showToast(err.message || 'Failed to create leave application');

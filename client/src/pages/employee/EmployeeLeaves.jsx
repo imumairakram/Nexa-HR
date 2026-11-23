@@ -204,9 +204,6 @@ const EmployeeLeaves = () => {
         reason: leaveForm.reason.trim(),
       });
 
-      broadcastAppEvent('nexahr_leaves_updated');
-      broadcastAppEvent('nexahr_notification_updated');
-      await fetchMyLeaves(true);
       setIsApplyOpen(false);
       setLeaveForm({
         leaveTypeId: activeLeaveTypes[0]?.id || '',
@@ -216,6 +213,9 @@ const EmployeeLeaves = () => {
         reason: '',
       });
       showToast('Time-off request submitted for management review.');
+      broadcastAppEvent('nexahr_leaves_updated');
+      broadcastAppEvent('nexahr_notification_updated');
+      fetchMyLeaves(true);
     } catch (err) {
       console.error('Apply leave error:', err);
       showToast(err.message || 'Failed to submit leave request');
