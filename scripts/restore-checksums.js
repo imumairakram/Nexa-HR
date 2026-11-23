@@ -8,8 +8,10 @@ fs.writeFileSync(p1031, content1031, 'utf8');
 
 // 2. Restore 20261121213000
 const p1121 = 'prisma/migrations/20261121213000_sync_schema_drift/migration.sql';
-const content1121 = fs.readFileSync('temp_step11282.sql', 'utf8').replace(/\r\n/g, '\n');
-fs.writeFileSync(p1121, content1121, 'utf8');
+if (fs.existsSync('temp_step11282.sql')) {
+  const content1121 = fs.readFileSync('temp_step11282.sql', 'utf8').replace(/\r\n/g, '\n');
+  fs.writeFileSync(p1121, content1121, 'utf8');
+}
 
 const h1031 = crypto.createHash('sha256').update(fs.readFileSync(p1031)).digest('hex');
 const h1121 = crypto.createHash('sha256').update(fs.readFileSync(p1121)).digest('hex');

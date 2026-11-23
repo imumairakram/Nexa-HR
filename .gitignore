@@ -27,6 +27,14 @@ dist/
 dist-ssr/
 client/dist/
 
+# Temporary and Scratch Files
+temp_*
+*.tmp
+*.temp
+*.bak
+*.swp
+
+
 # Uploads & Local File Storage
 uploads/
 
