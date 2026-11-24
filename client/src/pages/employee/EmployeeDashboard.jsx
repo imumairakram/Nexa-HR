@@ -292,7 +292,97 @@ const EmployeeDashboard = () => {
   }, [monthlyAttendance]);
 
   const [trendTimeframe, setTrendTimeframe] = useState('7d');
+  const [presenceTimeframe, setPresenceTimeframe] = useState('weekly');
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
+
+  // Weekly & Monthly Presence Analytics
+  const presenceAnalytics = useMemo(() => {
+    const now = new Date();
+
+    // 1. Current Week (Monday to today)
+    const currentDay = now.getDay();
+    const diffToMonday = currentDay === 0 ? 6 : currentDay - 1;
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diffToMonday, 0, 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    // Working days passed this week (Mon - Fri up to today)
+    let weeklyWorkingDaysPassed = 0;
+    for (let i = 0; i <= diffToMonday; i++) {
+      const d = new Date(startOfWeek);
+      d.setDate(startOfWeek.getDate() + i);
+      const dayOfWeek = d.getDay();
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        weeklyWorkingDaysPassed++;
+      }
+    }
+    weeklyWorkingDaysPassed = Math.max(1, weeklyWorkingDaysPassed);
+
+    let weeklyPresentDays = 0;
+    let weeklyHours = 0;
+
+    // Working days passed this month up to today
+    let monthWorkingDaysPassed = 0;
+    for (let day = 1; day <= now.getDate(); day++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), day);
+      const dayOfWeek = d.getDay();
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        monthWorkingDaysPassed++;
+      }
+    }
+    monthWorkingDaysPassed = Math.max(1, monthWorkingDaysPassed);
+
+    if (Array.isArray(attendanceLogs)) {
+      attendanceLogs.forEach((log) => {
+        if (!log.date) return;
+        const logDate = new Date(log.date);
+        const hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : log.status === 'LATE' ? 7.5 : 0);
+        const isPres = log.status === 'PRESENT' || log.status === 'LATE';
+
+        // Check if within this week
+        if (logDate >= startOfWeek && logDate <= endOfToday) {
+          if (isPres) {
+            weeklyPresentDays++;
+            weeklyHours += hours;
+          }
+        }
+      });
+    }
+
+    if (isPresent && weeklyPresentDays === 0) {
+      weeklyPresentDays = 1;
+      weeklyHours = Number(todayStatus?.totalHours) || 8.5;
+    }
+
+    const weeklyPercent = Math.min(100, Math.max(0, Math.round((weeklyPresentDays / weeklyWorkingDaysPassed) * 100)));
+
+    // Monthly stats
+    const monthlyPresentDays = monthlyAttendance?.presentDays || weeklyPresentDays || 0;
+    const monthlyHours = monthlyAttendance?.totalWorkHours || weeklyHours || 0;
+    const monthlyPercent = Math.min(100, Math.max(0, Math.round((monthlyPresentDays / monthWorkingDaysPassed) * 100)));
+
+    return {
+      weekly: {
+        percent: weeklyPercent,
+        presentDays: weeklyPresentDays,
+        workingDays: weeklyWorkingDaysPassed,
+        hours: weeklyHours,
+        subtext: `(${weeklyPresentDays} of ${weeklyWorkingDaysPassed} working days logged this week)`,
+        footerLeft: `${weeklyHours.toFixed(1)} hrs logged (${weeklyPresentDays} days)`,
+        footerRight: '40 hrs / Week Goal',
+      },
+      monthly: {
+        percent: monthlyPercent,
+        presentDays: monthlyPresentDays,
+        workingDays: monthWorkingDaysPassed,
+        hours: monthlyHours,
+        subtext: `(${monthlyPresentDays} of ${monthWorkingDaysPassed} working days logged this month)`,
+        footerLeft: `${monthlyHours.toFixed(1)} hrs logged (${monthlyPresentDays} days)`,
+        footerRight: '176 hrs / Month Goal',
+      },
+    };
+  }, [attendanceLogs, monthlyAttendance, isPresent, todayStatus]);
+
+  const activePresence = presenceTimeframe === 'weekly' ? presenceAnalytics.weekly : presenceAnalytics.monthly;
 
   // Dynamic Sparkline Time-Series Data Series
   const attendanceSparkData = useMemo(() => {
@@ -673,27 +763,49 @@ const EmployeeDashboard = () => {
 
       {/* Score Gauge & Main Trend Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Side: Today's Shift & Attendance Score */}
+        {/* Left Side: Weekly & Monthly Attendance Rate Feature */}
         <div className="lg:col-span-5 flex flex-col justify-between">
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 h-full flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Attendance Status</p>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
-                  Live Metric
-                </span>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {presenceTimeframe === 'weekly' ? 'Weekly Attendance Rate' : 'Monthly Attendance Rate'}
+                </p>
+                <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-[10px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setPresenceTimeframe('weekly')}
+                    className={`px-2.5 py-1 rounded-[10px] transition-all cursor-pointer ${
+                      presenceTimeframe === 'weekly'
+                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    Weekly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPresenceTimeframe('monthly')}
+                    className={`px-2.5 py-1 rounded-[10px] transition-all cursor-pointer ${
+                      presenceTimeframe === 'monthly'
+                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    Monthly
+                  </button>
+                </div>
               </div>
+
               {loading ? (
                 <div className="h-9 w-24 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg mb-4"></div>
               ) : (
                 <div className="flex items-baseline gap-2 mb-4">
                   <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {isPresent ? (todayStatus?.status === 'LATE' ? '85%' : '100%') : '0%'}
+                    {activePresence.percent}%
                   </h2>
                   <span className="text-xs font-medium text-slate-400">
-                    {isPresent
-                      ? `(${todayStatus?.status === 'LATE' ? 'Late check-in at' : 'Clocked in at'} ${formatDbTime(todayStatus?.checkInTime)})`
-                      : '(Awaiting biometric clock-in)'}
+                    {activePresence.subtext}
                   </span>
                 </div>
               )}
@@ -703,7 +815,7 @@ const EmployeeDashboard = () => {
               <div className="h-3 w-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 via-emerald-400 to-emerald-500 shadow-inner"></div>
               <div
                 className="absolute top-0.5 -translate-x-1/2 flex flex-col items-center transition-all duration-500"
-                style={{ left: `${isPresent ? (todayStatus?.status === 'LATE' ? 85 : 100) : 0}%` }}
+                style={{ left: `${Math.min(100, Math.max(0, activePresence.percent))}%` }}
               >
                 <div className="w-3.5 h-6 bg-white dark:bg-slate-900 rounded-full shadow-md border-2 border-emerald-500 ring-2 ring-emerald-500/20"></div>
               </div>
@@ -718,10 +830,10 @@ const EmployeeDashboard = () => {
             </div>
 
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-              <span className="font-semibold">Turnstile & Face-ID Terminal</span>
+              <span className="font-semibold">{activePresence.footerLeft}</span>
               <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                {isPresent ? 'Checked In' : 'Awaiting Check-in'}
+                {activePresence.footerRight}
               </span>
             </div>
           </div>
