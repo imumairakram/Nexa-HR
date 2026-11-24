@@ -1,6 +1,20 @@
 const prisma = require('../config/prisma');
 const { nonDemoUsersWhere, nonDemoRelationWhere } = require('../utils/userFilters');
 
+async function safeWidgetQuery(widgetName, fn, fallback, widgets) {
+  try {
+    const data = await fn();
+    if (!widgets[widgetName]) {
+      widgets[widgetName] = { error: false };
+    }
+    return data;
+  } catch (err) {
+    console.error(`[DASHBOARD WIDGET ERROR] ${widgetName}:`, err.message);
+    widgets[widgetName] = { error: true };
+    return fallback;
+  }
+}
+
 const getDepartmentShortName = (name, code) => {
   if (code && code.length <= 5) return code;
   const map = {
@@ -30,6 +44,7 @@ const getAdminDashboard = async (req, res) => {
     const thirtyDaysAgo = new Date(startOfToday);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
 
+    const widgets = {};
     const [
       activeEmployeesCount,
       departmentsCount,
@@ -39,75 +54,110 @@ const getAdminDashboard = async (req, res) => {
       departmentsWithProfiles,
       monthAttendances,
     ] = await Promise.all([
-      prisma.user.count({ where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere } }),
-      prisma.department.count(),
-      prisma.attendance.findMany({
-        where: {
-          date: { gte: startOfToday, lte: endOfToday },
-          ...nonDemoRelationWhere,
-          user: { deletedAt: null, isDemo: false },
-        },
-        include: {
-          user: {
-            select: {
-              employeeCode: true,
-              firstName: true,
-              lastName: true,
-              profile: {
-                select: {
-                  departmentId: true,
-                  department: { select: { id: true, name: true, code: true } },
+      safeWidgetQuery(
+        'headcount',
+        () => prisma.user.count({ where: { isActive: true, deletedAt: null, ...nonDemoUsersWhere } }),
+        0,
+        widgets
+      ),
+      safeWidgetQuery(
+        'departments',
+        () => prisma.department.count(),
+        0,
+        widgets
+      ),
+      safeWidgetQuery(
+        'attendance',
+        () => prisma.attendance.findMany({
+          where: {
+            date: { gte: startOfToday, lte: endOfToday },
+            ...nonDemoRelationWhere,
+            user: { deletedAt: null, isDemo: false },
+          },
+          include: {
+            user: {
+              select: {
+                employeeCode: true,
+                firstName: true,
+                lastName: true,
+                profile: {
+                  select: {
+                    departmentId: true,
+                    department: { select: { id: true, name: true, code: true } },
+                  },
                 },
               },
             },
           },
-        },
-        orderBy: { checkInTime: 'desc' },
-      }),
-      prisma.leaveRequest.count({
-        where: {
-          status: 'PENDING',
-          ...nonDemoRelationWhere,
-          user: { deletedAt: null, isDemo: false },
-        },
-      }),
-      prisma.legacyPayslip.aggregate({
-        where: {
-          ...nonDemoRelationWhere,
-          user: { deletedAt: null, isDemo: false },
-        },
-        _sum: { grossSalary: true, netSalary: true, taxDeductions: true },
-        _count: { id: true },
-      }),
-      prisma.department.findMany({
-        include: {
-          profiles: {
-            where: {
-              user: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
-            },
-            select: {
-              id: true,
-              userId: true,
+          orderBy: { checkInTime: 'desc' },
+        }),
+        [],
+        widgets
+      ),
+      safeWidgetQuery(
+        'leaves',
+        () => prisma.leaveRequest.count({
+          where: {
+            status: 'PENDING',
+            ...nonDemoRelationWhere,
+            user: { deletedAt: null, isDemo: false },
+          },
+        }),
+        0,
+        widgets
+      ),
+      safeWidgetQuery(
+        'payslips',
+        () => prisma.legacyPayslip.aggregate({
+          where: {
+            ...nonDemoRelationWhere,
+            user: { deletedAt: null, isDemo: false },
+          },
+          _sum: { grossSalary: true, netSalary: true, taxDeductions: true },
+          _count: { id: true },
+        }),
+        { _sum: { grossSalary: 0, netSalary: 0, taxDeductions: 0 }, _count: { id: 0 } },
+        widgets
+      ),
+      safeWidgetQuery(
+        'departments',
+        () => prisma.department.findMany({
+          include: {
+            profiles: {
+              where: {
+                user: { isActive: true, deletedAt: null, ...nonDemoUsersWhere },
+              },
+              select: {
+                id: true,
+                userId: true,
+              },
             },
           },
-        },
-        orderBy: { name: 'asc' },
-      }),
-      prisma.attendance.findMany({
-        where: {
-          date: { gte: thirtyDaysAgo, lte: endOfToday },
-          ...nonDemoRelationWhere,
-          user: { deletedAt: null, isDemo: false },
-        },
-        select: {
-          id: true,
-          date: true,
-          status: true,
-          checkInTime: true,
-          userId: true,
-        },
-        orderBy: { date: 'asc' },
-      }),
+          orderBy: { name: 'asc' },
+        }),
+        [],
+        widgets
+      ),
+      safeWidgetQuery(
+        'attendance',
+        () => prisma.attendance.findMany({
+          where: {
+            date: { gte: thirtyDaysAgo, lte: endOfToday },
+            ...nonDemoRelationWhere,
+            user: { deletedAt: null, isDemo: false },
+          },
+          select: {
+            id: true,
+            date: true,
+            status: true,
+            checkInTime: true,
+            userId: true,
+          },
+          orderBy: { date: 'asc' },
+        }),
+        [],
+        widgets
+      ),
     ]);
 
     // Live Metrics Calculation
@@ -396,6 +446,7 @@ const getAdminDashboard = async (req, res) => {
           totalNetSalaryPayout: latestPayrollSummary._sum.netSalary || 0,
           totalTaxWithheld: latestPayrollSummary._sum.taxDeductions || 0,
         },
+        widgets,
       },
     });
   } catch (error) {
@@ -416,6 +467,7 @@ const getEmployeeDashboard = async (req, res) => {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
+    const widgets = {};
     const [
       todayAttendance,
       monthlyAttendances,
@@ -423,39 +475,64 @@ const getEmployeeDashboard = async (req, res) => {
       latestPayslip,
       currentUser,
     ] = await Promise.all([
-      prisma.attendance.findUnique({
-        where: {
-          userId_date: { userId, date: today },
-        },
-      }),
-      prisma.attendance.findMany({
-        where: {
-          userId,
-          date: { gte: monthStart },
-        },
-        select: { status: true, totalHours: true },
-      }),
-      prisma.leaveRequest.groupBy({
-        by: ['status'],
-        where: { userId },
-        _count: { id: true },
-      }),
-      prisma.legacyPayslip.findFirst({
-        where: { userId },
-        orderBy: [{ year: 'desc' }, { month: 'desc' }],
-      }),
-      prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          profile: {
-            include: { department: true, designation: true },
+      safeWidgetQuery(
+        'attendance',
+        () => prisma.attendance.findUnique({
+          where: {
+            userId_date: { userId, date: today },
           },
-          salaryStructure: true,
-        },
-      }),
+        }),
+        null,
+        widgets
+      ),
+      safeWidgetQuery(
+        'attendance',
+        () => prisma.attendance.findMany({
+          where: {
+            userId,
+            date: { gte: monthStart },
+          },
+          select: { status: true, totalHours: true },
+        }),
+        [],
+        widgets
+      ),
+      safeWidgetQuery(
+        'leaves',
+        () => prisma.leaveRequest.groupBy({
+          by: ['status'],
+          where: { userId },
+          _count: { id: true },
+        }),
+        [],
+        widgets
+      ),
+      safeWidgetQuery(
+        'payslips',
+        () => prisma.legacyPayslip.findFirst({
+          where: { userId },
+          orderBy: [{ year: 'desc' }, { month: 'desc' }],
+        }),
+        null,
+        widgets
+      ),
+      safeWidgetQuery(
+        'profile',
+        () => prisma.user.findUnique({
+          where: { id: userId },
+          include: {
+            profile: {
+              include: { department: true, designation: true },
+            },
+            salaryStructure: true,
+          },
+        }),
+        null,
+        widgets
+      ),
     ]);
 
-    if (!currentUser || currentUser.deletedAt) {
+    if (!widgets.profile?.error && (!currentUser || currentUser.deletedAt)) {
       return res.status(404).json({
         success: false,
         message: 'Employee profile not found.',
@@ -527,6 +604,7 @@ const getEmployeeDashboard = async (req, res) => {
         },
         leavesSummary: leaveStats,
         latestPayslip: latestPayslip || null,
+        widgets,
       },
     });
   } catch (error) {

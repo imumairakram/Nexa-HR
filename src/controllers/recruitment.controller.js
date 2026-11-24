@@ -1356,6 +1356,30 @@ const deleteTaxonomy = async (req, res) => {
  */
 const seedRecruitmentData = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        success: false,
+        code: 'ACTION_DISABLED_IN_PRODUCTION',
+        message: 'Seeding recruitment data is permanently disabled in production environments.',
+      });
+    }
+
+    if (!['ADMIN', 'SUPER_ADMIN'].includes(req.user?.role)) {
+      return res.status(403).json({
+        success: false,
+        code: 'ADMIN_REQUIRED',
+        message: 'Access denied: Seeding recruitment data requires ADMIN or SUPER_ADMIN role.',
+      });
+    }
+
+    if (process.env.ALLOW_RECRUITMENT_SEED !== 'true') {
+      return res.status(403).json({
+        success: false,
+        code: 'ENV_FLAG_REQUIRED',
+        message: 'Seeding recruitment data requires explicit ALLOW_RECRUITMENT_SEED=true environment flag.',
+      });
+    }
+
     const force = req.query.force === 'true';
     const jobCount = await prisma.jobOpening.count();
 
@@ -1661,6 +1685,30 @@ const seedRecruitmentData = async (req, res) => {
  */
 const clearAllRecruitmentData = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        success: false,
+        code: 'ACTION_DISABLED_IN_PRODUCTION',
+        message: 'Clearing recruitment data is permanently disabled in production environments.',
+      });
+    }
+
+    if (!['ADMIN', 'SUPER_ADMIN'].includes(req.user?.role)) {
+      return res.status(403).json({
+        success: false,
+        code: 'ADMIN_REQUIRED',
+        message: 'Access denied: Clearing recruitment data requires ADMIN or SUPER_ADMIN role.',
+      });
+    }
+
+    if (process.env.ALLOW_RECRUITMENT_CLEAR !== 'true') {
+      return res.status(403).json({
+        success: false,
+        code: 'ENV_FLAG_REQUIRED',
+        message: 'Clearing recruitment data requires explicit ALLOW_RECRUITMENT_CLEAR=true environment flag.',
+      });
+    }
+
     const [ivs, apps, jobs, tax] = await Promise.all([
       prisma.jobInterview.deleteMany({}),
       prisma.jobApplication.deleteMany({}),
