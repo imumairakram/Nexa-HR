@@ -100,7 +100,7 @@ const EmployeeDashboard = () => {
         api.getLeaveTypes(opts),
         api.getMyLeaveRequests({}, opts),
         api.getAnnouncements(opts),
-        api.getMyAttendanceLogs ? api.getMyAttendanceLogs({ limit: 14 }, opts) : Promise.resolve(null),
+        api.getMyAttendanceLogs ? api.getMyAttendanceLogs({ limit: 30 }, opts) : Promise.resolve(null),
         api.getMyPayslips ? api.getMyPayslips(opts) : Promise.resolve(null),
       ]);
 
@@ -309,7 +309,7 @@ const EmployeeDashboard = () => {
     return days.map((day, i) => ({
       value: progression[i],
       label: day,
-      tooltip: `${day}: ${progression[i]} Active Headcount`,
+      tooltip: `${day}: ${progression[i]} Days Present`,
     }));
   }, [monthlyAttendance?.presentDays]);
 
@@ -421,6 +421,11 @@ const EmployeeDashboard = () => {
 
   const totalPeriodAttendance = useMemo(
     () => attendanceTrendData.reduce((acc, d) => acc + (d.attendance || 0), 0),
+    [attendanceTrendData]
+  );
+
+  const totalPeriodHours = useMemo(
+    () => attendanceTrendData.reduce((acc, d) => acc + (d.hours || 0), 0),
     [attendanceTrendData]
   );
 
@@ -583,16 +588,16 @@ const EmployeeDashboard = () => {
 
       {/* TOP METRICS CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Total Attendance */}
+        {/* Card 1: Dark Navy Card - Monthly Attendance */}
         <SparkMetricCard
           variant="dark"
-          title="Total Headcount"
+          title="Present This Month"
           value={monthlyAttendance?.presentDays || 0}
-          unit={monthlyAttendance?.presentDays === 1 ? 'Staff' : 'Staff'}
-          badgeText={(monthlyAttendance?.presentDays || 0) > 0 ? `${monthlyAttendance.presentDays} Active` : '0 Staff'}
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Active Company Roster"
+          unit={monthlyAttendance?.presentDays === 1 ? 'Day' : 'Days'}
+          badgeText={card1Badge.text}
+          badgeType={card1Badge.type}
+          badgeIcon={card1Badge.icon}
+          subtext={card1Badge.sub}
           chartColor="sky"
           presetWave="wave1"
           dataPoints={attendanceSparkData}
@@ -600,71 +605,80 @@ const EmployeeDashboard = () => {
           onClick={() => navigate('/employee/attendance')}
         />
 
-        {/* Card 2: Light Card - On-Time Arrival */}
+        {/* Card 2: Light Card - Logged Work Hours */}
         <SparkMetricCard
           variant="light"
-          title="On-Time Arrival"
-          value={(monthlyAttendance?.presentDays || 0) === 0 ? '0%' : `${attendanceOnTimeRate}%`}
-          badgeText={
-            (monthlyAttendance?.presentDays || 0) === 0
-              ? '0 Check-ins'
-              : attendanceOnTimeRate >= 80
-              ? `${attendanceOnTimeRate}% Punctual`
-              : `${attendanceOnTimeRate}% On-Time`
-          }
-          badgeType={(monthlyAttendance?.presentDays || 0) === 0 ? 'neutral' : attendanceOnTimeRate >= 80 ? 'positive' : 'warning'}
-          badgeIcon={(monthlyAttendance?.presentDays || 0) === 0 ? 'dot' : attendanceOnTimeRate >= 80 ? 'up' : 'down'}
-          subtext={(monthlyAttendance?.presentDays || 0) === 0 ? "Awaiting Today's Punch" : `${monthlyAttendance?.lateDays || 0} On-Time Today`}
+          title="Logged Hours"
+          value={monthlyAttendance?.totalWorkHours ? Number(monthlyAttendance.totalWorkHours.toFixed(1)) : 0}
+          unit="hrs"
+          badgeText={card2Badge.text}
+          badgeType={card2Badge.type}
+          badgeIcon={card2Badge.icon}
+          subtext={card2Badge.sub}
           chartColor="orange"
           presetWave="wave2"
-          dataPoints={onTimeSparkData}
+          dataPoints={hoursSparkData}
           loading={loading}
           onClick={() => navigate('/employee/attendance')}
         />
 
-        {/* Card 3: Light Card - Pending Leaves */}
+        {/* Card 3: Light Card - Available Leave Balance */}
         <SparkMetricCard
           variant="light"
-          title="Pending Leaves"
-          value={leavesSummary.pending || 0}
-          unit={leavesSummary.pending === 1 ? 'Request' : 'Requests'}
-          badgeText={leavesSummary.pending > 0 ? `${leavesSummary.pending} In Review` : 'All Cleared'}
-          badgeType={leavesSummary.pending > 0 ? 'warning' : 'positive'}
-          badgeIcon={leavesSummary.pending > 0 ? 'dot' : 'up'}
-          subtext={leavesSummary.pending > 0 ? 'Awaiting HR Review' : 'Zero Backlog'}
+          title="Available Leaves"
+          value={totalRemainingLeaves}
+          unit="Days"
+          badgeText={card3Badge.text}
+          badgeType={card3Badge.type}
+          badgeIcon={card3Badge.icon}
+          subtext={card3Badge.sub}
           chartColor="amber"
           presetWave="wave3"
-          dataPoints={pendingLeavesSparkData}
+          dataPoints={leavesSparkData}
           loading={loading}
           onClick={() => navigate('/employee/leaves')}
         />
 
-        {/* Card 4: Light Card - Absent Today */}
+        {/* Card 4: Light Card - Latest Net Salary with Privacy Toggle */}
         <SparkMetricCard
           variant="light"
-          title="Absent Today"
-          value={isPresent ? 0 : 1}
-          unit={isPresent ? 'Staff' : 'Staff'}
-          badgeText={isPresent ? 'Full Roster' : '1 Pending / Absent'}
-          badgeType={isPresent ? 'positive' : 'neutral'}
-          badgeIcon={isPresent ? 'up' : 'dot'}
-          subtext={isPresent ? '1 of 1 Logged In' : '0 of 1 Logged In'}
-          chartColor="rose"
+          title="Latest Net Salary"
+          titleAction={
+            <button
+              type="button"
+              onClick={toggleSalaryVisibility}
+              title={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
+              aria-label={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
+              className="p-1 -my-1 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center justify-center active:scale-90"
+            >
+              {isSalaryHidden ? (
+                <EyeOff className="w-3.5 h-3.5" />
+              ) : (
+                <Eye className="w-3.5 h-3.5" />
+              )}
+            </button>
+          }
+          value={displaySalary}
+          badgeText={card4Badge.text}
+          badgeType={card4Badge.type}
+          badgeIcon={card4Badge.icon}
+          subtext={card4Badge.sub}
+          chartColor="emerald"
           presetWave="wave4"
-          dataPoints={absentSparkData}
+          dataPoints={salarySparkData}
           loading={loading}
-          onClick={() => navigate('/employee/attendance')}
+          onClick={() => navigate('/employee/payslips')}
         />
       </div>
 
       {/* Score Gauge & Main Trend Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Side: Score Widget */}
+        {/* Left Side: Today's Shift & Attendance Score */}
         <div className="lg:col-span-5 flex flex-col justify-between">
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 h-full flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Workforce Presence</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Attendance Status</p>
                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
                   Live Metric
                 </span>
@@ -679,7 +693,7 @@ const EmployeeDashboard = () => {
                   <span className="text-xs font-medium text-slate-400">
                     {isPresent
                       ? `(${todayStatus?.status === 'LATE' ? 'Late check-in at' : 'Clocked in at'} ${formatDbTime(todayStatus?.checkInTime)})`
-                      : '(0 of 1 staff clocked in)'}
+                      : '(Awaiting biometric clock-in)'}
                   </span>
                 </div>
               )}
@@ -704,10 +718,10 @@ const EmployeeDashboard = () => {
             </div>
 
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-              <span className="font-semibold">Turnstile & Face-ID Stations</span>
+              <span className="font-semibold">Turnstile & Face-ID Terminal</span>
               <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Operational
+                {isPresent ? 'Checked In' : 'Awaiting Check-in'}
               </span>
             </div>
           </div>
@@ -717,8 +731,8 @@ const EmployeeDashboard = () => {
         <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-black text-sm text-slate-900 dark:text-white">Biometric Attendance Trend</h3>
-              <p className="text-xs text-slate-400 font-medium">Daily staff check-ins logged via biometric terminals</p>
+              <h3 className="font-black text-sm text-slate-900 dark:text-white">Biometric Attendance & Hours Trend</h3>
+              <p className="text-xs text-slate-400 font-medium">Daily check-ins and logged work hours via biometric terminals</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -759,7 +773,8 @@ const EmployeeDashboard = () => {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 10, fill: '#94A3B8' }}
-                  domain={[0, Math.max(1, ...attendanceTrendData.map((d) => d.attendance || 0))]}
+                  domain={[0, 10]}
+                  tickFormatter={(val) => `${val}h`}
                   allowDecimals={false}
                 />
                 <Tooltip
@@ -767,15 +782,15 @@ const EmployeeDashboard = () => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
                       return (
-                        <div className="bg-slate-900 text-white p-3 rounded-2xl shadow-xl border border-slate-700 text-xs space-y-1 min-w-[140px]">
+                        <div className="bg-slate-900 text-white p-3 rounded-2xl shadow-xl border border-slate-700 text-xs space-y-1.5 min-w-[150px]">
                           <div className="font-extrabold text-white text-xs border-b border-slate-800 pb-1">{data.fullDate || data.date}</div>
                           <div className="text-[11px] text-sky-300 font-semibold flex items-center justify-between gap-3">
-                            <span>Attendance:</span>
-                            <span className="font-bold font-mono">{data.attendance > 0 ? 'Present' : 'Absent'}</span>
+                            <span>Status:</span>
+                            <span className={`font-bold ${data.attendance > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>{data.status}</span>
                           </div>
-                          <div className="text-[10px] text-emerald-400 font-medium flex items-center justify-between gap-3">
+                          <div className="text-[11px] text-slate-200 font-medium flex items-center justify-between gap-3">
                             <span>Hours Logged:</span>
-                            <span className="font-mono">{data.hours} hrs</span>
+                            <span className="font-mono font-bold text-amber-300">{data.hours} hrs</span>
                           </div>
                         </div>
                       );
@@ -785,7 +800,7 @@ const EmployeeDashboard = () => {
                 />
                 <Area
                   type="monotone"
-                  dataKey="attendance"
+                  dataKey="hours"
                   stroke="#0A8FB5"
                   strokeWidth={3}
                   fillOpacity={1}
@@ -798,10 +813,10 @@ const EmployeeDashboard = () => {
           {/* Subtext info */}
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
             <span>
-              Period Total: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalPeriodAttendance} Check-ins</strong>
+              Period Logged: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalPeriodAttendance} Days Present</strong> ({totalPeriodHours.toFixed(1)} hrs total)
             </span>
             <span>
-              Roster Capacity: <strong className="text-slate-700 dark:text-slate-200 font-mono">1 Staff</strong>
+              Assigned Shift: <strong className="text-slate-700 dark:text-slate-200 font-mono">09:00 – 17:30 (8.5h)</strong>
             </span>
           </div>
         </div>

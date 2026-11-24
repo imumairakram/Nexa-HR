@@ -410,7 +410,7 @@ const getAdminDashboard = async (req, res) => {
 
 const getEmployeeDashboard = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.userId || req.user.id;
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -455,7 +455,7 @@ const getEmployeeDashboard = async (req, res) => {
       }),
     ]);
 
-    if (!user || user.deletedAt) {
+    if (!currentUser || currentUser.deletedAt) {
       return res.status(404).json({
         success: false,
         message: 'Employee profile not found.',
