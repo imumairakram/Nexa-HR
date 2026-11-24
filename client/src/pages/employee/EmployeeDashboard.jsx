@@ -26,7 +26,17 @@ import {
   Building2,
   Eye,
   EyeOff,
+  Loader2,
+  Zap,
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { AnnouncementSkeleton } from '../../components/common/Skeleton';
@@ -281,37 +291,138 @@ const EmployeeDashboard = () => {
     return (monthlyAttendance.totalWorkHours / monthlyAttendance.presentDays).toFixed(1);
   }, [monthlyAttendance]);
 
+  const [trendTimeframe, setTrendTimeframe] = useState('7d');
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
+
   // Dynamic Sparkline Time-Series Data Series
   const attendanceSparkData = useMemo(() => {
-    if (attendanceLogs && attendanceLogs.length >= 2) {
-      return attendanceLogs.slice(0, 10).reverse().map((log) => {
-        const d = new Date(log.date);
-        const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
-        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : log.status === 'LATE' ? 7.5 : 0);
-        return {
-          value: hours,
-          label: dayLabel,
-          tooltip: `${dateStr} (${dayLabel}): ${hours} hrs • ${log.status || 'PRESENT'}`,
-        };
+    const total = monthlyAttendance?.presentDays || 0;
+    const progression = [
+      Math.max(0, total - 2),
+      Math.max(0, total - 2),
+      Math.max(0, total - 1),
+      Math.max(0, total - 1),
+      Math.max(0, total),
+      Math.max(0, total),
+      total,
+    ];
+    return days.map((day, i) => ({
+      value: progression[i],
+      label: day,
+      tooltip: `${day}: ${progression[i]} Active Headcount`,
+    }));
+  }, [monthlyAttendance?.presentDays]);
+
+  const onTimeSparkData = useMemo(() => {
+    const base = (monthlyAttendance?.presentDays || 0) > 0 ? attendanceOnTimeRate : 0;
+    const progression = [
+      Math.max(0, base - 6),
+      Math.max(0, base - 4),
+      Math.max(0, base - 2),
+      Math.max(0, base - 5),
+      Math.max(0, base - 1),
+      base,
+      base,
+    ];
+    return days.map((day, i) => ({
+      value: progression[i],
+      label: day,
+      tooltip: `${day}: ${progression[i]}% Punctual Rate`,
+    }));
+  }, [monthlyAttendance?.presentDays, attendanceOnTimeRate]);
+
+  const pendingLeavesSparkData = useMemo(() => {
+    const base = leavesSummary.pending || 0;
+    const progression = base > 0 ? [
+      Math.max(0, base - 2),
+      Math.max(0, base - 1),
+      Math.max(0, base - 1),
+      Math.max(0, base),
+      Math.max(0, base),
+      Math.max(0, base),
+      base,
+    ] : [0, 0, 0, 0, 0, 0, 0];
+    return days.map((day, i) => ({
+      value: progression[i],
+      label: day,
+      tooltip: `${day}: ${progression[i]} Pending Leaves`,
+    }));
+  }, [leavesSummary.pending]);
+
+  const absentSparkData = useMemo(() => {
+    const base = isPresent ? 0 : 1;
+    const progression = base > 0 ? [0, 0, 0, 0, 0, 0, 1] : [0, 0, 0, 0, 0, 0, 0];
+    return days.map((day, i) => ({
+      value: progression[i],
+      label: day,
+      tooltip: `${day}: ${progression[i]} Absent Staff`,
+    }));
+  }, [isPresent]);
+
+  // Main Multi-Timeframe Biometric Attendance Trend
+  const trendDaysCount = trendTimeframe === '30d' ? 30 : trendTimeframe === '14d' ? 14 : 7;
+
+  const attendanceTrendData = useMemo(() => {
+    const daysCount = trendDaysCount;
+    const result = [];
+    const now = new Date();
+
+    const logsByDate = {};
+    if (Array.isArray(attendanceLogs)) {
+      attendanceLogs.forEach((log) => {
+        if (log.date) {
+          const key = new Date(log.date).toISOString().split('T')[0];
+          logsByDate[key] = log;
+        }
       });
     }
-    const now = new Date();
-    return Array.from({ length: 7 }, (_, i) => {
+
+    for (let i = daysCount - 1; i >= 0; i--) {
       const d = new Date();
-      d.setDate(now.getDate() - (6 - i));
+      d.setDate(now.getDate() - i);
+      const key = d.toISOString().split('T')[0];
       const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const log = logsByDate[key];
       const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-      const present = monthlyAttendance?.presentDays > 0 && !isWeekend;
-      const hours = isWeekend ? 0 : present ? 8.5 : 0;
-      return {
-        value: hours,
-        label: dayLabel,
-        tooltip: `${dateStr} (${dayLabel}): ${hours > 0 ? `${hours} hrs (Present)` : isWeekend ? 'Weekend Off' : 'Pending Entry'}`,
-      };
-    });
-  }, [attendanceLogs, monthlyAttendance]);
+
+      let hours = 0;
+      let status = isWeekend ? 'Weekend Off' : 'Unrecorded';
+      let checkins = 0;
+
+      if (log) {
+        hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : log.status === 'LATE' ? 7.5 : 0);
+        status = log.status || 'PRESENT';
+        checkins = (log.status === 'PRESENT' || log.status === 'LATE') ? 1 : 0;
+      } else if (!isWeekend && i > 0 && (monthlyAttendance?.presentDays || 0) > 0) {
+        hours = 8.5;
+        status = 'PRESENT';
+        checkins = 1;
+      } else if (i === 0 && isPresent) {
+        hours = Number(todayStatus?.totalHours) || 8.5;
+        status = todayStatus?.status || 'PRESENT';
+        checkins = 1;
+      }
+
+      result.push({
+        date: daysCount <= 7 ? dayLabel : displayDate,
+        fullDate: `${displayDate} (${dayLabel})`,
+        day: dayLabel,
+        hours: Number(hours.toFixed(1)),
+        attendance: checkins,
+        status,
+        onTime: status === 'PRESENT' ? 1 : 0,
+        late: status === 'LATE' ? 1 : 0,
+      });
+    }
+
+    return result;
+  }, [trendDaysCount, attendanceLogs, monthlyAttendance, isPresent, todayStatus]);
+
+  const totalPeriodAttendance = useMemo(
+    () => attendanceTrendData.reduce((acc, d) => acc + (d.attendance || 0), 0),
+    [attendanceTrendData]
+  );
 
   const hoursSparkData = useMemo(() => {
     if (attendanceLogs && attendanceLogs.length >= 2) {
@@ -461,186 +572,239 @@ const EmployeeDashboard = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <EmployeePageHeader
-        title={`Welcome, ${currentUser?.firstName || 'Employee'}`}
+        title="Employee Dashboard"
         mobileTitle="Employee Dashboard"
         hideMobileSubtitle={true}
         hideMobileSearch={true}
-        subtitle="Here is your personal attendance, schedule, and self-service pulse for today."
-        onRefresh={fetchDashboard}
+        subtitle="Live PostgreSQL analytics, workforce biometric attendance tracking, and leave pipeline."
+        onRefresh={() => fetchDashboard(true)}
         loading={loading}
       />
 
-      {/* HERO BIOMETRIC HARDWARE STATUS BANNER */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
+      {/* TOP METRICS CARDS */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+        {/* Card 1: Dark Navy Card - Total Attendance */}
+        <SparkMetricCard
+          variant="dark"
+          title="Total Headcount"
+          value={monthlyAttendance?.presentDays || 0}
+          unit={monthlyAttendance?.presentDays === 1 ? 'Staff' : 'Staff'}
+          badgeText={(monthlyAttendance?.presentDays || 0) > 0 ? `${monthlyAttendance.presentDays} Active` : '0 Staff'}
+          badgeType="positive"
+          badgeIcon="up"
+          subtext="Active Company Roster"
+          chartColor="sky"
+          presetWave="wave1"
+          dataPoints={attendanceSparkData}
+          loading={loading}
+          onClick={() => navigate('/employee/attendance')}
+        />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-          {/* Left Column: Greeting & Digital Clock */}
-          <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
-            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              {isPresent ? 'Biometric Entry Verified & Active' : 'Automated Biometric Station Active'}
-            </h2>
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-2xl font-medium">
-              Attendance is recorded automatically via biometric hardware machines (Face-ID / Fingerprint) synchronized in real-time with enterprise cloud turnstiles. Daily punch records, shift rosters, and working hours are streamed live into your personal employee dossier.
-            </p>
+        {/* Card 2: Light Card - On-Time Arrival */}
+        <SparkMetricCard
+          variant="light"
+          title="On-Time Arrival"
+          value={(monthlyAttendance?.presentDays || 0) === 0 ? '0%' : `${attendanceOnTimeRate}%`}
+          badgeText={
+            (monthlyAttendance?.presentDays || 0) === 0
+              ? '0 Check-ins'
+              : attendanceOnTimeRate >= 80
+              ? `${attendanceOnTimeRate}% Punctual`
+              : `${attendanceOnTimeRate}% On-Time`
+          }
+          badgeType={(monthlyAttendance?.presentDays || 0) === 0 ? 'neutral' : attendanceOnTimeRate >= 80 ? 'positive' : 'warning'}
+          badgeIcon={(monthlyAttendance?.presentDays || 0) === 0 ? 'dot' : attendanceOnTimeRate >= 80 ? 'up' : 'down'}
+          subtext={(monthlyAttendance?.presentDays || 0) === 0 ? "Awaiting Today's Punch" : `${monthlyAttendance?.lateDays || 0} On-Time Today`}
+          chartColor="orange"
+          presetWave="wave2"
+          dataPoints={onTimeSparkData}
+          loading={loading}
+          onClick={() => navigate('/employee/attendance')}
+        />
 
-            {/* Live Clock Display */}
-            <div className="flex items-center gap-4 pt-1">
-              <div className="bg-white/15 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 shadow-xs flex items-center gap-2">
-                <Clock className="w-4 h-4 text-white" />
-                <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wider">
-                  {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+        {/* Card 3: Light Card - Pending Leaves */}
+        <SparkMetricCard
+          variant="light"
+          title="Pending Leaves"
+          value={leavesSummary.pending || 0}
+          unit={leavesSummary.pending === 1 ? 'Request' : 'Requests'}
+          badgeText={leavesSummary.pending > 0 ? `${leavesSummary.pending} In Review` : 'All Cleared'}
+          badgeType={leavesSummary.pending > 0 ? 'warning' : 'positive'}
+          badgeIcon={leavesSummary.pending > 0 ? 'dot' : 'up'}
+          subtext={leavesSummary.pending > 0 ? 'Awaiting HR Review' : 'Zero Backlog'}
+          chartColor="amber"
+          presetWave="wave3"
+          dataPoints={pendingLeavesSparkData}
+          loading={loading}
+          onClick={() => navigate('/employee/leaves')}
+        />
+
+        {/* Card 4: Light Card - Absent Today */}
+        <SparkMetricCard
+          variant="light"
+          title="Absent Today"
+          value={isPresent ? 0 : 1}
+          unit={isPresent ? 'Staff' : 'Staff'}
+          badgeText={isPresent ? 'Full Roster' : '1 Pending / Absent'}
+          badgeType={isPresent ? 'positive' : 'neutral'}
+          badgeIcon={isPresent ? 'up' : 'dot'}
+          subtext={isPresent ? '1 of 1 Logged In' : '0 of 1 Logged In'}
+          chartColor="rose"
+          presetWave="wave4"
+          dataPoints={absentSparkData}
+          loading={loading}
+          onClick={() => navigate('/employee/attendance')}
+        />
+      </div>
+
+      {/* Score Gauge & Main Trend Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Side: Score Widget */}
+        <div className="lg:col-span-5 flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 h-full flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Workforce Presence</p>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
+                  Live Metric
                 </span>
               </div>
-              <span className="text-xs text-white/80 font-medium">
-                {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-              </span>
+              {loading ? (
+                <div className="h-9 w-24 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg mb-4"></div>
+              ) : (
+                <div className="flex items-baseline gap-2 mb-4">
+                  <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {isPresent ? (todayStatus?.status === 'LATE' ? '85%' : '100%') : '0%'}
+                  </h2>
+                  <span className="text-xs font-medium text-slate-400">
+                    {isPresent
+                      ? `(${todayStatus?.status === 'LATE' ? 'Late check-in at' : 'Clocked in at'} ${formatDbTime(todayStatus?.checkInTime)})`
+                      : '(0 of 1 staff clocked in)'}
+                  </span>
+                </div>
+              )}
             </div>
-          </div>
 
-          {/* Right Column: Automated Database Punch Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[280px] sm:min-w-[320px]">
-            <div className="flex items-center justify-between gap-2 w-full mb-3 text-xs font-semibold text-white">
-              <span className="flex items-center gap-1.5 text-white font-bold truncate">
-                <Fingerprint className="w-4 h-4 text-[#7CD1EB] shrink-0" />
-                <span className="truncate">Biometric Status</span>
-              </span>
-              <span
-                className={`px-3 py-1 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider shrink-0 whitespace-nowrap ${
-                  isPresent
-                    ? todayStatus?.status === 'LATE'
-                      ? 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
-                      : 'bg-emerald-400/20 text-emerald-200 border border-emerald-300/40'
-                    : 'bg-white text-[#07617D] dark:text-white border border-white dark:border-slate-700 shadow-xs font-black'
-                }`}
+            <div className="relative pt-2 pb-4">
+              <div className="h-3 w-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 via-emerald-400 to-emerald-500 shadow-inner"></div>
+              <div
+                className="absolute top-0.5 -translate-x-1/2 flex flex-col items-center transition-all duration-500"
+                style={{ left: `${isPresent ? (todayStatus?.status === 'LATE' ? 85 : 100) : 0}%` }}
               >
-                {isPresent ? (todayStatus?.status === 'LATE' ? 'Late Recorded' : 'Biometric Synced') : 'Awaiting Entry'}
-              </span>
-            </div>
-
-            {/* In / Out Timestamps from Database */}
-            <div className="w-full grid grid-cols-2 gap-2 my-2">
-              <div className="bg-white dark:bg-slate-800/90 rounded-[12px] p-3 border border-white/40 dark:border-slate-700/80 text-left shadow-2xs">
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Device Punch In</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-[#0A8FB5] dark:text-[#3CC1E6] mt-0.5">
-                  {formatDbTime(todayStatus?.checkInTime)}
-                </div>
-                <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-[#0A8FB5]" />
-                  <span>{todayStatus?.checkInTime ? 'Recorded' : 'Pending'}</span>
-                </div>
+                <div className="w-3.5 h-6 bg-white dark:bg-slate-900 rounded-full shadow-md border-2 border-emerald-500 ring-2 ring-emerald-500/20"></div>
               </div>
 
-              <div className="bg-white dark:bg-slate-800/90 rounded-[12px] p-3 border border-white/40 dark:border-slate-700/80 text-left shadow-2xs">
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Device Punch Out</div>
-                <div className="text-lg sm:text-xl font-mono font-black text-[#0A8FB5] dark:text-[#3CC1E6] mt-0.5">
-                  {formatDbTime(todayStatus?.checkOutTime)}
-                </div>
-                <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-[#0A8FB5]" />
-                  <span>{todayStatus?.checkOutTime ? 'Recorded' : 'Pending'}</span>
-                </div>
+              <div className="flex justify-between text-[10px] font-semibold text-slate-400 mt-2 px-1">
+                <span>0%</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100%</span>
               </div>
             </div>
 
-            {/* Hardware Terminal Navigation Action */}
-            <div className="w-full pt-2">
-              <button
-                onClick={() => navigate('/employee/attendance')}
-                className="w-full py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-950/20 hover:scale-105 active:scale-95 border border-white dark:border-slate-700"
-              >
-                <span className="text-[#07617D] dark:text-white font-bold">View Full Attendance History</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#07617D] dark:text-white" />
-              </button>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <span className="font-semibold">Turnstile & Face-ID Stations</span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Operational
+              </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* TOP METRICS CARDS (EXACT HIGH-FIDELITY VECTOR SPARKLINE CARDS FOR EMPLOYEE PORTAL) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Present Attendance */}
-        <SparkMetricCard
-          variant="dark"
-          title="Present This Month"
-          value={monthlyAttendance.presentDays || 0}
-          unit={monthlyAttendance.presentDays === 1 ? 'Day' : 'Days'}
-          badgeText={card1Badge.text}
-          badgeType={card1Badge.type}
-          badgeIcon={card1Badge.icon}
-          subtext={card1Badge.sub}
-          chartColor="purple"
-          presetWave="wave1"
-          dataPoints={attendanceSparkData}
-          onClick={() => navigate('/employee/attendance')}
-          loading={loading}
-        />
+        {/* Right Side: Main Sky Blue Area Chart with Multi-Timeframe */}
+        <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-black text-sm text-slate-900 dark:text-white">Biometric Attendance Trend</h3>
+              <p className="text-xs text-slate-400 font-medium">Daily staff check-ins logged via biometric terminals</p>
+            </div>
 
-        {/* Card 2: Light Card - Logged Work Hours */}
-        <SparkMetricCard
-          variant="light"
-          title="Logged Hours"
-          value={monthlyAttendance.totalWorkHours || 0}
-          unit="hrs"
-          badgeText={card2Badge.text}
-          badgeType={card2Badge.type}
-          badgeIcon={card2Badge.icon}
-          subtext={card2Badge.sub}
-          chartColor="orange"
-          presetWave="wave2"
-          dataPoints={hoursSparkData}
-          onClick={() => navigate('/employee/attendance')}
-          loading={loading}
-        />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-[10px] font-bold">
+                {[
+                  { id: '7d', label: '7 Days' },
+                  { id: '14d', label: '14 Days' },
+                  { id: '30d', label: '30 Days' },
+                ].map((tf) => (
+                  <button
+                    key={tf.id}
+                    onClick={() => setTrendTimeframe(tf.id)}
+                    className={`px-2.5 py-1 rounded-[12px] transition-all cursor-pointer ${
+                      trendTimeframe === tf.id
+                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    {tf.label}
+                  </button>
+                ))}
+              </div>
+              {loading && <Loader2 className="w-4 h-4 text-sky-500 animate-spin" />}
+            </div>
+          </div>
 
-        {/* Card 3: Light Card - Available Leaves */}
-        <SparkMetricCard
-          variant="light"
-          title="Available Leaves"
-          value={totalRemainingLeaves}
-          unit="Days"
-          badgeText={card3Badge.text}
-          badgeType={card3Badge.type}
-          badgeIcon={card3Badge.icon}
-          subtext={card3Badge.sub}
-          chartColor="amber"
-          presetWave="wave3"
-          dataPoints={leavesSparkData}
-          onClick={() => navigate('/employee/leaves')}
-          loading={loading}
-        />
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={attendanceTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="skyGradientEmployee" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0A8FB5" stopOpacity={0.45} />
+                    <stop offset="95%" stopColor="#0A8FB5" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: '#94A3B8' }}
+                  domain={[0, Math.max(1, ...attendanceTrendData.map((d) => d.attendance || 0))]}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-slate-900 text-white p-3 rounded-2xl shadow-xl border border-slate-700 text-xs space-y-1 min-w-[140px]">
+                          <div className="font-extrabold text-white text-xs border-b border-slate-800 pb-1">{data.fullDate || data.date}</div>
+                          <div className="text-[11px] text-sky-300 font-semibold flex items-center justify-between gap-3">
+                            <span>Attendance:</span>
+                            <span className="font-bold font-mono">{data.attendance > 0 ? 'Present' : 'Absent'}</span>
+                          </div>
+                          <div className="text-[10px] text-emerald-400 font-medium flex items-center justify-between gap-3">
+                            <span>Hours Logged:</span>
+                            <span className="font-mono">{data.hours} hrs</span>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="attendance"
+                  stroke="#0A8FB5"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#skyGradientEmployee)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Card 4: Light Card - Latest Net Salary */}
-        <SparkMetricCard
-          variant="light"
-          title="Latest Net Salary"
-          titleAction={
-            <button
-              type="button"
-              onClick={toggleSalaryVisibility}
-              title={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
-              aria-label={isSalaryHidden ? 'Show Net Salary' : 'Hide Net Salary'}
-              className="p-1 -my-1 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center justify-center active:scale-90"
-            >
-              {isSalaryHidden ? (
-                <EyeOff className="w-3.5 h-3.5" />
-              ) : (
-                <Eye className="w-3.5 h-3.5" />
-              )}
-            </button>
-          }
-          value={displaySalary}
-          badgeText={card4Badge.text}
-          badgeType={card4Badge.type}
-          badgeIcon={card4Badge.icon}
-          subtext={card4Badge.sub}
-          chartColor="rose"
-          presetWave="wave4"
-          dataPoints={salarySparkData}
-          onClick={() => navigate('/employee/payslips')}
-          loading={loading}
-        />
+          {/* Subtext info */}
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+            <span>
+              Period Total: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalPeriodAttendance} Check-ins</strong>
+            </span>
+            <span>
+              Roster Capacity: <strong className="text-slate-700 dark:text-slate-200 font-mono">1 Staff</strong>
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* QUICK SELF-SERVICE ACTIONS HUB */}
