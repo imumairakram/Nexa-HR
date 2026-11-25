@@ -151,7 +151,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
       icon: CreditCard,
       defaultPath: '/app/payroll',
       children: [
-        { label: 'Calculate Payroll', path: '/app/payroll/calculate' },
+        { label: 'Global Payroll Processing', path: '/app/payroll' },
         { label: 'Payslip List', path: '/app/payroll/payslips' },
       ],
     },

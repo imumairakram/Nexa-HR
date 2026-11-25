@@ -26,7 +26,6 @@ import PublicHoliday from './pages/app/holiday/PublicHoliday';
 import LeavePolicy from './pages/app/LeavePolicy';
 
 // Payroll Sub-pages
-import CalculatePayroll from './pages/app/payroll/CalculatePayroll';
 import PayslipList from './pages/app/payroll/PayslipList';
 
 
@@ -121,7 +120,7 @@ function App() {
 
           {/* Payroll Module */}
           <Route path="payroll" element={<Payroll />} />
-          <Route path="payroll/calculate" element={<CalculatePayroll />} />
+          <Route path="payroll/calculate" element={<Navigate to="/app/payroll" replace />} />
           <Route path="payroll/payslips" element={<PayslipList />} />
 
           <Route path="accounts" element={<Navigate to="/app/dashboard" replace />} />

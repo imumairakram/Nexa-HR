@@ -117,7 +117,7 @@ const getSalaryStructure = async (req, res) => {
 };
 
 const generateMonthlyPayroll = async (req, res) => {
-  const { month, year } = req.body;
+  const { month, year, userId } = req.body;
 
   if (!month || !year) {
     return res.status(400).json({
@@ -136,7 +136,8 @@ const generateMonthlyPayroll = async (req, res) => {
     });
   }
 
-  const runKey = `${parsedYear}-${parsedMonth}`;
+  const cleanUserId = typeof userId === 'string' && userId.trim() ? userId.trim() : null;
+  const runKey = cleanUserId ? `${parsedYear}-${parsedMonth}-${cleanUserId}` : `${parsedYear}-${parsedMonth}`;
   if (activePayrollRuns.has(runKey)) {
     return res.status(409).json({
       success: false,
@@ -148,21 +149,50 @@ const generateMonthlyPayroll = async (req, res) => {
   activePayrollRuns.add(runKey);
 
   try {
-    const employees = await prisma.user.findMany({
-      where: {
-        isActive: true,
-        deletedAt: null,
-        ...nonDemoUsersWhere,
-        salaryStructure: { isNot: null },
-      },
-      select: { id: true },
-    });
-
-    if (employees.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No active employees with configured salary structures found.',
+    let employees;
+    if (cleanUserId) {
+      const targetUser = await prisma.user.findFirst({
+        where: {
+          id: cleanUserId,
+          isActive: true,
+          deletedAt: null,
+          ...nonDemoUsersWhere,
+        },
+        select: {
+          id: true,
+          salaryStructure: { select: { id: true } },
+        },
       });
+      if (!targetUser) {
+        return res.status(404).json({
+          success: false,
+          message: 'Active employee not found.',
+        });
+      }
+      if (!targetUser.salaryStructure) {
+        return res.status(400).json({
+          success: false,
+          message: 'Selected employee does not have a salary structure configured.',
+        });
+      }
+      employees = [{ id: targetUser.id }];
+    } else {
+      employees = await prisma.user.findMany({
+        where: {
+          isActive: true,
+          deletedAt: null,
+          ...nonDemoUsersWhere,
+          salaryStructure: { isNot: null },
+        },
+        select: { id: true },
+      });
+
+      if (employees.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No active employees with configured salary structures found.',
+        });
+      }
     }
 
     // Query existing payslips for the given period to protect immutable PAID payslips
@@ -170,6 +200,7 @@ const generateMonthlyPayroll = async (req, res) => {
       where: {
         month: parsedMonth,
         year: parsedYear,
+        ...(cleanUserId ? { userId: cleanUserId } : {}),
       },
       select: {
         id: true,
@@ -182,8 +213,15 @@ const generateMonthlyPayroll = async (req, res) => {
       existingPayslips.filter((p) => p.status === 'PAID').map((p) => p.userId)
     );
 
+    if (cleanUserId && paidUserIds.has(cleanUserId)) {
+      return res.status(409).json({
+        success: false,
+        message: 'Payslip for this employee and period is already PAID and cannot be modified.',
+      });
+    }
+
     const skippedPaidPayslips = [];
-    const payslipsData = [];
+    const eligibleIds = [];
 
     for (const emp of employees) {
       if (paidUserIds.has(emp.id)) {
@@ -193,12 +231,13 @@ const generateMonthlyPayroll = async (req, res) => {
         });
         continue;
       }
-
-      const computed = await calculateEmployeePayroll(emp.id, parsedMonth, parsedYear);
-      if (computed) {
-        payslipsData.push(computed);
-      }
+      eligibleIds.push(emp.id);
     }
+
+    const computedList = await Promise.all(
+      eligibleIds.map((empId) => calculateEmployeePayroll(empId, parsedMonth, parsedYear))
+    );
+    const payslipsData = computedList.filter(Boolean);
 
     const createdPayslips = payslipsData.length > 0
       ? await prisma.$transaction(
@@ -227,27 +266,35 @@ const generateMonthlyPayroll = async (req, res) => {
     ];
     const monthLabel = monthNames[parsedMonth - 1] || `Month ${parsedMonth}`;
 
-    // Notify each employee whose payslip was generated/updated
-    for (const slip of createdPayslips) {
-      const user = await prisma.user.findUnique({
-        where: { id: slip.userId },
-        select: { firstName: true, lastName: true, email: true },
+    // Dispatch in-app notifications in parallel and send SMTP emails non-blocking
+    // so the HTTP response does not stall waiting on external mail servers.
+    if (createdPayslips.length > 0) {
+      const slipUserIds = createdPayslips.map((s) => s.userId);
+      const slipUsers = await prisma.user.findMany({
+        where: { id: { in: slipUserIds } },
+        select: { id: true, firstName: true, lastName: true, email: true },
       });
+      const userMap = new Map(slipUsers.map((u) => [u.id, u]));
 
-      if (user) {
-        // 1. In-App Notification
-        await createInAppNotification({
-          userId: slip.userId,
-          title: `${monthLabel} ${parsedYear} Payslip Ready`,
-          message: `Your monthly salary slip (PKR ${Number(slip.netSalary).toLocaleString()}) is ready for download.`,
-          type: 'success',
-          category: 'PAYROLL',
-          link: '/employee/payslips',
-        });
+      await Promise.allSettled(
+        createdPayslips.map((slip) => {
+          if (!userMap.has(slip.userId)) return Promise.resolve();
+          return createInAppNotification({
+            userId: slip.userId,
+            title: `${monthLabel} ${parsedYear} Payslip Ready`,
+            message: `Your monthly salary slip (PKR ${Number(slip.netSalary).toLocaleString()}) is ready for download.`,
+            type: 'success',
+            category: 'PAYROLL',
+            link: '/employee/payslips',
+          });
+        })
+      );
 
-        // 2. Corporate Email Dispatch
-        if (user.email) {
-          await sendPayslipEmail({
+      void Promise.allSettled(
+        createdPayslips.map((slip) => {
+          const user = userMap.get(slip.userId);
+          if (!user || !user.email) return Promise.resolve();
+          return sendPayslipEmail({
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
             month: monthLabel,
@@ -256,8 +303,8 @@ const generateMonthlyPayroll = async (req, res) => {
             deductions: (slip.taxDeductions || 0) + (slip.unpaidLeaveDeduction || 0) + (slip.otherDeductions || 0),
             netSalary: slip.netSalary,
           });
-        }
-      }
+        })
+      ).catch((err) => console.error('[PAYSLIP EMAIL DISPATCH ERROR]:', err.message));
     }
 
     return res.status(201).json({

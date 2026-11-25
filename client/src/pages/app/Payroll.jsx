@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   CreditCard,
   ShieldCheck,
@@ -39,6 +39,12 @@ const Payroll = () => {
   const [payslips, setPayslips] = useState(() => api.getCached('/payroll/payslips')?.data?.payslips || []);
   const [loading, setLoading] = useState(() => !api.hasCached('/payroll/payslips'));
   const [isRunModalOpen, setIsRunModalOpen] = useState(false);
+  const [isIndividualModalOpen, setIsIndividualModalOpen] = useState(false);
+  const [employeesList, setEmployeesList] = useState([]);
+  const [indUserId, setIndUserId] = useState('');
+  const [indMonth, setIndMonth] = useState(new Date().getMonth() + 1);
+  const [indYear, setIndYear] = useState(new Date().getFullYear());
+  const [indSubmitting, setIndSubmitting] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -150,6 +156,39 @@ const Payroll = () => {
     }
   };
 
+  const openIndividualModal = async () => {
+    setIsIndividualModalOpen(true);
+    try {
+      const res = await api.getEmployees();
+      const list = res?.data?.employees || [];
+      setEmployeesList(list);
+      if (list.length > 0 && !indUserId) {
+        setIndUserId(list[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to load employees for individual payslip:', err);
+    }
+  };
+
+  const handleRunIndividualPayslip = async () => {
+    if (!indUserId) {
+      showToast('Please select an employee.');
+      return;
+    }
+    try {
+      setIndSubmitting(true);
+      await api.generatePayroll({ month: indMonth, year: indYear, userId: indUserId });
+      await fetchPayroll();
+      setIsIndividualModalOpen(false);
+      showToast(`${MONTH_NAMES[indMonth - 1]} ${indYear} individual payslip generated successfully.`);
+    } catch (err) {
+      console.error('Failed to generate individual payslip:', err);
+      showToast(err.message || 'Failed to generate individual payslip.');
+    } finally {
+      setIndSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
@@ -218,12 +257,6 @@ const Payroll = () => {
                 <Zap className="w-3.5 h-3.5" />
                 <span>Run Payroll Batch</span>
               </button>
-              <Link
-                to="/app/payroll/calculate"
-                className="w-full px-4 py-2 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all text-center"
-              >
-                <span>Tax Calculator</span>
-              </Link>
             </div>
           </div>
 
@@ -236,12 +269,6 @@ const Payroll = () => {
               <Zap className="w-3.5 h-3.5" />
               <span>Run Payroll</span>
             </button>
-            <Link
-              to="/app/payroll/calculate"
-              className="py-3 px-4 rounded-[12px] bg-white/15 active:bg-white/25 text-white font-extrabold text-xs border border-white/25 flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 text-center"
-            >
-              <span>Tax Calculator</span>
-            </Link>
           </div>
         </div>
       </div>
@@ -325,12 +352,23 @@ const Payroll = () => {
             <p className="text-xs text-slate-400 font-medium">Historical batch pay records and tax statements</p>
           </div>
 
-          <button
-            onClick={() => navigate('/app/payroll/payslips')}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold rounded-[12px] transition-all cursor-pointer"
-          >
-            View All Individual Payslips
-          </button>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={openIndividualModal}
+              className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-[12px] transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Generate Individual Payslip</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/app/payroll/payslips')}
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold rounded-[12px] transition-all cursor-pointer"
+            >
+              View All Individual Payslips
+            </button>
+          </div>
         </div>
 
         {history.length > 0 ? (
@@ -606,6 +644,120 @@ const Payroll = () => {
                     )}
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GENERATE INDIVIDUAL PAYSLIP MODAL */}
+      {isIndividualModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-md p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-slate-700/80 max-w-lg w-full p-6 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 my-8">
+            <div className="flex items-start justify-between gap-4 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-md shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                    Generate Individual Payslip
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Generate or refresh a single employee&apos;s monthly payslip.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsIndividualModalOpen(false)}
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-2">
+                  Select Employee <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    value={indUserId}
+                    onChange={(e) => setIndUserId(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 appearance-none pr-10"
+                  >
+                    {employeesList.length === 0 && <option value="">Loading employees...</option>}
+                    {employeesList.map((emp) => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.firstName} {emp.lastName} ({emp.employeeCode})
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-2">
+                    Target Pay Month <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={indMonth}
+                      onChange={(e) => setIndMonth(parseInt(e.target.value, 10))}
+                      className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 appearance-none pr-10"
+                    >
+                      {MONTH_NAMES.map((m, idx) => (
+                        <option key={m} value={idx + 1}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-2">
+                    Pay Year <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={indYear}
+                    onChange={(e) => setIndYear(parseInt(e.target.value, 10))}
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsIndividualModalOpen(false)}
+                  className="px-4 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRunIndividualPayslip}
+                  disabled={indSubmitting || !indUserId}
+                  className="px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {indSubmitting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
+                      <span>Generate Payslip</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
