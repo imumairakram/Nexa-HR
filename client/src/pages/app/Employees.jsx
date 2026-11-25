@@ -403,11 +403,12 @@ NexaHR Workforce Systems`;
       workLocation: assignedOffice,
       location: assignedOffice,
       joiningDate: emp.profile?.joiningDate ? emp.profile.joiningDate.split('T')[0] : (emp.createdAt ? emp.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
-      basicSalary: emp.salaryStructure?.basicSalary?.toString() || '',
+      baseSalary: emp.salaryStructure?.basicSalary?.toString() || '',
+      performanceAllowance: emp.salaryStructure?.otherAllowances?.toString() || '0',
+      medicalAllowance: '0',
       housingAllowance: emp.salaryStructure?.housingAllowance?.toString() || '0',
       transportAllowance: emp.salaryStructure?.transportAllowance?.toString() || '0',
       taxDeductions: emp.salaryStructure?.taxDeductions?.toString() || '0',
-      otherAllowances: emp.salaryStructure?.otherAllowances?.toString() || '0',
       otherDeductions: emp.salaryStructure?.otherDeductions?.toString() || '0',
       gender: emp.profile?.gender || 'Not Specified',
       dateOfBirth: emp.profile?.dateOfBirth ? emp.profile.dateOfBirth.split('T')[0] : '',
@@ -428,6 +429,11 @@ NexaHR Workforce Systems`;
 
     try {
       setSubmitting(true);
+      const computedBasicSalary = parseFloat(editForm.baseSalary ?? editForm.basicSalary ?? 0) || 0;
+      const computedOtherAllowances =
+        (parseFloat(editForm.performanceAllowance || 0) || 0) +
+        (parseFloat(editForm.medicalAllowance || 0) || 0);
+
       const payload = {
         firstName: editForm.firstName,
         lastName: editForm.lastName,
@@ -441,12 +447,12 @@ NexaHR Workforce Systems`;
         address: editForm.address ? editForm.address.trim() : null,
         workLocation: (editForm.workLocation || editForm.location || 'Islamabad HQ & Innovation Lab').trim(),
         joiningDate: editForm.joiningDate,
-        basicSalary: parseFloat(editForm.basicSalary || 0),
-        housingAllowance: parseFloat(editForm.housingAllowance || 0),
-        transportAllowance: parseFloat(editForm.transportAllowance || 0),
-        taxDeductions: parseFloat(editForm.taxDeductions || 0),
-        otherAllowances: parseFloat(editForm.otherAllowances || 0),
-        otherDeductions: parseFloat(editForm.otherDeductions || 0),
+        basicSalary: computedBasicSalary,
+        housingAllowance: parseFloat(editForm.housingAllowance || 0) || 0,
+        transportAllowance: parseFloat(editForm.transportAllowance || 0) || 0,
+        taxDeductions: parseFloat(editForm.taxDeductions || 0) || 0,
+        otherAllowances: computedOtherAllowances,
+        otherDeductions: parseFloat(editForm.otherDeductions || 0) || 0,
         gender: editForm.gender,
         dateOfBirth: editForm.dateOfBirth,
         emergencyContact: editForm.emergencyContact,
@@ -468,10 +474,11 @@ NexaHR Workforce Systems`;
           emergencyContact: editForm.emergencyContact,
         },
         salaryStructure: {
-          basicSalary: parseFloat(editForm.basicSalary || 0),
-          housingAllowance: parseFloat(editForm.housingAllowance || 0),
-          transportAllowance: parseFloat(editForm.transportAllowance || 0),
-          taxDeductions: parseFloat(editForm.taxDeductions || 0),
+          basicSalary: computedBasicSalary,
+          housingAllowance: parseFloat(editForm.housingAllowance || 0) || 0,
+          transportAllowance: parseFloat(editForm.transportAllowance || 0) || 0,
+          otherAllowances: computedOtherAllowances,
+          taxDeductions: parseFloat(editForm.taxDeductions || 0) || 0,
         },
       };
 
@@ -489,34 +496,7 @@ NexaHR Workforce Systems`;
         return;
       }
       console.error('Update employee error:', err);
-      // Update locally
-      const updatedEmp = {
-        ...editingEmployee,
-        firstName: editForm.firstName,
-        lastName: editForm.lastName,
-        email: editForm.email,
-        phone: editForm.phone,
-        role: editForm.role,
-        isActive: editForm.isActive,
-        profile: {
-          ...editingEmployee?.profile,
-          department: { name: editForm.departmentName },
-          designation: { title: editForm.designationTitle },
-          address: editForm.location,
-          joiningDate: editForm.joiningDate,
-        },
-        salaryStructure: {
-          basicSalary: parseFloat(editForm.basicSalary || 0),
-          housingAllowance: parseFloat(editForm.housingAllowance || 0),
-          transportAllowance: parseFloat(editForm.transportAllowance || 0),
-        },
-      };
-      setEmployees((prev) => prev.map((e) => (e.id === editForm.id ? updatedEmp : e)));
-      if (selectedEmployee && selectedEmployee.id === editForm.id) {
-        setSelectedEmployee(updatedEmp);
-      }
-      setIsEditOpen(false);
-      showToast(`Updated ${editForm.firstName}'s profile.`, 'success');
+      showToast(err.message || 'Failed to update employee profile.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -1700,7 +1680,7 @@ NexaHR Workforce Systems`;
                   Base Compensation
                 </span>
                 <span className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono block truncate">
-                  {formatCurrency(selectedEmployee.profile?.baseSalary || 0)} / mo
+                  {formatCurrency(selectedEmployee.salaryStructure?.basicSalary ?? selectedEmployee.profile?.baseSalary ?? 0)} / mo
                 </span>
               </div>
 
