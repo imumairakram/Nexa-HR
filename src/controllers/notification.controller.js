@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const cacheService = require('../services/cache.service');
 
 /**
  * Get all notifications for the authenticated user
@@ -94,7 +95,12 @@ const markAllAsRead = async (req, res) => {
         userId,
         isRead: false,
       },
+      data: {
+        isRead: true,
+      },
     });
+
+    cacheService.invalidateTags(['notifications']);
 
     return res.status(200).json({
       success: true,

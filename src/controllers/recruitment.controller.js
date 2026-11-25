@@ -668,6 +668,8 @@ const getApplicationResume = async (req, res) => {
   }
 };
 
+const VALID_APPLICATION_SOURCES = ['MANUAL', 'GMAIL', 'CAREER_PORTAL', 'LINKEDIN', 'OTHER'];
+
 const createApplication = async (req, res) => {
   try {
     const {
@@ -684,13 +686,21 @@ const createApplication = async (req, res) => {
       resumeSummary,
       notes,
       tags = [],
-      source = 'Manual Entry',
+      source = 'MANUAL',
     } = req.body;
 
     if (!name || !email || !role || !department) {
       return res.status(400).json({
         success: false,
         message: 'Name, Email, Role, and Department are mandatory fields.',
+      });
+    }
+
+    const normalizedSource = typeof source === 'string' ? source.trim().toUpperCase() : '';
+    if (!VALID_APPLICATION_SOURCES.includes(normalizedSource)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid application source "${source}". Allowed values: ${VALID_APPLICATION_SOURCES.join(', ')}.`,
       });
     }
 
@@ -718,7 +728,7 @@ const createApplication = async (req, res) => {
         resumeSummary: resumeSummary ? resumeSummary.trim() : null,
         notes: notes ? notes.trim() : null,
         tags: Array.isArray(tags) ? tags : typeof tags === 'string' ? tags.split(',').map((t) => t.trim()) : [],
-        source: source.trim(),
+        source: normalizedSource,
       },
       include: {
         jobOpening: {
