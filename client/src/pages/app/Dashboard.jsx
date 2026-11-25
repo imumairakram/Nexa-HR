@@ -198,6 +198,7 @@ const Dashboard = () => {
 
   // Extracted Dynamic Values directly from PostgreSQL Database
   const metrics = metricsData?.metrics || {};
+  const widgets = metricsData?.widgets || {};
   const totalEmployees = metrics.totalActiveEmployees ?? 0;
   const pendingLeaves = metrics.pendingLeaveRequests ?? 0;
   const workforcePresence = metrics.workforcePresence ?? 0;
@@ -364,12 +365,12 @@ const Dashboard = () => {
         <SparkMetricCard
           variant="dark"
           title="Total Headcount"
-          value={totalEmployees}
-          unit={totalEmployees === 1 ? 'Staff' : 'Staff'}
-          badgeText={totalEmployees > 0 ? `${totalEmployees} Active` : '0 Staff'}
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Active Company Roster"
+          value={widgets.headcount?.error ? '—' : totalEmployees}
+          unit={widgets.headcount?.error ? '' : 'Staff'}
+          badgeText={widgets.headcount?.error ? 'Unavailable' : totalEmployees > 0 ? `${totalEmployees} Active` : '0 Staff'}
+          badgeType={widgets.headcount?.error ? 'warning' : 'positive'}
+          badgeIcon={widgets.headcount?.error ? 'dot' : 'up'}
+          subtext={widgets.headcount?.error ? 'Widget temporarily unavailable' : 'Active Company Roster'}
           chartColor="sky"
           presetWave="wave1"
           dataPoints={headcountSparkData}
@@ -381,17 +382,19 @@ const Dashboard = () => {
         <SparkMetricCard
           variant="light"
           title="On-Time Arrival"
-          value={todayPresentCount === 0 ? '0%' : `${onTimeArrival}%`}
+          value={widgets.attendance?.error ? '—' : todayPresentCount === 0 ? '0%' : `${onTimeArrival}%`}
           badgeText={
-            todayPresentCount === 0
+            widgets.attendance?.error
+              ? 'Unavailable'
+              : todayPresentCount === 0
               ? '0 Check-ins'
               : onTimeArrival >= 80
               ? `${onTimeArrival}% Punctual`
               : `${onTimeArrival}% On-Time`
           }
-          badgeType={todayPresentCount === 0 ? 'neutral' : onTimeArrival >= 80 ? 'positive' : 'warning'}
-          badgeIcon={todayPresentCount === 0 ? 'dot' : onTimeArrival >= 80 ? 'up' : 'down'}
-          subtext={todayPresentCount === 0 ? 'Awaiting Today\'s Punch' : `${todayOnTimeCount} On-Time Today`}
+          badgeType={widgets.attendance?.error ? 'warning' : todayPresentCount === 0 ? 'neutral' : onTimeArrival >= 80 ? 'positive' : 'warning'}
+          badgeIcon={widgets.attendance?.error ? 'dot' : todayPresentCount === 0 ? 'dot' : onTimeArrival >= 80 ? 'up' : 'down'}
+          subtext={widgets.attendance?.error ? 'Widget temporarily unavailable' : todayPresentCount === 0 ? 'Awaiting Today\'s Punch' : `${todayOnTimeCount} On-Time Today`}
           chartColor="orange"
           presetWave="wave2"
           dataPoints={onTimeSparkData}
@@ -403,12 +406,12 @@ const Dashboard = () => {
         <SparkMetricCard
           variant="light"
           title="Pending Leaves"
-          value={pendingLeaves}
-          unit={pendingLeaves === 1 ? 'Request' : 'Requests'}
-          badgeText={pendingLeaves > 0 ? `${pendingLeaves} In Review` : 'All Cleared'}
-          badgeType={pendingLeaves > 0 ? 'warning' : 'positive'}
-          badgeIcon={pendingLeaves > 0 ? 'dot' : 'up'}
-          subtext={pendingLeaves > 0 ? 'Awaiting HR Review' : 'Zero Backlog'}
+          value={widgets.leaves?.error ? '—' : pendingLeaves}
+          unit={widgets.leaves?.error ? '' : pendingLeaves === 1 ? 'Request' : 'Requests'}
+          badgeText={widgets.leaves?.error ? 'Unavailable' : pendingLeaves > 0 ? `${pendingLeaves} In Review` : 'All Cleared'}
+          badgeType={widgets.leaves?.error ? 'warning' : pendingLeaves > 0 ? 'warning' : 'positive'}
+          badgeIcon={widgets.leaves?.error ? 'dot' : pendingLeaves > 0 ? 'dot' : 'up'}
+          subtext={widgets.leaves?.error ? 'Widget temporarily unavailable' : pendingLeaves > 0 ? 'Awaiting HR Review' : 'Zero Backlog'}
           chartColor="amber"
           presetWave="wave3"
           dataPoints={pendingLeavesSparkData}
@@ -420,12 +423,12 @@ const Dashboard = () => {
         <SparkMetricCard
           variant="light"
           title="Absent Today"
-          value={absentToday}
-          unit={absentToday === 1 ? 'Staff' : 'Staff'}
-          badgeText={absentToday === 0 ? 'Full Roster' : `${absentToday} Pending / Absent`}
-          badgeType={absentToday === 0 ? 'positive' : 'neutral'}
-          badgeIcon={absentToday === 0 ? 'up' : 'dot'}
-          subtext={todayPresentCount > 0 ? `${absentToday} Unrecorded` : `0 of ${totalEmployees} Logged In`}
+          value={widgets.attendance?.error ? '—' : absentToday}
+          unit={widgets.attendance?.error ? '' : 'Staff'}
+          badgeText={widgets.attendance?.error ? 'Unavailable' : absentToday === 0 ? 'Full Roster' : `${absentToday} Pending / Absent`}
+          badgeType={widgets.attendance?.error ? 'warning' : absentToday === 0 ? 'positive' : 'neutral'}
+          badgeIcon={widgets.attendance?.error ? 'dot' : absentToday === 0 ? 'up' : 'dot'}
+          subtext={widgets.attendance?.error ? 'Widget temporarily unavailable' : todayPresentCount > 0 ? `${absentToday} Unrecorded` : `0 of ${totalEmployees} Logged In`}
           chartColor="rose"
           presetWave="wave4"
           dataPoints={absentSparkData}

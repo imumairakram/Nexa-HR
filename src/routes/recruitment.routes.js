@@ -42,12 +42,13 @@ const {
 // Require authentication for all recruitment endpoints
 router.use(verifyToken);
 
-const canManageRecruitment = checkRole('ADMIN', 'HR_MANAGER', 'EMPLOYEE', 'SUPER_ADMIN');
+const canManageRecruitment = checkRole('ADMIN', 'HR_MANAGER', 'SUPER_ADMIN');
+const canAdminRecruitment = checkRole('ADMIN', 'SUPER_ADMIN');
 
 // --- Telemetry, Seeding & Wiping ---
 router.get('/stats', cacheService.middleware({ ttlSeconds: 60, tags: ['recruitment', 'recruitment-stats'] }), getRecruitmentStats);
-router.post('/seed', blockDemo, canManageRecruitment, seedRecruitmentData);
-router.delete('/clear-all', blockDemo, canManageRecruitment, clearAllRecruitmentData);
+router.post('/seed', blockDemo, canAdminRecruitment, seedRecruitmentData);
+router.delete('/clear-all', blockDemo, canAdminRecruitment, clearAllRecruitmentData);
 
 // --- Job Openings ---
 router.get('/jobs', cacheService.middleware({ ttlSeconds: 60, tags: ['recruitment', 'recruitment-jobs'] }), getJobOpenings);
