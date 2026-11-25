@@ -661,6 +661,7 @@ const EmployeeDashboard = () => {
     return { text: 'No Records', type: 'neutral', icon: 'dot', sub: 'No Payroll Setup' };
   }, [latestPayslip, currentUser, payslipPeriod]);
 
+  const widgets = dashboardData?.widgets || {};
   const employeeShift = currentUser?.profile?.shift || currentUser?.shift || 'General Shift';
   const officeLocation = currentUser?.profile?.workLocation || currentUser?.workLocation || 'Corporate Office';
 
@@ -682,12 +683,12 @@ const EmployeeDashboard = () => {
         <SparkMetricCard
           variant="dark"
           title="Present This Month"
-          value={monthlyAttendance?.presentDays || 0}
-          unit={monthlyAttendance?.presentDays === 1 ? 'Day' : 'Days'}
-          badgeText={card1Badge.text}
-          badgeType={card1Badge.type}
-          badgeIcon={card1Badge.icon}
-          subtext={card1Badge.sub}
+          value={widgets.attendance?.error ? '—' : (monthlyAttendance?.presentDays || 0)}
+          unit={widgets.attendance?.error ? '' : monthlyAttendance?.presentDays === 1 ? 'Day' : 'Days'}
+          badgeText={widgets.attendance?.error ? 'Unavailable' : card1Badge.text}
+          badgeType={widgets.attendance?.error ? 'warning' : card1Badge.type}
+          badgeIcon={widgets.attendance?.error ? 'dot' : card1Badge.icon}
+          subtext={widgets.attendance?.error ? 'Widget temporarily unavailable' : card1Badge.sub}
           chartColor="sky"
           presetWave="wave1"
           dataPoints={attendanceSparkData}
@@ -699,12 +700,12 @@ const EmployeeDashboard = () => {
         <SparkMetricCard
           variant="light"
           title="Logged Hours"
-          value={monthlyAttendance?.totalWorkHours ? Number(monthlyAttendance.totalWorkHours.toFixed(1)) : 0}
-          unit="hrs"
-          badgeText={card2Badge.text}
-          badgeType={card2Badge.type}
-          badgeIcon={card2Badge.icon}
-          subtext={card2Badge.sub}
+          value={widgets.attendance?.error ? '—' : (monthlyAttendance?.totalWorkHours ? Number(monthlyAttendance.totalWorkHours.toFixed(1)) : 0)}
+          unit={widgets.attendance?.error ? '' : 'hrs'}
+          badgeText={widgets.attendance?.error ? 'Unavailable' : card2Badge.text}
+          badgeType={widgets.attendance?.error ? 'warning' : card2Badge.type}
+          badgeIcon={widgets.attendance?.error ? 'dot' : card2Badge.icon}
+          subtext={widgets.attendance?.error ? 'Widget temporarily unavailable' : card2Badge.sub}
           chartColor="orange"
           presetWave="wave2"
           dataPoints={hoursSparkData}
@@ -716,12 +717,12 @@ const EmployeeDashboard = () => {
         <SparkMetricCard
           variant="light"
           title="Available Leaves"
-          value={totalRemainingLeaves}
-          unit="Days"
-          badgeText={card3Badge.text}
-          badgeType={card3Badge.type}
-          badgeIcon={card3Badge.icon}
-          subtext={card3Badge.sub}
+          value={widgets.leaves?.error ? '—' : totalRemainingLeaves}
+          unit={widgets.leaves?.error ? '' : 'Days'}
+          badgeText={widgets.leaves?.error ? 'Unavailable' : card3Badge.text}
+          badgeType={widgets.leaves?.error ? 'warning' : card3Badge.type}
+          badgeIcon={widgets.leaves?.error ? 'dot' : card3Badge.icon}
+          subtext={widgets.leaves?.error ? 'Widget temporarily unavailable' : card3Badge.sub}
           chartColor="amber"
           presetWave="wave3"
           dataPoints={leavesSparkData}
@@ -748,11 +749,11 @@ const EmployeeDashboard = () => {
               )}
             </button>
           }
-          value={displaySalary}
-          badgeText={card4Badge.text}
-          badgeType={card4Badge.type}
-          badgeIcon={card4Badge.icon}
-          subtext={card4Badge.sub}
+          value={widgets.payslips?.error ? '—' : displaySalary}
+          badgeText={widgets.payslips?.error ? 'Unavailable' : card4Badge.text}
+          badgeType={widgets.payslips?.error ? 'warning' : card4Badge.type}
+          badgeIcon={widgets.payslips?.error ? 'dot' : card4Badge.icon}
+          subtext={widgets.payslips?.error ? 'Widget temporarily unavailable' : card4Badge.sub}
           chartColor="emerald"
           presetWave="wave4"
           dataPoints={salarySparkData}
