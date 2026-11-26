@@ -97,7 +97,7 @@ const EmployeeBottomNav = () => {
 
       {/* Fixed Bottom Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-3 pt-0">
-        <nav className="bg-[#111111] dark:bg-[#0a0a0a] rounded-2xl px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.45)] flex items-center justify-around border border-white/5">
+        <nav className="bg-[#111111] dark:bg-[#0a0a0a] rounded-full p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.45)] flex items-center justify-between border border-white/5">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -105,10 +105,10 @@ const EmployeeBottomNav = () => {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `relative flex flex-col items-center gap-1 px-3.5 py-2 rounded-[14px] transition-all duration-200 min-w-[52px] ${
+                  `relative flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-full transition-all duration-200 flex-1 ${
                     isActive
                       ? 'bg-white text-[#111111] font-bold shadow-sm'
-                      : 'text-white/50 hover:text-white/90'
+                      : 'text-white/55 hover:text-white/90'
                   }`
                 }
               >
@@ -135,7 +135,7 @@ const EmployeeBottomNav = () => {
           {/* More trigger */}
           <button
             onClick={() => setIsMoreOpen(true)}
-            className="flex flex-col items-center gap-1 px-3.5 py-2 rounded-[14px] text-white/50 hover:text-white/90 transition-all cursor-pointer min-w-[52px]"
+            className="flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-full text-white/55 hover:text-white/90 transition-all cursor-pointer flex-1"
           >
             <MoreHorizontal className="w-[18px] h-[18px] stroke-[1.6]" />
             <span className="text-[10px] tracking-wide font-semibold opacity-70">More</span>
