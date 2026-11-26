@@ -12,8 +12,8 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-gradient-to-t from-[#F4F4F7] via-[#F4F4F7]/90 dark:from-[#0B0F19] dark:via-[#0B0F19]/90 to-transparent">
-      <nav className="bg-slate-900/95 backdrop-blur-md rounded-[14px] p-2.5 shadow-2xl flex items-center justify-around border border-slate-800">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 pt-0">
+      <nav className="bg-[#111111] dark:bg-[#0a0a0a] rounded-2xl px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.45)] flex items-center justify-around border border-white/5">
         {mobileNavItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -21,15 +21,29 @@ const MobileBottomNav = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 px-4 py-2 rounded-[8px] transition-all duration-200 ${
+                `relative flex flex-col items-center gap-1 px-3.5 py-2 rounded-[14px] transition-all duration-200 min-w-[52px] ${
                   isActive
-                    ? 'bg-teal-700 text-white font-bold shadow-xs'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-[#111111] font-bold shadow-sm'
+                    : 'text-white/50 hover:text-white/90'
                 }`
               }
             >
-              <Icon className="w-5 h-5" />
-              <span className="text-[10px] tracking-wide">{item.label}</span>
+              {({ isActive }) => (
+                <>
+                  <Icon
+                    className={`w-[18px] h-[18px] transition-all duration-200 ${
+                      isActive ? 'stroke-[2.4]' : 'stroke-[1.6]'
+                    }`}
+                  />
+                  <span
+                    className={`text-[10px] tracking-wide font-semibold transition-all duration-200 ${
+                      isActive ? 'opacity-100' : 'opacity-70'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </>
+              )}
             </NavLink>
           );
         })}

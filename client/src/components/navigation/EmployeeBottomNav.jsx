@@ -7,7 +7,6 @@ import {
   CreditCard,
   User,
   MoreHorizontal,
-  FolderKanban,
   Megaphone,
   Award,
   Calendar,
@@ -37,26 +36,42 @@ const EmployeeBottomNav = () => {
     { label: 'Settings', path: '/employee/settings', icon: Settings },
   ];
 
-
   return (
     <>
-      {/* More Drawer Modal for Mobile */}
+      {/* More Drawer Modal */}
       {isMoreOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex flex-col justify-end p-3">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[14px] p-5 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4 animate-in slide-in-from-bottom-6 duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-400">
-                All Portal Modules
+        <div
+          className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end"
+          onClick={() => setIsMoreOpen(false)}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+          {/* Sheet */}
+          <div
+            className="relative bg-[#111111] rounded-t-3xl p-5 pb-8 shadow-2xl space-y-4 animate-in slide-in-from-bottom-6 duration-200 border-t border-white/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center mb-1">
+              <div className="w-10 h-1 rounded-full bg-white/20" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <span className="text-[11px] font-black uppercase tracking-widest text-white/40">
+                All Modules
               </span>
               <button
                 onClick={() => setIsMoreOpen(false)}
-                className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-pointer"
+                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white cursor-pointer transition-all"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-xs">
+            {/* Grid */}
+            <div className="grid grid-cols-3 gap-2.5">
               {moreItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -66,10 +81,10 @@ const EmployeeBottomNav = () => {
                       navigate(item.path);
                       setIsMoreOpen(false);
                     }}
-                    className="p-3 rounded-[12px] bg-slate-50 dark:bg-slate-800/80 hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-700 dark:hover:text-sky-300 flex flex-col items-center gap-1.5 text-center transition-all cursor-pointer"
+                    className="p-3.5 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/8 hover:border-white/20 flex flex-col items-center gap-2 text-center transition-all cursor-pointer group active:scale-95"
                   >
-                    <Icon className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 leading-tight">
+                    <Icon className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                    <span className="text-[11px] font-semibold text-white/60 group-hover:text-white leading-tight transition-colors">
                       {item.label}
                     </span>
                   </button>
@@ -81,8 +96,8 @@ const EmployeeBottomNav = () => {
       )}
 
       {/* Fixed Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-3 bg-gradient-to-t from-[#F4F4F7] via-[#F4F4F7]/90 dark:from-[#0B0F19] dark:via-[#0B0F19]/90 to-transparent">
-        <nav className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-[14px] p-1.5 shadow-2xl flex items-center justify-around border border-slate-200/80 dark:border-slate-800">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-3 pt-0">
+        <nav className="bg-[#111111] dark:bg-[#0a0a0a] rounded-2xl px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.45)] flex items-center justify-around border border-white/5">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -90,15 +105,29 @@ const EmployeeBottomNav = () => {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex flex-col items-center gap-1 px-3 py-1.5 rounded-[8px] transition-all duration-200 ${
+                  `relative flex flex-col items-center gap-1 px-3.5 py-2 rounded-[14px] transition-all duration-200 min-w-[52px] ${
                     isActive
-                      ? 'bg-sky-500 text-white font-bold shadow-xs'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                      ? 'bg-white text-[#111111] font-bold shadow-sm'
+                      : 'text-white/50 hover:text-white/90'
                   }`
                 }
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-[10px] tracking-tight">{item.label}</span>
+                {({ isActive }) => (
+                  <>
+                    <Icon
+                      className={`w-[18px] h-[18px] transition-all duration-200 ${
+                        isActive ? 'stroke-[2.4]' : 'stroke-[1.6]'
+                      }`}
+                    />
+                    <span
+                      className={`text-[10px] tracking-wide font-semibold transition-all duration-200 ${
+                        isActive ? 'opacity-100' : 'opacity-70'
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </>
+                )}
               </NavLink>
             );
           })}
@@ -106,10 +135,10 @@ const EmployeeBottomNav = () => {
           {/* More trigger */}
           <button
             onClick={() => setIsMoreOpen(true)}
-            className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[12px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer"
+            className="flex flex-col items-center gap-1 px-3.5 py-2 rounded-[14px] text-white/50 hover:text-white/90 transition-all cursor-pointer min-w-[52px]"
           >
-            <MoreHorizontal className="w-4 h-4" />
-            <span className="text-[10px] tracking-tight">More</span>
+            <MoreHorizontal className="w-[18px] h-[18px] stroke-[1.6]" />
+            <span className="text-[10px] tracking-wide font-semibold opacity-70">More</span>
           </button>
         </nav>
       </div>
