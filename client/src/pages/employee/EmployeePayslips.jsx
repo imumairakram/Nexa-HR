@@ -194,7 +194,7 @@ const EmployeePayslips = () => {
         <SparkMetricCard
           variant="light"
           title="Net Take-Home Pay"
-          value={formatCurrency(latestNet)}
+          value={Math.round(latestNet).toLocaleString()}
           unit=""
           badgeText={latestSlip ? (latestSlip.status === 'PAID' ? 'Disbursed' : 'Active Rate') : 'No Records'}
           badgeType={latestSlip ? 'positive' : 'neutral'}
@@ -210,7 +210,7 @@ const EmployeePayslips = () => {
         <SparkMetricCard
           variant="light"
           title="YTD Gross Earnings"
-          value={formatCurrency(ytdGross)}
+          value={Math.round(ytdGross).toLocaleString()}
           unit=""
           badgeText={`${currentYear} Total`}
           badgeType={ytdGross > 0 ? 'positive' : 'neutral'}
@@ -226,7 +226,7 @@ const EmployeePayslips = () => {
         <SparkMetricCard
           variant="light"
           title="Total Net Disbursed"
-          value={formatCurrency(totalNetAllTime)}
+          value={Math.round(totalNetAllTime).toLocaleString()}
           unit=""
           badgeText={`${payslips.length} Cycles Paid`}
           badgeType={payslips.length > 0 ? 'positive' : 'neutral'}
@@ -242,7 +242,7 @@ const EmployeePayslips = () => {
         <SparkMetricCard
           variant="light"
           title="Total Deductions"
-          value={formatCurrency(totalDeductionsAllTime)}
+          value={Math.round(totalDeductionsAllTime).toLocaleString()}
           unit=""
           badgeText={totalDeductionsAllTime > 0 ? 'Withholdings' : 'No Deductions'}
           badgeType="neutral"
