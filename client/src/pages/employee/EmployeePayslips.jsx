@@ -187,53 +187,6 @@ const EmployeePayslips = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 1. HERO PAYSLIP & COMPENSATION BANNER */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-          {/* Left Side: Payroll Overview */}
-          <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
-            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Payroll & Compensation Statements
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/90 leading-relaxed max-w-lg font-medium">
-              Access your monthly payslips, tax deductions, and salary records in one place.
-            </p>
-          </div>
-
-          {/* Right Side: Quick Download Voucher Action Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-2.5">
-            <div className="text-xs font-bold text-white/80 uppercase tracking-wider">Latest Net Salary</div>
-            <div className="text-2xl sm:text-3xl font-black text-white font-mono">
-              {formatCurrency(latestNet)}
-            </div>
-            <div className="text-[11px] text-white/80 font-medium">
-              {latestSlip ? 'Direct Bank Wire Disbursed' : 'No Disbursal Recorded'}
-            </div>
-            <button
-              disabled={!latestSlip}
-              onClick={() => {
-                if (latestSlip) handleDownload(latestSlip);
-              }}
-              className={`w-full mt-1 px-5 py-2.5 rounded-[12px] font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all ${
-                latestSlip
-                  ? 'bg-[#07617D] hover:bg-[#054C62] text-white shadow-md shadow-sky-950/25 cursor-pointer hover:scale-105 active:scale-95'
-                  : 'bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed shadow-none'
-              }`}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download Payslip</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
       {/* 2. COMPENSATION OVERVIEW SPARKLINE METRIC CARDS */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
