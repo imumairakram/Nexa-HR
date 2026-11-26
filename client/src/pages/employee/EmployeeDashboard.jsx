@@ -672,16 +672,16 @@ const EmployeeDashboard = () => {
         mobileTitle="Employee Dashboard"
         hideMobileSubtitle={true}
         hideMobileSearch={true}
-        subtitle="Live PostgreSQL analytics, workforce biometric attendance tracking, and leave pipeline."
+        subtitle="Track your attendance, manage leave requests, and stay updated with company announcements."
         onRefresh={() => fetchDashboard(true)}
         loading={loading}
       />
 
       {/* TOP METRICS CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Monthly Attendance */}
+        {/* Card 1: Light Card - Monthly Attendance */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Present This Month"
           value={widgets.attendance?.error ? '—' : (monthlyAttendance?.presentDays || 0)}
           unit={widgets.attendance?.error ? '' : monthlyAttendance?.presentDays === 1 ? 'Day' : 'Days'}
@@ -858,7 +858,7 @@ const EmployeeDashboard = () => {
                   <button
                     key={tf.id}
                     onClick={() => setTrendTimeframe(tf.id)}
-                    className={`px-2.5 py-1 rounded-[12px] transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-[10px] transition-all cursor-pointer ${
                       trendTimeframe === tf.id
                         ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -881,11 +881,11 @@ const EmployeeDashboard = () => {
                     <stop offset="95%" stopColor="#0A8FB5" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#595959' }} />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: '#94A3B8' }}
+                  tick={{ fontSize: 10, fill: '#595959' }}
                   domain={[0, 10]}
                   tickFormatter={(val) => `${val}h`}
                   allowDecimals={false}
@@ -924,7 +924,7 @@ const EmployeeDashboard = () => {
           </div>
 
           {/* Subtext info */}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-[#595959] dark:text-slate-400">
             <span>
               Period Logged: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalPeriodAttendance} Days Present</strong> ({totalPeriodHours.toFixed(1)} hrs total)
             </span>
@@ -1097,7 +1097,7 @@ const EmployeeDashboard = () => {
                   <h3 className="font-black text-sm text-slate-900 dark:text-white">
                     Upcoming Holidays
                   </h3>
-                  <p className="text-xs text-slate-400">Official non-working observance days</p>
+                  <p className="text-xs text-[#595959] dark:text-slate-400">Official public holidays and company closures</p>
                 </div>
               </div>
 
@@ -1145,35 +1145,35 @@ const EmployeeDashboard = () => {
           </div>
 
           {/* Assigned Shift Schedule Card */}
-          <div className="bg-gradient-to-br from-slate-900 to-sky-950 rounded-3xl p-6 shadow-soft text-white border border-slate-800 space-y-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-sky-400" />
-                <span className="text-xs font-black uppercase tracking-wider text-slate-300">
+                <ShieldCheck className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
                   Assigned Shift Schedule
                 </span>
               </div>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-500/20 text-sky-300 border border-sky-500/30">
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60">
                 Active Policy
               </span>
             </div>
 
             <div className="space-y-2.5 text-xs">
-              <div className="flex items-center justify-between py-1.5 border-b border-white/10">
-                <span className="text-slate-400">Shift Name</span>
-                <span className="font-bold text-white truncate max-w-[180px]">{employeeShift}</span>
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-[#595959] dark:text-slate-400">Shift Name</span>
+                <span className="font-bold text-slate-900 dark:text-white truncate max-w-[180px]">{employeeShift}</span>
               </div>
-              <div className="flex items-center justify-between py-1.5 border-b border-white/10">
-                <span className="text-slate-400">Working Hours</span>
-                <span className="font-bold text-sky-400">09:00 AM – 05:30 PM</span>
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-[#595959] dark:text-slate-400">Working Hours</span>
+                <span className="font-bold text-sky-700 dark:text-sky-400">09:00 AM – 05:30 PM</span>
               </div>
-              <div className="flex items-center justify-between py-1.5 border-b border-white/10">
-                <span className="text-slate-400">Work Week</span>
-                <span className="font-bold text-white">Monday – Friday</span>
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-[#595959] dark:text-slate-400">Work Week</span>
+                <span className="font-bold text-slate-900 dark:text-white">Monday – Friday</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-slate-400">Grace Period</span>
-                <span className="font-bold text-amber-300">15 Mins (Till 09:15 AM)</span>
+                <span className="text-[#595959] dark:text-slate-400">Grace Period</span>
+                <span className="font-bold text-amber-700 dark:text-amber-300">15 Mins (Till 09:15 AM)</span>
               </div>
             </div>
           </div>

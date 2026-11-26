@@ -456,7 +456,7 @@ const EmployeePageHeader = ({
               <p
                 className={`${
                   hideMobileSubtitle ? 'hidden sm:block' : 'line-clamp-1 sm:line-clamp-none'
-                } text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium max-w-xl leading-relaxed mt-0.5 truncate`}
+                } text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium max-w-xl leading-relaxed mt-0.5 truncate`}
                 title={typeof displaySubtitle === 'string' ? displaySubtitle : undefined}
               >
                 {displaySubtitle}
@@ -711,7 +711,7 @@ const EmployeePageHeader = ({
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Search self-service..."
+                placeholder="Search for policies, people, or help..."
                 value={searchQuery}
                 onFocus={() => setIsSearchOpen(true)}
                 onChange={handleSearchChange}
@@ -727,7 +727,7 @@ const EmployeePageHeader = ({
                     <X className="w-3.5 h-3.5" />
                   </button>
                 ) : (
-                  <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-slate-400 bg-slate-200/60 dark:bg-slate-700/60 px-1.5 py-0.5 rounded-[12px] pointer-events-none">
+                  <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-slate-600 dark:text-slate-200 bg-slate-200/80 dark:bg-slate-700/80 px-1.5 py-0.5 rounded-[12px] pointer-events-none">
                     ⌘K
                   </span>
                 )}
