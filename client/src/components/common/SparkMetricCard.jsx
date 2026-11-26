@@ -428,7 +428,7 @@ const SparkMetricCard = ({
             {unit && !loading && (
               <span
                 className={`text-xs font-semibold whitespace-nowrap shrink-0 ${
-                  isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
+                  isDark ? 'text-slate-300' : 'text-[#595959] dark:text-slate-300'
                 }`}
               >
                 {unit}
@@ -597,7 +597,7 @@ const SparkMetricCard = ({
           {normalizedPoints.length >= 2 && (
             <div
               className={`w-full flex justify-between items-center text-[9px] sm:text-xs font-medium tracking-tight px-0.5 mt-0.5 select-none ${
-                isDark ? 'text-slate-400' : 'text-slate-400 dark:text-slate-400'
+                isDark ? 'text-slate-300' : 'text-[#595959] dark:text-slate-300'
               }`}
             >
               <span>{normalizedPoints[0]?.label || 'Start'}</span>
