@@ -655,7 +655,7 @@ const EmployeeLeaves = () => {
                                 <div className="font-extrabold text-slate-900 dark:text-white text-xs">
                                   {req.leaveType?.name || 'General Leave'}
                                 </div>
-                                <div className="text-[10px] text-slate-400 font-mono">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                                <div className="text-[10px] text-slate-400 font-sans tabular-nums">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
                               </div>
                             </div>
                             <span
@@ -760,7 +760,7 @@ const EmployeeLeaves = () => {
                           </td>
 
                           {/* 2. Leave Policy Column */}
-                          <td className="py-4 px-4 font-mono">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             <div>
                               <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
                                 {req.leaveType?.name || 'General Leave'}
@@ -940,7 +940,7 @@ const EmployeeLeaves = () => {
                       <span>{selectedReq.status}</span>
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-sans tabular-nums">
                     REQ ID: #{selectedReq.id}
                   </p>
                 </div>
@@ -972,7 +972,7 @@ const EmployeeLeaves = () => {
                       {selectedReq.leaveType?.isPaid !== false ? 'Paid Allowance' : 'Unpaid Leave'}
                     </span>
                   </div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                  <div className="text-2xl font-black text-slate-900 dark:text-white font-sans tabular-nums tracking-tight">
                     {formatLeaveDays(calculateLeaveDays(selectedReq))}
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
@@ -987,14 +987,14 @@ const EmployeeLeaves = () => {
                       <Calendar className="w-3.5 h-3.5 text-sky-500" />
                       Schedule Window
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[10px] font-sans tabular-nums text-slate-400">
                       Calendar Span
                     </span>
                   </div>
                   <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                     {formatDateRange(selectedReq.startDate, selectedReq.endDate)}
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-sans tabular-nums">
                     {selectedReq.startDate ? selectedReq.startDate.split('T')[0] : ''} → {selectedReq.endDate ? selectedReq.endDate.split('T')[0] : ''}
                   </div>
                 </div>

@@ -1005,7 +1005,7 @@ const Attendance = () => {
                       {activeEmployeeObj.fullName ||
                         `${activeEmployeeObj.firstName} ${activeEmployeeObj.lastName}`}
                     </h4>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-[12px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60">
+                    <span className="text-[10px] font-sans tabular-nums font-bold px-2 py-0.5 rounded-[12px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60">
                       {activeEmployeeObj.employeeCode}
                     </span>
                   </div>
@@ -1081,7 +1081,7 @@ const Attendance = () => {
                                   >
                                     {log.user?.fullName}
                                   </button>
-                                  <div className="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                                  <div className="text-[10px] text-slate-400 font-sans tabular-nums flex items-center gap-1.5 mt-0.5">
                                     <span>{log.user?.employeeCode}</span>
                                     <span>•</span>
                                     <span className="text-slate-500 dark:text-slate-400 truncate max-w-[110px]">
@@ -1131,7 +1131,7 @@ const Attendance = () => {
                           </td>
 
                           {/* 2. Punch In Column */}
-                          <td className="py-4 px-4 font-mono">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             {isLeave ? (
                               <span className="text-slate-400 dark:text-slate-500 text-xs font-sans italic">
                                 — (Time Off)
@@ -1149,7 +1149,7 @@ const Attendance = () => {
                           </td>
 
                           {/* 3. Punch Out Column */}
-                          <td className="py-4 px-4 font-mono">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             {isLeave ? (
                               <span className="text-slate-400 dark:text-slate-500 text-xs font-sans italic">
                                 — (Time Off)
@@ -1285,7 +1285,7 @@ const Attendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch In
                             </div>
-                            <div className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300 mt-0.5">
+                            <div className="text-xs font-bold font-sans tabular-nums text-slate-700 dark:text-slate-300 mt-0.5">
                               {log.checkIn}
                             </div>
                           </div>
@@ -1293,7 +1293,7 @@ const Attendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch Out
                             </div>
-                            <div className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400 mt-0.5">
+                            <div className="text-xs font-bold font-sans tabular-nums text-sky-600 dark:text-sky-400 mt-0.5">
                               {log.checkOut}
                             </div>
                           </div>

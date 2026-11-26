@@ -310,7 +310,7 @@ const EmployeePayslips = () => {
                               </div>
                               <div>
                                 <div className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">{payMonthStr}</div>
-                                <div className="text-[10px] text-slate-400 font-mono">Voucher #{ps.id.slice(0, 8)}</div>
+                                <div className="text-[10px] text-slate-400 font-sans tabular-nums">Voucher #{ps.id.slice(0, 8)}</div>
                               </div>
                             </div>
                             <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-emerald-600 dark:text-emerald-400 shrink-0">
@@ -398,12 +398,12 @@ const EmployeePayslips = () => {
                           <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                             <div>
                               <div className="font-extrabold text-slate-800 dark:text-slate-100 text-xs sm:text-sm">{payMonthStr}</div>
-                              <div className="text-xs text-[#595959] dark:text-slate-400 font-mono tabular-nums mt-0.5">Voucher #{ps.id.slice(0, 8)}</div>
+                              <div className="text-xs text-[#595959] dark:text-slate-400 font-sans tabular-nums mt-0.5">Voucher #{ps.id.slice(0, 8)}</div>
                             </div>
                           </td>
 
                           {/* 2. Disbursal Date */}
-                          <td className="py-4 px-4 font-mono tabular-nums">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             <div>
                               <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                                 <Calendar className="w-3.5 h-3.5 text-[#595959] dark:text-slate-400" />
@@ -416,7 +416,7 @@ const EmployeePayslips = () => {
                           </td>
 
                           {/* 3. Gross Amount */}
-                          <td className="py-4 px-4 font-mono tabular-nums">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             <div className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
                               {formatCurrency(ps.grossSalary || 0)}
                             </div>
@@ -426,7 +426,7 @@ const EmployeePayslips = () => {
                           </td>
 
                           {/* 4. Deductions */}
-                          <td className="py-4 px-4 font-mono tabular-nums">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             <div className="font-semibold text-rose-600 dark:text-rose-400 text-xs sm:text-sm">
                               -{formatCurrency(totalDed)}
                             </div>
@@ -436,7 +436,7 @@ const EmployeePayslips = () => {
                           </td>
 
                           {/* 5. Net Payout */}
-                          <td className="py-4 px-4 font-mono tabular-nums">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             <div className="text-xs sm:text-sm font-black text-[#07617D] dark:text-sky-300">
                               {formatCurrency(ps.netSalary || 0)}
                             </div>
@@ -578,16 +578,16 @@ const EmployeePayslips = () => {
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between text-slate-600 dark:text-slate-300">
                       <span>Basic Base Salary</span>
-                      <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+                      <span className="font-sans tabular-nums font-bold text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
                     </div>
                     <div className="flex justify-between text-slate-600 dark:text-slate-300">
                       <span>Allowances & Housing</span>
-                      <span className="font-mono font-bold text-slate-900 dark:text-white">{formatCurrency(0)}</span>
+                      <span className="font-sans tabular-nums font-bold text-slate-900 dark:text-white">{formatCurrency(0)}</span>
                     </div>
                   </div>
                   <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700/80 flex justify-between text-xs font-extrabold text-slate-900 dark:text-white">
                     <span>Gross Total</span>
-                    <span className="font-mono text-sm">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
+                    <span className="font-sans tabular-nums text-sm">{formatCurrency(selectedPayslip.grossSalary || 0)}</span>
                   </div>
                 </div>
 
@@ -604,16 +604,16 @@ const EmployeePayslips = () => {
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between text-slate-600 dark:text-slate-300">
                       <span>Income Tax Withholding</span>
-                      <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.taxDeductions || 0)}</span>
+                      <span className="font-sans tabular-nums font-bold text-rose-500">-{formatCurrency(selectedPayslip.taxDeductions || 0)}</span>
                     </div>
                     <div className="flex justify-between text-slate-600 dark:text-slate-300">
                       <span>Unpaid Leaves</span>
-                      <span className="font-mono font-bold text-rose-500">-{formatCurrency(selectedPayslip.unpaidLeaveDeduction || 0)}</span>
+                      <span className="font-sans tabular-nums font-bold text-rose-500">-{formatCurrency(selectedPayslip.unpaidLeaveDeduction || 0)}</span>
                     </div>
                   </div>
                   <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700/80 flex justify-between text-xs font-extrabold text-slate-900 dark:text-white">
                     <span>Total Deductions</span>
-                    <span className="font-mono text-sm text-rose-500">
+                    <span className="font-sans tabular-nums text-sm text-rose-500">
                       -{formatCurrency(
                         (Number(selectedPayslip.taxDeductions) || 0) +
                         (Number(selectedPayslip.otherDeductions) || 0) +
@@ -634,7 +634,7 @@ const EmployeePayslips = () => {
                     Wire Transferred to Registered Bank Account
                   </div>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono tracking-tight">
+                <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-sans tabular-nums tracking-tight">
                   {formatCurrency(selectedPayslip.netSalary || 0)}
                 </div>
               </div>
