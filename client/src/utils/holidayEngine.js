@@ -528,9 +528,7 @@ export function getYearHolidays(year = 2026, timezone = 'Asia/Karachi', dateForm
         countdown = `In ${diffDays} Days`;
       } else {
         status = 'PASSED';
-        const pastDays = Math.abs(diffDays);
-        if (pastDays < 30) countdown = `Passed ${pastDays}d ago`;
-        else countdown = 'Observed';
+        countdown = 'Observed';
       }
 
       return {

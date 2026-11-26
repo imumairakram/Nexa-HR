@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Clock,
@@ -457,37 +457,41 @@ const EmployeeDashboard = () => {
     const result = [];
     const now = new Date();
 
+    const toLocalDateKey = (dateInput) => {
+      const dt = new Date(dateInput);
+      if (isNaN(dt.getTime())) return '';
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const day = String(dt.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
     const logsByDate = {};
     if (Array.isArray(attendanceLogs)) {
       attendanceLogs.forEach((log) => {
         if (log.date) {
-          const key = new Date(log.date).toISOString().split('T')[0];
-          logsByDate[key] = log;
+          const key = toLocalDateKey(log.date);
+          if (key) logsByDate[key] = log;
         }
       });
     }
 
     for (let i = daysCount - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(now.getDate() - i);
-      const key = d.toISOString().split('T')[0];
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const key = toLocalDateKey(d);
       const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
       const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const log = logsByDate[key];
       const isWeekend = d.getDay() === 0 || d.getDay() === 6;
 
       let hours = 0;
-      let status = isWeekend ? 'Weekend Off' : 'Unrecorded';
+      let status = isWeekend ? 'Weekend Off' : 'No Log';
       let checkins = 0;
 
       if (log) {
         hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : log.status === 'LATE' ? 7.5 : 0);
         status = log.status || 'PRESENT';
         checkins = (log.status === 'PRESENT' || log.status === 'LATE') ? 1 : 0;
-      } else if (!isWeekend && i > 0 && (monthlyAttendance?.presentDays || 0) > 0) {
-        hours = 8.5;
-        status = 'PRESENT';
-        checkins = 1;
       } else if (i === 0 && isPresent) {
         hours = Number(todayStatus?.totalHours) || 8.5;
         status = todayStatus?.status || 'PRESENT';
@@ -507,7 +511,7 @@ const EmployeeDashboard = () => {
     }
 
     return result;
-  }, [trendDaysCount, attendanceLogs, monthlyAttendance, isPresent, todayStatus]);
+  }, [trendDaysCount, attendanceLogs, isPresent, todayStatus]);
 
   const totalPeriodAttendance = useMemo(
     () => attendanceTrendData.reduce((acc, d) => acc + (d.attendance || 0), 0),

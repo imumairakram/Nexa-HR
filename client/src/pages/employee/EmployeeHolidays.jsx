@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Calendar,
   ChevronLeft,
@@ -77,7 +77,7 @@ const EmployeeHolidays = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <EmployeePageHeader
         title="Company Holidays Calendar"
-        subtitle="Dynamic calendar of gazetted public holidays, festival observances, and official non-working schedules."
+        subtitle="Official schedule of public holidays, festivals, and non-working days."
       />
 
       {/* ========================================================================= */}
@@ -95,8 +95,7 @@ const EmployeeHolidays = () => {
               </h2>
 
               <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
-                {featuredHoliday.description ||
-                  'Official paid public holiday observed across all company offices and duty stations. Attendance engines resume normal operations on the next working morning.'}
+                Official public holiday and company closure.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-white/90 font-semibold pt-1">
@@ -301,7 +300,9 @@ const EmployeeHolidays = () => {
 
                       <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         <span className="text-[10px] uppercase font-bold text-slate-400">{h.statusText}</span>
-                        <span className="text-xs font-extrabold text-sky-600 dark:text-sky-400">{h.countdown || 'Observed'}</span>
+                        <span className="text-xs font-extrabold text-sky-600 dark:text-sky-400">
+                          {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.status === 'PASSED' ? 'Observed' : h.countdown || 'Observed'}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -387,7 +388,7 @@ const EmployeeHolidays = () => {
                       {/* Column 5: Status & Countdown */}
                       <td className="py-4 px-6 whitespace-nowrap text-right">
                         <span className="text-xs font-sans tabular-nums font-bold text-slate-600 dark:text-slate-400">
-                          {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
+                          {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.status === 'PASSED' ? 'Observed' : h.countdown}
                         </span>
                       </td>
                     </tr>
