@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   FileText,
   Download,
@@ -114,6 +114,14 @@ const notifyVaultSync = () => {
     }
     localStorage.setItem('nexahr_sync_pulse', Date.now().toString());
   } catch { }
+};
+
+const formatDocumentTitle = (doc) => {
+  const raw = (doc?.title || '').trim();
+  if (!raw || raw.toLowerCase() === 'file') {
+    return doc?.typeLabel || (doc?.type ? doc.type.replace(/_/g, ' ') : '') || 'Professional Certificate';
+  }
+  return raw;
 };
 
 const EmployeeDocuments = () => {
@@ -870,7 +878,7 @@ const EmployeeDocuments = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full max-w-full overflow-x-hidden">
       <EmployeePageHeader
         title="Documents & Policies Hub"
-        subtitle="Access your personal employment vault, contracts, tax certificates, and verified company compliance handbooks."
+        subtitle="Manage your employment records and access company policy documents."
         onRefresh={fetchDocuments}
         loading={loading}
       />
@@ -890,7 +898,7 @@ const EmployeeDocuments = () => {
       {/* 1. DYNAMIC DOCUMENTS HERO BANNER */}
       {/* 2. SPARKLINE KPI METRIC CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Personal Vault */}
         <SparkMetricCard
           variant="light"
@@ -909,7 +917,7 @@ const EmployeeDocuments = () => {
             setActiveTab('personal');
             setTypeFilter('ALL');
           }}
-          className="cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+          className="w-full cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
         />
 
         {/* Card 2: Light Card - Handbooks & Charters */}
@@ -930,7 +938,7 @@ const EmployeeDocuments = () => {
             setActiveTab('policies');
             setTypeFilter('ALL');
           }}
-          className="cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+          className="w-full cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
         />
 
         {/* Card 3: Light Card - Authenticity & Compliance */}
@@ -947,6 +955,7 @@ const EmployeeDocuments = () => {
           presetWave="wave3"
           dataPoints={complianceSparkData}
           loading={loading}
+          className="w-full"
         />
 
         {/* Card 4: Light Card - Vault Storage */}
@@ -963,6 +972,7 @@ const EmployeeDocuments = () => {
           presetWave="wave4"
           dataPoints={storageSparkData}
           loading={loading}
+          className="w-full"
         />
       </div>
 
@@ -970,6 +980,7 @@ const EmployeeDocuments = () => {
       {/* 3. MODERN DYNAMIC REPOSITORY SEARCH & FILTER COMMAND BAR */}
       {/* ========================================================================= */}
       <ModernSearchBarSection
+        searchMaxWidthClass="sm:max-w-[400px]"
         statusTabs={
           activeTab === 'personal'
             ? [
@@ -1063,7 +1074,7 @@ const EmployeeDocuments = () => {
             <button
               type="button"
               onClick={() => setIsUploadOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-[12px] bg-[#087391] hover:bg-[#065d75] active:bg-[#054a5e] text-white font-bold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Upload Document</span>
@@ -1087,7 +1098,7 @@ const EmployeeDocuments = () => {
                   Personal Employment Vault & Certificates
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                  AES-256 encrypted repository of verified employment contracts, credentials, and tax filings
+                  Your documents are securely encrypted for privacy and verified for authenticity.
                 </p>
               </div>
             </div>
@@ -1104,7 +1115,7 @@ const EmployeeDocuments = () => {
                   className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'personal'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      : 'text-[#60718a] hover:text-slate-800 dark:text-slate-300 dark:hover:text-white'
                   }`}
                 >
                   Vault ({personalDocs.length})
@@ -1118,7 +1129,7 @@ const EmployeeDocuments = () => {
                   className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'policies'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      : 'text-[#60718a] hover:text-slate-800 dark:text-slate-300 dark:hover:text-white'
                   }`}
                 >
                   Policies ({policies.length})
@@ -1219,13 +1230,13 @@ const EmployeeDocuments = () => {
                                 </div>
                                 <div className="min-w-0 max-w-[240px] lg:max-w-xs">
                                   <span className="font-extrabold text-slate-900 dark:text-white text-xs block truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                                    {doc.title}
+                                    {formatDocumentTitle(doc)}
                                   </span>
                                   <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-sans tabular-nums font-bold">
+                                    <span className="text-[10px] text-[#687589] dark:text-slate-400 font-sans tabular-nums font-bold">
                                       {doc.referenceNumber || `#${doc.id}`}
                                     </span>
-                                    <span className="text-[10px] font-sans tabular-nums font-bold uppercase text-slate-500 dark:text-slate-400">
+                                    <span className="text-[10px] font-sans tabular-nums font-bold uppercase text-[#687589] dark:text-slate-400">
                                       PDF
                                     </span>
                                   </div>
@@ -1278,7 +1289,7 @@ const EmployeeDocuments = () => {
                                 </button>
                                 <button
                                   onClick={() => handleDownload(doc)}
-                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold border border-slate-900 dark:border-white shadow-xs transition-all active:scale-95 cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[12px] bg-sky-50/70 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-xs font-bold border border-sky-200 dark:border-sky-800/60 shadow-2xs transition-all active:scale-95 cursor-pointer"
                                 >
                                   <Download className="w-3 h-3 stroke-[2.2]" />
                                   <span>Download</span>
@@ -1325,14 +1336,14 @@ const EmployeeDocuments = () => {
 
                       <div>
                         <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-1 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                          {doc.title}
+                          {formatDocumentTitle(doc)}
                         </h4>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                             {doc.issuer}
                           </span>
                           <span className="text-slate-300 dark:text-slate-600">•</span>
-                          <span className="text-[10px] text-slate-400 font-sans tabular-nums font-bold">
+                          <span className="text-[10px] text-[#687589] dark:text-slate-400 font-sans tabular-nums font-bold">
                             {doc.referenceNumber || `#${doc.id}`}
                           </span>
                         </div>
@@ -1403,7 +1414,7 @@ const EmployeeDocuments = () => {
                   className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'personal'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      : 'text-[#60718a] hover:text-slate-800 dark:text-slate-300 dark:hover:text-white'
                   }`}
                 >
                   Vault ({personalDocs.length})
@@ -1417,7 +1428,7 @@ const EmployeeDocuments = () => {
                   className={`px-3.5 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'policies'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      : 'text-[#60718a] hover:text-slate-800 dark:text-slate-300 dark:hover:text-white'
                   }`}
                 >
                   Policies ({policies.length})
@@ -1510,7 +1521,7 @@ const EmployeeDocuments = () => {
                           <td className="py-4 px-6 text-right whitespace-nowrap">
                             <button
                               onClick={() => handleDownload(pol)}
-                              className="px-4 py-1.5 rounded-[12px] bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                              className="px-4 py-1.5 rounded-[12px] bg-sky-50/70 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 border border-sky-200 dark:border-sky-800/60 font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all active:scale-95"
                             >
                               <Download className="w-3.5 h-3.5" />
                               <span>Download Handbook</span>

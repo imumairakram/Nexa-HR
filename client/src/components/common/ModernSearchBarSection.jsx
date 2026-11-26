@@ -54,6 +54,7 @@ const ModernSearchBarSection = ({
   filterCount = 0,
   filterContent = null,
   actionButton = null,
+  searchMaxWidthClass = '',
   className = '',
 }) => {
   const [showDateMenu, setShowDateMenu] = useState(false);
@@ -317,7 +318,7 @@ const ModernSearchBarSection = ({
       {/* ========================================================================= */}
       <div className="flex items-center gap-2 sm:gap-2.5 w-full">
         {/* Search Input Container */}
-        <div className="flex-1 min-w-0 h-9 flex items-center gap-2 sm:gap-2.5 px-3 sm:px-3.5 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
+        <div className={`flex-1 min-w-0 h-9 flex items-center gap-2 sm:gap-2.5 px-3 sm:px-3.5 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors ${searchMaxWidthClass}`}>
           <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
 
           {/* Interactive Filter Chips */}
