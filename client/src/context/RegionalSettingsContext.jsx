@@ -261,7 +261,7 @@ export const RegionalSettingsProvider = ({ children }) => {
     const currCode = overrideCurrency || settings.currency || 'PKR';
     const curr = CURRENCY_OPTIONS.find((c) => c.code === currCode) || CURRENCY_OPTIONS[0];
     const num = Number(amount) || 0;
-    return `${curr.symbol}${num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
   const getCurrencySymbol = () => {

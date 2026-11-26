@@ -862,7 +862,7 @@ const Helpdesk = () => {
               Enterprise resolution command center for workforce inquiries, IT tickets, and grievance handling
             </p>
           </div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-[12px]">
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-[12px]">
             {filteredTickets.length} Tickets Found
           </span>
         </div>
@@ -1608,3 +1608,5 @@ const Helpdesk = () => {
 };
 
 export default Helpdesk;
+
+

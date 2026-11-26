@@ -482,7 +482,7 @@ const EmployeeAttendance = () => {
     <div className="space-y-6 font-sans text-slate-900 dark:text-white">
       <EmployeePageHeader
         title="My Attendance"
-        subtitle="Automated biometric time records, punch timestamps, and presence logs."
+        subtitle="Keep track of your daily check-ins, punch times, and total hours."
         onRefresh={fetchMyAttendance}
         loading={loading}
       />
@@ -667,16 +667,16 @@ const EmployeeAttendance = () => {
                       </span>
                     )}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
                     {isCurrentMonth
-                      ? `Viewing personal attendance records & timesheets (${selectedMonthLabel})`
-                      : `Viewing archived attendance records & timesheets (${selectedMonthLabel})`}
+                      ? 'A detailed log of your activity for this month.'
+                      : `A detailed log of your activity for ${selectedMonthLabel}.`}
                   </p>
                 </div>
               </div>
             </div>
 
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-[12px] self-start md:self-auto shrink-0">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-[12px] self-start md:self-auto shrink-0">
               {filteredLogs.length} Records
             </span>
           </div>
@@ -687,7 +687,7 @@ const EmployeeAttendance = () => {
               {/* Desktop Table View */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50/75 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                  <thead className="bg-slate-50/75 dark:bg-slate-800/60 text-[#595959] dark:text-slate-300 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                     <tr>
                       <th className="py-3.5 px-6">Work Date</th>
                       <th className="py-3.5 px-4">Punch In</th>
@@ -707,38 +707,16 @@ const EmployeeAttendance = () => {
                         >
                           {/* 1. Work Date Column */}
                           <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
-                            <div className="flex items-center gap-3.5">
-                              {/* Date Number Badge */}
-                              <div
-                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all ${log.isToday
-                                    ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-400 dark:border-sky-600 text-sky-600 dark:text-sky-400 shadow-xs'
-                                    : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-sky-400/50'
-                                  }`}
-                              >
-                                <span className="text-[9px] font-black uppercase tracking-wider leading-none">
-                                  {log.monthShort || 'DAY'}
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm">
+                                {log.day}, {log.monthShort ? log.monthShort.charAt(0) + log.monthShort.slice(1).toLowerCase() : ''} {Number(log.dayNum) || log.dayNum}
+                              </span>
+                              {log.isToday && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[9px] font-black uppercase tracking-wider bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700/60">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                                  Today
                                 </span>
-                                <span className="text-base font-black leading-tight mt-0.5">
-                                  {log.dayNum || '01'}
-                                </span>
-                              </div>
-
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
-                                    {log.formattedDate}
-                                  </span>
-                                  {log.isToday && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[12px] text-[9px] font-black uppercase tracking-wider bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700/60 animate-pulse">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                                      Today
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="text-[11px] text-slate-400 font-medium mt-0.5">
-                                  {log.day}
-                                </div>
-                              </div>
+                              )}
                             </div>
                           </td>
 
@@ -983,3 +961,4 @@ const EmployeeAttendance = () => {
 };
 
 export default EmployeeAttendance;
+

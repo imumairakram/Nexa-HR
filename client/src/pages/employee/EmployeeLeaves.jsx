@@ -624,7 +624,7 @@ const EmployeeLeaves = () => {
               </div>
             </div>
 
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-[12px] self-start md:self-auto shrink-0">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-[12px] self-start md:self-auto shrink-0">
               {filteredRequests.length} Requests Found
             </span>
           </div>
@@ -707,7 +707,7 @@ const EmployeeLeaves = () => {
               {/* Desktop Table View */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50/75 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                  <thead className="bg-slate-50/75 dark:bg-slate-800/60 text-[#595959] dark:text-slate-300 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                     <tr>
                       <th className="py-3.5 px-6">Leave Duration & Dates</th>
                       <th className="py-3.5 px-4">Leave Policy</th>
@@ -1335,3 +1335,4 @@ const EmployeeLeaves = () => {
 };
 
 export default EmployeeLeaves;
+

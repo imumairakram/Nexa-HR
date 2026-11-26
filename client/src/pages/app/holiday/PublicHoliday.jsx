@@ -763,7 +763,7 @@ const PublicHoliday = () => {
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-black uppercase text-slate-400 tracking-wider bg-slate-50/60 dark:bg-slate-800/40">
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-black uppercase text-[#595959] dark:text-slate-300 tracking-wider bg-slate-50/60 dark:bg-slate-800/40">
                       <th className="py-4 px-6">Date & Day</th>
                       <th className="py-4 px-6">Holiday Title & Details</th>
                       <th className="py-4 px-6">Category</th>
@@ -1289,3 +1289,4 @@ const PublicHoliday = () => {
 };
 
 export default PublicHoliday;
+

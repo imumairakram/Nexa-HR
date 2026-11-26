@@ -435,7 +435,7 @@ const Payroll = () => {
             {/* Desktop Table View (Hidden on Mobile) */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 text-[#595959] dark:text-slate-300 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
                   <tr>
                     <th className="py-3.5 px-6">Pay Period Cycle</th>
                     <th className="py-3.5 px-4">Disbursement Date</th>
@@ -768,3 +768,4 @@ const Payroll = () => {
 };
 
 export default Payroll;
+
