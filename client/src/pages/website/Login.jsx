@@ -265,8 +265,8 @@ const Login = () => {
             <Logo variant="sky" />
 
             {/* Enterprise Security Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E1F4FA]/80 dark:bg-[#12333D] text-[10px] font-semibold text-[#07617D] dark:text-[#3CC1E6] border border-[#0A8FB5]/30 shadow-xs">
-              <Shield className="w-3.5 h-3.5 text-[#0A8FB5] dark:text-[#3CC1E6]" />
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#07617D] dark:text-[#3CC1E6]">
+              <Shield className="w-3.5 h-3.5 text-[#07617D] dark:text-[#3CC1E6]" />
               <span>SSL Protected</span>
             </div>
           </div>
@@ -279,7 +279,7 @@ const Login = () => {
                 {loginRole === 'hr' && 'Welcome, HR Administrator'}
                 {loginRole === 'employee' && 'Welcome, Employee'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#595959] dark:text-slate-300 mt-1.5 leading-relaxed">
                 {loginRole === 'hr' && 'Sign in with HR credentials to manage employees, attendance, leaves, and payroll.'}
                 {loginRole === 'employee' && 'Sign in to access your personal dashboard, clock-in records, leaves & payslips.'}
               </p>
@@ -293,10 +293,10 @@ const Login = () => {
                 onClick={() => handleRoleTabChange('hr')}
                 className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-[12px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'hr'
                   ? 'bg-white dark:bg-[#16211E] text-[#07617D] dark:text-[#3CC1E6] shadow-sm border border-[#0A8FB5]/30 dark:border-slate-700 font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  : 'text-[#595959] dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
               >
-                <UserCheck className={`w-4 h-4 shrink-0 ${loginRole === 'hr' ? 'text-[#0A8FB5] dark:text-[#3CC1E6]' : 'text-slate-400'}`} />
+                <UserCheck className={`w-4 h-4 shrink-0 ${loginRole === 'hr' ? 'text-[#07617D] dark:text-[#3CC1E6]' : 'text-[#595959] dark:text-slate-300'}`} />
                 <span className="truncate">HR Admin</span>
               </button>
 
@@ -306,10 +306,10 @@ const Login = () => {
                 onClick={() => handleRoleTabChange('employee')}
                 className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-[12px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${loginRole === 'employee'
                   ? 'bg-white dark:bg-[#16211E] text-[#07617D] dark:text-[#3CC1E6] shadow-sm border border-[#0A8FB5]/30 dark:border-slate-700 font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  : 'text-[#595959] dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
               >
-                <User className={`w-4 h-4 shrink-0 ${loginRole === 'employee' ? 'text-[#0A8FB5] dark:text-[#3CC1E6]' : 'text-slate-400'}`} />
+                <User className={`w-4 h-4 shrink-0 ${loginRole === 'employee' ? 'text-[#07617D] dark:text-[#3CC1E6]' : 'text-[#595959] dark:text-slate-300'}`} />
                 <span className="truncate">Employee</span>
               </button>
             </div>
@@ -368,7 +368,7 @@ const Login = () => {
               {/* Email Address */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  {loginRole === 'hr' ? 'HR Admin Work Email' : 'Employee Work Email'}{' '}
+                  Work email{' '}
                   <span className="text-[#0A8FB5] dark:text-[#3CC1E6]">*</span>
                 </label>
                 <div className="relative">
@@ -402,8 +402,9 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer p-1"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#595959] hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center p-1.5 rounded-lg"
                     title={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4 stroke-[1.8]" />
@@ -422,7 +423,7 @@ const Login = () => {
                       defaultChecked
                       className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer text-[#0A8FB5] focus:ring-[#0A8FB5] accent-[#0A8FB5]"
                     />
-                    <label htmlFor="remember-me" className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 cursor-pointer select-none">
+                    <label htmlFor="remember-me" className="text-[11px] font-semibold text-[#595959] dark:text-slate-300 cursor-pointer select-none">
                       Remember me
                     </label>
                   </div>
@@ -433,7 +434,7 @@ const Login = () => {
                       setResetSuccessNotification(null);
                       setIsForgotPasswordOpen(true);
                     }}
-                    className="text-[11px] font-bold text-[#0A8FB5] dark:text-[#3CC1E6] hover:text-[#07617D] dark:hover:text-[#7CD1EB] hover:underline cursor-pointer transition-colors"
+                    className="text-[11px] font-bold text-[#07617D] dark:text-[#3CC1E6] hover:text-[#054C62] dark:hover:text-[#7CD1EB] hover:underline cursor-pointer transition-colors"
                   >
                     Forgot Password?
                   </button>
@@ -452,9 +453,7 @@ const Login = () => {
                     <span>Signing in to NexaHR...</span>
                   </>
                 ) : (
-                  <span>
-                    {loginRole === 'hr' ? 'Sign In as HR Admin' : 'Sign In as Employee'}
-                  </span>
+                  <span>Sign in</span>
                 )}
               </button>
 
@@ -463,7 +462,7 @@ const Login = () => {
                 <>
                   <div className="relative flex py-2 items-center">
                     <div className="flex-grow border-t border-slate-200 dark:border-slate-700/80"></div>
-                    <span className="flex-shrink mx-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    <span className="flex-shrink mx-3 text-[11px] font-semibold text-[#595959] dark:text-slate-400 uppercase tracking-wider">
                       Or explore instantly
                     </span>
                     <div className="flex-grow border-t border-slate-200 dark:border-slate-700/80"></div>
@@ -481,16 +480,12 @@ const Login = () => {
                       </div>
                       <div>
                         <div className="text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                          <span>
-                            {loginRole === 'hr'
-                              ? 'Experience as Guest HR'
-                              : 'Experience as Guest Employee'}
-                          </span>
+                          <span>Try the guest demo</span>
                           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 shadow-xs border border-slate-200/60 dark:border-slate-700/60">
                             1-Click Demo
                           </span>
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                        <div className="text-[10px] text-[#595959] dark:text-slate-300 font-medium">
                           {loginRole === 'hr'
                             ? 'Explore full payroll, attendance & staff management'
                             : 'Explore employee portal, leave requests & payslips'}
