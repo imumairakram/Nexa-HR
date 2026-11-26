@@ -1,4 +1,4 @@
-ï»¿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
@@ -151,14 +151,14 @@ const PayslipList = () => {
 
   const dateRangeOptions = [
     { key: 'ALL', label: 'All Cycles' },
-    { key: 'THIS_MONTH', label: 'Oct 1 â€“ Oct 31, 2026' },
-    { key: 'LAST_MONTH', label: 'Sep 1 â€“ Sep 30, 2026' },
+    { key: 'THIS_MONTH', label: 'Oct 1 – Oct 31, 2026' },
+    { key: 'LAST_MONTH', label: 'Sep 1 – Sep 30, 2026' },
     { key: 'THIS_YEAR', label: 'Fiscal Year 2026' },
   ];
 
   const dateRangeLabel = useMemo(() => {
-    if (dateRange === 'THIS_MONTH') return 'Oct 1 â€“ Oct 31, 2026';
-    if (dateRange === 'LAST_MONTH') return 'Sep 1 â€“ Sep 30, 2026';
+    if (dateRange === 'THIS_MONTH') return 'Oct 1 – Oct 31, 2026';
+    if (dateRange === 'LAST_MONTH') return 'Sep 1 – Sep 30, 2026';
     if (dateRange === 'THIS_YEAR') return 'Fiscal Year 2026';
     return 'All Cycles';
   }, [dateRange]);
@@ -187,7 +187,7 @@ const PayslipList = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
         title="Employee Payslip Repository"
-        subtitle="Search and print official company payslips, verify tax withholding schedules, and export batch archives."
+        subtitle="Browse, download, and manage employee payslips and salary records."
       />
 
       {toastMsg && (
@@ -202,56 +202,6 @@ const PayslipList = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC PAYSLIPS HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left Side: Payslip Archive Telemetry */}
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Employee Payslip Repository & PDF Invoicing
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
-              Search and print official company payslips, verify tax withholding schedules, and export encrypted batch archives.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{payslips.length} Official Payslips Recorded</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>100% Disbursed Successfully</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center">
-              <Download className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="text-xs font-extrabold text-white">Batch Export</div>
-              <div className="text-[11px] text-white/80 mt-0.5">Download all monthly slips</div>
-            </div>
-            <button
-              onClick={() => {
-                setToastMsg('Exporting zip package containing all official PDF payslips...');
-                setTimeout(() => setToastMsg(''), 3000);
-              }}
-              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export Batch Archive</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* ========================================================================= */}
       {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
@@ -426,7 +376,7 @@ const PayslipList = () => {
                     <div>
                       <div className="font-extrabold text-slate-900 dark:text-white text-sm">{p.employee}</div>
                       <div className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5">
-                        {p.code} â€¢ {p.dept}
+                        {p.code} • {p.dept}
                       </div>
                     </div>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold shrink-0">
@@ -499,7 +449,7 @@ const PayslipList = () => {
                   </td>
                   <td className="py-4 px-4 font-extrabold text-slate-900 dark:text-white">
                     <div>{p.employee}</div>
-                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{p.code} â€¢ {p.dept}</div>
+                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{p.code} • {p.dept}</div>
                   </td>
                   <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{p.month}</td>
                   <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">PKR {p.gross.toLocaleString()}</td>
@@ -604,4 +554,6 @@ const PayslipList = () => {
 };
 
 export default PayslipList;
+
+
 

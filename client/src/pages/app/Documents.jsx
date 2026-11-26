@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   FileText,
   Download,
@@ -1088,7 +1088,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
         title="Documents & Corporate Policies"
-        subtitle="Issue official employment offers, contracts, and NDA letters to employees, and govern statutory company handbooks."
+        subtitle="Manage employee contracts, policy files, and official company documents."
       />
 
       {toastMsg && (
@@ -1103,81 +1103,17 @@ ${doc.description || 'This document serves as an official verified corporate rec
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC HERO BANNER (AQUA-TEAL LIGHT THEME AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left Side: Vault Telemetry */}
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Enterprise Document Issuance & Policy Governance
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-xl font-medium">
-              Create and dispatch official appointment offer letters, contracts, NDAs, and increment letters directly to employee dossiers with automatic email notification.
-            </p>
-
-            {/* Dynamic Telemetry Badges */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{issuedDocs.length} Issued Records</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{companyPolicies.length} Active Policies</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{employees.length} Registered Employees</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{departments.length} Operating Departments</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[240px] sm:min-w-[280px] shrink-0 space-y-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center">
-              <Upload className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="text-xs font-extrabold text-white">HR Document Management</div>
-              <div className="text-[11px] text-white/80 mt-0.5">Issue new offer, contract, or policy</div>
-            </div>
-
-            <div className="w-full flex flex-col gap-2">
-              <button
-                onClick={() => setIsIssueModalOpen(true)}
-                className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
-              >
-                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Issue Document to Employee</span>
-              </button>
-
-              <button
-                onClick={() => setIsPolicyModalOpen(true)}
-                className="w-full px-5 py-2.5 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                <span>Publish Company Policy</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ========================================================================= */}
       {/* 2. SPARKLINE KPI METRIC CARDS (100% LIVE DYNAMIC TELEMETRY) */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         <SparkMetricCard
           variant="light"
           title="Issued Documents"
           value={issuedDocs.length}
           unit={issuedDocs.length === 1 ? 'Record' : 'Records'}
           badgeText={`${verifiedCount} Verified`}
+          className="w-full"
           badgeType="positive"
           badgeIcon="up"
           subtext={issuedBreakdownSubtext}
@@ -1741,9 +1677,9 @@ ${doc.description || 'This document serves as an official verified corporate rec
                               </div>
                               <div className="min-w-0">
                                 <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate max-w-xs">
-                                  {doc.title}
+                                  {doc.title && doc.title.trim().toLowerCase() !== 'file' ? doc.title : (doc.typeLabel || 'Professional Certificate')}
                                 </span>
-                                <span className="text-[10px] text-slate-400 font-sans tabular-nums font-bold tracking-tight">
+                                <span className="text-[10px] text-[#687589] dark:text-slate-400 font-sans tabular-nums font-bold tracking-tight">
                                   {doc.referenceNumber || `#${doc.id}`}
                                 </span>
                               </div>
@@ -1804,7 +1740,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                               </button>
                               <button
                                 onClick={() => handleDownload(doc)}
-                                className="px-3.5 py-1.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                                className="px-3.5 py-1.5 rounded-[12px] bg-sky-50/70 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/60 border border-sky-200 dark:border-sky-800/60 font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all active:scale-95"
                               >
                                 <Download className="w-3 h-3" />
                                 <span>Download</span>
@@ -2649,93 +2585,117 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* 8. MODAL: DOCUMENT PREVIEW */}
       {/* ========================================================================= */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[28px] sm:rounded-[32px] max-w-xl sm:max-w-2xl w-full shadow-2xl border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="px-6 sm:px-8 py-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-4 bg-gradient-to-br from-sky-50/80 via-white to-cyan-50/40 dark:from-sky-950/30 dark:via-[#1E293B] dark:to-[#1E293B]">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/60">
-                  <FileText className="w-6 h-6 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-3xl lg:max-w-4xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <FileText className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {selectedDoc.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-sans tabular-nums mt-0.5">
-                    Ref: {selectedDoc.referenceNumber || `#${selectedDoc.id}`}
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="text-xs font-sans tabular-nums font-bold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700">
+                      Ref: {selectedDoc.referenceNumber || `#${selectedDoc.id}`}
+                    </span>
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>Signature Verified</span>
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug truncate">
+                    {selectedDoc.title && selectedDoc.title.trim().toLowerCase() !== 'file' ? selectedDoc.title : (selectedDoc.typeLabel || 'Professional Certificate')}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal truncate">
+                    Issued by <strong className="text-slate-700 dark:text-slate-200 font-semibold">{selectedDoc.issuer || 'NexaHR Authority'}</strong>
                   </p>
                 </div>
               </div>
 
               <button
                 type="button"
+                aria-label="Close modal"
                 onClick={() => setSelectedDoc(null)}
-                className="w-9 h-9 rounded-[12px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shrink-0 ml-3"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            {/* Document Formal Preview */}
-            <div className="p-6 space-y-4 text-xs">
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 to-teal-50/30 dark:from-slate-800/50 dark:to-teal-950/20 border border-teal-100 dark:border-slate-800 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-medium">Recipient Employee</span>
-                  <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                    {selectedDoc.employeeName || 'Company Team Member'} ({selectedDoc.employeeCode || selectedDoc.designation || 'Staff'})
+            {/* Body Grid */}
+            <div className="space-y-5 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />
+                    Recipient Details
                   </span>
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Recipient Employee</span>
+                    <span className="font-bold text-slate-900 dark:text-white text-right">
+                      {selectedDoc.employeeName || 'Company Team Member'} ({selectedDoc.employeeCode || selectedDoc.designation || 'Staff'})
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Department & Role</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-right">
+                      {selectedDoc.department || 'Operations'} • {selectedDoc.designation || 'Specialist'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-medium">Department & Role</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
-                    {selectedDoc.department || 'Operations'} • {selectedDoc.designation || 'Specialist'}
+
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
+                    Issuance & Seal
                   </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-medium">Issuing Body</span>
-                  <span className="font-bold text-sky-700 dark:text-sky-300">
-                    {selectedDoc.issuer}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-medium">Issue Date</span>
-                  <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
-                    {selectedDoc.issueDate}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-400 font-medium">Verification Seal</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 font-sans tabular-nums text-[11px]">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>NexaHR Signature Verified ({generateDocumentHash(selectedDoc.id, selectedDoc.referenceNumber)})</span>
-                  </span>
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Issue Date</span>
+                    <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
+                      {selectedDoc.issueDate}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Verification Hash</span>
+                    <span className="font-sans tabular-nums font-bold text-emerald-700 dark:text-emerald-400 text-[11px]">
+                      {generateDocumentHash(selectedDoc.id, selectedDoc.referenceNumber)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {selectedDoc.description && (
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <div className="font-bold text-slate-800 dark:text-slate-100 mb-1">Terms & Conditions Summary:</div>
-                  {selectedDoc.description}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 shadow-xs">
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Terms & Conditions Summary</div>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                    {selectedDoc.description}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="px-6 sm:px-8 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
-              <button
-                type="button"
-                onClick={() => setSelectedDoc(null)}
-                className="px-5 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
-              >
-                Close
-              </button>
-              <div className="flex items-center gap-2">
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6" data-purpose="modal-footer">
+              <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 order-2 sm:order-1">
+                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                <span>Your documents are securely encrypted for privacy and verified for authenticity</span>
+              </div>
+              <div className="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDoc(null)}
+                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                >
+                  Close
+                </button>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-4 py-2.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                 >
-                  <Printer className="w-3.5 h-3.5" />
+                  <Printer className="w-4 h-4" />
                   <span>Print</span>
                 </button>
                 <button
@@ -2744,14 +2704,14 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     handleDownload(selectedDoc);
                     setSelectedDoc(null);
                   }}
-                  className="px-5 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 via-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-lg shadow-sky-500/25 active:scale-95 transition-all"
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-4 h-4" />
                   <span>Download Certified Copy</span>
                 </button>
               </div>
-            </div>
-          </div>
+            </footer>
+          </main>
         </div>
       )}
     </div>
@@ -2759,3 +2719,4 @@ ${doc.description || 'This document serves as an official verified corporate rec
 };
 
 export default Documents;
+

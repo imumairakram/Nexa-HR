@@ -1,4 +1,4 @@
-ï»¿import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
@@ -311,7 +311,7 @@ const Announcement = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
         title="Company Announcements Board"
-        subtitle="Publish official company circulars, policy changes, retreat notices, and executive broadcasts."
+        subtitle="Post company announcements, policy updates, and notices to your team."
       />
 
       {toastMsg && (
@@ -326,58 +326,6 @@ const Announcement = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC ANNOUNCEMENT HERO BANNER */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left Side: Broadcast Telemetry */}
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Company Announcements & Notice Board
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
-              Publish official company circulars, organizational policy updates, team retreats, and executive broadcasts in real-time.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{stats.total} Circulars Published</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{stats.pinned} High-Priority Pinned</span>
-              </span>
-              {stats.events > 0 && (
-                <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                  <span>{stats.events} Company Events</span>
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center">
-              <Plus className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="text-xs font-extrabold text-white">Broadcast Bulletin</div>
-              <div className="text-[11px] text-white/80 mt-0.5">Post to employee portal</div>
-            </div>
-            <button
-              onClick={() => setIsPostModalOpen(true)}
-              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
-            >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Create Announcement</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* ========================================================================= */}
       {/* 2. DYNAMIC SPARKLINES TELEMETRY KPI CARDS */}
       {/* ========================================================================= */}
@@ -583,7 +531,7 @@ const Announcement = () => {
                     </span>
 
                     <span className="text-xs text-slate-400 font-medium">{item.date}</span>
-                    <span className="text-xs text-slate-400 font-medium">â€¢ By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
+                    <span className="text-xs text-slate-400 font-medium">• By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
                   </div>
 
                   <h3
@@ -653,7 +601,7 @@ const Announcement = () => {
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                 {searchQuery || categoryFilter !== 'ALL' || activeDateRange !== 'ALL'
                   ? 'No company announcements match your active search terms or category filter. Try clearing keywords or resetting filters.'
-                  : 'There are currently no active company notices or circulars posted. Broadcast official updates, policy revisions, event announcements, and corporate townhall invitations to your workforce.'}
+                  : 'No announcements have been posted yet. Create one to notify your team.'}
               </p>
             </div>
 
@@ -716,7 +664,7 @@ const Announcement = () => {
                     Broadcast Announcement
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                    Publish company circulars, executive updates, and operational memos to all employees.
+                    Post updates, policy changes, and notices to your team.
                   </p>
                 </div>
               </div>
@@ -925,7 +873,7 @@ const Announcement = () => {
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           {getCategoryLabel(form.category)}
                         </span>
-                        <span className="text-slate-300 dark:text-slate-600">â€¢</span>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
                         <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 truncate">
                           {form.department}
                         </span>
@@ -1043,7 +991,7 @@ const Announcement = () => {
                     {selectedNotice.title}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal truncate">
-                    Issued by <strong className="font-semibold text-slate-700 dark:text-slate-200">{selectedNotice.author || 'System Administrator'}</strong> â€¢ {selectedNotice.department || 'Company-Wide (All Offices)'}
+                    Issued by <strong className="font-semibold text-slate-700 dark:text-slate-200">{selectedNotice.author || 'System Administrator'}</strong> • {selectedNotice.department || 'Company-Wide (All Offices)'}
                   </p>
                 </div>
               </div>
@@ -1136,3 +1084,5 @@ const Announcement = () => {
 };
 
 export default Announcement;
+
+

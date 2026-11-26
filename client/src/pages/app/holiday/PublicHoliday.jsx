@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
@@ -396,7 +396,7 @@ const PublicHoliday = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
       <AppPageHeader
         title="Official Holidays & Calendar"
-        subtitle="Dynamic multi-year holiday schedule synchronized in real-time with regional timezone and organizational policies."
+        subtitle="View and manage official public holidays and non-working days."
       />
 
       {toastMsg && (
@@ -411,64 +411,6 @@ const PublicHoliday = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC PUBLIC HOLIDAY HERO BANNER (SKY-BLUE LIGHT THEME AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left Side: Telemetry & Holiday Highlights */}
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Gazetted Holidays & Corporate Calendar
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-2xl font-medium">
-              Automated Islamic lunar ephemeris and gazetted statutory calendar synchronization. Real-time timezone and lunar calendar alignment ensures 100% accurate holiday schedules, automated attendance waivers, and workforce payroll compliance.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{allHolidays.length} Observances in {selectedYear}</span>
-              </span>
-              {stats.activeToday ? (
-                <span className="flex items-center bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 px-3 py-1 rounded-xl border border-sky-200/80 dark:border-sky-800/60 animate-pulse font-bold">
-                  <span>Today is {stats.activeToday.name}!</span>
-                </span>
-              ) : nextHoliday ? (
-                <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                  <span>Next: {nextHoliday.name} ({nextHoliday.countdown})</span>
-                </span>
-              ) : null}
-            </div>
-          </div>
-
-          {/* Right Side: Quick Action Glassmorphic Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center border border-sky-200/50 dark:border-sky-800/40 shadow-xs">
-              <PartyPopper className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <div>
-              <div className="text-xs font-black text-white">Custom Holiday Entry</div>
-              <div className="text-[11px] text-white/80 mt-0.5">
-                Add company-specific floating day
-              </div>
-            </div>
-            <button
-              onClick={() => setIsAddOpen(true)}
-              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>Add Custom Holiday</span>
-            </button>
-            <div className="text-[10px] font-bold text-white/70">
-              Active Year: {selectedYear}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ========================================================================= */}
       {/* 2. DYNAMIC SPARKLINES TELEMETRY KPI CARDS */}
       {/* ========================================================================= */}
@@ -752,7 +694,9 @@ const PublicHoliday = () => {
 
                       <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         <span className="text-[10px] uppercase font-bold text-slate-400">{h.statusText}</span>
-                        <span className="text-xs font-extrabold text-sky-600 dark:text-sky-400">{h.countdownText || 'Observed'}</span>
+                        <span className="text-xs font-extrabold text-sky-600 dark:text-sky-400">
+                          {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.status === 'PASSED' ? 'Observed' : h.countdownText || 'Observed'}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -838,7 +782,7 @@ const PublicHoliday = () => {
                         <td className="py-4 px-6 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
                             <span className="text-xs font-sans tabular-nums font-bold text-slate-600 dark:text-slate-400">
-                              {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
+                              {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.status === 'PASSED' ? 'Observed' : h.countdown}
                             </span>
 
                             {h.isCustom && (
@@ -1289,4 +1233,5 @@ const PublicHoliday = () => {
 };
 
 export default PublicHoliday;
+
 

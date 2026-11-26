@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CreditCard,
@@ -193,7 +193,7 @@ const Payroll = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
       <AppPageHeader
         title="Global Payroll Processing"
-        subtitle="Automate salary disbursements, compute tax withholdings, manage allowances, and export payslips."
+        subtitle="Run payroll, manage salary structures, and generate monthly payslips."
         onRefresh={fetchPayroll}
         loading={loading}
       />
@@ -210,69 +210,6 @@ const Payroll = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. DYNAMIC PAYROLL HERO BANNER (BLUE-INDIGO LIGHT THEME AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-5 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-          {/* Left Side: Payroll Telemetry */}
-          <div className="space-y-2.5 sm:space-y-3 flex-1 min-w-0">
-            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Global Payroll Processing & Auto-Tax Engine
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
-              Calculates base salary, allowances, biometric attendance deductions, and progressive statutory tax withholdings directly from PostgreSQL.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{formatCurrency(latestBatch?.netPayable || 0)} Latest Batch Disbursed</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{latestBatch ? `${latestBatch.employeesCount} Staff Disbursed` : '0 Staff Disbursed'}</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{payslips.length} Total Payslips Generated</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Right Side: Action Glassmorphic Card (Desktop / Tablet) */}
-          <div className="hidden sm:flex bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center">
-              <Banknote className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="text-xs font-extrabold text-white">Pay Run Generator</div>
-              <div className="text-[11px] text-white/80 mt-0.5">Execute monthly disbursement</div>
-            </div>
-            <div className="flex flex-col w-full gap-2">
-              <button
-                onClick={() => setIsRunModalOpen(true)}
-                className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>Run Payroll Batch</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Quick Action Buttons */}
-          <div className="sm:hidden pt-1 flex items-center gap-2">
-            <button
-              onClick={() => setIsRunModalOpen(true)}
-              className="flex-1 py-3 px-4 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-extrabold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              <span>Run Payroll</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* ========================================================================= */}
       {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS WITH SPARKLINES */}
       {/* ========================================================================= */}
@@ -768,4 +705,5 @@ const Payroll = () => {
 };
 
 export default Payroll;
+
 
