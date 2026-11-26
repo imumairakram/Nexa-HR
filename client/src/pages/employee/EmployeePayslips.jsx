@@ -16,7 +16,9 @@ import {
   Calendar,
   ArrowDownRight,
   ArrowUpRight,
+  RotateCcw,
 } from 'lucide-react';
+import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
@@ -34,6 +36,12 @@ const EmployeePayslips = () => {
   const [loading, setLoading] = useState(() => !api.hasCached('/payroll/my-payslips'));
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [yearFilter, setYearFilter] = useState('ALL');
+  const [dateRange, setDateRange] = useState('ALL');
+  const [sortKey, setSortKey] = useState('period');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -82,6 +90,96 @@ const EmployeePayslips = () => {
   const ytdGross = payslips
     .filter((p) => Number(p.year) === currentYear)
     .reduce((acc, p) => acc + (Number(p.grossSalary) || 0), 0);
+
+  const availableYears = useMemo(() => {
+    const yrs = [...new Set(payslips.map((p) => String(p.year)).filter(Boolean))];
+    return yrs.sort((a, b) => Number(b) - Number(a));
+  }, [payslips]);
+
+  const statusTabs = useMemo(() => {
+    const paidCount = payslips.filter((p) => (p.status || 'PAID') === 'PAID').length;
+    const pendingCount = payslips.filter((p) => p.status === 'PENDING').length;
+    return [
+      { key: 'ALL', label: 'All', count: payslips.length },
+      { key: 'PAID', label: 'Paid', count: paidCount },
+      { key: 'PENDING', label: 'Pending', count: pendingCount },
+    ];
+  }, [payslips]);
+
+  const dateRangeOptions = [
+    { key: 'ALL', label: 'All Cycles' },
+    { key: 'THIS_YEAR', label: 'This Year' },
+    { key: 'LAST_6_MONTHS', label: 'Last 6 Months' },
+    { key: 'LAST_3_MONTHS', label: 'Last 3 Months' },
+  ];
+
+  const dateRangeLabel = useMemo(() => {
+    return dateRangeOptions.find((o) => o.key === dateRange)?.label || 'All Cycles';
+  }, [dateRange]);
+
+  const sortOptions = [
+    { key: 'period', label: 'Pay Period' },
+    { key: 'net', label: 'Net Payout' },
+    { key: 'gross', label: 'Gross Amount' },
+  ];
+
+  const filterTags = useMemo(() => {
+    const tags = [];
+    if (yearFilter !== 'ALL') tags.push({ key: 'year', label: 'year', value: yearFilter });
+    if (dateRange !== 'ALL') tags.push({ key: 'date', label: 'range', value: dateRangeLabel.toLowerCase() });
+    return tags;
+  }, [yearFilter, dateRange, dateRangeLabel]);
+
+  const filterCount = (yearFilter !== 'ALL' ? 1 : 0) + (dateRange !== 'ALL' ? 1 : 0);
+
+  const filteredPayslips = useMemo(() => {
+    const now = new Date();
+    const currentMonthIndex = now.getFullYear() * 12 + now.getMonth();
+
+    return payslips
+      .filter((ps) => {
+        const query = searchQuery.toLowerCase().trim();
+        const monthName = MONTH_NAMES[(ps.month || 1) - 1] || '';
+        const periodStr = `${monthName} ${ps.year}`.toLowerCase();
+        const voucherStr = `voucher #${(ps.id || '').slice(0, 8)}`.toLowerCase();
+        const matchesSearch =
+          !query ||
+          periodStr.includes(query) ||
+          voucherStr.includes(query) ||
+          (ps.id && ps.id.toLowerCase().includes(query)) ||
+          String(ps.year || '').includes(query);
+
+        const psStatus = ps.status || 'PAID';
+        const matchesStatus = statusFilter === 'ALL' || psStatus === statusFilter;
+        const matchesYear = yearFilter === 'ALL' || String(ps.year) === String(yearFilter);
+
+        let matchesDate = true;
+        if (dateRange !== 'ALL' && ps.year && ps.month) {
+          const psMonthIndex = Number(ps.year) * 12 + (Number(ps.month) - 1);
+          const diffMonths = currentMonthIndex - psMonthIndex;
+          if (dateRange === 'THIS_YEAR') {
+            matchesDate = Number(ps.year) === now.getFullYear();
+          } else if (dateRange === 'LAST_6_MONTHS') {
+            matchesDate = diffMonths >= 0 && diffMonths < 6;
+          } else if (dateRange === 'LAST_3_MONTHS') {
+            matchesDate = diffMonths >= 0 && diffMonths < 3;
+          }
+        }
+
+        return matchesSearch && matchesStatus && matchesYear && matchesDate;
+      })
+      .sort((a, b) => {
+        let diff = 0;
+        if (sortKey === 'period') {
+          diff = (Number(b.year || 0) * 12 + Number(b.month || 0)) - (Number(a.year || 0) * 12 + Number(a.month || 0));
+        } else if (sortKey === 'net') {
+          diff = (Number(b.netSalary) || 0) - (Number(a.netSalary) || 0);
+        } else if (sortKey === 'gross') {
+          diff = (Number(b.grossSalary) || 0) - (Number(a.grossSalary) || 0);
+        }
+        return sortOrder === 'asc' ? -diff : diff;
+      });
+  }, [payslips, searchQuery, statusFilter, yearFilter, dateRange, sortKey, sortOrder]);
 
   // Dynamic Sparkline Data for Compensation
   const netSparkData = useMemo(() => {
@@ -256,7 +354,74 @@ const EmployeePayslips = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SALARY DISBURSAL HISTORY LIST */}
+      {/* 2. MODERN DYNAMIC SEARCH & FILTER COMMAND BAR */}
+      {/* ========================================================================= */}
+      <ModernSearchBarSection
+        statusTabs={statusTabs}
+        activeStatus={statusFilter}
+        onStatusChange={setStatusFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search payslips by month, year, or voucher ID..."
+        searchHint='Try "November" or "2026"'
+        filterTags={filterTags}
+        onRemoveTag={(key) => {
+          if (key === 'year') setYearFilter('ALL');
+          if (key === 'date') setDateRange('ALL');
+        }}
+        dateRangeLabel={dateRangeLabel}
+        dateRangeOptions={dateRangeOptions}
+        activeDateRange={dateRange}
+        onDateRangeChange={setDateRange}
+        sortOptions={sortOptions}
+        activeSort={sortKey}
+        sortOrder={sortOrder}
+        onSortChange={(key, order) => {
+          setSortKey(key);
+          setSortOrder(order);
+        }}
+        filterCount={filterCount}
+        filterContent={
+          <div className="space-y-3.5">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                Payroll Year
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {['ALL', ...availableYears].map((yr) => (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => setYearFilter(yr)}
+                    className={`px-2.5 py-1.5 rounded-[12px] text-xs font-semibold text-left transition-all cursor-pointer truncate ${yearFilter === yr
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-700'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                      }`}
+                  >
+                    {yr === 'ALL' ? 'All Years' : yr}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filterCount > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setYearFilter('ALL');
+                  setDateRange('ALL');
+                }}
+                className="w-full py-2 rounded-[12px] bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+              >
+                Reset All Filters
+              </button>
+            )}
+          </div>
+        }
+      />
+
+      {/* ========================================================================= */}
+      {/* 3. SALARY DISBURSAL HISTORY LIST */}
       {/* ========================================================================= */}
       {loading ? (
         <TableSkeleton rows={6} cols={7} />
@@ -281,16 +446,16 @@ const EmployeePayslips = () => {
             </div>
 
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-[12px] self-start md:self-auto shrink-0">
-              {payslips.length} Cycles Logged
+              {filteredPayslips.length} Cycles Logged
             </span>
           </div>
 
-          {payslips.length > 0 ? (
+          {filteredPayslips.length > 0 ? (
             <>
               {/* Mobile Responsive Grid View (Hidden on Desktop) */}
               <div className="block md:hidden p-3.5 sm:p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {payslips.map((ps) => {
+                  {filteredPayslips.map((ps) => {
                     const totalDed = (Number(ps.taxDeductions) || 0) + (Number(ps.otherDeductions) || 0) + (Number(ps.unpaidLeaveDeduction) || 0);
                     const payMonthStr = `${MONTH_NAMES[(ps.month || 1) - 1]} ${ps.year}`;
                     const payDateStr = ps.generatedAt
@@ -385,7 +550,7 @@ const EmployeePayslips = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
-                    {payslips.map((ps) => {
+                    {filteredPayslips.map((ps) => {
                       const totalDed = (Number(ps.taxDeductions) || 0) + (Number(ps.otherDeductions) || 0) + (Number(ps.unpaidLeaveDeduction) || 0);
                       const payMonthStr = `${MONTH_NAMES[(ps.month || 1) - 1]} ${ps.year}`;
                       const payDateStr = ps.generatedAt
@@ -495,20 +660,38 @@ const EmployeePayslips = () => {
             </div>
             <div className="space-y-2 max-w-lg mx-auto">
               <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                No Payslips Issued Yet
+                {payslips.length > 0 ? 'No Matching Payslips' : 'No Payslips Issued Yet'}
               </h4>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                Your monthly salary vouchers, tax withholding breakdowns, and net disbursement statements will appear securely here once the month-end payroll cycle is disbursed.
+                {payslips.length > 0
+                  ? 'No payroll vouchers matched your active search query or filters. Try clearing your search keywords or resetting filters.'
+                  : 'Your monthly salary vouchers, tax withholding breakdowns, and net disbursement statements will appear securely here once the month-end payroll cycle is disbursed.'}
               </p>
             </div>
             <div className="pt-2">
-              <a
-                href="/employee/profile"
-                className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
-              >
-                <Eye className="w-4 h-4 stroke-[2.5]" />
-                <span>Verify Salary Account & Bank Details</span>
-              </a>
+              {payslips.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('ALL');
+                    setYearFilter('ALL');
+                    setDateRange('ALL');
+                  }}
+                  className="px-5 py-2.5 rounded-[12px] bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 transition-all hover:scale-105 active:scale-95"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Search & Filters</span>
+                </button>
+              ) : (
+                <a
+                  href="/employee/profile"
+                  className="px-6 py-3 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/25 inline-flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                >
+                  <Eye className="w-4 h-4 stroke-[2.5]" />
+                  <span>Verify Salary Account & Bank Details</span>
+                </a>
+              )}
             </div>
             <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 font-semibold">
               <span className="flex items-center px-3 py-1 rounded-[12px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
