@@ -187,7 +187,7 @@ const ModernSearchBarSection = ({
                     setShowSortMenu(false);
                     setShowFilterMenu(false);
                   }}
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-xs sm:text-[13.5px] font-medium text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5] shadow-2xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 h-9 px-3.5 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-xs sm:text-[13.5px] font-medium text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5] shadow-2xs transition-all cursor-pointer"
                 >
                   <Calendar className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
                   <span className="truncate max-w-[120px] sm:max-w-none">{dateRangeLabel || 'Date Range'}</span>
@@ -234,7 +234,7 @@ const ModernSearchBarSection = ({
                     setShowDateMenu(false);
                     setShowFilterMenu(false);
                   }}
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-xs sm:text-[13.5px] font-medium text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5] shadow-2xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 h-9 px-3.5 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] text-xs sm:text-[13.5px] font-medium text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5] shadow-2xs transition-all cursor-pointer"
                 >
                   <ArrowUpDown className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
                   <span className="truncate max-w-[130px] sm:max-w-none">{sortDisplayLabel}</span>

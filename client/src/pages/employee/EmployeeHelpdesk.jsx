@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   LifeBuoy,
   Plus,
@@ -435,19 +435,28 @@ const EmployeeHelpdesk = () => {
     });
   }, [tickets, last7Days]);
 
-  // 4. Priority breakdown sparkline
+  // 4. SLA response trend sparkline (temporal 7-day format matching other cards)
   const slaSparkData = useMemo(() => {
-    const high = tickets.filter((t) => t.priority === 'HIGH').length;
-    const med = tickets.filter((t) => t.priority === 'MEDIUM').length;
-    const low = tickets.filter((t) => t.priority === 'LOW').length;
-    const closed = tickets.filter((t) => t.status === 'RESOLVED').length;
-    return [
-      { value: high, label: 'High', tooltip: `High Priority: ${high} Tickets` },
-      { value: med, label: 'Med', tooltip: `Medium Priority: ${med} Tickets` },
-      { value: low, label: 'Low', tooltip: `Routine Low: ${low} Tickets` },
-      { value: closed, label: 'Done', tooltip: `Total Solved: ${closed} Tickets` },
-    ];
-  }, [tickets]);
+    return last7Days.map(({ dateKey, dayLabel }) => {
+      const dayDeltas = [];
+      tickets.forEach((t) => {
+        const raw = t.createdDate ? new Date(t.createdDate).toISOString().split('T')[0] : '';
+        if (raw === dateKey && t.replies && t.replies.length > 1) {
+          const firstStaffReply = t.replies.find((r) => r.userId !== t.userId);
+          if (firstStaffReply && t.createdDate) {
+            const diffMin = Math.max(0, (new Date(firstStaffReply.time).getTime() - new Date(t.createdDate).getTime()) / 60000);
+            if (!isNaN(diffMin)) dayDeltas.push(diffMin);
+          }
+        }
+      });
+      const avgMin = dayDeltas.length > 0 ? Math.round(dayDeltas.reduce((a, b) => a + b, 0) / dayDeltas.length) : 0;
+      return {
+        value: avgMin,
+        label: dayLabel,
+        tooltip: avgMin > 0 ? `${dayLabel}: ${avgMin}m Avg SLA` : `${dayLabel}: No SLA logs`,
+      };
+    });
+  }, [tickets, last7Days]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 w-full">
@@ -630,10 +639,10 @@ const EmployeeHelpdesk = () => {
           <button
             type="button"
             onClick={() => setIsNewTicketOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-[12px] bg-[#007699] hover:bg-[#006280] active:bg-[#004f66] text-white font-bold text-xs sm:text-[13px] shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>New Ticket</span>
+            <span>Create Ticket</span>
           </button>
         }
       />
@@ -645,13 +654,13 @@ const EmployeeHelpdesk = () => {
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>Support Inquiries & Service Log</span>
+              <span>Recent Inquiries</span>
             </h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Direct enterprise resolution queue for hardware requisitions, payroll adjustments, and amenities
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+              Track your requests for hardware, payroll adjustments, and office services.
             </p>
           </div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-[12px]">
+          <span className="text-xs font-bold text-[#5e6d82] dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-[12px]">
             {filteredTickets.length} Tickets Found
           </span>
         </div>
@@ -688,10 +697,10 @@ const EmployeeHelpdesk = () => {
                       {t.priority} Priority
                     </span>
 
-                    <span className="text-[11px] text-slate-400 font-medium">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       Updated {formatTimeDisplay(t.lastUpdated)}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       • Assigned: <strong className="text-slate-700 dark:text-slate-300">{t.assignedTo}</strong>
                     </span>
                   </div>
@@ -700,9 +709,11 @@ const EmployeeHelpdesk = () => {
                     {t.subject}
                   </h4>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 max-w-4xl font-medium">
-                    {t.description}
-                  </p>
+                  {t.description && t.description.trim() && !/^\.+$/.test(t.description.trim()) && (
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-1 max-w-4xl font-medium">
+                      {t.description}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
@@ -763,7 +774,7 @@ const EmployeeHelpdesk = () => {
                     setStatusFilter('ALL');
                     setCategoryFilter('ALL');
                   }}
-                  className="px-5 py-2.5 rounded-[12px] bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
+                  className="px-5 py-2.5 rounded-[12px] bg-[#007699] hover:bg-[#006280] text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-sky-500/20 transition-all hover:scale-105 active:scale-95"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Reset Search & Filters</span>

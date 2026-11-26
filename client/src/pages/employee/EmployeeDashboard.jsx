@@ -488,11 +488,19 @@ const EmployeeDashboard = () => {
       let status = isWeekend ? 'Weekend Off' : 'No Log';
       let checkins = 0;
 
+      const todayStatusDateKey = todayStatus?.date || todayStatus?.checkIn
+        ? toLocalDateKey(todayStatus.date || todayStatus.checkIn)
+        : null;
+      const isTodayStatusForThisDay =
+        i === 0 &&
+        isPresent &&
+        (todayStatusDateKey ? todayStatusDateKey === key : Object.keys(logsByDate).length === 0);
+
       if (log) {
         hours = Number(log.totalHours) || (log.status === 'PRESENT' ? 8.5 : log.status === 'LATE' ? 7.5 : 0);
         status = log.status || 'PRESENT';
         checkins = (log.status === 'PRESENT' || log.status === 'LATE') ? 1 : 0;
-      } else if (i === 0 && isPresent) {
+      } else if (isTodayStatusForThisDay) {
         hours = Number(todayStatus?.totalHours) || 8.5;
         status = todayStatus?.status || 'PRESENT';
         checkins = 1;
