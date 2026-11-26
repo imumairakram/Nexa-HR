@@ -980,7 +980,6 @@ const EmployeeDocuments = () => {
       {/* 3. MODERN DYNAMIC REPOSITORY SEARCH & FILTER COMMAND BAR */}
       {/* ========================================================================= */}
       <ModernSearchBarSection
-        searchMaxWidthClass="sm:max-w-[400px]"
         statusTabs={
           activeTab === 'personal'
             ? [
@@ -1895,147 +1894,177 @@ const EmployeeDocuments = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 6. DOCUMENT PREVIEW MODAL (ENTERPRISE VAULT CARD) */}
+      {/* 6. DOCUMENT PREVIEW MODAL (MATCHING NEW TICKET CARD DESIGN) */}
       {/* ========================================================================= */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] rounded-[28px] sm:rounded-[32px] max-w-xl w-full shadow-2xl shadow-sky-950/20 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
-            {/* Header */}
-            <div className="px-6 sm:px-8 py-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-4 shrink-0 bg-gradient-to-br from-sky-50/80 via-white to-cyan-50/40 dark:from-sky-950/30 dark:via-[#1E293B] dark:to-[#1E293B] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 left-10 w-48 h-48 bg-cyan-300/15 dark:bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-500 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/25 ring-4 ring-sky-100 dark:ring-sky-950/60">
-                  <FileText className="w-6 h-6 stroke-[2.2]" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+          <main className="relative z-10 w-full max-w-3xl lg:max-w-4xl bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/80 dark:border-slate-700/80 p-6 sm:p-9 transition-all max-h-[94vh] overflow-y-auto no-scrollbar animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <header className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6" data-purpose="modal-header">
+              <div className="flex items-center gap-4 min-w-0">
+                {/* Glowing Icon Badge */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1px] shadow-lg shadow-sky-500/25 flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-[15px] bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white">
+                    <FileText className="w-6 h-6 stroke-[2.2]" />
+                  </div>
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white truncate tracking-tight">
-                    {selectedDoc.title}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      Issuer: <strong className="text-slate-800 dark:text-slate-200 font-bold">{selectedDoc.issuer}</strong>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="text-xs font-sans tabular-nums font-bold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700">
+                      {selectedDoc.referenceNumber || `#${selectedDoc.id}`}
+                    </span>
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>HR Verified & Encrypted</span>
                     </span>
                     {selectedDoc.category && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[10px] font-extrabold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] text-xs font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
                         {selectedDoc.category}
                       </span>
                     )}
                   </div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug truncate">
+                    {formatDocumentTitle(selectedDoc)}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal truncate">
+                    Issued by <strong className="text-slate-700 dark:text-slate-200 font-semibold">{selectedDoc.issuer || 'Certifying Authority'}</strong>
+                  </p>
                 </div>
               </div>
 
+              {/* Close Action */}
               <button
                 type="button"
+                aria-label="Close modal"
                 onClick={() => setSelectedDoc(null)}
-                className="w-9 h-9 rounded-[12px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 relative z-10"
-                aria-label="Close dialog"
+                className="p-2 rounded-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shrink-0 ml-3"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            {/* Metadata Body */}
-            <div className="px-6 sm:px-8 py-5 space-y-4">
-              <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                <span>Vault Specifications</span>
-                <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold normal-case">
-                  <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>HR Verified & Encrypted</span>
+            {/* Body Grid */}
+            <div className="space-y-5 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                {/* Card 1: Vault Record & File Details */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-sky-500" />
+                      Vault Specifications
+                    </span>
+                    <span className="text-[11px] font-sans tabular-nums font-semibold text-slate-500 dark:text-slate-400">
+                      PDF
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Vault Record ID</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <code className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 font-sans tabular-nums text-[11px] font-bold text-slate-800 dark:text-slate-200 select-all truncate max-w-[180px] sm:max-w-[220px]">
+                        #{selectedDoc.id}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyId(selectedDoc.id)}
+                        className="p-1.5 rounded-[10px] text-slate-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer shrink-0"
+                        title="Copy Record ID"
+                      >
+                        {copiedId ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                      <HardDrive className="w-3.5 h-3.5 text-slate-400" />
+                      Encrypted File Size
+                    </span>
+                    <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
+                      {selectedDoc.size || 'Encrypted File'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card 2: Verification & Issue Timeline */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />
+                      Compliance & Verification
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                      Active
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      Issue / Verification Date
+                    </span>
+                    <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
+                      {selectedDoc.issueDate || 'Recent'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-slate-400" />
+                      Document Category
+                    </span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                      {selectedDoc.typeLabel || selectedDoc.type?.replace(/_/g, ' ') || 'Professional Certificate'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description / Summary Box */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 shadow-xs">
+                <span className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
+                  <Shield className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+                  Verification Summary
                 </span>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800/80 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-xs">
-                    <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Vault Record ID</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <code className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 font-sans tabular-nums text-[11px] font-bold text-slate-800 dark:text-slate-200 select-all tracking-tight max-w-[210px] sm:max-w-xs truncate">
-                      #{selectedDoc.id}
-                    </code>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyId(selectedDoc.id)}
-                      className="p-1.5 rounded-[12px] text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white dark:hover:bg-slate-900 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer"
-                      title="Copy Record ID"
-                    >
-                      {copiedId ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-xs">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Issue / Verification Date</span>
-                  </div>
-                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
-                    {selectedDoc.issueDate || 'Recent'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-xs">
-                    <HardDrive className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Encrypted File Size</span>
-                  </div>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-200/60 dark:bg-slate-700/60 font-sans tabular-nums font-bold text-[11px] text-slate-700 dark:text-slate-300">
-                    {selectedDoc.size || 'Encrypted File'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-xs">
-                    <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Compliance Verification</span>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[12px] text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 stroke-[2.5]" />
-                    <span>HR Verified & Encrypted</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Verified Certificate Callout */}
-              <div className="p-4 rounded-2xl bg-sky-50/70 dark:bg-sky-950/20 border border-sky-100/90 dark:border-sky-900/40 flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 mt-0.5 border border-sky-500/20">
-                  <Shield className="w-4 h-4 stroke-[2]" />
-                </div>
-                <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
                   {selectedDoc.description || 'Verified Professional Certificate uploaded to personal compliance vault.'}
-                </div>
+                </p>
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="px-6 sm:px-8 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
-              <button
-                type="button"
-                onClick={() => setSelectedDoc(null)}
-                className="px-5 py-2.5 rounded-[12px] text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-all cursor-pointer"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  handleDownload(selectedDoc);
-                  setSelectedDoc(null);
-                }}
-                className="px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-500 via-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-lg shadow-sky-500/25 active:scale-95 transition-all"
-              >
-                <Download className="w-4 h-4 stroke-[2.2]" />
-                <span>Download Secure Copy</span>
-              </button>
-            </div>
-          </div>
+            {/* Modal Footer */}
+            <footer className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6" data-purpose="modal-footer">
+              <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 order-2 sm:order-1">
+                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                <span>Your documents are securely encrypted for privacy and verified for authenticity</span>
+              </div>
+
+              <div className="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDoc(null)}
+                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-[12px] border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownload(selectedDoc);
+                    setSelectedDoc(null);
+                  }}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-[12px] bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-sm font-semibold shadow-lg shadow-sky-600/25 active:scale-[0.99] transition-all cursor-pointer"
+                >
+                  <Download className="w-4 h-4 stroke-[2.2]" />
+                  <span>Download Secure Copy</span>
+                </button>
+              </div>
+            </footer>
+          </main>
         </div>
       )}
     </div>
