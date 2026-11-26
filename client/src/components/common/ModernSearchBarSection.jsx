@@ -150,7 +150,7 @@ const ModernSearchBarSection = ({
                       key={tab.key}
                       type="button"
                       onClick={() => onStatusChange && onStatusChange(tab.key)}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-[12px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
+                      className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-[12px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
                         isSelected
                           ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                           : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -159,7 +159,7 @@ const ModernSearchBarSection = ({
                       <span>{tab.label}</span>
                       {tab.count !== undefined && (
                         <span
-                          className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-[10px] transition-all ${
+                          className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 ml-0.5 rounded-[10px] transition-all ${
                             isSelected
                               ? 'bg-white/20 text-white'
                               : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
@@ -317,7 +317,7 @@ const ModernSearchBarSection = ({
       {/* ========================================================================= */}
       <div className="flex items-center gap-2 sm:gap-2.5 w-full">
         {/* Search Input Container */}
-        <div className="flex-1 min-w-0 flex items-center gap-2 sm:gap-2.5 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
+        <div className="flex-1 min-w-0 h-9 flex items-center gap-2 sm:gap-2.5 px-3 sm:px-3.5 rounded-[12px] bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] shadow-2xs focus-within:border-[#0A8FB5] dark:focus-within:border-[#3CC1E6] transition-colors">
           <Search className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1] shrink-0" />
 
           {/* Interactive Filter Chips */}
@@ -406,7 +406,7 @@ const ModernSearchBarSection = ({
                 setShowDateMenu(false);
                 setShowSortMenu(false);
               }}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-[12px] border text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer shadow-2xs shrink-0 whitespace-nowrap ${
+              className={`inline-flex items-center gap-1.5 sm:gap-2 h-9 px-3 sm:px-4 rounded-[12px] border text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer shadow-2xs shrink-0 whitespace-nowrap ${
                 effectiveFilterCount > 0 || showFilterMenu
                   ? 'bg-[#E1F4FA] dark:bg-[#12333D] border-[#0A8FB5] dark:border-[#3CC1E6] text-[#07617D] dark:text-[#3CC1E6]'
                   : 'bg-white dark:bg-[#112229] border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5]'
@@ -455,7 +455,7 @@ const ModernSearchBarSection = ({
                               onClick={() => {
                                 onStatusChange && onStatusChange(tab.key);
                               }}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                              className={`flex items-center gap-2 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
                                 isSelected
                                   ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                                   : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1] border border-[#DCE6EA] dark:border-[#223840]'
@@ -464,7 +464,7 @@ const ModernSearchBarSection = ({
                               <span>{tab.label}</span>
                               {tab.count !== undefined && (
                                 <span
-                                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-[10px] ${
+                                  className={`text-[10px] font-semibold px-2 py-0.5 ml-0.5 rounded-[10px] ${
                                     isSelected
                                       ? 'bg-white/20 text-white'
                                       : 'bg-[#DCE6EA] dark:bg-[#223840] text-[#5B727B] dark:text-[#8FA8B1]'

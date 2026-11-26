@@ -25,10 +25,123 @@ import {
 } from 'lucide-react';
 import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
 import EmployeePageHeader from '../../components/navigation/EmployeePageHeader';
-import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import { api } from '../../services/api';
 import { broadcastAppEvent, subscribeAppEvent } from '../../utils/crossTabSync';
+
+export const formatLeaveTypeName = (name) => {
+  if (!name) return 'General Leave';
+  if (name.trim().toLowerCase() === 'annual leave') return 'Annual Vacation';
+  return name;
+};
+
+export const formatLeaveStatusLabel = (status) => {
+  if (status === 'REJECTED') return 'DECLINED';
+  return status || 'PENDING';
+};
+
+const BALANCE_CARD_STYLES = {
+  purple: {
+    barFill: 'bg-indigo-600 dark:bg-indigo-400',
+    barTrack: 'bg-indigo-100 dark:bg-indigo-950/60',
+    badge: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-800/50',
+  },
+  coral: {
+    barFill: 'bg-rose-600 dark:bg-rose-400',
+    barTrack: 'bg-rose-100 dark:bg-rose-950/60',
+    badge: 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50',
+  },
+  amber: {
+    barFill: 'bg-amber-600 dark:bg-amber-400',
+    barTrack: 'bg-amber-100 dark:bg-amber-950/60',
+    badge: 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50',
+  },
+  teal: {
+    barFill: 'bg-teal-700 dark:bg-teal-400',
+    barTrack: 'bg-teal-100 dark:bg-teal-950/60',
+    badge: 'bg-teal-50 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200/70 dark:border-teal-800/50',
+  },
+};
+
+const LeaveBalanceCard = ({
+  title,
+  available,
+  total,
+  unit,
+  percent,
+  badgeText,
+  subtext,
+  color = 'teal',
+  loading = false,
+}) => {
+  const palette = BALANCE_CARD_STYLES[color] || BALANCE_CARD_STYLES.teal;
+  const clampedPct = Math.min(100, Math.max(0, Number(percent) || 0));
+
+  if (loading) {
+    return (
+      <div className="rounded-[14px] p-4 sm:p-5 bg-white dark:bg-[#16211E] border border-[#E2E1DC] dark:border-[#273834] shadow-subtle flex flex-col justify-between min-h-[142px]">
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-2 flex-1">
+            <div className="skeleton-shimmer animate-pulse h-3.5 w-24 rounded-lg" />
+            <div className="skeleton-shimmer animate-pulse h-7 w-20 rounded-lg" />
+          </div>
+          <div className="skeleton-shimmer animate-pulse h-5 w-16 rounded-full" />
+        </div>
+        <div className="space-y-2 pt-3">
+          <div className="skeleton-shimmer animate-pulse h-2 w-full rounded-full" />
+          <div className="skeleton-shimmer animate-pulse h-3 w-28 rounded-md" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-[14px] p-4 sm:p-5 bg-white dark:bg-[#16211E] text-[#1C2321] dark:text-[#F1F5F4] border border-[#E2E1DC] dark:border-[#273834] shadow-subtle hover:border-[#C7C5BB] dark:hover:border-[#384E48] hover:shadow-elevated transition-all duration-150 flex flex-col justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <span className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300 truncate block" title={title}>
+            {title}
+          </span>
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-xl sm:text-2xl xl:text-3xl font-bold tracking-tight font-sans tabular-nums leading-tight text-slate-900 dark:text-white">
+              {available}
+            </span>
+            {unit && (
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                {unit}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {badgeText && (
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap shrink-0 ${palette.badge}`}>
+            {badgeText}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-1.5">
+        <div
+          role="progressbar"
+          aria-label={`${title} remaining balance`}
+          aria-valuenow={clampedPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className={`w-full h-2 rounded-full overflow-hidden ${palette.barTrack}`}
+        >
+          <div
+            className={`h-full rounded-full transition-all duration-500 ease-out ${palette.barFill}`}
+            style={{ width: `${total > 0 ? clampedPct : 0}%` }}
+          />
+        </div>
+        <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+          {subtext}
+        </p>
+      </div>
+    </div>
+  );
+};
 
 export const calculateLeaveDays = (req) => {
   if (!req) return 1;
@@ -370,69 +483,10 @@ const EmployeeLeaves = () => {
 
   const totalAvailableLeaves = quotaCards.reduce((acc, c) => acc + c.available, 0);
   const totalAllowedLeaves = quotaCards.reduce((acc, c) => acc + c.total, 0);
-  const totalPendingRequests = stats.pending;
-  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation') || c.code?.toLowerCase().includes('annual')) || { type: 'Annual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
+  const totalAvailablePercent = totalAllowedLeaves > 0 ? Math.min(100, Math.max(0, Math.round((totalAvailableLeaves / totalAllowedLeaves) * 100))) : 0;
+  const annualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('annual') || c.type?.toLowerCase().includes('vacation') || c.code?.toLowerCase().includes('annual')) || { type: 'Annual Vacation', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
   const sickCard = quotaCards.find((c) => c.type?.toLowerCase().includes('sick') || c.type?.toLowerCase().includes('medical') || c.code?.toLowerCase().includes('sick')) || { type: 'Sick Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
   const casualCard = quotaCards.find((c) => c.type?.toLowerCase().includes('casual') || c.code?.toLowerCase().includes('casual')) || { type: 'Casual Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
-  const unpaidCard = quotaCards.find((c) => c.type?.toLowerCase().includes('unpaid') || c.type?.toLowerCase().includes('sabbatical') || c.code?.toLowerCase().includes('unpaid')) || { type: 'Unpaid Leave', available: 0, total: 0, used: 0, percent: 0, pending: 0 };
-
-  // Dynamic Sparkline Data for Total Leaves
-  const totalLeavesSparkData = useMemo(() => {
-    if (quotaCards.length > 0) {
-      return quotaCards.map((c) => ({
-        value: c.available,
-        label: c.type.split(' ')[0],
-        tooltip: `${c.type}: ${c.available} / ${c.total} Days Left (${c.used} Used)`,
-      }));
-    }
-    return [
-      { value: totalAllowedLeaves, label: 'Quota', tooltip: `Total Quota: ${totalAllowedLeaves} Days` },
-      { value: totalAvailableLeaves, label: 'Available', tooltip: `Total Available: ${totalAvailableLeaves} Days` },
-      { value: Math.max(0, totalAllowedLeaves - totalAvailableLeaves), label: 'Used', tooltip: `Total Used: ${Math.max(0, totalAllowedLeaves - totalAvailableLeaves)} Days` },
-    ];
-  }, [quotaCards, totalAllowedLeaves, totalAvailableLeaves]);
-
-  const annualSparkData = useMemo(() => {
-    const total = annualCard.total || 0;
-    const used = annualCard.used || 0;
-    const avail = annualCard.available || (total - used);
-    return [
-      { value: total, label: 'Quota', tooltip: `Total Entitlement: ${total} Days` },
-      { value: Math.max(0, total - Math.round(used * 0.5)), label: 'Q2', tooltip: `Mid-Year Balance: ${Math.max(0, total - Math.round(used * 0.5))} Days` },
-      { value: avail, label: 'Available', tooltip: `Current Remaining: ${avail} Days (${used} Taken)` },
-    ];
-  }, [annualCard]);
-
-  const sickSparkData = useMemo(() => {
-    const total = sickCard.total || 0;
-    const used = sickCard.used || 0;
-    const avail = sickCard.available || (total - used);
-    return [
-      { value: total, label: 'Quota', tooltip: `Medical Quota: ${total} Days` },
-      { value: Math.max(0, total - used), label: 'Active', tooltip: `Current Available: ${avail} Days` },
-      { value: used, label: 'Taken', tooltip: `Medical Leave Used: ${used} Days` },
-    ];
-  }, [sickCard]);
-
-  const casualSparkData = useMemo(() => {
-    const total = casualCard.total || 0;
-    const used = casualCard.used || 0;
-    const avail = casualCard.available || (total - used);
-    return [
-      { value: total, label: 'Quota', tooltip: `Casual Quota: ${total} Days` },
-      { value: Math.max(0, total - Math.round(used * 0.5)), label: 'Q2', tooltip: `Mid-Year: ${Math.max(0, total - Math.round(used * 0.5))} Days` },
-      { value: avail, label: 'Available', tooltip: `Current Available: ${avail} Days (${used} Taken)` },
-    ];
-  }, [casualCard]);
-
-  const pendingSparkData = useMemo(() => {
-    return [
-      { value: stats.total, label: 'Total', tooltip: `Total Submissions: ${stats.total} Requests` },
-      { value: stats.approved, label: 'Approved', tooltip: `Approved: ${stats.approved} Requests` },
-      { value: stats.pending, label: 'Pending', tooltip: `Pending Review: ${stats.pending} Requests` },
-      { value: stats.rejected, label: 'Rejected', tooltip: `Declined: ${stats.rejected} Requests` },
-    ];
-  }, [stats]);
 
   return (
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100">
@@ -454,70 +508,54 @@ const EmployeeLeaves = () => {
         </div>
       )}
 
-      {/* 2. TOP METRIC SPARKLINE CARDS */}
+      {/* 2. TOP LEAVE BALANCE PROGRESS CARDS */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Dark Navy Card - Total Leaves */}
-        <SparkMetricCard
-          variant="light"
+        <LeaveBalanceCard
           title="Total Leaves"
-          value={totalAvailableLeaves}
+          available={totalAvailableLeaves}
+          total={totalAllowedLeaves}
           unit={totalAvailableLeaves === 1 ? 'Day' : 'Days'}
-          badgeText={`${totalAvailableLeaves}d Available`}
-          badgeType={totalAvailableLeaves > 0 ? 'positive' : 'neutral'}
-          badgeIcon={totalAvailableLeaves > 0 ? 'up' : 'dot'}
+          percent={totalAvailablePercent}
+          badgeText={`${totalAvailablePercent}% Left`}
           subtext={`Quota: ${totalAllowedLeaves} Total Days`}
-          chartColor="purple"
-          presetWave="wave1"
-          dataPoints={totalLeavesSparkData}
+          color="purple"
           loading={loading}
         />
 
-        {/* Card 2: Light Card - Annual Vacation */}
-        <SparkMetricCard
-          variant="light"
+        <LeaveBalanceCard
           title="Annual Vacation"
-          value={annualCard.available}
+          available={annualCard.available}
+          total={annualCard.total}
           unit={`/ ${annualCard.total}d`}
+          percent={annualCard.percent}
           badgeText={annualCard.total > 0 ? `${annualCard.percent}% Available` : '0 Quota'}
-          badgeType={annualCard.total === 0 ? 'neutral' : annualCard.percent >= 50 ? 'positive' : 'warning'}
-          badgeIcon={annualCard.total === 0 ? 'dot' : annualCard.percent >= 50 ? 'up' : 'dot'}
           subtext={annualCard.total > 0 ? `${annualCard.used} Days Used This Year` : 'No Annual Quota Configured'}
-          chartColor="coral"
-          presetWave="wave2"
-          dataPoints={annualSparkData}
+          color="coral"
           loading={loading}
         />
 
-        {/* Card 3: Light Card - Sick & Medical */}
-        <SparkMetricCard
-          variant="light"
+        <LeaveBalanceCard
           title="Sick & Medical"
-          value={sickCard.available}
+          available={sickCard.available}
+          total={sickCard.total}
           unit={`/ ${sickCard.total}d`}
+          percent={sickCard.percent}
           badgeText={sickCard.total > 0 ? `${sickCard.percent}% Available` : '0 Quota'}
-          badgeType={sickCard.total === 0 ? 'neutral' : sickCard.used === 0 ? 'positive' : 'neutral'}
-          badgeIcon={sickCard.total === 0 ? 'dot' : sickCard.used === 0 ? 'up' : 'dot'}
           subtext={sickCard.total > 0 ? (sickCard.used > 0 ? `${sickCard.used}d Used • Medical Allowance` : 'Full Medical Allowance') : 'No Medical Quota Configured'}
-          chartColor="amber"
-          presetWave="wave3"
-          dataPoints={sickSparkData}
+          color="amber"
           loading={loading}
         />
 
-        {/* Card 4: Light Card - Casual Leave */}
-        <SparkMetricCard
-          variant="light"
+        <LeaveBalanceCard
           title="Casual Leave"
-          value={casualCard.available}
+          available={casualCard.available}
+          total={casualCard.total}
           unit={`/ ${casualCard.total}d`}
+          percent={casualCard.percent}
           badgeText={casualCard.total > 0 ? `${casualCard.percent}% Available` : '0 Quota'}
-          badgeType={casualCard.total === 0 ? 'neutral' : casualCard.percent >= 50 ? 'positive' : 'warning'}
-          badgeIcon={casualCard.total === 0 ? 'dot' : casualCard.percent >= 50 ? 'up' : 'dot'}
           subtext={casualCard.total > 0 ? `${casualCard.used} Days Used This Year` : 'Short Notice Personal Leave'}
-          chartColor="teal"
-          presetWave="wave4"
-          dataPoints={casualSparkData}
+          color="teal"
           loading={loading}
         />
       </div>
@@ -554,7 +592,7 @@ const EmployeeLeaves = () => {
           <button
             type="button"
             onClick={() => setIsApplyOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Apply for Leave</span>
@@ -563,7 +601,7 @@ const EmployeeLeaves = () => {
         filterContent={
           <div className="space-y-3.5">
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                 Leave Policy
               </label>
               <div className="grid grid-cols-2 gap-1.5">
@@ -577,7 +615,7 @@ const EmployeeLeaves = () => {
                       : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                       }`}
                   >
-                    {typeName === 'ALL' ? 'All Policies' : typeName}
+                    {typeName === 'ALL' ? 'All Policies' : formatLeaveTypeName(typeName)}
                   </button>
                 ))}
               </div>
@@ -618,7 +656,7 @@ const EmployeeLeaves = () => {
                     <span>Leave History & Review Status</span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                    Review log of all time-off submissions and management approval states
+                    Review the history of your time-off submissions and their approval status.
                   </p>
                 </div>
               </div>
@@ -653,9 +691,9 @@ const EmployeeLeaves = () => {
                               </div>
                               <div>
                                 <div className="font-extrabold text-slate-900 dark:text-white text-xs">
-                                  {req.leaveType?.name || 'General Leave'}
+                                  {formatLeaveTypeName(req.leaveType?.name)}
                                 </div>
-                                <div className="text-[10px] text-slate-400 font-sans tabular-nums">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-sans tabular-nums">ID: {req.id ? req.id.slice(0, 8) : 'REQ'}</div>
                               </div>
                             </div>
                             <span
@@ -666,10 +704,10 @@ const EmployeeLeaves = () => {
                                   : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
                                 }`}
                             >
-                              {req.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
+                              {req.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />}
                               {req.status === 'PENDING' && <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
                               {req.status === 'REJECTED' && <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />}
-                              <span>{req.status}</span>
+                              <span>{formatLeaveStatusLabel(req.status)}</span>
                             </span>
                           </div>
 
@@ -750,7 +788,7 @@ const EmployeeLeaves = () => {
                                     ({formatLeaveDays(daysCount)})
                                   </span>
                                 </div>
-                                <div className="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
                                   <span>{startInfo.weekday ? `${startInfo.weekday} Start` : 'Scheduled'}</span>
                                   <span>•</span>
                                   <span>{req.dayType === 'HALF' ? 'Half Day' : 'Full Day'}</span>
@@ -763,9 +801,9 @@ const EmployeeLeaves = () => {
                           <td className="py-4 px-4 font-sans tabular-nums">
                             <div>
                               <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                                {req.leaveType?.name || 'General Leave'}
+                                {formatLeaveTypeName(req.leaveType?.name)}
                               </span>
-                              <div className="text-[10px] text-slate-400 font-sans mt-0.5">
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-sans mt-0.5">
                                 {req.leaveType?.isPaid !== false ? 'Paid Allowance' : 'Unpaid Leave'}
                               </div>
                             </div>
@@ -778,7 +816,7 @@ const EmployeeLeaves = () => {
                               title={req.reason}
                             >
                               {req.reason || (
-                                <span className="text-slate-400 italic">No notes or reason provided</span>
+                                <span className="text-slate-500 dark:text-slate-400 italic">No notes or reason provided</span>
                               )}
                             </p>
                           </td>
@@ -787,22 +825,22 @@ const EmployeeLeaves = () => {
                           <td className="py-4 px-4">
                             <span
                               className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase ${req.status === 'APPROVED'
-                                ? 'text-emerald-600 dark:text-emerald-400'
+                                ? 'text-emerald-700 dark:text-emerald-400'
                                 : req.status === 'REJECTED'
                                   ? 'text-rose-600 dark:text-rose-400'
-                                  : 'text-amber-600 dark:text-amber-400'
+                                  : 'text-amber-700 dark:text-amber-400'
                                 }`}
                             >
                               {req.status === 'APPROVED' && (
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                               )}
                               {req.status === 'PENDING' && (
-                                <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                                <Clock className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                               )}
                               {req.status === 'REJECTED' && (
                                 <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                               )}
-                              <span>{req.status}</span>
+                              <span>{formatLeaveStatusLabel(req.status)}</span>
                             </span>
                           </td>
 
@@ -811,10 +849,10 @@ const EmployeeLeaves = () => {
                             {req.status === 'APPROVED' ? (
                               <div className="inline-flex flex-col items-end">
                                 <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1">
-                                  <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                  <UserCheck className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                                   <span>Approved</span>
                                 </span>
-                                <span className="text-[10px] text-slate-400 mt-0.5">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                                   by {req.approvedBy?.firstName || 'HR Lead'} {req.approvedBy?.lastName || ''}
                                 </span>
                               </div>
@@ -823,17 +861,17 @@ const EmployeeLeaves = () => {
                                 <span className="text-rose-700 dark:text-rose-300 font-bold">
                                   Declined
                                 </span>
-                                <span className="text-[10px] text-slate-400 mt-0.5 max-w-[200px] truncate" title={req.rejectionReason}>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 max-w-[200px] truncate" title={req.rejectionReason}>
                                   {req.rejectionReason || 'Declined by HR'}
                                 </span>
                               </div>
                             ) : (
                               <div className="inline-flex flex-col items-end">
                                 <span className="text-amber-700 dark:text-amber-300 font-semibold flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-amber-500" />
+                                  <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                                   <span>Awaiting Review</span>
                                 </span>
-                                <span className="text-[10px] text-slate-400 mt-0.5">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                                   In HR Management Queue
                                 </span>
                               </div>
@@ -924,7 +962,7 @@ const EmployeeLeaves = () => {
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
-                      {selectedReq.leaveType?.name || 'Leave Record'}
+                      {selectedReq.leaveType?.name ? formatLeaveTypeName(selectedReq.leaveType.name) : 'Leave Record'}
                     </h2>
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-2xs ${selectedReq.status === 'APPROVED'
@@ -934,10 +972,10 @@ const EmployeeLeaves = () => {
                             : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50'
                         }`}
                     >
-                      {selectedReq.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
+                      {selectedReq.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />}
                       {selectedReq.status === 'PENDING' && <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />}
                       {selectedReq.status === 'REJECTED' && <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />}
-                      <span>{selectedReq.status}</span>
+                      <span>{formatLeaveStatusLabel(selectedReq.status)}</span>
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-sans tabular-nums">
@@ -976,7 +1014,7 @@ const EmployeeLeaves = () => {
                     {formatLeaveDays(calculateLeaveDays(selectedReq))}
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    {selectedReq.dayType === 'HALF' ? 'Half-Day Session' : 'Full-Day Allocation'} • {selectedReq.leaveType?.name || 'General Leave'}
+                    {selectedReq.dayType === 'HALF' ? 'Half-Day Session' : 'Full-Day Allocation'} • {formatLeaveTypeName(selectedReq.leaveType?.name)}
                   </div>
                 </div>
 
@@ -1144,7 +1182,7 @@ const EmployeeLeaves = () => {
                         value={lt.id}
                         className="text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 py-1.5"
                       >
-                        {lt.name} ({lt.daysAllowed || lt.days || 12} days quota • {lt.isPaid ? 'Paid' : 'Unpaid'})
+                        {formatLeaveTypeName(lt.name)} ({lt.daysAllowed || lt.days || 12} days quota • {lt.isPaid ? 'Paid' : 'Unpaid'})
                       </option>
                     ))}
                   </select>
@@ -1266,7 +1304,7 @@ const EmployeeLeaves = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
-                        {activeLeaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name || 'Leave Request'}
+                        {formatLeaveTypeName(activeLeaveTypes.find((l) => String(l.id) === String(leaveForm.leaveTypeId))?.name) || 'Leave Request'}
                       </h4>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
