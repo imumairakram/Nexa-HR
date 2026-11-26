@@ -528,7 +528,7 @@ const Leaves = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1 */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Total Applications"
           value={stats.total}
           unit={stats.total === 1 ? 'Request' : 'Requests'}

@@ -576,7 +576,7 @@ const AppPageHeader = ({
                     <X className="w-3.5 h-3.5" />
                   </button>
                 ) : (
-                  <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-slate-400 bg-slate-200/60 dark:bg-slate-700/60 px-1.5 py-0.5 rounded-[12px] pointer-events-none">
+                  <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-slate-600 dark:text-slate-200 bg-slate-200/80 dark:bg-slate-700/80 px-1.5 py-0.5 rounded-[12px] pointer-events-none">
                     ⌘K
                   </span>
                 )}

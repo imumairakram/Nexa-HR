@@ -1173,7 +1173,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Issued Documents"
           value={issuedDocs.length}
           unit={issuedDocs.length === 1 ? 'Record' : 'Records'}

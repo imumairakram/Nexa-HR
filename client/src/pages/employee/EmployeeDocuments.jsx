@@ -940,7 +940,7 @@ const EmployeeDocuments = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Personal Vault */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Personal Vault"
           value={personalDocs.length}
           unit={personalDocs.length === 1 ? 'File' : 'Files'}

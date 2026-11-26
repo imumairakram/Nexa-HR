@@ -360,7 +360,7 @@ const LeavePolicy = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1 */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Leave Policy Tiers"
           value={policies.length}
           unit={policies.length === 1 ? 'Tier' : 'Tiers'}

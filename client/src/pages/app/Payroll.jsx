@@ -279,7 +279,7 @@ const Payroll = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1 */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Latest Batch Disbursed"
           value={formatCurrency(latestBatch?.netPayable || 0)}
           badgeText="Disbursed"

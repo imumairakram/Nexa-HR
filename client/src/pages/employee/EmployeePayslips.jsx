@@ -247,7 +247,7 @@ const EmployeePayslips = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Latest Net Salary */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Net Take-Home Pay"
           value={formatCurrency(latestNet)}
           unit=""

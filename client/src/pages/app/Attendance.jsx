@@ -737,7 +737,7 @@ const Attendance = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Verified Present */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title={selectedEmployee === 'ALL' ? 'Total Clocked In' : 'Verified Present'}
           value={totalDaysPresent}
           unit={totalDaysPresent === 1 ? 'Record' : 'Records'}

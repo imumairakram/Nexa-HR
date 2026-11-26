@@ -343,7 +343,7 @@ const Dashboard = () => {
         mobileTitle={mobileDashboardTitle}
         hideMobileSubtitle={true}
         hideMobileSearch={true}
-        subtitle="Live PostgreSQL analytics, workforce biometric attendance tracking, and leave pipeline."
+        subtitle="Track workforce attendance, manage leave requests, and monitor company updates."
         onRefresh={() => loadDashboardMetrics()}
         loading={loading}
         action={
@@ -363,7 +363,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Total Headcount */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Total Headcount"
           value={widgets.headcount?.error ? '—' : totalEmployees}
           unit={widgets.headcount?.error ? '' : 'Staff'}
@@ -530,11 +530,11 @@ const Dashboard = () => {
                     <stop offset="95%" stopColor="#0A8FB5" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#595959' }} />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: '#94A3B8' }}
+                  tick={{ fontSize: 10, fill: '#595959' }}
                   domain={[0, Math.max(totalEmployees || 3, ...lineChartData.map((d) => d.attendance || 0))]}
                   allowDecimals={false}
                 />
@@ -650,9 +650,9 @@ const Dashboard = () => {
                     dataKey="shortName"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#94A3B8', fontWeight: 700 }}
+                    tick={{ fontSize: 9, fill: '#595959', fontWeight: 700 }}
                   />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#94A3B8' }} allowDecimals={false} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#595959' }} allowDecimals={false} />
                   <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {

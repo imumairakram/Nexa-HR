@@ -527,7 +527,7 @@ const EmployeeHelpdesk = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Dark Navy Card - Total Inquiries */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Total Inquiries"
           value={stats.total}
           unit={stats.total === 1 ? 'Ticket' : 'Tickets'}

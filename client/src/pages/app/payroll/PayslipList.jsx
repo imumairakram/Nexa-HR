@@ -258,7 +258,7 @@ const PayslipList = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1 */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Total Vouchers"
           value={payslips.length}
           unit={payslips.length === 1 ? 'Slip' : 'Slips'}

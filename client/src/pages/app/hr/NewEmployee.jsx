@@ -380,14 +380,14 @@ const NewEmployee = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1 */}
         <SparkMetricCard
-          variant="dark"
+          variant="light"
           title="Total Headcount"
           value={orgStats.totalEmployees}
           unit="Staff"
           badgeText="Active Roster"
           badgeType="positive"
           badgeIcon="up"
-          subtext="Live PostgreSQL DB"
+          subtext="Synced with directory"
           chartColor="sky"
           dataPoints={headcountSparkData}
         />
