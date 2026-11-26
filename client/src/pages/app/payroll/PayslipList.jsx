@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+ï»¿import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
@@ -151,14 +151,14 @@ const PayslipList = () => {
 
   const dateRangeOptions = [
     { key: 'ALL', label: 'All Cycles' },
-    { key: 'THIS_MONTH', label: 'Oct 1 – Oct 31, 2026' },
-    { key: 'LAST_MONTH', label: 'Sep 1 – Sep 30, 2026' },
+    { key: 'THIS_MONTH', label: 'Oct 1 ï¿½ Oct 31, 2026' },
+    { key: 'LAST_MONTH', label: 'Sep 1 ï¿½ Sep 30, 2026' },
     { key: 'THIS_YEAR', label: 'Fiscal Year 2026' },
   ];
 
   const dateRangeLabel = useMemo(() => {
-    if (dateRange === 'THIS_MONTH') return 'Oct 1 – Oct 31, 2026';
-    if (dateRange === 'LAST_MONTH') return 'Sep 1 – Sep 30, 2026';
+    if (dateRange === 'THIS_MONTH') return 'Oct 1 ï¿½ Oct 31, 2026';
+    if (dateRange === 'LAST_MONTH') return 'Sep 1 ï¿½ Sep 30, 2026';
     if (dateRange === 'THIS_YEAR') return 'Fiscal Year 2026';
     return 'All Cycles';
   }, [dateRange]);
@@ -376,7 +376,7 @@ const PayslipList = () => {
                     <div>
                       <div className="font-extrabold text-slate-900 dark:text-white text-sm">{p.employee}</div>
                       <div className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5">
-                        {p.code} • {p.dept}
+                        {p.code} ï¿½ {p.dept}
                       </div>
                     </div>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold shrink-0">
@@ -396,19 +396,19 @@ const PayslipList = () => {
                     <div>
                       <div className="text-[9px] uppercase font-bold text-slate-400">Gross</div>
                       <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
-                        PKR {p.gross.toLocaleString()}
+                        {p.gross.toLocaleString()}
                       </div>
                     </div>
                     <div className="border-x border-slate-100 dark:border-slate-800">
                       <div className="text-[9px] uppercase font-bold text-slate-400">Deduct</div>
                       <div className="text-xs font-bold text-rose-500 mt-0.5">
-                        -PKR {p.deductions.toLocaleString()}
+                        -{p.deductions.toLocaleString()}
                       </div>
                     </div>
                     <div>
                       <div className="text-[9px] uppercase font-bold text-slate-400">Net</div>
                       <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        PKR {p.net.toLocaleString()}
+                        {p.net.toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -449,13 +449,13 @@ const PayslipList = () => {
                   </td>
                   <td className="py-4 px-4 font-extrabold text-slate-900 dark:text-white">
                     <div>{p.employee}</div>
-                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{p.code} • {p.dept}</div>
+                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{p.code} ï¿½ {p.dept}</div>
                   </td>
                   <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{p.month}</td>
-                  <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">PKR {p.gross.toLocaleString()}</td>
-                  <td className="py-4 px-4 font-medium text-rose-500">-PKR {p.deductions.toLocaleString()}</td>
+                  <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">{p.gross.toLocaleString()}</td>
+                  <td className="py-4 px-4 font-medium text-rose-500">-{p.deductions.toLocaleString()}</td>
                   <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                    PKR {p.net.toLocaleString()}
+                    {p.net.toLocaleString()}
                   </td>
                   <td className="py-4 px-4">
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
@@ -517,15 +517,15 @@ const PayslipList = () => {
             <div className="space-y-2 text-xs">
               <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-500 dark:text-slate-400">Gross Base Salary & Allowances:</span>
-                <span className="font-bold text-slate-900 dark:text-white">PKR {selectedSlip.gross.toLocaleString()}.00</span>
+                <span className="font-bold text-slate-900 dark:text-white">{selectedSlip.gross.toLocaleString()}.00</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-500 dark:text-slate-400">Federal/State Tax & Benefits Deductions:</span>
-                <span className="font-bold text-rose-500">-PKR {selectedSlip.deductions.toLocaleString()}.00</span>
+                <span className="font-bold text-rose-500">-{selectedSlip.deductions.toLocaleString()}.00</span>
               </div>
               <div className="flex justify-between py-3 text-sm font-black bg-sky-50/80 dark:bg-sky-950/40 p-4 rounded-xl border border-sky-100 dark:border-sky-900/50">
                 <span className="text-sky-900 dark:text-sky-200">Net Take-Home Pay (ACH Direct):</span>
-                <span className="text-emerald-600 dark:text-emerald-400">PKR {selectedSlip.net.toLocaleString()}.00</span>
+                <span className="text-emerald-600 dark:text-emerald-400">{selectedSlip.net.toLocaleString()}.00</span>
               </div>
             </div>
 

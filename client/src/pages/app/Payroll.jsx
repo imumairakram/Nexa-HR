@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CreditCard,
@@ -340,19 +340,19 @@ const Payroll = () => {
                         <div>
                           <div className="text-[9px] uppercase font-bold text-slate-400">Gross</div>
                           <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
-                            PKR {run.totalGross.toLocaleString()}
+                            {run.totalGross.toLocaleString()}
                           </div>
                         </div>
                         <div className="border-x border-slate-100 dark:border-slate-800">
                           <div className="text-[9px] uppercase font-bold text-slate-400">Tax</div>
                           <div className="text-xs font-bold text-rose-500 mt-0.5">
-                            -PKR {run.totalDeductions.toLocaleString()}
+                            -{run.totalDeductions.toLocaleString()}
                           </div>
                         </div>
                         <div>
                           <div className="text-[9px] uppercase font-bold text-slate-400">Net</div>
                           <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                            PKR {run.netPayable.toLocaleString()}
+                            {run.netPayable.toLocaleString()}
                           </div>
                         </div>
                       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+ï»¿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -136,10 +136,10 @@ const formatSalary = (salaryStructure, rawSalary) => {
   if (salaryStructure && salaryStructure.basicSalary) {
     const basic = Number(salaryStructure.basicSalary);
     const total = basic + Number(salaryStructure.housingAllowance || 0) + Number(salaryStructure.transportAllowance || 0) + Number(salaryStructure.otherAllowances || 0);
-    return `PKR ${total.toLocaleString()} / mo`;
+    return `${total.toLocaleString()} / mo`;
   }
   if (rawSalary) {
-    if (typeof rawSalary === 'number') return `PKR ${rawSalary.toLocaleString()} / mo`;
+    if (typeof rawSalary === 'number') return `${rawSalary.toLocaleString()} / mo`;
     return rawSalary;
   }
   return 'Not Configured';
@@ -1367,7 +1367,7 @@ NexaHR Workforce Systems`;
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
-                        Base Monthly Salary (PKR) <span className="text-rose-500 ml-0.5">*</span>
+                        Base Monthly Salary <span className="text-rose-500 ml-0.5">*</span>
                       </label>
                       <input
                         type="number"
@@ -1379,7 +1379,7 @@ NexaHR Workforce Systems`;
                     </div>
                     <div>
                       <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
-                        Performance Bonus Allowance (PKR/mo)
+                        Performance Bonus Allowance
                       </label>
                       <input
                         type="number"
@@ -1393,7 +1393,7 @@ NexaHR Workforce Systems`;
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
-                        Medical Health Allowance (PKR/mo)
+                        Medical Health Allowance
                       </label>
                       <input
                         type="number"
@@ -1404,7 +1404,7 @@ NexaHR Workforce Systems`;
                     </div>
                     <div>
                       <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
-                        House Rent Allowance (HRA) (PKR/mo)
+                        House Rent Allowance (HRA)
                       </label>
                       <input
                         type="number"
@@ -1418,7 +1418,7 @@ NexaHR Workforce Systems`;
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
-                        Travel / Conveyance Allowance (PKR/mo)
+                        Travel / Conveyance Allowance
                       </label>
                       <input
                         type="number"
@@ -1429,7 +1429,7 @@ NexaHR Workforce Systems`;
                     </div>
                     <div>
                       <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase mb-2">
-                        Tax Deductions (PKR/mo)
+                        Tax Deductions
                       </label>
                       <input
                         type="number"
@@ -1570,7 +1570,7 @@ NexaHR Workforce Systems`;
                     {selectedEmployee.firstName} {selectedEmployee.lastName}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
-                    {selectedEmployee.profile?.designation?.title || 'Staff Member'} • {selectedEmployee.profile?.department?.name || 'Engineering'}
+                    {selectedEmployee.profile?.designation?.title || 'Staff Member'} ï¿½ {selectedEmployee.profile?.department?.name || 'Engineering'}
                   </p>
                 </div>
               </div>

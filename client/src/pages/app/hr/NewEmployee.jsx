@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ï»¿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -636,7 +636,7 @@ const NewEmployee = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Monthly Base Salary (PKR) *</label>
+                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Monthly Base Salary *</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -692,13 +692,13 @@ const NewEmployee = () => {
                 <div className="p-3 bg-white/70 dark:bg-slate-900/60 rounded-xl border border-sky-100 dark:border-slate-700">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Monthly Base Compensation</div>
                   <div className="text-base font-black text-sky-600 dark:text-sky-400 mt-0.5">
-                    PKR {parseFloat(form.baseSalary || 0).toLocaleString()} <span className="text-xs font-semibold text-slate-500">/ mo</span>
+                    {parseFloat(form.baseSalary || 0).toLocaleString()} <span className="text-xs font-semibold text-slate-500">/ mo</span>
                   </div>
                 </div>
                 <div className="p-3 bg-white/70 dark:bg-slate-900/60 rounded-xl border border-sky-100 dark:border-slate-700">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Annualized Gross Equivalent</div>
                   <div className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                    PKR {(parseFloat(form.baseSalary || 0) * 12).toLocaleString()} <span className="text-xs font-semibold text-slate-500">/ yr</span>
+                    {(parseFloat(form.baseSalary || 0) * 12).toLocaleString()} <span className="text-xs font-semibold text-slate-500">/ yr</span>
                   </div>
                 </div>
                 <div className="p-3 bg-white/70 dark:bg-slate-900/60 rounded-xl border border-sky-100 dark:border-slate-700">
@@ -1054,7 +1054,7 @@ const NewEmployee = () => {
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Monthly Base Salary:</span>
-                <span className="text-emerald-600 font-black">PKR {parseFloat(form.baseSalary || 0).toLocaleString()} / month</span>
+                <span className="text-emerald-600 font-black">{parseFloat(form.baseSalary || 0).toLocaleString()} / month</span>
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Payroll Cycle & Method:</span>
@@ -1087,7 +1087,7 @@ const NewEmployee = () => {
               <div className="flex justify-between items-center font-bold pt-2 border-t border-slate-200/60 dark:border-slate-700">
                 <span className="text-slate-400">Configured Default Password:</span>
                 <div className="flex items-center gap-2 font-sans tabular-nums text-slate-900 dark:text-white bg-white dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <span>{showPassword ? form.defaultPassword : '••••••••••••'}</span>
+                  <span>{showPassword ? form.defaultPassword : 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'}</span>
                   <button
                     type="button"
                     onClick={handleCopyPassword}
