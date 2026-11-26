@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
@@ -425,7 +425,7 @@ const PayslipList = () => {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="font-extrabold text-slate-900 dark:text-white text-sm">{p.employee}</div>
-                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      <div className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5">
                         {p.code} • {p.dept}
                       </div>
                     </div>
@@ -437,7 +437,7 @@ const PayslipList = () => {
 
                   <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
                     <span className="text-slate-500 font-medium">{p.month}</span>
-                    <span className="font-mono text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-900/60 px-2 py-0.5 rounded-[12px] border border-slate-100 dark:border-slate-800">
+                    <span className="font-sans tabular-nums text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-900/60 px-2 py-0.5 rounded-[12px] border border-slate-100 dark:border-slate-800">
                       {p.id}
                     </span>
                   </div>
@@ -494,12 +494,12 @@ const PayslipList = () => {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filtered.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="py-4 px-6 font-mono text-[10px] font-bold text-slate-400">
+                  <td className="py-4 px-6 font-sans tabular-nums text-[10px] font-bold text-slate-400">
                     {p.id}
                   </td>
                   <td className="py-4 px-4 font-extrabold text-slate-900 dark:text-white">
                     <div>{p.employee}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">{p.code} • {p.dept}</div>
+                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{p.code} • {p.dept}</div>
                   </td>
                   <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{p.month}</td>
                   <td className="py-4 px-4 font-medium text-slate-900 dark:text-white">PKR {p.gross.toLocaleString()}</td>
@@ -535,7 +535,7 @@ const PayslipList = () => {
           <div className="bg-white/85 dark:bg-[#1E293B]/85 backdrop-blur-2xl rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-sky-200/60 dark:border-sky-800/60 space-y-4 animate-in zoom-in-95 duration-200 relative">
             <div className="flex items-start justify-between border-b border-sky-100/80 dark:border-sky-800/60 pb-4">
               <div>
-                <span className="text-[10px] font-mono font-bold text-slate-400">{selectedSlip.id}</span>
+                <span className="text-[10px] font-sans tabular-nums font-bold text-slate-400">{selectedSlip.id}</span>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
                   Official Salary Statement
                 </h3>
@@ -555,7 +555,7 @@ const PayslipList = () => {
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Employee</span>
                 <span className="font-bold text-slate-900 dark:text-white">{selectedSlip.employee}</span>
-                <span className="text-[10px] text-slate-400 block font-mono">{selectedSlip.code}</span>
+                <span className="text-[10px] text-slate-400 block font-sans tabular-nums">{selectedSlip.code}</span>
               </div>
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Disbursement Period</span>

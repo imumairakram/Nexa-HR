@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Settings,
   Bell,
@@ -386,17 +386,17 @@ const EmployeeSettings = () => {
             <div>
               <span className="font-bold text-slate-700 dark:text-slate-200">Live Format Preview:</span>
               <div className="text-[11px] text-slate-400 mt-0.5">
-                Timezone: <span className="font-mono font-bold text-slate-600 dark:text-slate-300">{formState.timezone}</span>
+                Timezone: <span className="font-sans tabular-nums font-bold text-slate-600 dark:text-slate-300">{formState.timezone}</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-600 dark:text-slate-300 font-semibold">
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 font-mono">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 font-sans tabular-nums">
                 <span>
                   {formatDate(new Date(), formState.dateFormat, formState.timezone)} •{' '}
                   {formatTime(new Date(), true, formState.timezone, formState.timeFormat)}
                 </span>
               </span>
-              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 font-mono">
+              <span className="flex items-center bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 font-sans tabular-nums">
                 <span>{formatCurrency(150000, formState.currency)}</span>
               </span>
             </div>

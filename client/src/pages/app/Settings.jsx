@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import {
   Bell,
@@ -451,15 +451,15 @@ const Settings = () => {
               <div>
                 <span className="font-bold text-slate-700 dark:text-slate-200">Live Format Preview:</span>
                 <div className="text-[11px] text-slate-400 mt-0.5">
-                  Timezone: <span className="font-mono font-bold text-slate-600 dark:text-slate-300">{formState.timezone}</span>
+                  Timezone: <span className="font-sans tabular-nums font-bold text-slate-600 dark:text-slate-300">{formState.timezone}</span>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
                   {formatDate(new Date(), formState.dateFormat, formState.timezone)} •{' '}
                   {formatTime(new Date(), true, formState.timezone, formState.timeFormat)}
                 </span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span className="font-sans tabular-nums font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
                   {formatCurrency(250000, formState.currency)}
                 </span>
               </div>

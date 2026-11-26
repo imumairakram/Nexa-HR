@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -610,7 +610,7 @@ const NewEmployee = () => {
                   type="text"
                   value={form.employeeCode}
                   onChange={(e) => setForm({ ...form, employeeCode: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-sans tabular-nums font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
                 />
               </div>
               <div>
@@ -789,7 +789,7 @@ const NewEmployee = () => {
 
                 <div className="pt-2">
                   <div className="text-[10px] font-semibold text-sky-200 uppercase tracking-widest">Account / IBAN Number</div>
-                  <div className="font-mono text-base sm:text-lg font-black tracking-wider text-white mt-0.5">
+                  <div className="font-sans tabular-nums text-base sm:text-lg font-black tracking-wider text-white mt-0.5">
                     {form.accountNumber
                       ? form.accountNumber
                       : `PK72 SCBL 0000 00${(form.employeeCode || '101').replace(/[^0-9]/g, '').padStart(6, '0')} 01`}
@@ -864,7 +864,7 @@ const NewEmployee = () => {
                   placeholder="e.g. PK72 SCBL 0000 0012 3456 7801"
                   value={form.accountNumber}
                   onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-sans tabular-nums font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
                 />
               </div>
 
@@ -977,7 +977,7 @@ const NewEmployee = () => {
                       value={form.defaultPassword}
                       onChange={(e) => setForm({ ...form, defaultPassword: e.target.value })}
                       placeholder="e.g. Nexa#2026!"
-                      className="w-full pl-10 pr-11 py-3 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold text-xs tracking-wider focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                      className="w-full pl-10 pr-11 py-3 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-sans tabular-nums font-bold text-xs tracking-wider focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                     />
                     <button
                       type="button"
@@ -1075,7 +1075,7 @@ const NewEmployee = () => {
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Corporate Email:</span>
-                <span className="text-slate-900 dark:text-white font-mono">{form.email || 'Not Provided'}</span>
+                <span className="text-slate-900 dark:text-white font-sans tabular-nums">{form.email || 'Not Provided'}</span>
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Assigned Department:</span>
@@ -1112,7 +1112,7 @@ const NewEmployee = () => {
               </div>
               <div className="flex justify-between font-bold">
                 <span className="text-slate-400">Designated Bank & IBAN:</span>
-                <span className="text-slate-900 dark:text-white flex items-center gap-1.5 font-mono text-xs">
+                <span className="text-slate-900 dark:text-white flex items-center gap-1.5 font-sans tabular-nums text-xs">
                   <Landmark className="w-3.5 h-3.5 text-blue-500" />
                   {(form.bankName === 'CUSTOM' ? form.customBankName : form.bankName) || 'Standard Chartered Bank'} (
                   {form.accountNumber
@@ -1133,7 +1133,7 @@ const NewEmployee = () => {
               </div>
               <div className="flex justify-between items-center font-bold pt-2 border-t border-slate-200/60 dark:border-slate-700">
                 <span className="text-slate-400">Configured Default Password:</span>
-                <div className="flex items-center gap-2 font-mono text-slate-900 dark:text-white bg-white dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 font-sans tabular-nums text-slate-900 dark:text-white bg-white dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700">
                   <span>{showPassword ? form.defaultPassword : '••••••••••••'}</span>
                   <button
                     type="button"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
@@ -1068,7 +1068,7 @@ const Announcement = () => {
                     <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
                     Official Notice Memorandum
                   </label>
-                  <span className="text-[11px] font-mono font-medium text-slate-400">
+                  <span className="text-[11px] font-sans tabular-nums font-medium text-slate-400">
                     Broadcast ID #{selectedNotice.id}
                   </span>
                 </div>

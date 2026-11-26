@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   LifeBuoy,
   Plus,
@@ -668,7 +668,7 @@ const EmployeeHelpdesk = () => {
               >
                 <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-black text-sky-600 dark:text-sky-400 group-hover:underline">
+                    <span className="text-xs font-sans tabular-nums font-black text-sky-600 dark:text-sky-400 group-hover:underline">
                       #{t.id}
                     </span>
 
@@ -806,7 +806,7 @@ const EmployeeHelpdesk = () => {
 
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700">
+                    <span className="text-xs font-sans tabular-nums font-bold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700">
                       #{selectedTicket.id}
                     </span>
                     <span className="text-xs font-semibold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700">
@@ -878,7 +878,7 @@ const EmployeeHelpdesk = () => {
                     <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
                     Original Ticket Description
                   </span>
-                  <span className="text-[11px] font-mono font-medium text-slate-400">
+                  <span className="text-[11px] font-sans tabular-nums font-medium text-slate-400">
                     {formatTimeDisplay(selectedTicket.createdDate)}
                   </span>
                 </div>
@@ -1038,7 +1038,7 @@ const EmployeeHelpdesk = () => {
                       <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
                       Ticket Subject <span className="text-rose-500 ml-0.5">*</span>
                     </label>
-                    <span className="text-[11px] font-mono font-medium text-slate-400">
+                    <span className="text-[11px] font-sans tabular-nums font-medium text-slate-400">
                       {newTicketForm.subject.length}/100 chars
                     </span>
                   </div>

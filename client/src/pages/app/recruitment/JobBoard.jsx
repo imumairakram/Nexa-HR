@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   Users,
@@ -361,7 +361,7 @@ const JobBoard = () => {
                             <ChevronLeft className="w-3.5 h-3.5" />
                           </button>
                         )}
-                        <span className="text-[9px] font-mono text-slate-400">{c.id}</span>
+                        <span className="text-[9px] font-sans tabular-nums text-slate-400">{c.id}</span>
                         {sIdx < STAGES.length - 1 && (
                           <button
                             onClick={() => moveCandidate(c, stage.key, STAGES[sIdx + 1].key)}

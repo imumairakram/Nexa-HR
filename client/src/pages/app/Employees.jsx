@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -1212,7 +1212,7 @@ NexaHR Workforce Systems`;
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
                     }`}
                   >
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-[8px] font-mono ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-[8px] font-sans tabular-nums ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
                       {tab.step}
                     </span>
                     <TabIcon className="w-3.5 h-3.5" />
@@ -1275,7 +1275,7 @@ NexaHR Workforce Systems`;
                         type="text"
                         value={editForm.employeeCode || ''}
                         onChange={(e) => setEditForm({ ...editForm, employeeCode: e.target.value })}
-                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
+                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 text-slate-800 dark:text-white font-sans tabular-nums font-bold placeholder:text-slate-400 transition-all focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -1409,7 +1409,7 @@ NexaHR Workforce Systems`;
                         <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Calculated Total Monthly Gross
                         </div>
-                        <div className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                        <div className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white font-sans tabular-nums">
                           {formatCurrency(
                             (Number(editForm.baseSalary) || 0) +
                             (Number(editForm.performanceAllowance) || 0) +
@@ -1622,7 +1622,7 @@ NexaHR Workforce Systems`;
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-xs font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/60">
+                    <span className="text-xs font-sans tabular-nums font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/60">
                       #{selectedEmployee.employeeCode}
                     </span>
                     <span className="text-xs font-semibold px-2.5 py-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -1679,7 +1679,7 @@ NexaHR Workforce Systems`;
                   <Banknote className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   Base Compensation
                 </span>
-                <span className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono block truncate">
+                <span className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 font-sans tabular-nums block truncate">
                   {formatCurrency(selectedEmployee.salaryStructure?.basicSalary ?? selectedEmployee.profile?.baseSalary ?? 0)} / mo
                 </span>
               </div>
@@ -1818,19 +1818,19 @@ NexaHR Workforce Systems`;
             <div className="p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 space-y-3.5 mb-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Employee ID / Code:</span>
-                <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                <span className="font-sans tabular-nums font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
                   {createdCreds.employeeCode}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200/70 dark:border-slate-700/60 pt-3">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Work Email:</span>
-                <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                <span className="font-sans tabular-nums font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
                   {createdCreds.email}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200/70 dark:border-slate-700/60 pt-3">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Temporary Password:</span>
-                <span className="font-mono font-bold text-xs sm:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-[12px] border border-amber-200 dark:border-amber-800/80 shadow-xs">
+                <span className="font-sans tabular-nums font-bold text-xs sm:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-[12px] border border-amber-200 dark:border-amber-800/80 shadow-xs">
                   {createdCreds.tempPassword}
                 </span>
               </div>
@@ -1926,7 +1926,7 @@ NexaHR Workforce Systems`;
             </header>
 
             <p className="text-sm text-slate-600 dark:text-slate-300 font-normal leading-relaxed mb-5">
-              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-bold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500 dark:text-slate-400 font-semibold">{employeeToDelete.employeeCode}</span>) from company directory?
+              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-bold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-sans tabular-nums text-slate-500 dark:text-slate-400 font-semibold">{employeeToDelete.employeeCode}</span>) from company directory?
             </p>
 
             <div className="rounded-2xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-4 space-y-2.5 text-xs mb-5">

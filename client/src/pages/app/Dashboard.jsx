@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart2,
@@ -547,15 +547,15 @@ const Dashboard = () => {
                           <div className="font-extrabold text-white text-xs border-b border-slate-800 pb-1">{data.date}</div>
                           <div className="text-[11px] text-sky-300 font-semibold flex items-center justify-between gap-3">
                             <span>Total Attendance:</span>
-                            <span className="font-bold font-mono">{data.attendance}</span>
+                            <span className="font-bold font-sans tabular-nums">{data.attendance}</span>
                           </div>
                           <div className="text-[10px] text-emerald-400 font-medium flex items-center justify-between gap-3">
                             <span>On-Time:</span>
-                            <span className="font-mono">{data.onTime ?? 0}</span>
+                            <span className="font-sans tabular-nums">{data.onTime ?? 0}</span>
                           </div>
                           <div className="text-[10px] text-rose-400 font-medium flex items-center justify-between gap-3">
                             <span>Late:</span>
-                            <span className="font-mono">{data.late ?? 0}</span>
+                            <span className="font-sans tabular-nums">{data.late ?? 0}</span>
                           </div>
                         </div>
                       );
@@ -578,10 +578,10 @@ const Dashboard = () => {
           {/* Subtext info */}
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
             <span>
-              Period Total: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalPeriodAttendance} Check-ins</strong>
+              Period Total: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">{totalPeriodAttendance} Check-ins</strong>
             </span>
             <span>
-              Roster Capacity: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalEmployees} Staff</strong>
+              Roster Capacity: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">{totalEmployees} Staff</strong>
             </span>
           </div>
         </div>
@@ -622,7 +622,7 @@ const Dashboard = () => {
 
             {/* Live Indicator & Legend */}
             <div className="flex items-center justify-between pt-1 border-t border-slate-100/80 dark:border-slate-800/80 text-[10px] font-bold">
-              <span className="text-slate-400 font-mono text-[10px]">
+              <span className="text-slate-400 font-sans tabular-nums text-[10px]">
                 {deptTimeframe === 'today'
                   ? 'Real-Time Today'
                   : deptTimeframe === 'week'
@@ -661,22 +661,22 @@ const Dashboard = () => {
                           <div className="bg-slate-900 text-white p-3 rounded-2xl shadow-xl border border-slate-700 text-xs space-y-1.5 min-w-[170px]">
                             <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1">
                               <span className="font-extrabold text-white text-xs">{data.name}</span>
-                              <span className="px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 font-mono text-[9px] font-bold">
+                              <span className="px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 font-sans tabular-nums text-[9px] font-bold">
                                 {data.code}
                               </span>
                             </div>
                             <div className="text-[11px] text-emerald-400 font-semibold flex items-center justify-between gap-3">
                               <span>On-Time:</span>
-                              <span className="font-bold font-mono">{data.onTime}</span>
+                              <span className="font-bold font-sans tabular-nums">{data.onTime}</span>
                             </div>
                             <div className="text-[11px] text-rose-400 font-semibold flex items-center justify-between gap-3">
                               <span>Late:</span>
-                              <span className="font-bold font-mono">{data.late}</span>
+                              <span className="font-bold font-sans tabular-nums">{data.late}</span>
                             </div>
                             {deptTimeframe === 'today' && (
                               <div className="text-[11px] text-amber-300 font-semibold flex items-center justify-between gap-3">
                                 <span>Absent / Pending:</span>
-                                <span className="font-bold font-mono">{data.absent ?? 0}</span>
+                                <span className="font-bold font-sans tabular-nums">{data.absent ?? 0}</span>
                               </div>
                             )}
                             <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-800 flex items-center justify-between">
@@ -685,7 +685,7 @@ const Dashboard = () => {
                             </div>
                             <div className="text-[10px] text-sky-400 font-semibold flex items-center justify-between">
                               <span>Punctuality:</span>
-                              <span className="font-bold font-mono">{data.punctualityRate ?? 100}%</span>
+                              <span className="font-bold font-sans tabular-nums">{data.punctualityRate ?? 100}%</span>
                             </div>
                           </div>
                         );
@@ -733,7 +733,7 @@ const Dashboard = () => {
                         return (
                           <div className="bg-slate-900 text-white px-3 py-2 rounded-xl shadow-xl border border-slate-700 text-xs">
                             <span className="font-extrabold text-sky-400">{item.subject}: </span>
-                            <span className="font-mono font-black">{item.scoreA}%</span>
+                            <span className="font-sans tabular-nums font-black">{item.scoreA}%</span>
                             <span className="text-slate-400 text-[10px]"> (Target: 100%)</span>
                           </div>
                         );
@@ -789,7 +789,7 @@ const Dashboard = () => {
                         <div className="font-extrabold text-xs text-slate-900 dark:text-white truncate">
                           {log.employeeName}
                         </div>
-                        <div className="text-[10px] text-slate-400 font-mono truncate">
+                        <div className="text-[10px] text-slate-400 font-sans tabular-nums truncate">
                           {log.empCode} • {log.department}
                         </div>
                       </div>
@@ -805,7 +805,7 @@ const Dashboard = () => {
                       >
                         {log.status || 'PRESENT'}
                       </span>
-                      <span className="text-[10px] font-mono font-semibold text-slate-400">
+                      <span className="text-[10px] font-sans tabular-nums font-semibold text-slate-400">
                         {log.time}
                       </span>
                     </div>

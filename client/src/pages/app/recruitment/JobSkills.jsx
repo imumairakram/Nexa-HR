@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { Plus, CheckCircle2, X, Search, Code, Check, ShieldCheck, Layers, RefreshCw } from 'lucide-react';
 import { api } from '../../../services/api';
@@ -434,7 +434,7 @@ const JobSkills = () => {
               {/* Preview Card */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-blue-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-mono font-black text-xs shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-sans tabular-nums font-black text-xs shadow-sm">
                     <Code className="w-5 h-5" />
                   </div>
                   <div>

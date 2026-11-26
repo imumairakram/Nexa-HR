@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import {
   Calendar,
   ChevronLeft,
@@ -121,7 +121,7 @@ const EmployeeHolidays = () => {
                 {featuredHoliday.status === 'ACTIVE_TODAY' ? 'Status' : 'Countdown'}
               </div>
               <div
-                className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${
+                className={`text-2xl sm:text-3xl font-black font-sans tabular-nums tracking-tight ${
                   featuredHoliday.status === 'ACTIVE_TODAY'
                     ? 'text-[#7CD1EB]'
                     : 'text-white drop-shadow-xs'
@@ -238,7 +238,7 @@ const EmployeeHolidays = () => {
                 Official Gazetted Holidays Schedule ({selectedYear})
               </h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Automatically calculated according to timezone: <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{timezone}</span>
+                Automatically calculated according to timezone: <span className="font-sans tabular-nums text-sky-600 dark:text-sky-400 font-bold">{timezone}</span>
               </p>
             </div>
             <span className="text-[11px] font-bold px-3 py-1 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 self-start sm:self-auto">
@@ -270,13 +270,13 @@ const EmployeeHolidays = () => {
                               <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
                                 {h.monthShort}
                               </span>
-                              <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
+                              <span className="text-base font-black text-slate-900 dark:text-white font-sans tabular-nums leading-none mt-0.5">
                                 {h.dayNum}
                               </span>
                             </div>
                             <div>
                               <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.name}</div>
-                              <div className="text-[10px] text-slate-400 font-mono">{h.displayDate} • {h.day}</div>
+                              <div className="text-[10px] text-slate-400 font-sans tabular-nums">{h.displayDate} • {h.day}</div>
                             </div>
                           </div>
                         </div>
@@ -335,13 +335,13 @@ const EmployeeHolidays = () => {
                             <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
                               {h.monthShort}
                             </span>
-                            <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
+                            <span className="text-base font-black text-slate-900 dark:text-white font-sans tabular-nums leading-none mt-0.5">
                               {h.dayNum}
                             </span>
                           </div>
                           <div>
                             <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.day}</div>
-                            <div className="text-[11px] text-slate-400 font-mono">{h.displayDate}</div>
+                            <div className="text-[11px] text-slate-400 font-sans tabular-nums">{h.displayDate}</div>
                           </div>
                         </div>
                       </td>
@@ -386,7 +386,7 @@ const EmployeeHolidays = () => {
 
                       {/* Column 5: Status & Countdown */}
                       <td className="py-4 px-6 whitespace-nowrap text-right">
-                        <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                        <span className="text-xs font-sans tabular-nums font-bold text-slate-600 dark:text-slate-400">
                           {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
                         </span>
                       </td>

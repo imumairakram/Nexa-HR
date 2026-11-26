@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   MoreHorizontal,
   Eye,
@@ -65,7 +65,7 @@ export const QuotaStat = ({ policy }) => {
     <div className="flex items-center justify-between gap-3 pt-1">
       {/* Hero Stat: Large bold number + small muted unit */}
       <div className="flex items-baseline">
-        <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+        <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tabular-nums tracking-tight">
           {quotaDays}
         </span>
         <span className="text-[11px] sm:text-xs font-semibold text-slate-400 dark:text-slate-500 ml-1.5">

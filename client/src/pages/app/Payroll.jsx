@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CreditCard,
@@ -385,7 +385,7 @@ const Payroll = () => {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="font-extrabold text-slate-900 dark:text-white text-sm">{run.month}</div>
-                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">{run.id}</div>
+                          <div className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5">{run.id}</div>
                         </div>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-[12px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-extrabold shrink-0">
                           <span>{run.status}</span>
@@ -452,7 +452,7 @@ const Payroll = () => {
                     <tr key={run.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                       <td className="py-4 px-6">
                         <div className="font-extrabold text-slate-900 dark:text-white">{run.month}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">{run.id}</div>
+                        <div className="text-[10px] text-slate-400 font-sans tabular-nums">{run.id}</div>
                       </td>
                       <td className="py-4 px-4 font-semibold text-slate-700 dark:text-slate-300">{run.payDate}</td>
                       <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">{run.employeesCount} Staff</td>

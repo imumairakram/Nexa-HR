@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../../components/common/ModernSearchBarSection';
@@ -669,7 +669,7 @@ const PublicHoliday = () => {
                 <span>Official Gazetted & Corporate Calendar — Year {selectedYear}</span>
               </h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Synchronized with regional timezone: <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{timezone}</span>
+                Synchronized with regional timezone: <span className="font-sans tabular-nums text-sky-600 dark:text-sky-400 font-bold">{timezone}</span>
               </p>
             </div>
             <span className="text-[11px] font-bold px-3 py-1 rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 self-start sm:self-auto">
@@ -712,13 +712,13 @@ const PublicHoliday = () => {
                               <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
                                 {h.monthShort}
                               </span>
-                              <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
+                              <span className="text-base font-black text-slate-900 dark:text-white font-sans tabular-nums leading-none mt-0.5">
                                 {h.dayNum}
                               </span>
                             </div>
                             <div>
                               <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.name}</div>
-                              <div className="text-[10px] text-slate-400 font-mono">{h.displayDate} • {h.day}</div>
+                              <div className="text-[10px] text-slate-400 font-sans tabular-nums">{h.displayDate} • {h.day}</div>
                             </div>
                           </div>
                           {h.isCustom && (
@@ -785,13 +785,13 @@ const PublicHoliday = () => {
                               <span className="text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">
                                 {h.monthShort}
                               </span>
-                              <span className="text-base font-black text-slate-900 dark:text-white font-mono leading-none mt-0.5">
+                              <span className="text-base font-black text-slate-900 dark:text-white font-sans tabular-nums leading-none mt-0.5">
                                 {h.dayNum}
                               </span>
                             </div>
                             <div>
                               <div className="font-extrabold text-slate-900 dark:text-white text-xs">{h.day}</div>
-                              <div className="text-[11px] text-slate-400 font-mono">{h.displayDate}</div>
+                              <div className="text-[11px] text-slate-400 font-sans tabular-nums">{h.displayDate}</div>
                             </div>
                           </div>
                         </td>
@@ -837,7 +837,7 @@ const PublicHoliday = () => {
                         {/* Column 5: Status & Actions */}
                         <td className="py-4 px-6 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                            <span className="text-xs font-sans tabular-nums font-bold text-slate-600 dark:text-slate-400">
                               {h.status === 'ACTIVE_TODAY' ? 'TODAY' : h.countdown}
                             </span>
 

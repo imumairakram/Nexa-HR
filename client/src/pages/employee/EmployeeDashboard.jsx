@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Clock,
@@ -903,7 +903,7 @@ const EmployeeDashboard = () => {
                           </div>
                           <div className="text-[11px] text-slate-200 font-medium flex items-center justify-between gap-3">
                             <span>Hours Logged:</span>
-                            <span className="font-mono font-bold text-amber-300">{data.hours} hrs</span>
+                            <span className="font-sans tabular-nums font-bold text-amber-300">{data.hours} hrs</span>
                           </div>
                         </div>
                       );
@@ -926,10 +926,10 @@ const EmployeeDashboard = () => {
           {/* Subtext info */}
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-[#595959] dark:text-slate-400">
             <span>
-              Period Logged: <strong className="text-slate-700 dark:text-slate-200 font-mono">{totalPeriodAttendance} Days Present</strong> ({totalPeriodHours.toFixed(1)} hrs total)
+              Period Logged: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">{totalPeriodAttendance} Days Present</strong> ({totalPeriodHours.toFixed(1)} hrs total)
             </span>
             <span>
-              Assigned Shift: <strong className="text-slate-700 dark:text-slate-200 font-mono">09:00 – 17:30 (8.5h)</strong>
+              Assigned Shift: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">09:00 – 17:30 (8.5h)</strong>
             </span>
           </div>
         </div>

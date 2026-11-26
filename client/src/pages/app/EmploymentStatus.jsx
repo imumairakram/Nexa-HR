@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
@@ -1089,7 +1089,7 @@ const EmploymentStatus = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/60 inline-block">
+                    <span className="text-[11px] font-sans tabular-nums font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/60 inline-block">
                       {selectedEmployee.employeeCode}
                     </span>
                   </div>
@@ -1234,7 +1234,7 @@ const EmploymentStatus = () => {
             </div>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-mono text-slate-500 dark:text-slate-400">{employeeToDelete.employeeCode}</span>) from company directory?
+              Are you sure you want to remove <strong className="text-slate-900 dark:text-white font-extrabold">{employeeToDelete.firstName} {employeeToDelete.lastName}</strong> (<span className="font-sans tabular-nums text-slate-500 dark:text-slate-400">{employeeToDelete.employeeCode}</span>) from company directory?
             </p>
 
             {/* Employee Preview Summary Box */}

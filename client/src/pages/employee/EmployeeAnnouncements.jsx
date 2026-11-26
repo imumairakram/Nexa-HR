@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Megaphone,
   Calendar,
@@ -422,7 +422,7 @@ const EmployeeAnnouncements = () => {
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
-                  <span className="text-[10px] font-mono font-bold px-1 text-white/90">
+                  <span className="text-[10px] font-sans tabular-nums font-bold px-1 text-white/90">
                     {(((heroIndex % heroCandidates.length) + heroCandidates.length) % heroCandidates.length) + 1} / {heroCandidates.length}
                   </span>
                   <button
@@ -825,7 +825,7 @@ const EmployeeAnnouncements = () => {
                     <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
                     Official Notice Memorandum
                   </label>
-                  <span className="text-[11px] font-mono font-medium text-slate-400">
+                  <span className="text-[11px] font-sans tabular-nums font-medium text-slate-400">
                     Broadcast ID #{selectedItem.id}
                   </span>
                 </div>

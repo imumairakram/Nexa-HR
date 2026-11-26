@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
@@ -1212,7 +1212,7 @@ const handleViewResume = async (candidateId) => {
                             <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-tight">
                               {app.name}
                             </h4>
-                            <span className="px-2 py-0.5 rounded-md font-mono text-[11px] font-bold bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80">
+                            <span className="px-2 py-0.5 rounded-md font-sans tabular-nums text-[11px] font-bold bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80">
                               {app.applicationId}
                             </span>
                             {app.experience && (

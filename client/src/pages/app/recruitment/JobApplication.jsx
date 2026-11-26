@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import {
   FileText,
@@ -476,7 +476,7 @@ const JobApplication = () => {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="font-extrabold text-slate-900 dark:text-white text-sm">{a.name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">{a.id}</div>
+                      <div className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5">{a.id}</div>
                     </div>
                     <span className="inline-flex items-center font-black text-amber-500 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md text-[10px] shrink-0">
                       {a.rating}
@@ -500,7 +500,7 @@ const JobApplication = () => {
 
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/60 p-2 rounded-xl border border-slate-100 dark:border-slate-800 space-y-0.5">
                     <div>{a.email}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">{a.phone} • Applied: {a.date}</div>
+                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{a.phone} • Applied: {a.date}</div>
                   </div>
                 </div>
 
@@ -535,7 +535,7 @@ const JobApplication = () => {
                 <tr key={a.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                   <td className="py-4 px-6 font-extrabold text-slate-900 dark:text-white">
                     <div>{a.name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">{a.id}</div>
+                    <div className="text-[10px] text-slate-400 font-sans tabular-nums">{a.id}</div>
                   </td>
                   <td className="py-4 px-4 font-semibold text-blue-600 dark:text-blue-400">{a.role}</td>
                   <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">

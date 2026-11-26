@@ -721,7 +721,7 @@ const EmployeeAttendance = () => {
                           </td>
 
                           {/* 2. Punch In Column */}
-                          <td className="py-4 px-4 font-mono">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             {isLeave ? (
                               <span className="text-slate-400 dark:text-slate-500 text-xs font-sans italic">
                                 — (Time Off)
@@ -739,7 +739,7 @@ const EmployeeAttendance = () => {
                           </td>
 
                           {/* 3. Punch Out Column */}
-                          <td className="py-4 px-4 font-mono">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             {isLeave ? (
                               <span className="text-slate-400 dark:text-slate-500 text-xs font-sans italic">
                                 — (Time Off)
@@ -867,7 +867,7 @@ const EmployeeAttendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch In
                             </div>
-                            <div className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300 mt-0.5">
+                            <div className="text-xs font-bold font-sans tabular-nums text-slate-700 dark:text-slate-300 mt-0.5">
                               {log.checkIn}
                             </div>
                           </div>
@@ -875,7 +875,7 @@ const EmployeeAttendance = () => {
                             <div className="text-[9px] uppercase font-bold text-slate-400">
                               Punch Out
                             </div>
-                            <div className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400 mt-0.5">
+                            <div className="text-xs font-bold font-sans tabular-nums text-sky-600 dark:text-sky-400 mt-0.5">
                               {log.checkOut}
                             </div>
                           </div>

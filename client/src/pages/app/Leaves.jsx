@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   CalendarDays,
   ShieldCheck,
@@ -791,7 +791,7 @@ const Leaves = () => {
                       {activeEmployeeObj.fullName ||
                         `${activeEmployeeObj.firstName} ${activeEmployeeObj.lastName}`}
                     </h4>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-[12px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60">
+                    <span className="text-[10px] font-sans tabular-nums font-bold px-2 py-0.5 rounded-[12px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60">
                       {activeEmployeeObj.employeeCode}
                     </span>
                   </div>
@@ -869,7 +869,7 @@ const Leaves = () => {
                                   >
                                     {req.user?.firstName} {req.user?.lastName}
                                   </button>
-                                  <div className="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                                  <div className="text-[10px] text-slate-400 font-sans tabular-nums flex items-center gap-1.5 mt-0.5">
                                     <span>{req.user?.employeeCode || req.user?.email}</span>
                                     {(req.user?.department || req.user?.profile?.department?.name) && (
                                       <>
@@ -919,7 +919,7 @@ const Leaves = () => {
                           </td>
 
                           {/* 2. Leave Policy Column */}
-                          <td className="py-4 px-4 font-mono">
+                          <td className="py-4 px-4 font-sans tabular-nums">
                             <div>
                               <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
                                 {req.leaveType?.name || 'General Leave'}
@@ -1073,7 +1073,7 @@ const Leaves = () => {
                               <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate max-w-[150px]">
                                 {req.user?.firstName} {req.user?.lastName}
                               </div>
-                              <div className="text-[10px] text-slate-400 font-mono truncate">
+                              <div className="text-[10px] text-slate-400 font-sans tabular-nums truncate">
                                 {req.user?.employeeCode || req.user?.email}
                               </div>
                             </div>

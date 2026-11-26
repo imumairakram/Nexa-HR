@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { Briefcase, Plus, CheckCircle2, X, Search, Clock, Users, ShieldCheck, RefreshCw } from 'lucide-react';
 import { api } from '../../../services/api';
@@ -266,7 +266,7 @@ const JobType = () => {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="font-extrabold text-slate-900 dark:text-white text-sm">{t.name}</div>
-                  <span className="font-mono text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-[12px] shrink-0">
+                  <span className="font-sans tabular-nums text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-[12px] shrink-0">
                     {t.code}
                   </span>
                 </div>
@@ -306,7 +306,7 @@ const JobType = () => {
               {filtered.map((t) => (
                 <tr key={t.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                   <td className="py-4 px-4 font-bold text-slate-900 dark:text-white">{t.name}</td>
-                  <td className="py-4 px-4 font-mono text-xs text-blue-600 font-bold">{t.code}</td>
+                  <td className="py-4 px-4 font-sans tabular-nums text-xs text-blue-600 font-bold">{t.code}</td>
                   <td className="py-4 px-4 font-medium text-slate-600 dark:text-slate-300">{t.hours}</td>
                   <td className="py-4 px-4 text-slate-500">{t.benefits}</td>
                   <td className="py-4 px-4 text-right font-black text-slate-900 dark:text-white text-sm">{t.count} Roles</td>
@@ -382,7 +382,7 @@ const JobType = () => {
                     placeholder="e.g. PT"
                     value={newType.code}
                     onChange={(e) => setNewType({ ...newType, code: e.target.value.toUpperCase() })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400 text-center"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-sans tabular-nums font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase transition-all placeholder:text-slate-400 text-center"
                   />
                 </div>
 
@@ -406,7 +406,7 @@ const JobType = () => {
               {/* Preview Card */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-slate-800/70 dark:via-slate-800/50 dark:to-slate-800/70 border border-blue-100 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-mono font-black text-xs shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-sans tabular-nums font-black text-xs shadow-sm">
                     {newType.code.trim() || 'TYP'}
                   </div>
                   <div>

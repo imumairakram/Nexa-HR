@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import { LeaveCardSkeleton } from '../../components/common/Skeleton';
@@ -531,7 +531,7 @@ const LeavePolicy = () => {
                     placeholder="e.g. STUDY"
                     value={form.code}
                     onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-mono text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 uppercase transition-all shadow-inner text-center sm:text-left"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-sans tabular-nums text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 uppercase transition-all shadow-inner text-center sm:text-left"
                   />
                 </div>
               </div>
@@ -732,7 +732,7 @@ const LeavePolicy = () => {
                       Annual Quota
                     </span>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                      <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-sans tabular-nums tracking-tight">
                         {viewingPolicy.days ?? 0}
                       </span>
                       <span className="text-[11px] font-semibold text-slate-400">Days / Yr</span>
@@ -747,7 +747,7 @@ const LeavePolicy = () => {
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Policy Code
                     </span>
-                    <div className="text-xl sm:text-2xl font-black font-mono text-sky-600 dark:text-sky-400 tracking-tight">
+                    <div className="text-xl sm:text-2xl font-black font-sans tabular-nums text-sky-600 dark:text-sky-400 tracking-tight">
                       {viewingPolicy.code || 'N/A'}
                     </div>
                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
@@ -795,7 +795,7 @@ const LeavePolicy = () => {
                     <Shield className="w-3.5 h-3.5 text-slate-400" />
                     Policy Identifier:
                   </span>
-                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                  <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
                     {viewingPolicy.id}
                   </span>
                 </div>
@@ -895,7 +895,7 @@ const LeavePolicy = () => {
                     placeholder="e.g. STUDY"
                     value={editForm.code}
                     onChange={(e) => setEditForm({ ...editForm, code: e.target.value.toUpperCase() })}
-                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-mono text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 uppercase transition-all shadow-inner text-center sm:text-left"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-sans tabular-nums text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 uppercase transition-all shadow-inner text-center sm:text-left"
                   />
                 </div>
               </div>

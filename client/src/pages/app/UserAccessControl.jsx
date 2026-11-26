@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
@@ -1102,7 +1102,7 @@ const UserAccessControl = () => {
                             {emp.role}
                           </span>
                         )}
-                        <span className="text-[10px] font-mono font-bold text-slate-400">
+                        <span className="text-[10px] font-sans tabular-nums font-bold text-slate-400">
                           {coverage.enabled}/{coverage.total}
                         </span>
                       </div>
@@ -1158,7 +1158,7 @@ const UserAccessControl = () => {
                           <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">
                             {selectedEmployee.firstName} {selectedEmployee.lastName}
                           </h3>
-                          <span className="font-mono text-[11px] text-sky-700 dark:text-sky-300 font-bold bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
+                          <span className="font-sans tabular-nums text-[11px] text-sky-700 dark:text-sky-300 font-bold bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-[12px] border border-sky-200/80 dark:border-sky-800/80 shadow-2xs">
                             {selectedEmployee.employeeCode || 'EMP-CODE'}
                           </span>
                         </div>
@@ -1487,7 +1487,7 @@ const UserAccessControl = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="text-[10px] text-slate-400 font-mono bg-white dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-200/70 dark:border-slate-800">
+                          <div className="text-[10px] text-slate-400 font-sans tabular-nums bg-white dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-200/70 dark:border-slate-800">
                             {new Date(log.timestamp).toLocaleString()}
                           </div>
                         </div>

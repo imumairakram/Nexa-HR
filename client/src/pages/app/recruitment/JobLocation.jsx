@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { MapPin, Plus, CheckCircle2, X, Search, Building2, Globe, RefreshCw } from 'lucide-react';
 import { api } from '../../../services/api';
@@ -274,7 +274,7 @@ const JobLocation = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800/80">
                   <span className="font-semibold text-slate-700 dark:text-slate-300">{l.city}, {l.country}</span>
-                  <span className="font-mono text-[10px] text-slate-400">{l.timezone}</span>
+                  <span className="font-sans tabular-nums text-[10px] text-slate-400">{l.timezone}</span>
                 </div>
               </div>
             ))}

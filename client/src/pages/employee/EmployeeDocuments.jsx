@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+﻿import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   FileText,
   Download,
@@ -1222,10 +1222,10 @@ const EmployeeDocuments = () => {
                                     {doc.title}
                                   </span>
                                   <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-bold">
+                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-sans tabular-nums font-bold">
                                       {doc.referenceNumber || `#${doc.id}`}
                                     </span>
-                                    <span className="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">
+                                    <span className="text-[10px] font-sans tabular-nums font-bold uppercase text-slate-500 dark:text-slate-400">
                                       PDF
                                     </span>
                                   </div>
@@ -1248,7 +1248,7 @@ const EmployeeDocuments = () => {
                               </div>
                             </td>
 
-                            <td className="py-4 px-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono text-[11px]">
+                            <td className="py-4 px-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-sans tabular-nums text-[11px]">
                               <div className="flex items-center gap-1.5">
                                 <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                                 <span>{doc.issueDate || '—'}</span>
@@ -1256,7 +1256,7 @@ const EmployeeDocuments = () => {
                             </td>
 
                             <td className="py-4 px-4 whitespace-nowrap">
-                              <span className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
+                              <span className="font-sans tabular-nums text-xs font-semibold text-slate-600 dark:text-slate-400">
                                 {doc.size || '1.2 MB'}
                               </span>
                             </td>
@@ -1332,14 +1332,14 @@ const EmployeeDocuments = () => {
                             {doc.issuer}
                           </span>
                           <span className="text-slate-300 dark:text-slate-600">•</span>
-                          <span className="text-[10px] text-slate-400 font-mono font-bold">
+                          <span className="text-[10px] text-slate-400 font-sans tabular-nums font-bold">
                             {doc.referenceNumber || `#${doc.id}`}
                           </span>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
-                        <span className="text-[11px] text-slate-400 font-mono">{doc.size || '1.2 MB'}</span>
+                        <span className="text-[11px] text-slate-400 font-sans tabular-nums">{doc.size || '1.2 MB'}</span>
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setSelectedDoc(doc)}
@@ -1490,11 +1490,11 @@ const EmployeeDocuments = () => {
                             </span>
                           </td>
 
-                          <td className="py-4 px-4 whitespace-nowrap font-mono font-bold text-xs text-slate-500 dark:text-slate-400">
+                          <td className="py-4 px-4 whitespace-nowrap font-sans tabular-nums font-bold text-xs text-slate-500 dark:text-slate-400">
                             {pol.version}
                           </td>
 
-                          <td className="py-4 px-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono text-[11px]">
+                          <td className="py-4 px-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-sans tabular-nums text-[11px]">
                             <div className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                               <span>{pol.updated}</span>
@@ -1502,7 +1502,7 @@ const EmployeeDocuments = () => {
                           </td>
 
                           <td className="py-4 px-4 whitespace-nowrap">
-                            <span className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
+                            <span className="font-sans tabular-nums text-xs font-semibold text-slate-600 dark:text-slate-400">
                               {pol.size}
                             </span>
                           </td>
@@ -1543,7 +1543,7 @@ const EmployeeDocuments = () => {
                             {pol.categoryLabel || pol.category}
                           </span>
                         </div>
-                        <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
+                        <span className="text-xs font-sans tabular-nums font-bold text-slate-400">{pol.version}</span>
                       </div>
 
                       <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
@@ -1623,7 +1623,7 @@ const EmployeeDocuments = () => {
                       <FileText className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
                       Document Title <span className="text-rose-500 ml-0.5">*</span>
                     </label>
-                    <span className="text-[11px] font-mono font-medium text-slate-400">
+                    <span className="text-[11px] font-sans tabular-nums font-medium text-slate-400">
                       {uploadForm.title.length}/100 chars
                     </span>
                   </div>
@@ -1942,7 +1942,7 @@ const EmployeeDocuments = () => {
                     <span>Vault Record ID</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <code className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 font-mono text-[11px] font-bold text-slate-800 dark:text-slate-200 select-all tracking-tight max-w-[210px] sm:max-w-xs truncate">
+                    <code className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 font-sans tabular-nums text-[11px] font-bold text-slate-800 dark:text-slate-200 select-all tracking-tight max-w-[210px] sm:max-w-xs truncate">
                       #{selectedDoc.id}
                     </code>
                     <button
@@ -1975,7 +1975,7 @@ const EmployeeDocuments = () => {
                     <HardDrive className="w-3.5 h-3.5 text-slate-400" />
                     <span>Encrypted File Size</span>
                   </div>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-200/60 dark:bg-slate-700/60 font-mono font-bold text-[11px] text-slate-700 dark:text-slate-300">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-200/60 dark:bg-slate-700/60 font-sans tabular-nums font-bold text-[11px] text-slate-700 dark:text-slate-300">
                     {selectedDoc.size || 'Encrypted File'}
                   </span>
                 </div>

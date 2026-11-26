@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   FileText,
   Download,
@@ -1743,7 +1743,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                                 <span className="font-extrabold text-slate-900 dark:text-white text-xs block group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate max-w-xs">
                                   {doc.title}
                                 </span>
-                                <span className="text-[10px] text-slate-400 font-mono font-bold tracking-tight">
+                                <span className="text-[10px] text-slate-400 font-sans tabular-nums font-bold tracking-tight">
                                   {doc.referenceNumber || `#${doc.id}`}
                                 </span>
                               </div>
@@ -1759,7 +1759,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                                 <div className="font-bold text-slate-900 dark:text-white text-xs">
                                   {doc.employeeName || 'Company Team Member'}
                                 </div>
-                                <div className="text-[10px] text-slate-400 font-mono">
+                                <div className="text-[10px] text-slate-400 font-sans tabular-nums">
                                   {doc.employeeCode || doc.designation || 'Staff'}
                                 </div>
                               </div>
@@ -1783,7 +1783,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                             {doc.department || 'Operations'}
                           </td>
 
-                          <td className="py-4 px-4 text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap text-xs">
+                          <td className="py-4 px-4 text-slate-500 dark:text-slate-400 font-sans tabular-nums whitespace-nowrap text-xs">
                             {doc.issueDate}
                           </td>
 
@@ -1858,7 +1858,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                           {doc.title}
                         </h4>
-                        <p className="text-[10px] text-slate-400 font-mono mt-0.5 font-bold">
+                        <p className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5 font-bold">
                           {doc.referenceNumber || `#${doc.id}`}
                         </p>
                       </div>
@@ -1880,7 +1880,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     </div>
 
                     <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-                      <span className="text-[11px] text-slate-400 font-mono">{doc.issueDate}</span>
+                      <span className="text-[11px] text-slate-400 font-sans tabular-nums">{doc.issueDate}</span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedDoc(doc)}
@@ -2020,7 +2020,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                           {pol.categoryLabel || pol.category}
                         </span>
                       </div>
-                      <span className="text-xs font-mono font-bold text-slate-400">{pol.version}</span>
+                      <span className="text-xs font-sans tabular-nums font-bold text-slate-400">{pol.version}</span>
                     </div>
 
                     <h4 className="text-base font-black text-slate-900 dark:text-white leading-snug group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
@@ -2128,7 +2128,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     type="text"
                     value={issueForm.referenceNumber}
                     onChange={(e) => setIssueForm({ ...issueForm, referenceNumber: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-mono text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold font-sans tabular-nums text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
               </div>
@@ -2157,7 +2157,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                         {selectedEmployeeObj.profile?.department?.name || 'Operations'}
                       </span>
                       <span className="text-slate-300 dark:text-slate-600">•</span>
-                      <span className="font-mono text-slate-500 dark:text-slate-400 truncate text-[11px]">
+                      <span className="font-sans tabular-nums text-slate-500 dark:text-slate-400 truncate text-[11px]">
                         {selectedEmployeeObj.email || 'N/A'}
                       </span>
                     </div>
@@ -2342,7 +2342,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                       </div>
                     </div>
                     {issueForm.fileName && (
-                      <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0 ml-2">
+                      <span className="text-xs font-sans tabular-nums font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0 ml-2">
                         {issueForm.size}
                       </span>
                     )}
@@ -2509,7 +2509,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     type="text"
                     value={policyForm.version}
                     onChange={(e) => setPolicyForm({ ...policyForm, version: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold font-mono text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
+                    className="w-full px-4 py-3 bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-semibold font-sans tabular-nums text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-inner"
                   />
                 </div>
 
@@ -2599,7 +2599,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                     </div>
                   </div>
                   {policyForm.fileName && (
-                    <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0 ml-2">
+                    <span className="text-xs font-sans tabular-nums font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/80 px-2.5 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0 ml-2">
                       {policyForm.size}
                     </span>
                   )}
@@ -2661,7 +2661,7 @@ ${doc.description || 'This document serves as an official verified corporate rec
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     {selectedDoc.title}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-sans tabular-nums mt-0.5">
                     Ref: {selectedDoc.referenceNumber || `#${selectedDoc.id}`}
                   </p>
                 </div>
@@ -2699,13 +2699,13 @@ ${doc.description || 'This document serves as an official verified corporate rec
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 font-medium">Issue Date</span>
-                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                  <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
                     {selectedDoc.issueDate}
                   </span>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
                   <span className="text-slate-400 font-medium">Verification Seal</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 font-mono text-[11px]">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 font-sans tabular-nums text-[11px]">
                     <CheckCircle2 className="w-4 h-4" />
                     <span>NexaHR Signature Verified ({generateDocumentHash(selectedDoc.id, selectedDoc.referenceNumber)})</span>
                   </span>

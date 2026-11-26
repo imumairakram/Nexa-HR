@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Camera,
   User,
@@ -724,7 +724,7 @@ const EmployeeProfile = () => {
                     {formData.firstName || 'Employee'} {formData.lastName || ''}
                   </h2>
                   {formData.empCode && (
-                    <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-[12px] border border-white/20 text-xs font-mono font-bold shadow-xs">
+                    <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-[12px] border border-white/20 text-xs font-sans tabular-nums font-bold shadow-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5" />
                       <span>{formData.empCode}</span>
                     </span>
@@ -1179,7 +1179,7 @@ const EmployeeProfile = () => {
                     <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                       <span className="text-slate-400 font-semibold">Account / IBAN</span>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                        <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200 text-[11px]">
                           {formData.accountNumber || 'Not Configured'}
                         </span>
                         {formData.accountNumber && (
@@ -1202,7 +1202,7 @@ const EmployeeProfile = () => {
 
                     <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                       <span className="text-slate-400 font-semibold">Branch Code</span>
-                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || 'Not Set'}</span>
+                      <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.branchCode || 'Not Set'}</span>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
@@ -1213,7 +1213,7 @@ const EmployeeProfile = () => {
                     {formData.ntnNumber && (
                       <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                         <span className="text-slate-400 font-semibold">Tax NTN / Registration</span>
-                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.ntnNumber}</span>
+                        <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200 text-[11px]">{formData.ntnNumber}</span>
                       </div>
                     )}
                   </div>
@@ -1286,7 +1286,7 @@ const EmployeeProfile = () => {
                           const val = e.target.value;
                           setFormData((prev) => ({ ...prev, accountNumber: val }));
                         }}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-sans tabular-nums font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
                       />
                     </div>
 
