@@ -243,10 +243,10 @@ const EmployeeDashboard = () => {
   }, [announcements]);
 
   const netSalaryAmount = latestPayslip?.netSalary
-    ? formatCurrency(latestPayslip.netSalary)
+    ? Math.round(Number(latestPayslip.netSalary)).toLocaleString()
     : currentUser?.salaryStructure?.basicSalary
-    ? formatCurrency(currentUser.salaryStructure.basicSalary)
-    : formatCurrency(0);
+    ? Math.round(Number(currentUser.salaryStructure.basicSalary)).toLocaleString()
+    : '0';
 
   const displaySalary = useMemo(() => {
     if (!isSalaryHidden) return netSalaryAmount;

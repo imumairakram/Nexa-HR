@@ -276,7 +276,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Total Disbursed"
-          value={`PKR ${payslips.reduce((acc, p) => acc + p.net, 0).toLocaleString()}`}
+          value={`${payslips.reduce((acc, p) => acc + p.net, 0).toLocaleString()}`}
           badgeText="100% Net Paid"
           badgeType="positive"
           badgeIcon="up"
@@ -291,7 +291,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Tax Withholdings"
-          value={`PKR ${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
+          value={`${payslips.reduce((acc, p) => acc + p.deductions, 0).toLocaleString()}`}
           badgeText="Statutory Filing"
           badgeType="warning"
           badgeIcon="dot"
@@ -306,7 +306,7 @@ const PayslipList = () => {
         <SparkMetricCard
           variant="light"
           title="Average Net Salary"
-          value={`PKR ${Math.round(payslips.reduce((acc, p) => acc + p.net, 0) / (payslips.length || 1)).toLocaleString()}`}
+          value={`${Math.round(payslips.reduce((acc, p) => acc + p.net, 0) / (payslips.length || 1)).toLocaleString()}`}
           badgeText="Per Employee"
           badgeType="positive"
           badgeIcon="dot"

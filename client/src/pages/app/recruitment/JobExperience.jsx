@@ -225,7 +225,7 @@ const JobExperience = () => {
           </div>
           <div className="space-y-1">
             <div className="text-2xl sm:text-3xl font-black text-amber-500 tracking-tight">
-              PKR 220k <span className="text-base font-bold text-slate-400">Max</span>
+              220k <span className="text-base font-bold text-slate-400">Max</span>
             </div>
             <div className="flex items-center justify-between pt-2 text-xs font-semibold">
               <span className="text-amber-600 dark:text-amber-400 font-bold">Senior Cap</span>

@@ -281,7 +281,7 @@ const Payroll = () => {
         <SparkMetricCard
           variant="light"
           title="Latest Batch Disbursed"
-          value={formatCurrency(latestBatch?.netPayable || 0)}
+          value={Math.round(Number(latestBatch?.netPayable || 0)).toLocaleString()}
           badgeText="Disbursed"
           badgeType="positive"
           badgeIcon="up"
@@ -296,7 +296,7 @@ const Payroll = () => {
         <SparkMetricCard
           variant="light"
           title="Total Net All-Time"
-          value={formatCurrency(totalNetDisbursedAllTime)}
+          value={Math.round(Number(totalNetDisbursedAllTime || 0)).toLocaleString()}
           badgeText="Cumulative Net"
           badgeType="positive"
           badgeIcon="up"
@@ -311,7 +311,7 @@ const Payroll = () => {
         <SparkMetricCard
           variant="light"
           title="Tax Withheld YTD"
-          value={formatCurrency(totalTaxWithheldAllTime)}
+          value={Math.round(Number(totalTaxWithheldAllTime || 0)).toLocaleString()}
           badgeText="Statutory Filing"
           badgeType="positive"
           badgeIcon="dot"
