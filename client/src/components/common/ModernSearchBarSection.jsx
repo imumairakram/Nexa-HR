@@ -14,7 +14,7 @@ import {
 
 /**
  * ModernSearchBarSection
- * 
+ *
  * Reusable, high-fidelity search & filtering bar matching the modern SaaS segmented UI.
  * Features:
  * - Segmented status tabs with count badges (All, Paid/Approved, Pending, etc.)
@@ -23,6 +23,11 @@ import {
  * - Capsule search input with tag chips, smart hint, and Cmd/Ctrl+K shortcut
  * - Filters popover button with active counter badge
  * - Optional top-right action button
+ *
+ * Mobile behaviour (< sm breakpoint):
+ * - Row 1 (status tabs, date range, sort, view toggle) is HIDDEN
+ * - All those controls move INSIDE the Filters panel so the user can access them
+ * - Only the search bar + Filters button are shown on mobile
  */
 const ModernSearchBarSection = ({
   statusTabs = [],
@@ -54,11 +59,20 @@ const ModernSearchBarSection = ({
   const [showDateMenu, setShowDateMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  // Tracks whether we're on a mobile-sized screen
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
 
   const dateMenuRef = useRef(null);
   const sortMenuRef = useRef(null);
   const filterMenuRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  // Track window size for mobile detection
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Keyboard shortcut: Cmd+K / Ctrl+K to focus search
   useEffect(() => {
@@ -95,13 +109,35 @@ const ModernSearchBarSection = ({
     ? sortRawLabel
     : `Sort: ${sortRawLabel}`;
 
+  // Calculate effective filter count: on mobile include status/date/sort as "filters"
+  const mobileExtraCount =
+    isMobile
+      ? (activeStatus !== 'ALL' ? 1 : 0) +
+        (activeDateRange !== 'ALL' ? 1 : 0) +
+        (activeSort ? 1 : 0)
+      : 0;
+  const effectiveFilterCount = filterCount + mobileExtraCount;
+
+  // Whether any Row-1 controls exist
+  const hasRow1 =
+    customTabs ||
+    statusTabs.length > 0 ||
+    dateRangeOptions.length > 0 ||
+    sortOptions.length > 0 ||
+    onViewModeChange ||
+    actionButton;
+
+  // Whether to show the filter button at all
+  const showFilterButton = filterContent || effectiveFilterCount > 0 || isMobile;
+
   return (
     <div className={`space-y-2.5 sm:space-y-3 w-full max-w-full min-w-0 ${className}`}>
       {/* ========================================================================= */}
       {/* ROW 1: STATUS SEGMENTS + DATE RANGE & SORT PICKERS (+ ACTION BUTTON)      */}
+      {/* Hidden on mobile — controls move into the Filters panel instead           */}
       {/* ========================================================================= */}
-      {(customTabs || statusTabs.length > 0 || dateRangeOptions.length > 0 || sortOptions.length > 0 || onViewModeChange || actionButton) && (
-        <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 w-full min-w-0">
+      {hasRow1 && (
+        <div className="hidden sm:flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 w-full min-w-0">
           {/* Left: Custom Tabs (e.g. Issued Documents vs Policies) + Segmented Status Pills */}
           <div className="flex items-center gap-2 flex-wrap max-w-full min-w-0">
             {customTabs}
@@ -361,7 +397,7 @@ const ModernSearchBarSection = ({
         </div>
 
         {/* Filters Button with Dropdown / Popover */}
-        {(filterContent || filterCount > 0) && (
+        {showFilterButton && (
           <div className="relative shrink-0" ref={filterMenuRef}>
             <button
               type="button"
@@ -371,16 +407,16 @@ const ModernSearchBarSection = ({
                 setShowSortMenu(false);
               }}
               className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-[12px] border text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer shadow-2xs shrink-0 whitespace-nowrap ${
-                filterCount > 0 || showFilterMenu
+                effectiveFilterCount > 0 || showFilterMenu
                   ? 'bg-[#E1F4FA] dark:bg-[#12333D] border-[#0A8FB5] dark:border-[#3CC1E6] text-[#07617D] dark:text-[#3CC1E6]'
                   : 'bg-white dark:bg-[#112229] border-[#DCE6EA] dark:border-[#223840] text-[#0E2A33] dark:text-[#E6F2F5] hover:border-[#0A8FB5]'
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
               <span>Filters</span>
-              {filterCount > 0 && (
+              {effectiveFilterCount > 0 && (
                 <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#0A8FB5] dark:bg-[#3CC1E6] text-white dark:text-[#0E2A33] text-[9px] sm:text-[10px] font-bold flex items-center justify-center shrink-0">
-                  {filterCount}
+                  {effectiveFilterCount}
                 </span>
               )}
             </button>
@@ -391,23 +427,163 @@ const ModernSearchBarSection = ({
                 <div className="flex items-center justify-between pb-3 border-b border-[#DCE6EA] dark:border-[#223840]">
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-[#5B727B] dark:text-[#8FA8B1]" />
-                    <span className="text-xs font-bold text-[#0E2A33] dark:text-[#E6F2F5]">Active Filters</span>
+                    <span className="text-xs font-bold text-[#0E2A33] dark:text-[#E6F2F5]">Filters</span>
                   </div>
-                  {filterCount > 0 && (
+                  {effectiveFilterCount > 0 && (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-[12px] bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] border border-[#0A8FB5]/20">
-                      {filterCount} applied
+                      {effectiveFilterCount} applied
                     </span>
                   )}
                 </div>
 
-                {/* Dynamic Filter Content supplied by consumer page */}
-                <div className="py-3 max-h-72 overflow-y-auto custom-scrollbar">
-                  {filterContent || (
-                    <div className="text-center py-4 text-xs text-[#5B727B] dark:text-[#8FA8B1]">
-                      No additional filters configured.
+                {/* ============================================================= */}
+                {/* MOBILE-ONLY CONTROLS: Status tabs, Date range, Sort, View      */}
+                {/* These are only shown on mobile inside the filter panel         */}
+                {/* ============================================================= */}
+                <div className="sm:hidden py-3 space-y-4 border-b border-[#DCE6EA] dark:border-[#223840]">
+                  {/* Status Tabs on mobile */}
+                  {(statusTabs.length > 0 || customTabs) && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#5B727B] dark:text-[#8FA8B1] mb-2">Status</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {statusTabs.map((tab) => {
+                          const isSelected = activeStatus === tab.key;
+                          return (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              onClick={() => {
+                                onStatusChange && onStatusChange(tab.key);
+                              }}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                                isSelected
+                                  ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
+                                  : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1] border border-[#DCE6EA] dark:border-[#223840]'
+                              }`}
+                            >
+                              <span>{tab.label}</span>
+                              {tab.count !== undefined && (
+                                <span
+                                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-[10px] ${
+                                    isSelected
+                                      ? 'bg-white/20 text-white'
+                                      : 'bg-[#DCE6EA] dark:bg-[#223840] text-[#5B727B] dark:text-[#8FA8B1]'
+                                  }`}
+                                >
+                                  {tab.count}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Date Range on mobile */}
+                  {dateRangeOptions.length > 0 && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#5B727B] dark:text-[#8FA8B1] mb-2">
+                        {dateRangeLabel || 'Date Range'}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {dateRangeOptions.map((opt) => (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => onDateRangeChange && onDateRangeChange(opt.key)}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer ${
+                              activeDateRange === opt.key
+                                ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold border border-[#0A8FB5]/30'
+                                : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] border border-[#DCE6EA] dark:border-[#223840]'
+                            }`}
+                          >
+                            <span>{opt.label}</span>
+                            {activeDateRange === opt.key && <Check className="w-3 h-3 text-[#0A8FB5] dark:text-[#3CC1E6]" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sort on mobile */}
+                  {sortOptions.length > 0 && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#5B727B] dark:text-[#8FA8B1] mb-2">Sort By</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {sortOptions.map((opt) => (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => {
+                              const nextOrder = activeSort === opt.key && sortOrder === 'desc' ? 'asc' : 'desc';
+                              onSortChange && onSortChange(opt.key, nextOrder);
+                            }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer ${
+                              activeSort === opt.key
+                                ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] font-bold border border-[#0A8FB5]/30'
+                                : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] border border-[#DCE6EA] dark:border-[#223840]'
+                            }`}
+                          >
+                            <span>{opt.label}</span>
+                            {activeSort === opt.key && (
+                              <span className="text-[9px] uppercase font-bold">
+                                {sortOrder === 'asc' ? '↑' : '↓'}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* View Mode on mobile */}
+                  {onViewModeChange && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#5B727B] dark:text-[#8FA8B1] mb-2">View</div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => onViewModeChange('list')}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer border ${
+                            viewMode === 'list'
+                              ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] border-[#0A8FB5]/30'
+                              : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] border-[#DCE6EA] dark:border-[#223840]'
+                          }`}
+                        >
+                          <List className="w-3.5 h-3.5" />
+                          <span>List</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onViewModeChange('grid')}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all cursor-pointer border ${
+                            viewMode === 'grid'
+                              ? 'bg-[#E1F4FA] dark:bg-[#12333D] text-[#07617D] dark:text-[#3CC1E6] border-[#0A8FB5]/30'
+                              : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] border-[#DCE6EA] dark:border-[#223840]'
+                          }`}
+                        >
+                          <LayoutGrid className="w-3.5 h-3.5" />
+                          <span>Grid</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
+
+                {/* Dynamic Filter Content supplied by consumer page */}
+                {filterContent && (
+                  <div className="py-3 max-h-72 overflow-y-auto custom-scrollbar">
+                    {filterContent}
+                  </div>
+                )}
+
+                {/* Empty state when no filter content and not mobile */}
+                {!filterContent && effectiveFilterCount === 0 && (
+                  <div className="sm:block hidden text-center py-4 text-xs text-[#5B727B] dark:text-[#8FA8B1]">
+                    No additional filters configured.
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -418,4 +594,3 @@ const ModernSearchBarSection = ({
 };
 
 export default ModernSearchBarSection;
-
