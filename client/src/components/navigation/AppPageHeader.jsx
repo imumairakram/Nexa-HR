@@ -528,16 +528,6 @@ const AppPageHeader = ({
                 {title}
               </h1>
             )}
-            {displaySubtitle && (
-              <p
-                className={`${
-                  hideMobileSubtitle ? 'hidden sm:block' : 'line-clamp-1 sm:line-clamp-none'
-                } text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium leading-relaxed mt-0.5`}
-                title={typeof displaySubtitle === 'string' ? displaySubtitle : undefined}
-              >
-                {displaySubtitle}
-              </p>
-            )}
           </div>
         </div>
 
