@@ -531,7 +531,7 @@ const Announcement = () => {
                     </span>
 
                     <span className="text-xs text-slate-400 font-medium">{item.date}</span>
-                    <span className="text-xs text-slate-400 font-medium">• By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
+                    <span className="text-xs text-slate-400 font-medium">Â• By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
                   </div>
 
                   <h3
@@ -873,7 +873,7 @@ const Announcement = () => {
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           {getCategoryLabel(form.category)}
                         </span>
-                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                        <span className="text-slate-300 dark:text-slate-600">Â•</span>
                         <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 truncate">
                           {form.department}
                         </span>
@@ -991,7 +991,7 @@ const Announcement = () => {
                     {selectedNotice.title}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-normal truncate">
-                    Issued by <strong className="font-semibold text-slate-700 dark:text-slate-200">{selectedNotice.author || 'System Administrator'}</strong> • {selectedNotice.department || 'Company-Wide (All Offices)'}
+                    Issued by <strong className="font-semibold text-slate-700 dark:text-slate-200">{selectedNotice.author || 'System Administrator'}</strong> Â• {selectedNotice.department || 'Company-Wide (All Offices)'}
                   </p>
                 </div>
               </div>
