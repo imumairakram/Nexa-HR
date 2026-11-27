@@ -515,58 +515,6 @@ const JobsWorkspace = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. HERO COMMAND BANNER (INTEGRATING JOB DESK TELEMETRY) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-              Talent Requisitions & Open Positions Desk
-            </h2>
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-xl font-medium">
-              Oversee corporate headcount expansion, manage job openings across all functional branches, and advance high-caliber applicants seamlessly into the ATS pipeline.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{jobs.length} Total Postings</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{totalOpenings} Active Requisitions</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{totalApplicants} Active Candidates Sourced</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{offerRate} Acceptance Rate</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Quick Action Buttons */}
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
-            <button
-              onClick={handleOpenCreate}
-              className="px-5 py-3 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>Create Job Opening</span>
-            </button>
-            <button
-              onClick={() => navigate('/app/recruitment/pipeline')}
-              className="px-4 py-2.5 rounded-[12px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
-            >
-              <Users className="w-3.5 h-3.5 text-[#3CC1E6]" />
-              <span>Go to ATS Pipeline</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
       {/* 2. RECRUITMENT KPI TELEMETRY CARDS (SPARK METRIC CARDS) */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">

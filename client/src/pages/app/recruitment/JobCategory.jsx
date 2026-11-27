@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
 import { Tag, Plus, Search, CheckCircle2, X, Trash2, Layers, Briefcase, Building, RefreshCw } from 'lucide-react';
 import { api } from '../../../services/api';
@@ -90,54 +90,6 @@ const JobCategory = () => {
           </p>
         </div>
       )}
-
-      {/* ========================================================================= */}
-      {/* 1. DYNAMIC JOB CATEGORY HERO BANNER (INDIGO-BLUE LIGHT THEME AESTHETIC) */}
-      {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A8FB5] via-[#087A9B] to-[#07617D] p-6 sm:p-8 shadow-lg shadow-sky-950/15 border border-[#3CC1E6]/30 text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3CC1E6]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left Side: Category Telemetry */}
-          <div className="space-y-3 flex-1 min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[28px] xl:text-3xl font-black tracking-tight text-white leading-tight">
-              Job Categories Master Table & Requisition Taxonomy
-            </h2>
-
-            <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-lg font-medium">
-              Organize job requisitions, career portal departments, and hiring pipelines into structured functional categories.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/90 font-semibold pt-1">
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{categories.length} Functional Clusters</span>
-              </span>
-              <span className="flex items-center bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-xl border border-white/20">
-                <span>{categories.reduce((acc, c) => acc + c.count, 0)} Active Job Openings</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Right Side: Action Glassmorphic Card */}
-          <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 border border-white/25 shadow-xl text-white flex flex-col items-center text-center min-w-[220px] sm:min-w-[250px] shrink-0 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center">
-              <Plus className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="text-xs font-extrabold text-white">Add Category</div>
-              <div className="text-[11px] text-white/80 mt-0.5">Define functional branch</div>
-            </div>
-            <button
-              onClick={() => setIsAddOpen(true)}
-              className="w-full px-5 py-2.5 rounded-[12px] bg-white hover:bg-[#E1F4FA] active:bg-[#C8ECF8] text-[#07617D] dark:text-white font-bold text-xs shadow-md shadow-sky-950/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
-            >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Add Category</span>
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* ========================================================================= */}
       {/* 2. STITCH-INSPIRED TELEMETRY KPI CARDS */}
