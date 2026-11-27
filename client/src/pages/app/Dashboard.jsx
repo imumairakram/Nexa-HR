@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart2,
@@ -402,10 +402,10 @@ const Dashboard = () => {
           onClick={() => navigate('/app/attendance')}
         />
 
-        {/* Card 3: Light Card - Pending Leaves */}
+        {/* Card 3: Light Card - Leave Requests */}
         <SparkMetricCard
           variant="light"
-          title="Pending Leaves"
+          title="Leave Requests"
           value={widgets.leaves?.error ? '—' : pendingLeaves}
           unit={widgets.leaves?.error ? '' : pendingLeaves === 1 ? 'Request' : 'Requests'}
           badgeText={widgets.leaves?.error ? 'Unavailable' : pendingLeaves > 0 ? `${pendingLeaves} In Review` : 'All Cleared'}
@@ -444,7 +444,7 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 h-full flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Workforce Presence</p>
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Today's Workforce Presence</p>
                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-600 dark:bg-sky-950/70 dark:text-sky-300">
                   Live Metric
                 </span>
@@ -454,7 +454,7 @@ const Dashboard = () => {
               ) : (
                 <div className="flex items-baseline gap-2 mb-4">
                   <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{workforcePresence}%</h2>
-                  <span className="text-xs font-medium text-slate-400">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                     ({todayPresentCount} of {totalEmployees} staff clocked in)
                   </span>
                 </div>
@@ -462,7 +462,12 @@ const Dashboard = () => {
             </div>
 
             <div className="relative pt-2 pb-4">
-              <div className="h-3 w-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 via-emerald-400 to-emerald-500 shadow-inner"></div>
+              <div className="h-3 w-full rounded-full bg-[#E5E7EB] dark:bg-slate-700 shadow-inner overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${Math.min(100, Math.max(0, workforcePresence))}%` }}
+                />
+              </div>
               <div
                 className="absolute top-0.5 -translate-x-1/2 flex flex-col items-center transition-all duration-500"
                 style={{ left: `${Math.min(100, Math.max(0, workforcePresence))}%` }}
@@ -470,7 +475,7 @@ const Dashboard = () => {
                 <div className="w-3.5 h-6 bg-white dark:bg-slate-900 rounded-full shadow-md border-2 border-emerald-500 ring-2 ring-emerald-500/20"></div>
               </div>
 
-              <div className="flex justify-between text-[10px] font-semibold text-slate-400 mt-2 px-1">
+              <div className="flex justify-between text-[10px] font-semibold text-slate-600 dark:text-slate-400 mt-2 px-1">
                 <span>0%</span>
                 <span>25%</span>
                 <span>50%</span>
@@ -494,7 +499,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-black text-sm text-slate-900 dark:text-white">Biometric Attendance Trend</h3>
-              <p className="text-xs text-slate-400 font-medium">Daily staff check-ins logged via biometric terminals</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Daily staff check-ins logged via biometric terminals</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -576,9 +581,9 @@ const Dashboard = () => {
           </div>
 
           {/* Subtext info */}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
             <span>
-              Period Total: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">{totalPeriodAttendance} Check-ins</strong>
+              Period Total: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">{totalPeriodAttendance} {totalPeriodAttendance === 1 ? 'check-in' : 'check-ins'}</strong>
             </span>
             <span>
               Roster Capacity: <strong className="text-slate-700 dark:text-slate-200 font-sans tabular-nums">{totalEmployees} Staff</strong>
@@ -595,7 +600,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-black text-sm text-slate-900 dark:text-white">Department Attendance</h3>
-                <p className="text-[11px] text-slate-400">On-time vs Late check-ins by unit</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">On-time vs Late check-ins by unit</p>
               </div>
 
               {/* Timeframe Selector Tabs */}
@@ -622,7 +627,7 @@ const Dashboard = () => {
 
             {/* Live Indicator & Legend */}
             <div className="flex items-center justify-between pt-1 border-t border-slate-100/80 dark:border-slate-800/80 text-[10px] font-bold">
-              <span className="text-slate-400 font-sans tabular-nums text-[10px]">
+              <span className="text-slate-600 dark:text-slate-400 font-sans tabular-nums text-[10px]">
                 {deptTimeframe === 'today'
                   ? 'Real-Time Today'
                   : deptTimeframe === 'week'
@@ -643,7 +648,7 @@ const Dashboard = () => {
           </div>
 
           <div className="h-56 w-full">
-            {barChartData.length > 0 ? (
+            {barChartData.length > 0 && (totalDeptOnTime > 0 || totalDeptLate > 0) ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barChartData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
                   <XAxis
@@ -697,11 +702,23 @@ const Dashboard = () => {
                   <Bar dataKey="late" fill="#F43F5E" radius={[4, 4, 0, 0]} name="Late" />
                 </BarChart>
               </ResponsiveContainer>
+            ) : barChartData.length > 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                <Building2 className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-1" />
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  {deptTimeframe === 'today'
+                    ? 'No check-in activity recorded today'
+                    : 'No check-in activity recorded for this period'}
+                </p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                  {barChartData.length} {barChartData.length === 1 ? 'department' : 'departments'} monitored • 0 check-ins
+                </p>
+              </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                 <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-1" />
                 <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Department Metrics Loading</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">Fetching organizational division roster.</p>
+                <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">Fetching organizational division roster.</p>
               </div>
             )}
           </div>
@@ -712,7 +729,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-2">
             <div>
               <h3 className="font-black text-sm text-slate-900 dark:text-white">Organization Operations Health</h3>
-              <p className="text-[11px] text-slate-400">Punctuality, presence & capacity index</p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">Punctuality, presence & capacity index</p>
             </div>
             <span className="text-[10px] font-black px-2 py-0.5 rounded-[12px] bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
               Health Index
@@ -755,13 +772,15 @@ const Dashboard = () => {
         </div>
 
         {/* 3. Live Biometric Logs */}
-        <div className="lg:col-span-4 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
+        <div className="lg:col-span-4 bg-white dark:bg-[#1E293B] rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <div>
                 <h3 className="font-black text-sm text-slate-900 dark:text-white">Live Biometric Logs</h3>
-                <p className="text-[11px] text-slate-400">{biometricLogs.length} verified check-ins</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                  {biometricLogs.length} {biometricLogs.length === 1 ? 'verified check-in' : 'verified check-ins'}
+                </p>
               </div>
             </div>
             <button
@@ -773,7 +792,7 @@ const Dashboard = () => {
             </button>
           </div>
 
-          <div className="overflow-y-auto max-h-56 pr-1 custom-scrollbar">
+          <div className="flex-1 flex flex-col items-stretch justify-start overflow-y-auto max-h-56 pr-1 custom-scrollbar">
             {biometricLogs.length > 0 ? (
               <div className="space-y-2">
                 {biometricLogs.map((log, idx) => (
@@ -789,7 +808,7 @@ const Dashboard = () => {
                         <div className="font-extrabold text-xs text-slate-900 dark:text-white truncate">
                           {log.employeeName}
                         </div>
-                        <div className="text-[10px] text-slate-400 font-sans tabular-nums truncate">
+                        <div className="text-[10px] text-slate-600 dark:text-slate-400 font-sans tabular-nums truncate">
                           {log.empCode} • {log.department}
                         </div>
                       </div>
@@ -805,7 +824,7 @@ const Dashboard = () => {
                       >
                         {log.status || 'PRESENT'}
                       </span>
-                      <span className="text-[10px] font-sans tabular-nums font-semibold text-slate-400">
+                      <span className="text-[10px] font-sans tabular-nums font-semibold text-slate-600 dark:text-slate-400">
                         {log.time}
                       </span>
                     </div>

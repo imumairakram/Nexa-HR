@@ -358,8 +358,8 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
           onClick={handleLogout}
           title="Sign Out"
           className={`flex items-center transition-all cursor-pointer ${isCollapsed
-            ? 'w-11 h-11 rounded-[12px] justify-center mx-auto text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-            : 'w-full gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400'
+            ? 'w-11 h-11 rounded-[12px] justify-center mx-auto text-[#d91448] dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+            : 'w-full gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-[#d91448] dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-300'
             }`}
         >
           <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
@@ -543,7 +543,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
             <button
               type="button"
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-400 transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] text-xs font-semibold text-[#d91448] dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-700 dark:hover:text-rose-300 transition-all cursor-pointer"
             >
               <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
               <span>Sign Out</span>
