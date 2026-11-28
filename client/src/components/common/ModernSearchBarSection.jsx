@@ -74,18 +74,6 @@ const ModernSearchBarSection = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Keyboard shortcut: Cmd+K / Ctrl+K to focus search
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Close menus on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -379,7 +367,7 @@ const ModernSearchBarSection = ({
               </span>
             )}
 
-            {searchQuery ? (
+            {searchQuery && (
               <button
                 type="button"
                 onClick={() => onSearchChange && onSearchChange('')}
@@ -388,10 +376,6 @@ const ModernSearchBarSection = ({
               >
                 <X className="w-3.5 h-3.5" />
               </button>
-            ) : (
-              <kbd className="hidden sm:inline-flex text-[11px] font-medium bg-[#F5F8F9] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[#5B727B] dark:text-[#8FA8B1] px-1.5 py-0.5 rounded-[6px] shrink-0 select-none">
-                ⌘K
-              </kbd>
             )}
           </div>
         </div>

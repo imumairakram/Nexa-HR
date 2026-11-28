@@ -57,6 +57,13 @@ const formatDateRange = (startDate, endDate) => {
   const sInfo = parseDateInfo(startDate);
   if (!endDate || startDate === endDate) return sInfo.formatted;
   const eInfo = parseDateInfo(endDate);
+  if (sInfo.formatted === eInfo.formatted) return sInfo.formatted;
+  const sDate = new Date(startDate);
+  const eDate = new Date(endDate);
+  if (!isNaN(sDate.getTime()) && !isNaN(eDate.getTime()) && sDate.getFullYear() === eDate.getFullYear()) {
+    const startShort = sDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${startShort} – ${eInfo.formatted}`;
+  }
   return `${sInfo.formatted} – ${eInfo.formatted}`;
 };
 
@@ -388,8 +395,8 @@ const Leaves = () => {
 
   const statusTabs = [
     { key: 'ALL', label: 'All', count: stats.total },
-    { key: 'APPROVED', label: 'Approved', count: stats.approved },
     { key: 'PENDING', label: 'Pending', count: stats.pending },
+    { key: 'APPROVED', label: 'Approved', count: stats.approved },
     { key: 'REJECTED', label: 'Declined', count: stats.rejected },
   ];
 
@@ -493,7 +500,7 @@ const Leaves = () => {
         {/* Card 3 */}
         <SparkMetricCard
           variant="light"
-          title="Approved Leaves"
+          title="Approved Requests"
           value={stats.approved}
           unit="Granted"
           badgeText="Synchronized"
@@ -508,7 +515,7 @@ const Leaves = () => {
         {/* Card 4 */}
         <SparkMetricCard
           variant="light"
-          title="Declined / Rejected"
+          title="Declined Requests"
           value={stats.rejected}
           unit="Declined"
           badgeText={stats.rejected > 0 ? `${stats.rejected} Declined` : '0 Declined'}
@@ -531,7 +538,6 @@ const Leaves = () => {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Search leave requests by employee name, code, reason, or leave type..."
-        searchHint="status:pending"
         filterTags={filterTags}
         onRemoveTag={(tag) => {
           const key = typeof tag === 'string' ? tag : tag.key;
@@ -773,7 +779,7 @@ const Leaves = () => {
                       <th className="py-3.5 px-4">Leave Policy</th>
                       <th className="py-3.5 px-4">Reason / Notes</th>
                       <th className="py-3.5 px-4">Status</th>
-                      <th className="py-3.5 px-6 text-right">Actions</th>
+                      <th className="py-3.5 px-6 text-right">Decision</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
@@ -803,12 +809,12 @@ const Leaves = () => {
                                   >
                                     {req.user?.firstName} {req.user?.lastName}
                                   </button>
-                                  <div className="text-[10px] text-slate-400 font-sans tabular-nums flex items-center gap-1.5 mt-0.5">
+                                  <div className="text-[10px] text-[#596780] dark:text-slate-400 font-sans tabular-nums flex items-center gap-1.5 mt-0.5">
                                     <span>{req.user?.employeeCode || req.user?.email}</span>
                                     {(req.user?.department || req.user?.profile?.department?.name) && (
                                       <>
                                         <span>•</span>
-                                        <span className="text-slate-500 dark:text-slate-400 truncate max-w-[110px]">
+                                        <span className="text-slate-600 dark:text-slate-400 truncate max-w-[110px]">
                                           {typeof req.user.department === 'object'
                                             ? req.user.department?.name
                                             : req.user?.profile?.department?.name || req.user.department}
@@ -823,31 +829,14 @@ const Leaves = () => {
 
                           {/* 1. Leave Duration & Dates Column */}
                           <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
-                            <div className="flex items-center gap-3.5">
-                              {/* Date Number Badge */}
-                              <div className="w-11 h-11 rounded-xl flex flex-col items-center justify-center border transition-all bg-slate-100 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:border-sky-400/50 shrink-0">
-                                <span className="text-[9px] font-black uppercase tracking-wider leading-none">
-                                  {startInfo.monthShort}
-                                </span>
-                                <span className="text-base font-black leading-tight mt-0.5">
-                                  {startInfo.dayNum}
-                                </span>
+                            <div>
+                              <div className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
+                                {dateRangeText}
                               </div>
-
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">
-                                    {dateRangeText}
-                                  </span>
-                                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                                    ({formatLeaveDays(daysCount)})
-                                  </span>
-                                </div>
-                                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
-                                  <span>{startInfo.weekday ? `${startInfo.weekday} Start` : 'Scheduled'}</span>
-                                  <span>•</span>
-                                  <span>{req.dayType === 'HALF' ? 'Half Day' : 'Full Day'}</span>
-                                </div>
+                              <div className="text-[11px] text-slate-600 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
+                                <span>{formatLeaveDays(daysCount)}</span>
+                                <span>•</span>
+                                <span>{req.dayType === 'HALF' ? 'Half Day' : 'Full Day'}</span>
                               </div>
                             </div>
                           </td>
@@ -1007,7 +996,7 @@ const Leaves = () => {
                               <div className="font-extrabold text-slate-900 dark:text-white text-xs truncate max-w-[150px]">
                                 {req.user?.firstName} {req.user?.lastName}
                               </div>
-                              <div className="text-[10px] text-slate-400 font-sans tabular-nums truncate">
+                              <div className="text-[10px] text-[#596780] dark:text-slate-400 font-sans tabular-nums truncate">
                                 {req.user?.employeeCode || req.user?.email}
                               </div>
                             </div>
