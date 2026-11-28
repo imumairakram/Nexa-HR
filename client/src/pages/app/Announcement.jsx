@@ -133,7 +133,28 @@ const Announcement = () => {
         pinned: form.pinned,
       });
 
-      await loadAnnouncements();
+      // Optimistic UI: immediately inject the new announcement from the
+      // server response (or build a local placeholder) so the modal closes
+      // instantly without waiting for a full list refetch.
+      const created =
+        res?.data?.announcement ||
+        res?.announcement ||
+        {
+          id: `local-${Date.now()}`,
+          title: form.title.trim(),
+          category: form.category,
+          priority: form.priority,
+          department: form.department,
+          summary: form.summary.trim() || form.content.slice(0, 140) + '...',
+          content: form.content.trim(),
+          pinned: form.pinned,
+          date: new Date().toISOString().slice(0, 10),
+          author: 'Admin',
+        };
+
+      setAnnouncements((prev) => [created, ...prev]);
+
+      // Close modal and reset form immediately — no blocking refetch
       setIsPostModalOpen(false);
       setForm({
         title: '',
@@ -150,6 +171,9 @@ const Announcement = () => {
 
       setToastMsg('Announcement published! Notifications and emails broadcasted to all employees.');
       setTimeout(() => setToastMsg(''), 4000);
+
+      // Fire-and-forget background sync to reconcile server state
+      loadAnnouncements().catch(() => {});
     } catch (err) {
       console.error('Error posting announcement:', err);
       setToastMsg(err.message || 'Failed to post announcement.');
