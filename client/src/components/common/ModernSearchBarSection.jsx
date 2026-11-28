@@ -125,9 +125,9 @@ const ModernSearchBarSection = ({
       {/* Hidden on mobile — controls move into the Filters panel instead           */}
       {/* ========================================================================= */}
       {hasRow1 && (
-        <div className="hidden sm:flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 w-full min-w-0">
+        <div className="hidden sm:flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 w-full min-w-0">
           {/* Left: Custom Tabs (e.g. Issued Documents vs Policies) + Segmented Status Pills */}
-          <div className="flex items-center gap-2 flex-wrap max-w-full min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap max-w-full min-w-0">
             {customTabs}
             {statusTabs.length > 0 && (
               <div className="flex items-center gap-1 p-1 bg-white dark:bg-[#112229] border border-[#DCE6EA] dark:border-[#223840] rounded-[12px] shadow-2xs overflow-x-auto max-w-full min-w-0 scrollbar-none no-scrollbar">
@@ -138,7 +138,7 @@ const ModernSearchBarSection = ({
                       key={tab.key}
                       type="button"
                       onClick={() => onStatusChange && onStatusChange(tab.key)}
-                      className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-[12px] text-xs sm:text-[13.5px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
+                      className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-[12px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
                         isSelected
                           ? 'bg-[#0E2A33] text-white dark:bg-[#0B3946] dark:text-[#E8F6FA]'
                           : 'text-[#5B727B] hover:text-[#0E2A33] dark:text-[#8FA8B1] dark:hover:text-[#E6F2F5] hover:bg-[#F5F8F9] dark:hover:bg-[#0D1B21]'
@@ -147,7 +147,7 @@ const ModernSearchBarSection = ({
                       <span>{tab.label}</span>
                       {tab.count !== undefined && (
                         <span
-                          className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 ml-0.5 rounded-[10px] transition-all ${
+                          className={`text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-[10px] transition-all ${
                             isSelected
                               ? 'bg-white/20 text-white'
                               : 'bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#5B727B] dark:text-[#8FA8B1]'
@@ -164,7 +164,7 @@ const ModernSearchBarSection = ({
           </div>
 
           {/* Right: Date Range + Sort Controls + Action Button */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto max-w-full">
+          <div className="flex flex-wrap lg:flex-nowrap items-center gap-1.5 sm:gap-2 ml-auto shrink-0 max-w-full">
             {/* Date Range Picker Button */}
             {dateRangeOptions.length > 0 && (
               <div className="relative" ref={dateMenuRef}>
