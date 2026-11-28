@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AppPageHeader from '../../components/navigation/AppPageHeader';
 import SparkMetricCard from '../../components/common/SparkMetricCard';
 import ModernSearchBarSection from '../../components/common/ModernSearchBarSection';
@@ -506,7 +506,7 @@ const Announcement = () => {
           <button
             type="button"
             onClick={() => setIsPostModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-sky-700 hover:bg-sky-800 active:bg-sky-900 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Post Circular</span>
@@ -554,8 +554,8 @@ const Announcement = () => {
                       {getCategoryLabel(item.category)}
                     </span>
 
-                    <span className="text-xs text-slate-400 font-medium">{item.date}</span>
-                    <span className="text-xs text-slate-400 font-medium"> By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{item.date}</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400 font-medium"> By <strong className="font-bold text-slate-900 dark:text-white">{item.author}</strong></span>
                   </div>
 
                   <h3
@@ -577,7 +577,7 @@ const Announcement = () => {
                       <Eye className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                       <span>Read Full Notice</span>
                     </button>
-                    <span className="text-xs text-slate-400 font-medium">Broadcasted to employee portal</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Broadcasted to employee portal</span>
                   </div>
                 </div>
 

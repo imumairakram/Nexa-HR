@@ -322,17 +322,25 @@ const ModernSearchBarSection = ({
                   labelText = labelText.replace(/:+$/, '').trim();
                 }
 
+                // Capitalize label and value for human-readable display
+                const capitalizeText = (text) => {
+                  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                };
+                
+                const displayLabel = labelText ? capitalizeText(labelText) : '';
+                const displayValue = valText ? capitalizeText(valText) : '';
+
                 return (
                   <span
                     key={tag.key}
                     className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-[12px] bg-[#F5F8F9] dark:bg-[#0D1B21] text-[#0E2A33] dark:text-[#E6F2F5] font-mono text-[10px] sm:text-[11px] border border-[#DCE6EA] dark:border-[#223840] shrink-0 whitespace-nowrap"
                   >
-                    {labelText && (
+                    {displayLabel && (
                       <span className="text-[#5B727B] dark:text-[#8FA8B1] font-normal">
-                        {labelText}{valText ? ':' : ''}
+                        {displayLabel}{displayValue ? ':' : ''}
                       </span>
                     )}
-                    {valText && <strong className="font-bold text-[#0E2A33] dark:text-[#E6F2F5]">{valText}</strong>}
+                    {displayValue && <strong className="font-bold text-[#0E2A33] dark:text-[#E6F2F5]">{displayValue}</strong>}
                     {onRemoveTag && (
                       <button
                         type="button"
