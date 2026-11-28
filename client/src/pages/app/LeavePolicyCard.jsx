@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   MoreHorizontal,
   Eye,
@@ -68,7 +68,7 @@ export const QuotaStat = ({ policy }) => {
         <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tabular-nums tracking-tight">
           {quotaDays}
         </span>
-        <span className="text-[11px] sm:text-xs font-semibold text-slate-400 dark:text-slate-500 ml-1.5">
+        <span className="text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1.5">
           days / year
         </span>
       </div>
@@ -122,7 +122,7 @@ export const LeaveCardMenu = ({ policy, onView, onEdit, onDelete }) => {
   }, [isOpen]);
 
   return (
-    <div className="relative shrink-0" ref={menuRef}>
+    <div className="relative z-10 shrink-0" ref={menuRef}>
       <button
         type="button"
         aria-label="More actions"
@@ -198,28 +198,12 @@ export const LeavePolicyCard = ({ policy, onView, onEdit, onDelete }) => {
   const isPaid = isPaidPolicy(policy);
   const PolicyIcon = getPolicyIcon(policy);
 
-  const handleCardClick = () => {
-    onView?.(policy);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onView?.(policy);
-    }
-  };
-
   return (
     <div
-      role="button"
-      tabIndex={0}
-      aria-label={`${policy.name} leave policy details`}
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 text-left h-full"
+      className="relative bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between group text-left h-full"
     >
       <div>
-        {/* Header Row: Left Icon Tile + Title/Pill + Right More Actions Button */}
+        {/* Header Row: Left Icon Tile + Title + Right More Actions Button */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
             {/* Rounded Icon Tile tinted by policy type */}
@@ -233,22 +217,17 @@ export const LeavePolicyCard = ({ policy, onView, onEdit, onDelete }) => {
               <PolicyIcon className="w-5 h-5 stroke-[2]" />
             </div>
 
-            {/* Title & Single Status Pill */}
+            {/* Title (stretched click target) */}
             <div className="min-w-0">
               <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                {policy.name}
-              </h3>
-              <div className="mt-1">
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${
-                    isPaid
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/50'
-                      : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/50'
-                  }`}
+                <button
+                  type="button"
+                  onClick={() => onView?.(policy)}
+                  className="text-left cursor-pointer focus:outline-none focus-visible:underline after:absolute after:inset-0 after:content-[''] after:rounded-2xl"
                 >
-                  {isPaid ? 'Paid' : 'Unpaid'}
-                </span>
-              </div>
+                  {policy.name}
+                </button>
+              </h3>
             </div>
           </div>
 

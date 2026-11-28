@@ -596,12 +596,13 @@ const SparkMetricCard = ({
           {/* Start / End Boundary Labels */}
           {normalizedPoints.length >= 2 && (
             <div
-              className={`w-full flex justify-between items-center text-[9px] sm:text-xs font-medium tracking-tight px-0.5 mt-0.5 select-none ${
+              className={`w-full flex justify-between items-center gap-1.5 text-[9px] sm:text-xs font-medium tracking-tight px-0.5 mt-0.5 select-none ${
                 isDark ? 'text-slate-300' : 'text-[#595959] dark:text-slate-300'
               }`}
             >
-              <span>{normalizedPoints[0]?.label || 'Start'}</span>
-              <span>{normalizedPoints[normalizedPoints.length - 1]?.label || 'Today'}</span>
+              <span className="truncate">{normalizedPoints[0]?.label || 'Start'}</span>
+              <span aria-hidden="true" className="shrink-0 opacity-60">·</span>
+              <span className="truncate">{normalizedPoints[normalizedPoints.length - 1]?.label || 'Today'}</span>
             </div>
           )}
         </div>

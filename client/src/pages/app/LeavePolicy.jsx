@@ -70,16 +70,27 @@ const LeavePolicy = () => {
         'from-slate-600 to-slate-800',
       ];
 
-      const mapped = apiTypes.map((lt, idx) => ({
-        id: lt.id || `lt-${idx}`,
-        name: lt.name,
-        code: lt.code,
-        days: lt.daysAllowed || lt.days || 12,
-        daysAllowed: lt.daysAllowed || lt.days || 12,
-        type: (lt.isPaid !== undefined ? lt.isPaid : lt.type === 'PAID') ? 'PAID' : 'UNPAID',
-        color: colors[idx % colors.length],
-        description: lt.description || `${lt.name} entitlement governed by corporate human resources handbook.`,
-      }));
+      const mapped = apiTypes.map((lt, idx) => {
+        const rawName = (lt.name || '').trim();
+        const isAnnual = rawName.toLowerCase() === 'annual vacations' || rawName.toLowerCase() === 'annual vacation' || rawName.toLowerCase() === 'annual leave';
+        const displayName = (rawName.toLowerCase() === 'annual vacations' || rawName.toLowerCase() === 'annual vacation') ? 'Annual Leave' : rawName;
+        const rawDesc = (lt.description || '').trim();
+        const isGenericDesc = !rawDesc || /governed by (company hr regulations|corporate human resources handbook)/i.test(rawDesc);
+        const description = isAnnual && isGenericDesc
+          ? 'Paid time off for rest, travel, and personal recreation.'
+          : rawDesc || `${displayName} entitlement governed by corporate human resources handbook.`;
+
+        return {
+          id: lt.id || `lt-${idx}`,
+          name: displayName,
+          code: lt.code,
+          days: lt.daysAllowed || lt.days || 12,
+          daysAllowed: lt.daysAllowed || lt.days || 12,
+          type: (lt.isPaid !== undefined ? lt.isPaid : lt.type === 'PAID') ? 'PAID' : 'UNPAID',
+          color: colors[idx % colors.length],
+          description,
+        };
+      });
 
       setPolicies(mapped);
     } catch (err) {
@@ -258,11 +269,17 @@ const LeavePolicy = () => {
 
   const quotaSparkData = useMemo(() => {
     if (!policies.length) return [{ value: 0, label: 'None' }];
-    return policies.map((p, idx) => ({
-      value: p.days || 0,
-      label: p.code || `P${idx + 1}`,
-      tooltip: `${p.name}: ${p.days} Days`,
-    }));
+    return policies.map((p, idx) => {
+      const rawCode = (p.code || '').trim();
+      const formattedLabel = rawCode
+        ? rawCode.charAt(0).toUpperCase() + rawCode.slice(1).toLowerCase()
+        : `P${idx + 1}`;
+      return {
+        value: p.days || 0,
+        label: formattedLabel,
+        tooltip: `${p.name}: ${p.days} Days`,
+      };
+    });
   }, [policies]);
 
   const paidRatioSparkData = useMemo(() => {
@@ -368,13 +385,13 @@ const LeavePolicy = () => {
       </div>
       <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div>
-          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Active Policy Matrices</h3>
-          <p className="text-xs text-slate-400">Rules applied to employee leave quota meters</p>
+          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Active Leave Policies</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400">Rules applied to employee leave allowances and balances.</p>
         </div>
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-[12px] flex items-center gap-1.5 shadow-md shadow-sky-500/20 cursor-pointer transition-all hover:scale-105"
+          className="px-5 py-2.5 bg-[#076d8a] hover:bg-[#065a73] text-white text-xs font-bold rounded-[12px] flex items-center gap-1.5 shadow-md shadow-sky-900/20 cursor-pointer transition-all hover:scale-105"
         >
           <Plus className="w-4 h-4" />
           <span>Add Leave Policy</span>
