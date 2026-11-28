@@ -160,7 +160,7 @@ const Sidebar = ({ isCollapsed = false, toggleSidebar }) => {
     { type: 'link', label: 'Leave', path: '/app/leaves', icon: CalendarDays },
     { type: 'link', label: 'Holiday', path: '/app/holiday/public', icon: Calendar },
     { type: 'link', label: 'Leave Policy', path: '/app/leave-policy', icon: FileText },
-    { type: 'link', label: 'Announcement', path: '/app/announcement', icon: Megaphone },
+    { type: 'link', label: 'Announcements', path: '/app/announcement', icon: Megaphone },
     { type: 'link', label: 'Helpdesk & Support', path: '/app/helpdesk', icon: LifeBuoy },
     { type: 'link', label: 'Documents & Policies', path: '/app/documents', icon: BookOpen },
 

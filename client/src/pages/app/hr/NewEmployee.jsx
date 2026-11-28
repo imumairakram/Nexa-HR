@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -28,7 +28,6 @@ import {
   CreditCard,
 } from 'lucide-react';
 import AppPageHeader from '../../../components/navigation/AppPageHeader';
-import SparkMetricCard from '../../../components/common/SparkMetricCard';
 import { api } from '../../../services/api';
 
 const STEPS = [
@@ -66,10 +65,6 @@ const NewEmployee = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [copiedPassword, setCopiedPassword] = useState(false);
-  const [orgStats, setOrgStats] = useState({
-    totalEmployees: 0,
-    totalDepartments: 0,
-  });
 
   const DEFAULT_DEPARTMENTS = [
     'Human Resources',
@@ -124,11 +119,6 @@ const NewEmployee = () => {
         if (empRes.status === 'fulfilled' && empRes.value?.data?.employees) {
           empCount = empRes.value.data.employees.length;
         }
-
-        setOrgStats({
-          totalEmployees: empCount,
-          totalDepartments: deptCount || deptNames.length || 0,
-        });
 
         if (deptNames.length > 0 || desigTitles.length > 0) {
           setForm((prev) => ({
@@ -208,32 +198,6 @@ const NewEmployee = () => {
       setToastMsg('');
     }, 2500);
   };
-
-  const headcountSparkData = React.useMemo(() => {
-    const total = orgStats.totalEmployees;
-    return [
-      { value: Math.max(0, total - 2), label: 'Mon' },
-      { value: Math.max(0, total - 2), label: 'Tue' },
-      { value: Math.max(0, total - 1), label: 'Wed' },
-      { value: Math.max(0, total - 1), label: 'Thu' },
-      { value: Math.max(0, total), label: 'Fri' },
-      { value: Math.max(0, total), label: 'Sat' },
-      { value: total, label: 'Today' },
-    ];
-  }, [orgStats.totalEmployees]);
-
-  const deptSparkData = React.useMemo(() => {
-    const total = orgStats.totalDepartments;
-    return [
-      { value: Math.max(0, total - 1), label: 'Mon' },
-      { value: Math.max(0, total - 1), label: 'Tue' },
-      { value: Math.max(0, total - 1), label: 'Wed' },
-      { value: Math.max(0, total), label: 'Thu' },
-      { value: Math.max(0, total), label: 'Fri' },
-      { value: Math.max(0, total), label: 'Sat' },
-      { value: total, label: 'Today' },
-    ];
-  }, [orgStats.totalDepartments]);
 
   const handleNext = () => {
     if (currentStep < 5) setCurrentStep(currentStep + 1);
@@ -327,66 +291,6 @@ const NewEmployee = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 2. TELEMETRY KPI CARDS WITH SPARKLINES */}
-      {/* ========================================================================= */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1 */}
-        <SparkMetricCard
-          variant="light"
-          title="Total Headcount"
-          value={orgStats.totalEmployees}
-          unit="Staff"
-          badgeText="Active Roster"
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Synced with directory"
-          chartColor="sky"
-          dataPoints={headcountSparkData}
-        />
-
-        {/* Card 2 */}
-        <SparkMetricCard
-          variant="light"
-          title="Organizational Units"
-          value={orgStats.totalDepartments}
-          unit="Divisions"
-          badgeText="Configured"
-          badgeType="positive"
-          badgeIcon="up"
-          subtext="Active Pipeline"
-          chartColor="emerald"
-          dataPoints={deptSparkData}
-        />
-
-        {/* Card 3 */}
-        <SparkMetricCard
-          variant="light"
-          title="Avg Setup Time"
-          value="< 2"
-          unit="Minutes"
-          badgeText="Automated Flow"
-          badgeType="positive"
-          badgeIcon="dot"
-          subtext="Fast-Track"
-          chartColor="amber"
-          presetWave="wave3"
-        />
-
-        {/* Card 4 */}
-        <SparkMetricCard
-          variant="light"
-          title="Security Access"
-          value="Auto 2FA"
-          unit="RBAC"
-          badgeText="Mandatory Provisioning"
-          badgeType="positive"
-          badgeIcon="dot"
-          subtext="OAuth / SAML"
-          chartColor="rose"
-          presetWave="wave4"
-        />
-      </div>
 
       {/* ========================================================================= */}
       {/* 2. PROGRESS STEPPER */}
@@ -420,8 +324,8 @@ const NewEmployee = () => {
                   {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">STEP 0{step.id}</div>
-                  <div className="font-extrabold text-xs text-slate-900 dark:text-white truncate">{step.label}</div>
+                  <div className="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase">STEP 0{step.id}</div>
+                  <div className="font-extrabold text-xs text-slate-900 dark:text-white whitespace-normal leading-[1.2]">{step.label}</div>
                 </div>
               </div>
             );
@@ -436,8 +340,8 @@ const NewEmployee = () => {
         {currentStep === 1 && (
           <div className="space-y-5 text-xs animate-in fade-in">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Personal & Contact Dossier</h3>
-              <p className="text-xs text-slate-400">Enter government-registered legal name and direct communication channels.</p>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Personal & Contact Details</h3>
+              <p className="text-xs text-slate-400">Enter the employee's legal name and primary contact details.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -467,8 +371,9 @@ const NewEmployee = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Personal Work Email *</label>
+                <label htmlFor="work-email" className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5">Work Email *</label>
                 <input
+                  id="work-email"
                   type="email"
                   required
                   placeholder="jordan.hayes@company.com"
@@ -501,7 +406,7 @@ const NewEmployee = () => {
               </div>
               <div>
                 <label className="block text-slate-700 dark:text-slate-200 font-bold mb-1.5 flex items-center justify-between">
-                  <span>Residential Street Address (Home)</span>
+                  <span>Home Address</span>
                   <span className="text-[10px] text-slate-400 font-normal">Personal Residence</span>
                 </label>
                 <input

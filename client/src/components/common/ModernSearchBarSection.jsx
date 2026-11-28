@@ -370,7 +370,7 @@ const ModernSearchBarSection = ({
           {/* Smart Search Hint & Keyboard Shortcut */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {searchHint && !searchQuery && filterTags.length === 0 && (
-              <span className="hidden sm:inline-block text-xs text-[#5B727B] hover:text-[#0A8FB5] dark:text-[#8FA8B1] dark:hover:text-[#3CC1E6] select-none font-medium transition-colors">
+              <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-[8px] bg-[#F0F7FA] dark:bg-[#0D1B21] border border-[#DCE6EA] dark:border-[#223840] text-[10px] font-mono text-[#5B727B] dark:text-[#8FA8B1] select-none whitespace-nowrap">
                 {searchHint}
               </span>
             )}

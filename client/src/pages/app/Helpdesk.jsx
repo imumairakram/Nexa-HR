@@ -580,7 +580,7 @@ const Helpdesk = () => {
         {/* Card 1: Dark Navy Card - Total Inquiries */}
         <SparkMetricCard
           variant="light"
-          title="Total Employee Tickets"
+          title="Total Tickets"
           value={stats.total}
           unit={stats.total === 1 ? 'Ticket' : 'Tickets'}
           badgeText={`${stats.total} Logged`}
@@ -801,7 +801,7 @@ const Helpdesk = () => {
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>Recent Inquiries</span>
+              <span>Recent Tickets</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
               Track employee requests for hardware, payroll adjustments, and office services.
@@ -844,7 +844,7 @@ const Helpdesk = () => {
                       )}
                       <span>{t.userName || 'Employee'}</span>
                       {t.userEmail && (
-                        <span className="text-slate-500 dark:text-slate-400 font-normal">({t.userEmail})</span>
+                        <span className="text-slate-600 dark:text-slate-300 font-normal">({t.userEmail})</span>
                       )}
                     </div>
 
@@ -861,7 +861,7 @@ const Helpdesk = () => {
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200/60'
                       }`}
                     >
-                      {t.priority} Priority
+                      {t.priority === 'HIGH' ? 'High' : t.priority === 'MEDIUM' ? 'Medium' : 'Low'} priority
                     </span>
 
                     <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">

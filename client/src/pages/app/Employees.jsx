@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -1478,7 +1478,7 @@ NexaHR Workforce Systems`;
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <label className="flex items-center text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide uppercase">
-                          Residential Street Address (Home)
+                          Home Address
                         </label>
                         <span className="text-[11px] text-slate-400">Personal Residence</span>
                       </div>
